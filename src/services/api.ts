@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 // API Configuration
-const API_BASE_URL = import.meta.env.VITE_BASE_URL ? `${import.meta.env.VITE_BASE_URL}/api` : 'https://api.bricolaltd.com/api/';
+const API_BASE_URL = import.meta.env.VITE_BASE_URL ? `${import.meta.env.VITE_BASE_URL}/api` : 'https://api.bricolaltd.com/api';
 const API_TIMEOUT = 60000; // 60 seconds for file uploads
 
 // Create axios instance
