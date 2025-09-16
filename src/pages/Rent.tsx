@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
+import { useAuth } from '@/contexts/AuthContext'
+
 import { useLanguage } from '@/contexts/LanguageContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -39,12 +41,15 @@ import {
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { cn } from '@/lib/utils'
+import { PaymentMethod } from '@/types/bridge'
 
 const Rent = () => {
+  const { user } = useAuth()
   const { id } = useParams()
   const { t, language } = useLanguage()
   const { toast } = useToast()
   const navigate = useNavigate()
+  const location = useLocation()
 
   // State variables
   const [tool, setTool] = useState<Tool | null>(null)
@@ -58,12 +63,8 @@ const Rent = () => {
   const [formData, setFormData] = useState({
     startDate: '',
     endDate: '',
-    pickupTime: '09:00',
+    pickupHour: '09:00',
     message: '',
-    firstName: '',
-    lastName: '',
-    phone: '',
-    phonePrefix: '+965',
     paymentMethod: 'card',
   })
   const [countries, setCountries] = useState<Country[]>([])
@@ -115,7 +116,7 @@ const Rent = () => {
         '2024-01-25',
         '2024-02-01',
         '2024-02-02',
-        '2024-02-10'
+        '2024-02-10',
       ]
       const dates = mockUnavailableDates.map((dateStr) => new Date(dateStr))
       setUnavailableDates(dates)
@@ -129,6 +130,12 @@ const Rent = () => {
   useEffect(() => {
     fetchTool()
   }, [id])
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/login', { state: { from: location } })
+    }
+  }, [user, navigate])
 
   const isDateUnavailable = (date: Date) => {
     return unavailableDates.some(
@@ -183,14 +190,20 @@ const Rent = () => {
     fetchPricing()
   }, [tool, startDate, endDate])
 
-  // Pricing values with fallbacks
-  const basePrice = Number(pricing?.basePrice || tool?.basePrice) || 25
-  const days = Number(pricing?.totalDays || calculateDays()) || 1
-  const totalPrice = Number(pricing?.subtotal) || basePrice * days
-  const totalFees = Number(pricing?.fees) || totalPrice * 0.05
-  const deposit = Number(pricing?.deposit) || 50
+  // Pricing values with fallbacks and validation
+  const basePrice = Math.max(
+    Number(pricing?.basePrice || tool?.basePrice) || 25,
+    0
+  )
+  const days = Math.max(Number(pricing?.totalDays || calculateDays()) || 1, 1)
+  const totalPrice = Math.max(Number(pricing?.subtotal) || basePrice * days, 0)
+  const totalFees = Math.max(Number(pricing?.fees) || totalPrice * 0.05, 0)
+  const deposit = Math.max(Number(pricing?.deposit) || 50, 0)
   const displayPrice = basePrice
-  const totalToPay = Number(pricing?.totalAmount) || totalPrice + totalFees + deposit
+  const totalToPay = Math.max(
+    Number(pricing?.totalAmount) || totalPrice + totalFees + deposit,
+    0
+  )
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -205,12 +218,13 @@ const Rent = () => {
       return
     }
 
-    // Note: Date validation will be handled server-side
-
-    if (!formData.firstName || !formData.lastName || !formData.phone) {
+    // Validate rental period does not exceed 5 days
+    const diffTime = Math.abs(endDate.getTime() - startDate.getTime())
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    if (diffDays > 5) {
       toast({
         title: t('errors.validation_error'),
-        description: t('reservation.fill_required_fields'),
+        description: 'La période de location ne peut pas dépasser 5 jours',
         variant: 'destructive',
       })
       return
@@ -228,20 +242,29 @@ const Rent = () => {
     try {
       setSubmitting(true)
 
+      // Validate totalPrice
+      if (!totalToPay || isNaN(totalToPay) || totalToPay <= 0) {
+        toast({
+          title: t('errors.validation_error'),
+          description: 'Le prix total est invalide. Veuillez réessayer.',
+          variant: 'destructive',
+        })
+        return
+      }
+
       // Create booking data
       const bookingData: CreateBookingData = {
         toolId: tool.id,
         startDate: startDate.toISOString().split('T')[0],
         endDate: endDate.toISOString().split('T')[0],
-        pickupTime: formData.pickupTime,
-        paymentMethod: formData.paymentMethod as 'card' | 'paypal',
+        pickupHour: formData.pickupHour,
+        paymentMethod: formData.paymentMethod as
+          | PaymentMethod.CARD
+          | PaymentMethod.PAYPAL,
         message: formData.message || undefined,
-        renterInfo: {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          phone: formData.phone,
-          phonePrefix: formData.phonePrefix,
-        },
+        renterId: user?.id!,
+        ownerId: tool.ownerId,
+        totalPrice: totalToPay,
       }
 
       // Create the booking
@@ -258,9 +281,82 @@ const Rent = () => {
       }, 2000)
     } catch (err: any) {
       console.error('Booking creation failed:', err)
+
+      // Function to get user-friendly error message
+      const getErrorMessage = (error: any) => {
+        const errorMessage =
+          error.response?.data?.message || error.message || ''
+
+        // Check for specific error types
+        if (
+          errorMessage.includes(
+            'Tool is already booked for the requested dates'
+          )
+        ) {
+          return {
+            title: 'Outil non disponible',
+            description:
+              "Cet outil est déjà réservé pour les dates sélectionnées. Veuillez choisir d'autres dates.",
+          }
+        }
+
+        if (
+          errorMessage.includes('validation') ||
+          errorMessage.includes('Invalid')
+        ) {
+          return {
+            title: 'Erreur de validation',
+            description:
+              'Les informations saisies ne sont pas valides. Veuillez vérifier vos données.',
+          }
+        }
+
+        if (
+          errorMessage.includes('payment') ||
+          errorMessage.includes('Payment')
+        ) {
+          return {
+            title: 'Erreur de paiement',
+            description:
+              'Un problème est survenu lors du traitement du paiement. Veuillez réessayer.',
+          }
+        }
+
+        if (
+          errorMessage.includes('unauthorized') ||
+          errorMessage.includes('Unauthorized')
+        ) {
+          return {
+            title: 'Accès non autorisé',
+            description:
+              'Vous devez être connecté pour effectuer cette action.',
+          }
+        }
+
+        if (
+          errorMessage.includes('not found') ||
+          errorMessage.includes('Not found')
+        ) {
+          return {
+            title: 'Outil introuvable',
+            description:
+              "L'outil sélectionné n'existe plus ou n'est plus disponible.",
+          }
+        }
+
+        // Default error message
+        return {
+          title: 'Erreur lors de la réservation',
+          description:
+            "Une erreur inattendue s'est produite. Veuillez réessayer dans quelques instants.",
+        }
+      }
+
+      const errorInfo = getErrorMessage(err)
+
       toast({
-        title: t('errors.booking_failed'),
-        description: err.message || t('errors.generic_error'),
+        title: errorInfo.title,
+        description: errorInfo.description,
         variant: 'destructive',
       })
     } finally {
@@ -452,10 +548,25 @@ const Rent = () => {
                                 selected={endDate}
                                 onSelect={setEndDate}
                                 disabled={(date) => {
-                                  return (
+                                  if (
                                     date < (startDate || new Date()) ||
                                     isDateUnavailable(date)
-                                  )
+                                  ) {
+                                    return true
+                                  }
+
+                                  // Disable dates that would exceed 5 days rental period
+                                  if (startDate) {
+                                    const diffTime = Math.abs(
+                                      date.getTime() - startDate.getTime()
+                                    )
+                                    const diffDays = Math.ceil(
+                                      diffTime / (1000 * 60 * 60 * 24)
+                                    )
+                                    return diffDays > 5
+                                  }
+
+                                  return false
                                 }}
                                 modifiers={{
                                   unavailable: unavailableDates,
@@ -476,13 +587,13 @@ const Rent = () => {
                       </div>
 
                       <div className='space-y-2'>
-                        <Label htmlFor='pickupTime'>
+                        <Label htmlFor='pickupHour'>
                           {t('reservation.pickup_time')}
                         </Label>
                         <Select
-                          value={formData.pickupTime}
+                          value={formData.pickupHour}
                           onValueChange={(value) =>
-                            setFormData({ ...formData, pickupTime: value })
+                            setFormData({ ...formData, pickupHour: value })
                           }
                         >
                           <SelectTrigger>
@@ -516,101 +627,6 @@ const Rent = () => {
                           setFormData({ ...formData, message: e.target.value })
                         }
                       />
-                    </div>
-
-                    {/* Informations personnelles */}
-                    <div className='space-y-4'>
-                      <h3 className='font-semibold text-lg'>
-                        {t('reservation.contact_information')}
-                      </h3>
-                      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                        <div className='space-y-2'>
-                          <Label htmlFor='firstName'>
-                            {t('general.first_name')} *
-                          </Label>
-                          <Input
-                            id='firstName'
-                            placeholder={t('general.first_name_placeholder')}
-                            value={formData.firstName}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                firstName: e.target.value,
-                              })
-                            }
-                            required
-                          />
-                        </div>
-                        <div className='space-y-2'>
-                          <Label htmlFor='lastName'>
-                            {t('general.last_name')} *
-                          </Label>
-                          <Input
-                            id='lastName'
-                            placeholder={t('general.last_name_placeholder')}
-                            value={formData.lastName}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                lastName: e.target.value,
-                              })
-                            }
-                            required
-                          />
-                        </div>
-                      </div>
-                      {/* Téléphone avec préfixe */}
-                      <div className='space-y-2'>
-                        <Label htmlFor='phone'>{t('register.phone')}</Label>
-                        <div className='flex space-x-2'>
-                          <Select
-                            value={formData.phonePrefix}
-                            onValueChange={(value) =>
-                              setFormData({ ...formData, phonePrefix: value })
-                            }
-                            disabled={loadingCountries}
-                          >
-                            <SelectTrigger className='w-32'>
-                              {loadingCountries ? (
-                                <div className='flex items-center gap-2'>
-                                  <Loader2 className='h-4 w-4 animate-spin' />
-                                  <span>Loading</span>
-                                </div>
-                              ) : (
-                                <SelectValue />
-                              )}
-                            </SelectTrigger>
-                            <SelectContent>
-                              {phonePrefixes.map((prefix) => (
-                                <SelectItem
-                                  key={prefix.value}
-                                  value={prefix.value}
-                                >
-                                  <img
-                                    src={`https://flagcdn.com/16x12/${prefix.flag}.png`}
-                                    alt=''
-                                    className='inline w-4 h-3 mr-2'
-                                  />
-                                  {prefix.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <Input
-                            id='phone'
-                            type='tel'
-                            placeholder='12 34 56 78'
-                            className='flex-1'
-                            value={formData.phone}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                phone: e.target.value,
-                              })
-                            }
-                          />
-                        </div>
-                      </div>
                     </div>
 
                     {/* Mode de paiement */}

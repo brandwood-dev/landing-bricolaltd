@@ -24,8 +24,15 @@ const FeaturedToolsSection = () => {
       try {
         setLoading(true);
         setError(null);
-        const featuredTools = await toolsService.getFeaturedTools(8);
-        setTools(featuredTools);
+        const featuredTools = await toolsService.getFeaturedTools(12);
+        
+        // Ensure featuredTools is always an array
+        if (Array.isArray(featuredTools)) {
+          setTools(featuredTools);
+        } else {
+          console.warn('Featured tools is not an array:', featuredTools);
+          setTools([]);
+        }
       } catch (err: any) {
         console.error('Error fetching featured tools:', err);
         setError(err.message);
@@ -136,7 +143,7 @@ const FeaturedToolsSection = () => {
           className="w-full"
         >
           <CarouselContent className="-ml-2 md:-ml-4">
-            {tools.map((tool) => {
+            {Array.isArray(tools) && tools.map((tool) => {
               const displayPrice = calculateDisplayPrice(tool.basePrice);
               return (
                 <CarouselItem key={tool.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/4">

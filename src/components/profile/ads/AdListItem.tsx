@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
@@ -9,17 +9,49 @@ import { Edit, Eye, Trash2 } from 'lucide-react';
 import AdEditDialog from '../AdEditDialog';
 import AdViewDialog from '../AdViewDialog';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { ModerationStatus } from '@/types/bridge/enums';
+import { toolsService, Tool } from '@/services/toolsService';
+import { useToast } from '@/hooks/use-toast';
 
 interface AdListItemProps {
   ad: any;
   onPublishToggle: (adId: string, published: boolean) => void;
   onDeleteAd: (adId: string) => void;
+  onRefresh: () => void;
   getValidationStatusColor: (status: string) => string;
   getValidationStatusText: (status: string) => string;
 }
 
-const AdListItem = ({ ad, onPublishToggle, onDeleteAd, getValidationStatusColor, getValidationStatusText }: AdListItemProps) => {
+const AdListItem = ({ ad, onPublishToggle, onDeleteAd, onRefresh, getValidationStatusColor, getValidationStatusText }: AdListItemProps) => {
   const { t, language } = useLanguage();
+  const { toast } = useToast();
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [toolData, setToolData] = useState<Tool | null>(null);
+
+  const handleEditClick = async () => {
+    try {
+      const tool = await toolsService.getTool(ad.id);
+      setToolData(tool);
+      setIsEditDialogOpen(true);
+    } catch (error) {
+      console.error('Error fetching tool details:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de charger les détails de l\'outil',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleEditSave = () => {
+    onRefresh();
+    setIsEditDialogOpen(false);
+  };
+
+  const handleEditClose = () => {
+    setIsEditDialogOpen(false);
+    setToolData(null);
+  };
   return (
     <div className="border rounded-lg p-3 flex items-center gap-4">
       <img 
@@ -34,28 +66,35 @@ const AdListItem = ({ ad, onPublishToggle, onDeleteAd, getValidationStatusColor,
       <Badge className={getValidationStatusColor(ad.validationStatus)} variant="outline">
         {getValidationStatusText(ad.validationStatus)}
       </Badge>
-      <div className="flex items-center space-x-2">
-        <Switch
-          id={`list-published-${ad.id}`}
-          checked={ad.published}
-          onCheckedChange={(checked) => onPublishToggle(ad.id, checked)}
-        />
-        <Label htmlFor={`list-published-${ad.id}`} className="text-xs">
-          {ad.published ? t('general.published') : t('general.unpublished')}
-        </Label>
-      </div>
+      {ad.moderationStatus === ModerationStatus.CONFIRMED && (
+        <div className="flex items-center space-x-2">
+          <Switch
+            id={`list-published-${ad.id}`}
+            checked={ad.published}
+            onCheckedChange={(checked) => onPublishToggle(ad.id, checked)}
+          />
+          <Label htmlFor={`list-published-${ad.id}`} className="text-xs">
+            {ad.published ? t('general.published') : t('general.unpublished')}
+          </Label>
+        </div>
+      )}
       <div className="font-semibold text-sm text-primary">
         {ad.price}€/{t('general.day')}
       </div>
       <div className="flex gap-1">
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outline" size="sm">
-              <Edit className="h-3 w-3" />
-            </Button>
-          </DialogTrigger>
-          <AdEditDialog ad={ad} />
-        </Dialog>
+        <Button variant="outline" size="sm" onClick={handleEditClick}>
+          <Edit className="h-3 w-3" />
+        </Button>
+        
+        {toolData && (
+          <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+            <AdEditDialog 
+              ad={toolData} 
+              onClose={handleEditClose}
+              onSave={handleEditSave}
+            />
+          </Dialog>
+        )}
         
         <Dialog>
           <DialogTrigger asChild>

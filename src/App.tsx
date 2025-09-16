@@ -41,6 +41,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import PolitiqueAnnulation from "./pages/PolitiqueAnnulation";
 import PolitiqueRemboursement from "./pages/PolitiqueRemboursement";
 import NotificationsPage from "./pages/NotificationsPage";
+import CategorySelectorExample from "./pages/CategorySelectorExample";
 
 const queryClient = new QueryClient();
 
@@ -121,6 +122,7 @@ const App = () => (
                 <Route path="/politique-annulation" element={<PolitiqueAnnulation />} />
                 <Route path="/politique-remboursement" element={<PolitiqueRemboursement />} />
                 <Route path="/under-age" element={<UnderAge />} />
+                <Route path="/category-selector-example" element={<CategorySelectorExample />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

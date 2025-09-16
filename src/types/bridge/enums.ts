@@ -3,11 +3,11 @@
 // Booking Status Enum (from api/src/bookings/enums/booking-status.enum.ts)
 export enum BookingStatus {
   PENDING = 'PENDING',
-  CONFIRMED = 'CONFIRMED',
-  REJECTED = 'REJECTED',
-  APPROVED = 'APPROVED',
-  CANCELLED = 'CANCELLED',
+  ACCEPTED = 'ACCEPTED',
+  ONGOING = 'ONGOING',
   COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+  REJECTED = 'REJECTED',
 }
 
 // Payment Status Enum
@@ -29,11 +29,14 @@ export enum PaymentMethod {
 // Tool Status Enum
 export enum ToolStatus {
   DRAFT = 'DRAFT',
-  PENDING_APPROVAL = 'PENDING_APPROVAL',
-  APPROVED = 'APPROVED',
-  REJECTED = 'REJECTED',
-  SUSPENDED = 'SUSPENDED',
-  DELETED = 'DELETED',
+  PUBLISHED = 'PUBLISHED',
+}
+
+// Moderation Status Enum
+export enum ModerationStatus {
+  PENDING = 'Pending',
+  CONFIRMED = 'Confirmed',
+  REJECTED = 'Rejected',
 }
 
 // Availability Status Enum

@@ -58,7 +58,8 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination'
 import { useLanguage } from '@/contexts/LanguageContext'
-
+import { bookingService } from '@/services/bookingService'
+import { Booking, BookingStatus } from '@/types/bridge'
 interface Reservation {
   id: string
   referenceId: string
@@ -68,18 +69,17 @@ interface Reservation {
   owner: string
   ownerEmail: string
   ownerPhone: string
+  renterName: string
+  renterEmail: string
+  renterPhone: string
   startDate: string
   endDate: string
-  status:
-    | 'pending'
-    | 'accepted'
-    | 'ongoing'
-    | 'completed'
-    | 'cancelled'
-    | 'rejected'
+  pickupHour: string
+  status: BookingStatus
   price: number
   dailyPrice: number
   location: string
+  message: string
   validationCode?: string
   hasActiveClaim?: boolean
   cancellationReason?: string
@@ -112,198 +112,94 @@ const Reservations = () => {
   const [itemsPerPage] = useState(5)
   const { toast } = useToast()
 
-  const [reservations, setReservations] = useState<Reservation[]>([
-    {
-      id: '1',
-      referenceId: 'RES-2024-001',
-      toolName: 'Perceuse sans fil',
-      toolDescription: 'Perceuse visseuse sans fil 18V avec 2 batteries',
+  const [reservations, setReservations] = useState<Reservation[]>([])
+  const transformBookingToReservation = (booking: Booking): Reservation => {
+    return {
+      id: booking.id,
+      referenceId: `RES-${booking.id}`,
+      toolName: booking.tool?.title || t('general.tool_not_specified'),
+      toolDescription: booking.tool?.description || '',
       toolImage:
+        booking.tool?.photos?.[0]?.url ||
         'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=400&h=300&fit=crop',
-      owner: 'Marie Dubois',
-      ownerEmail: 'marie.dubois@email.com',
-      ownerPhone: '+33 6 87 65 43 21',
-      startDate: '2024-01-15',
-      endDate: '2024-01-17',
-      status: 'pending',
-      price: 25,
-      dailyPrice: 12.5,
-      location: 'Paris 15ème',
-    },
-    {
-      id: '2',
-      referenceId: 'RES-2024-002',
-      toolName: 'Scie circulaire',
-      toolDescription: 'Scie circulaire 1400W avec lame carbure',
-      toolImage:
-        'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=400&h=300&fit=crop',
-      owner: 'Paul Martin',
-      ownerEmail: 'paul.martin@email.com',
-      ownerPhone: '+33 6 11 22 33 44',
-      startDate: '2024-01-20',
-      endDate: '2024-01-22',
-      status: 'accepted',
-      price: 35,
-      dailyPrice: 17.5,
-      location: 'Paris 12ème',
-      validationCode: 'ABC123',
-    },
-    {
-      id: '3',
-      referenceId: 'RES-2024-003',
-      toolName: 'Ponceuse orbitale',
-      toolDescription: 'Ponceuse orbitale 240W avec disques',
-      toolImage:
-        'https://images.unsplash.com/photo-1609592242810-8de8b4c6e0bc?w=400&h=300&fit=crop',
-      owner: 'Sophie Durand',
-      ownerEmail: 'sophie.durand@email.com',
-      ownerPhone: '+33 6 98 76 54 32',
-      startDate: '2024-01-25',
-      endDate: '2024-01-26',
-      status: 'ongoing',
-      price: 20,
-      dailyPrice: 20,
-      location: 'Paris 8ème',
-      validationCode: 'XYZ789',
-    },
-    {
-      id: '4',
-      referenceId: 'RES-2024-004',
-      toolName: 'Échelle télescopique',
-      toolDescription: 'Échelle télescopique 3.8m, charge max 150kg',
-      toolImage:
-        'https://images.unsplash.com/photo-1631047038830-c6c8e1af70b9?w=400&h=300&fit=crop',
-      owner: 'Marc Dubois',
-      ownerEmail: 'marc.dubois@email.com',
-      ownerPhone: '+33 6 22 33 44 55',
-      startDate: '2024-01-10',
-      endDate: '2024-01-12',
-      status: 'cancelled',
-      price: 40,
-      dailyPrice: 20,
-      location: 'Paris 14ème',
-      cancellationReason: 'Changement de plans',
-      cancellationMessage: "Je ne peux plus utiliser l'outil à ces dates.",
-    },
-    {
-      id: '5',
-      referenceId: 'RES-2024-005',
-      toolName: 'Marteau-piqueur',
-      toolDescription: 'Marteau-piqueur électrique 1500W avec 3 burins',
-      toolImage:
-        'https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=400&h=300&fit=crop',
-      owner: 'Claire Martin',
-      ownerEmail: 'claire.martin@email.com',
-      ownerPhone: '+33 6 55 44 33 22',
-      startDate: '2024-01-05',
-      endDate: '2024-01-07',
-      status: 'completed',
-      price: 60,
-      dailyPrice: 30,
-      location: 'Paris 11ème',
-    },
-    {
-      id: '6',
-      referenceId: 'RES-2024-006',
-      toolName: 'Niveau laser',
-      toolDescription: 'Niveau laser rotatif avec trépied',
-      toolImage:
-        'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=400&h=300&fit=crop',
-      owner: 'Thomas Bernard',
-      ownerEmail: 'thomas.bernard@email.com',
-      ownerPhone: '+33 6 77 88 99 00',
-      startDate: '2024-01-08',
-      endDate: '2024-01-10',
-      status: 'rejected',
-      price: 45,
-      dailyPrice: 22.5,
-      location: 'Paris 18ème',
-    },
-    {
-      id: '7',
-      referenceId: 'RES-2024-007',
-      toolName: 'Aspirateur de chantier',
-      toolDescription: 'Aspirateur eau et poussière 30L',
-      toolImage:
-        'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop',
-      owner: 'Alex Dupont',
-      ownerEmail: 'alex.dupont@email.com',
-      ownerPhone: '+33 6 99 88 77 66',
-      startDate: '2024-01-28',
-      endDate: '2024-01-30',
-      status: 'pending',
-      price: 50,
-      dailyPrice: 25,
-      location: 'Paris 13ème',
-    },
-    {
-      id: '8',
-      referenceId: 'RES-2024-008',
-      toolName: "Compresseur d'air",
-      toolDescription: 'Compresseur 50L avec pistolet de soufflage',
-      toolImage:
-        'https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=400&h=300&fit=crop',
-      owner: 'Laurent Petit',
-      ownerEmail: 'laurent.petit@email.com',
-      ownerPhone: '+33 6 44 55 66 77',
-      startDate: '2024-02-01',
-      endDate: '2024-02-03',
-      status: 'accepted',
-      price: 60,
-      dailyPrice: 30,
-      location: 'Paris 17ème',
-      validationCode: 'DEF456',
-    },
-    {
-      id: '9',
-      referenceId: 'RES-2024-009',
-      toolName: "Meuleuse d'angle",
-      toolDescription: 'Meuleuse 125mm avec disques de coupe',
-      toolImage:
-        'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=400&h=300&fit=crop',
-      owner: 'Emma Wilson',
-      ownerEmail: 'emma.wilson@email.com',
-      ownerPhone: '+33 6 33 22 11 00',
-      startDate: '2024-02-05',
-      endDate: '2024-02-06',
-      status: 'ongoing',
-      price: 25,
-      dailyPrice: 25,
-      location: 'Paris 19ème',
-      validationCode: 'GHI789',
-    },
-    {
-      id: '10',
-      referenceId: 'RES-2024-010',
-      toolName: 'Débroussailleuse',
-      toolDescription: 'Débroussailleuse thermique 2 temps',
-      toolImage:
-        'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop',
-      owner: 'Nicolas Roy',
-      ownerEmail: 'nicolas.roy@email.com',
-      ownerPhone: '+33 6 12 34 56 78',
-      startDate: '2024-02-10',
-      endDate: '2024-02-12',
-      status: 'completed',
-      price: 75,
-      dailyPrice: 37.5,
-      location: 'Paris 20ème',
-    },
-  ])
+      owner:
+        `${booking.tool?.owner?.firstName || ''} ${
+          booking.tool?.owner?.lastName || ''
+        }`.trim() || t('general.unknown_owner'),
+      ownerEmail: booking.tool?.owner?.email || '',
+      ownerPhone: booking.tool?.owner?.phone || '',
+      renterName:
+        `${booking.renter?.firstName || ''} ${
+          booking.renter?.lastName || ''
+        }`.trim() || t('general.unknown_renter'),
+      renterEmail: booking.renter?.email || '',
+      renterPhone: booking.renter?.phone || '',
+      pickupHour: booking.pickupHour,
+      startDate: booking.startDate,
+      endDate: booking.endDate,
+      message: booking.message,
+      status: booking.status,
+      price: booking.totalAmount || 0,
+      dailyPrice: booking.basePrice || 0,
+      location:
+        booking.tool?.pickupAddress || t('general.location_not_specified'),
+      validationCode: `VAL-${booking.id.slice(-6).toUpperCase()}`,
+      hasActiveClaim: booking.hasActiveClaim,
+      cancellationReason: booking.cancellationReason,
+      cancellationMessage: booking.cancellationMessage,
+      renterHasReturned: booking.renterHasReturned,
+      hasUsedReturnButton: booking.hasUsedReturnButton,
+    }
+  }
+
+  // API data loading
+  const loadBookings = async () => {
+    if (!user?.id) {
+      setError(t('auth.user_not_found'))
+      setLoading(false)
+      return
+    }
+
+    try {
+      setLoading(true)
+      setError(null)
+      const bookingsData = await bookingService.getUserBookings(user.id, {
+        page: 1,
+        limit: 100,
+      })
+      const transformedReservations = bookingsData.map(
+        transformBookingToReservation
+      )
+      setReservations(transformedReservations)
+      // setBookings(transformedReservations)
+    } catch (err: any) {
+      setError(err.message || t('reservation.load_error'))
+      setReservations([])
+      // setBookings([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (user?.id) {
+      loadBookings()
+    }
+  }, [user?.id])
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending':
+      case 'PENDING':
         return 'bg-yellow-100 text-yellow-800'
-      case 'accepted':
+      case 'ACCEPTED':
         return 'bg-green-100 text-green-800'
-      case 'ongoing':
+      case 'ONGOING':
         return 'bg-blue-100 text-blue-800'
-      case 'completed':
+      case 'COMPLETED':
         return 'bg-emerald-100 text-emerald-800'
-      case 'cancelled':
+      case 'CANCELLED':
         return 'bg-red-100 text-red-800'
-      case 'rejected':
+      case 'REJECTED':
         return 'bg-red-100 text-red-800'
       default:
         return 'bg-gray-100 text-gray-800'
@@ -312,17 +208,17 @@ const Reservations = () => {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'pending':
+      case 'PENDING':
         return 'En attente'
-      case 'accepted':
+      case 'ACCEPTED':
         return 'Acceptée'
-      case 'ongoing':
+      case 'ONGOING':
         return 'En cours'
-      case 'completed':
+      case 'COMPLETED':
         return 'Terminée'
-      case 'cancelled':
+      case 'CANCELLED':
         return 'Annulée'
-      case 'rejected':
+      case 'REJECTED':
         return 'Refusée'
       default:
         return status
@@ -337,6 +233,7 @@ const Reservations = () => {
     return today < start
   }
 
+  //doit etre dynamic
   const handleCancelReservation = (reservationId: string) => {
     if (!cancellationReason) {
       toast({
@@ -346,13 +243,12 @@ const Reservations = () => {
       })
       return
     }
-
     setReservations((prev) =>
       prev.map((res) =>
         res.id === reservationId
           ? {
               ...res,
-              status: 'cancelled' as const,
+              status: 'CANCELLED' as const,
               cancellationReason,
               cancellationMessage,
             }
@@ -361,8 +257,8 @@ const Reservations = () => {
     )
 
     toast({
-      title: t('booking.cancelled'),
-      description: t('booking.cancelled_message'),
+      title: t('booking.CANCELLED'),
+      description: t('booking.CANCELLED_message'),
     })
 
     setCancellationReason('')
@@ -377,12 +273,12 @@ const Reservations = () => {
       ownerName: reservation.owner,
       ownerEmail: reservation.ownerEmail,
       ownerPhone: reservation.ownerPhone,
-      renterName: 'Jean Dupont', // Current user
-      renterEmail: 'jean.dupont@email.com',
-      renterPhone: '+33 6 12 34 56 78',
+      renterName: reservation.renterName, // Current user
+      renterEmail: reservation.renterEmail,
+      renterPhone: reservation.renterPhone,
       startDate: reservation.startDate,
       endDate: reservation.endDate,
-      pickupTime: '14:00',
+      pickupHour: reservation.pickupHour,
       totalPrice: reservation.price,
       dailyPrice: reservation.dailyPrice,
     }
@@ -396,6 +292,7 @@ const Reservations = () => {
     })
   }
 
+  //doit etre dynamic
   const handleReport = (reservationId: string) => {
     if (!reportReason) {
       toast({
@@ -414,8 +311,8 @@ const Reservations = () => {
     )
 
     toast({
-      title: t('request.report.accepted.title'),
-      description: t('request.report.accepted.message'),
+      title: t('request.report.ACCEPTED.title'),
+      description: t('request.report.ACCEPTED.message'),
     })
 
     setReportReason('')
@@ -427,6 +324,7 @@ const Reservations = () => {
     setIsReturnDialogOpen(true)
   }
 
+  //doit etre dynamic
   const handleConfirmReturn = () => {
     setReservations((prev) =>
       prev.map((res) =>
@@ -453,7 +351,7 @@ const Reservations = () => {
     setIsReturnDialogOpen(false)
     setIsClaimDialogOpen(true)
   }
-
+  // doit etre dynamic -> save in bookings -> save in disputes (add attribut photo)
   const handleSubmitClaim = () => {
     if (!claimType || !claimDescription) {
       toast({
@@ -523,12 +421,12 @@ const Reservations = () => {
   }
 
   const statusOptions = [
-    { value: 'pending', label: 'En attente' },
-    { value: 'accepted', label: 'Acceptée' },
-    { value: 'ongoing', label: 'En cours' },
-    { value: 'completed', label: 'Terminée' },
-    { value: 'cancelled', label: 'Annulée' },
-    { value: 'rejected', label: 'Refusée' },
+    { value: 'PENDING', label: 'En attente' },
+    { value: 'ACCEPTED', label: 'Acceptée' },
+    { value: 'ONGOING', label: 'En cours' },
+    { value: 'COMPLETED', label: 'Terminée' },
+    { value: 'CANCELLED', label: 'Annulée' },
+    { value: 'REJECTED', label: 'Refusée' },
   ]
 
   // Données à paginer
@@ -595,7 +493,7 @@ const Reservations = () => {
                           <Badge className={getStatusColor(reservation.status)}>
                             {t(`general.${reservation.status}`)}
                           </Badge>
-                          {reservation.status === 'ongoing' &&
+                          {reservation.status === 'ONGOING' &&
                             reservation.renterHasReturned && (
                               <Badge
                                 variant='outline'
@@ -604,8 +502,8 @@ const Reservations = () => {
                                 {t('booking.wait')}
                               </Badge>
                             )}
-                          {(reservation.status === 'ongoing' ||
-                            reservation.status === 'accepted') &&
+                          {(reservation.status === 'ONGOING' ||
+                            reservation.status === 'ACCEPTED') &&
                             reservation.hasActiveClaim && (
                               <Badge
                                 variant='outline'
@@ -665,7 +563,7 @@ const Reservations = () => {
                     {/* Actions */}
                     <div className='flex gap-2 flex-wrap'>
                       {/* Actions pour statut "En attente" */}
-                      {reservation.status === 'pending' && (
+                      {reservation.status === 'PENDING' && (
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button variant='outline' size='sm'>
@@ -730,7 +628,7 @@ const Reservations = () => {
                       )}
 
                       {/* Actions pour statut "Acceptée" */}
-                      {reservation.status === 'accepted' && (
+                      {reservation.status === 'ACCEPTED' && (
                         <>
                           <Dialog>
                             <DialogTrigger asChild>
@@ -981,7 +879,7 @@ const Reservations = () => {
                       )}
 
                       {/* Actions pour statut "En cours" */}
-                      {reservation.status === 'ongoing' && (
+                      {reservation.status === 'ONGOING' && (
                         <>
                           <Button
                             variant='outline'
@@ -1120,7 +1018,7 @@ const Reservations = () => {
                       )}
 
                       {/* Bouton pour voir les détails d'annulation */}
-                      {reservation.status === 'cancelled' && (
+                      {reservation.status === 'CANCELLED' && (
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button variant='outline' size='sm'>
@@ -1160,7 +1058,7 @@ const Reservations = () => {
                     </div>
 
                     {/* Section code de validation modernisée */}
-                    {reservation.status === 'accepted' &&
+                    {reservation.status === 'ACCEPTED' &&
                       reservation.validationCode && (
                         <div className='mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200'>
                           <div className='flex items-center justify-between'>

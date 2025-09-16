@@ -2,7 +2,7 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 // API Configuration
 const API_BASE_URL = import.meta.env.VITE_BASE_URL ? `${import.meta.env.VITE_BASE_URL}/api` : 'http://localhost:4000/api';
-const API_TIMEOUT = 60000; // 60 seconds for file uploads
+const API_TIMEOUT = 120000; // 120 seconds for file uploads
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({
@@ -55,10 +55,24 @@ apiClient.interceptors.response.use(
   },
   (error) => {
     console.error('🌐 API Response Error Interceptor:');
-    console.error('🌐 - Error object:', error);
+    // Create a serializable error object to avoid circular references
+    const serializableError = {
+      message: error.message,
+      name: error.name,
+      stack: error.stack,
+      config: error.config ? {
+        url: error.config.url,
+        method: error.config.method,
+        baseURL: error.config.baseURL
+      } : undefined,
+      response: error.response ? {
+        status: error.response.status,
+        statusText: error.response.statusText,
+        data: error.response.data
+      } : undefined
+    };
+    console.error('🌐 - Error details:', serializableError);
     console.error('🌐 - Error message:', error.message);
-    console.error('🌐 - Error config:', error.config);
-    console.error('🌐 - Error response:', error.response);
     console.error('🌐 - Error response status:', error.response?.status);
     console.error('🌐 - Error response data:', error.response?.data);
     

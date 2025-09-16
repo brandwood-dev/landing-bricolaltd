@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { toolsService, Tool } from '@/services/toolsService';
+import { ModerationStatus } from '@/types/bridge/enums';
 import MyAdsSearchAndFilters from './MyAdsSearchAndFilters';
 import AdCard from './ads/AdCard';
 import AdListItem from './ads/AdListItem';
@@ -21,6 +22,7 @@ interface Ad {
   price: number;
   published: boolean;
   validationStatus: 'confirmed' | 'pending' | 'rejected';
+  moderationStatus: string;
   rating: number;
   totalRentals: number;
   image: string;
@@ -46,11 +48,11 @@ const MyAds = () => {
 
   // Transform Tool to Ad for compatibility with existing components
   const transformToolToAd = (tool: Tool): Ad => {
-    const getValidationStatus = (status: string): 'confirmed' | 'pending' | 'rejected' => {
-      switch (status) {
-        case 'PUBLISHED': return 'confirmed';
-        case 'UNDER_REVIEW': return 'pending';
-        case 'REJECTED': return 'rejected';
+    const getValidationStatus = (moderationStatus: string): 'confirmed' | 'pending' | 'rejected' => {
+      switch (moderationStatus) {
+        case ModerationStatus.CONFIRMED: return 'confirmed';
+        case ModerationStatus.PENDING: return 'pending';
+        case ModerationStatus.REJECTED: return 'rejected';
         default: return 'pending';
       }
     };
@@ -60,8 +62,9 @@ const MyAds = () => {
       title: tool.title,
       category: tool.category?.displayName || tool.category?.name || 'Non catégorisé',
       price: tool.basePrice,
-      published: tool.toolStatus === 'PUBLISHED' && tool.isAvailable,
-      validationStatus: getValidationStatus(tool.toolStatus),
+      published: tool.moderationStatus === ModerationStatus.CONFIRMED && tool.toolStatus === 'PUBLISHED' && tool.isAvailable,
+      validationStatus: getValidationStatus(tool.moderationStatus),
+      moderationStatus: tool.moderationStatus,
       rating: 0, // Rating would need to come from reviews/bookings data
       totalRentals: 0, // This would need to come from bookings data
       image: tool.photos?.[0]?.url || '/placeholder.svg'
@@ -267,6 +270,7 @@ const MyAds = () => {
                 ad={ad}
                 onPublishToggle={handlePublishToggle}
                 onDeleteAd={handleDeleteAd}
+                onRefresh={refreshAds}
                 getValidationStatusColor={getValidationStatusColor}
                 getValidationStatusText={getValidationStatusText}
               />
@@ -276,6 +280,7 @@ const MyAds = () => {
                 ad={ad}
                 onPublishToggle={handlePublishToggle}
                 onDeleteAd={handleDeleteAd}
+                onRefresh={refreshAds}
                 getValidationStatusColor={getValidationStatusColor}
                 getValidationStatusText={getValidationStatusText}
               />

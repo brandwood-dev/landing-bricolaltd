@@ -34,7 +34,7 @@ export class BookingService {
   }
 
   // Get user's bookings (as renter)
-  async getUserBookings(filters?: BookingFilters): Promise<PaginatedResponse<Booking>> {
+  async getUserBookings(userId: string, filters?: BookingFilters): Promise<Booking[]> {
     try {
       const params = new URLSearchParams();
       
@@ -49,7 +49,9 @@ export class BookingService {
         if (filters.sortOrder) params.append('sortOrder', filters.sortOrder);
       }
       
-      const response = await api.get<ApiResponse<PaginatedResponse<Booking>>>(`/bookings/user/renter?${params.toString()}`);
+      const queryString = params.toString();
+      const url = queryString ? `/bookings/user/${userId}?${queryString}` : `/bookings/user/${userId}`;
+      const response = await api.get<ApiResponse<Booking[]>>(url);
       return response.data.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch user bookings');
@@ -57,7 +59,7 @@ export class BookingService {
   }
 
   // Get owner's bookings (tools being rented)
-  async getOwnerBookings(filters?: BookingFilters): Promise<PaginatedResponse<Booking>> {
+  async getOwnerBookings(userId: string, filters?: BookingFilters): Promise<{ data: Booking[] }> {
     try {
       const params = new URLSearchParams();
       
@@ -72,17 +74,23 @@ export class BookingService {
         if (filters.sortOrder) params.append('sortOrder', filters.sortOrder);
       }
       
-      const response = await api.get<ApiResponse<PaginatedResponse<Booking>>>(`/bookings/user/owner?${params.toString()}`);
-      return response.data.data;
+      const queryString = params.toString();
+      const url = queryString ? `/bookings/user/owner/${userId}?${queryString}` : `/bookings/user/owner/${userId}`;
+      const response = await api.get<ApiResponse<Booking[]>>(url);
+      return { data: response.data.data };
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch owner bookings');
     }
   }
 
   // Update booking status
-  async updateBookingStatus(id: string, status: Booking['status']): Promise<Booking> {
+  async updateBookingStatus(id: string, statusOrData: Booking['status'] | { status?: Booking['status']; pickupTool?: boolean }): Promise<Booking> {
     try {
-      const response = await api.patch<ApiResponse<Booking>>(`/bookings/${id}/status`, { status });
+      const updateData = typeof statusOrData === 'string' 
+        ? { status: statusOrData }
+        : statusOrData;
+      
+      const response = await api.patch<ApiResponse<Booking>>(`/bookings/${id}`, updateData);
       return response.data.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to update booking status');
@@ -90,12 +98,50 @@ export class BookingService {
   }
 
   // Cancel booking
-  async cancelBooking(id: string, reason?: string): Promise<Booking> {
+  async cancelBooking(id: string, reason?: string, cancellationMessage?: string): Promise<Booking> {
     try {
-      const response = await api.patch<ApiResponse<Booking>>(`/bookings/${id}/cancel`, { reason });
+      const response = await api.patch<ApiResponse<Booking>>(`/bookings/${id}/cancel`, { 
+        reason,
+        cancellationMessage
+      });
       return response.data.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to cancel booking');
+    }
+  }
+
+  // Reject booking
+  async rejectBooking(id: string, refusalReason: string, refusalMessage?: string): Promise<Booking> {
+    try {
+      const response = await api.patch<ApiResponse<Booking>>(`/bookings/${id}/reject`, {
+        refusalReason,
+        refusalMessage
+      });
+      return response.data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to reject booking');
+    }
+  }
+
+  // Accept booking
+  async acceptBooking(id: string): Promise<Booking> {
+    try {
+      const response = await api.patch<ApiResponse<Booking>>(`/bookings/${id}/accept`);
+      return response.data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to accept booking');
+    }
+  }
+
+  // Validate booking code
+  async validateBookingCode(id: string, validationCode: string): Promise<Booking> {
+    try {
+      const response = await api.patch<ApiResponse<Booking>>(`/bookings/${id}/validate-code`, {
+        validationCode
+      });
+      return response.data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to validate booking code');
     }
   }
 
@@ -180,6 +226,18 @@ export class BookingService {
     }
   }
 
+  // Confirm tool return
+  async confirmToolReturn(id: string, notes?: string): Promise<Booking> {
+    try {
+      const response = await api.patch<ApiResponse<Booking>>(`/bookings/${id}/confirm-return`, {
+        notes
+      });
+      return response.data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to confirm tool return');
+    }
+  }
+
   // Get booking statistics for dashboard
   async getBookingStats(): Promise<BookingStats> {
     try {
@@ -187,6 +245,40 @@ export class BookingService {
       return response.data.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch booking statistics');
+    }
+  }
+
+  // Confirm tool pickup
+  async confirmPickup(bookingId: string): Promise<Booking> {
+    try {
+      const response = await api.patch<ApiResponse<Booking>>(`/bookings/${bookingId}/confirm-pickup`);
+      return response.data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to confirm pickup');
+    }
+  }
+
+  // Report pickup issue and create dispute
+  async reportPickup(bookingId: string, disputeData: { reason: string; description: string }, images?: File[]): Promise<Booking> {
+    try {
+      const formData = new FormData();
+      formData.append('reason', disputeData.reason);
+      formData.append('description', disputeData.description);
+      
+      if (images && images.length > 0) {
+        images.forEach((image, index) => {
+          formData.append(`images`, image);
+        });
+      }
+
+      const response = await api.post<ApiResponse<Booking>>(`/bookings/${bookingId}/report-pickup`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to report pickup issue');
     }
   }
 }

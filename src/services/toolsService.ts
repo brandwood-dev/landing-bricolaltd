@@ -1,10 +1,9 @@
 import { api } from './api';
 import { Tool, ToolPhoto, Category, Subcategory, CreateToolData, UpdateToolData, Review, CreateReviewData, ToolFilters } from '../types/bridge/tool.types';
 import { ApiResponse, PaginatedResponse } from '../types/bridge/common.types';
+import { ModerationStatus, ToolStatus } from '../types/bridge/enums';
 
 export type { Tool, ToolPhoto, Category, Subcategory, CreateToolData, UpdateToolData,Review, CreateReviewData, ToolFilters };
-
-
 
 // Tools service
 export class ToolsService {
@@ -14,21 +13,39 @@ export class ToolsService {
     
     if (filters) {
       if (filters.search) params.append('search', filters.search);
-      if (filters.isAvailable !== undefined) params.append('isAvailable', filters.isAvailable.toString());
       if (filters.toolStatus) params.append('toolStatus', filters.toolStatus);
+      if (filters.moderationStatus) params.append('moderationStatus', filters.moderationStatus);
     }
     
     const response = await api.get<ApiResponse<Tool[]>>(`/tools?${params.toString()}`);
     
-    let allTools = response.data.data || [];
+    // Access the nested data structure: response.data.data.data
+    let allTools = response.data.data?.data || response.data.data;
     
-    // Process tools to ensure numeric prices, calculate isAvailable, and apply client-side filtering
+    // Ensure we have a valid array
+    if (!Array.isArray(allTools)) {
+      console.warn('Tools response is not an array:', allTools);
+      return {
+        data: [],
+        total: 0,
+        page: 1,
+        limit: 10,
+        totalPages: 0
+      };
+    }
+    
+    // Process tools to ensure numeric prices
     allTools = allTools.map(tool => ({
       ...tool,
       basePrice: typeof tool.basePrice === 'string' ? parseFloat(tool.basePrice) : tool.basePrice,
       depositAmount: typeof tool.depositAmount === 'string' ? parseFloat(tool.depositAmount) : tool.depositAmount,
-      isAvailable: tool.availabilityStatus === '1' || tool.availabilityStatus === 1,
     }));
+
+    // Filter only confirmed and published tools for public display
+    allTools = allTools.filter(tool => 
+      tool.moderationStatus === ModerationStatus.CONFIRMED && 
+      tool.toolStatus === ToolStatus.PUBLISHED
+    );
     
     // Apply client-side filters
     if (filters) {
@@ -100,19 +117,34 @@ export class ToolsService {
 
   // Get featured tools for homepage
   async getFeaturedTools(limit: number = 8): Promise<Tool[]> {
-    const response = await api.get<ApiResponse<PaginatedResponse<Tool>>>(`/tools?limit=${limit}&isAvailable=true&sortBy=rating&sortOrder=desc`);
-    // Calculate isAvailable from availabilityStatus for each tool
-    return response.data.data.map(tool => ({
-      ...tool,
-      isAvailable: tool.availabilityStatus === '1' || tool.availabilityStatus === 1,
-    }));
+    try {
+      const response = await api.get<ApiResponse<Tool[]>>(`/tools/featured?limit=${limit}`);
+      
+      // Access the nested data structure: response.data.data.data
+      const tools = response.data.data?.data || response.data.data;
+      if (!Array.isArray(tools)) {
+        console.warn('Featured tools response is not an array:', tools);
+        return [];
+      }
+      
+      // Process tools to ensure numeric prices - API already filters for confirmed/published tools
+      return tools
+        .map(tool => ({
+          ...tool,
+          basePrice: typeof tool.basePrice === 'string' ? parseFloat(tool.basePrice) : tool.basePrice,
+          depositAmount: typeof tool.depositAmount === 'string' ? parseFloat(tool.depositAmount) : tool.depositAmount,
+        }));
+    } catch (error: any) {
+      console.error('Error fetching featured tools:', error);
+      return [];
+    }
   }
 
   // Get single tool by ID
   async getTool(id: string): Promise<Tool> {
     try {
       const response = await api.get<ApiResponse<Tool>>(`/tools/${id}`);
-      return response.data.data;
+      return response.data.data?.data || response.data.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch tool');
     }
@@ -122,7 +154,7 @@ export class ToolsService {
   async getToolsByUser(userId: string): Promise<Tool[]> {
     try {
       const response = await api.get<ApiResponse<Tool[]>>(`/tools/user/${userId}`);
-      return response.data.data;
+      return response.data.data?.data || response.data.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch user tools');
     }
@@ -164,29 +196,9 @@ export class ToolsService {
   }
 
   // Update tool
-  async updateTool(id: string, toolData: Partial<UpdateToolData>, files?: File[]): Promise<Tool> {
+  async updateTool(id: string, updateData: UpdateToolData): Promise<Tool> {
     try {
-      const formData = new FormData();
-      
-      // Add tool data
-      Object.entries(toolData).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          formData.append(key, value.toString());
-        }
-      });
-      
-      // Add files
-      if (files && files.length > 0) {
-        files.forEach((file) => {
-          formData.append('files', file);
-        });
-      }
-      
-      const response = await api.patch<ApiResponse<Tool>>(`/tools/${id}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const response = await api.patch<ApiResponse<Tool>>(`/tools/${id}`, updateData);
       return response.data.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to update tool');
@@ -199,6 +211,58 @@ export class ToolsService {
       await api.delete(`/tools/${id}`);
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to delete tool');
+    }
+  }
+
+  // Upload photos to tool
+  async uploadPhotos(toolId: string, formData: FormData): Promise<ToolPhoto[]> {
+    try {
+      const response = await api.post<ApiResponse<ToolPhoto[]>>(`/tools/${toolId}/photos`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to upload photos');
+    }
+  }
+
+  // Add photo to tool
+  async addToolPhoto(toolId: string, file: File, isPrimary: boolean = false): Promise<ToolPhoto> {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('toolId', toolId);
+      formData.append('isPrimary', isPrimary.toString());
+      
+      const response = await api.post<ApiResponse<ToolPhoto>>('/tool-photos', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to add photo');
+    }
+  }
+
+  // Set photo as primary
+  async setPhotoPrimary(photoId: string): Promise<ToolPhoto> {
+    try {
+      const response = await api.patch<ApiResponse<ToolPhoto>>(`/tool-photos/${photoId}/set-primary`);
+      return response.data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to set photo as primary');
+    }
+  }
+
+  // Delete photo from tool
+  async deletePhoto(toolId: string, photoId: string): Promise<void> {
+    try {
+      await api.delete(`/tool-photos/${photoId}`);
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to delete photo');
     }
   }
 

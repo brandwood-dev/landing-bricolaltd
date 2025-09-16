@@ -4,13 +4,13 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 export const getStatusColor = (status: string) => {
   switch (status) {
-    case 'pending': return 'bg-yellow-100 text-yellow-800';
-    case 'accepted': return 'bg-green-100 text-green-800';
-    case 'declined': return 'bg-red-100 text-red-800';
-    case 'cancelled': return 'bg-gray-100 text-gray-800';
-    case 'confirmed': return 'bg-blue-100 text-blue-800';
-    case 'ongoing': return 'bg-purple-100 text-purple-800';
-    case 'completed': return 'bg-emerald-100 text-emerald-800';
+    case 'PENDING': return 'bg-yellow-100 text-yellow-800';
+    case 'ACCEPTED': return 'bg-green-100 text-green-800';
+    case 'DECLINED': return 'bg-red-100 text-red-800';
+    case 'CANCELLED': return 'bg-gray-100 text-gray-800';
+    case 'CONFIRMED': return 'bg-blue-100 text-blue-800';
+    case 'ONGOING': return 'bg-purple-100 text-purple-800';
+    case 'COMPLETED': return 'bg-emerald-100 text-emerald-800';
     default: return 'bg-gray-100 text-gray-800';
   }
 };

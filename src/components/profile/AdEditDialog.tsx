@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,61 +7,313 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Upload, Euro, MapPin, Tag, FileText, Camera } from 'lucide-react';
+import { Upload, Euro, MapPin, Tag, FileText, Camera, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { toolsService } from '@/services/toolsService';
 
-interface Ad {
+interface ToolPhoto {
+  id: string;
+  url: string;
+  filename: string;
+  isPrimary: boolean;
+  toolId: string;
+  createdAt: string;
+}
+
+interface Tool {
   id: string;
   title: string;
-  category: string;
-  price: number;
-  published: boolean;
-  validationStatus: string;
-  rating: number;
-  totalRentals: number;
-  image: string;
+  description: string;
+  brand?: string;
+  model?: string;
+  year?: number;
+  condition: string;
+  pickupAddress: string;
+  basePrice: number;
+  depositAmount: number;
+  ownerInstructions?: string;
+  category: {
+    id: string;
+    name: string;
+  };
+  subcategory: {
+    id: string;
+    name: string;
+  };
+  photos: ToolPhoto[];
+  toolStatus: string;
+  moderationStatus: string;
 }
 
 interface AdEditDialogProps {
-  ad: Ad;
+  ad: Tool;
+  onClose: () => void;
+  onSave: () => void;
 }
 
-const AdEditDialog = ({ ad }: AdEditDialogProps) => {
+const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     title: ad.title,
-    brand: '',
-    model: '',
-    year: '',
-    category: ad.category,
-    subcategory: '',
-    condition: '',
-    price: ad.price,
-    deposit: '',
-    location: '',
-    description: '',
-    instructions: ''
+    brand: ad.brand || '',
+    model: ad.model || '',
+    year: ad.year?.toString() || '',
+    category: ad.category.name,
+    subcategory: ad.subcategory.name,
+    condition: ad.condition.toString(),
+    price: ad.basePrice,
+    deposit: ad.depositAmount.toString(),
+    location: ad.pickupAddress,
+    description: ad.description,
+    instructions: ad.ownerInstructions || ''
   });
+  const [existingPhotos, setExistingPhotos] = useState<ToolPhoto[]>(ad.photos || []);
+  const [newPhotos, setNewPhotos] = useState<File[]>([]);
+  const [photosToDelete, setPhotosToDelete] = useState<string[]>([]);
+  const [primaryPhotoId, setPrimaryPhotoId] = useState<string | null>(
+    ad.photos?.find(photo => photo.isPrimary)?.id || null
+  );
+  const [newPhotoPrimaryIndex, setNewPhotoPrimaryIndex] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [categories, setCategories] = useState<Array<{id: string, name: string}>>([]);
+  const [subcategories, setSubcategories] = useState<Array<{id: string, name: string}>>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [loadingSubcategories, setLoadingSubcategories] = useState(false);
 
-  const categories = {
-    'jardinage': 'Jardinage',
-    'bricolage': 'Bricolage', 
-    'nettoyage': 'Nettoyage',
-    'evenementiel': 'Événementiel'
-  };
+  // Load categories on component mount
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        setLoadingCategories(true);
+        const categories = await toolsService.getCategories();
+        setCategories(categories || []);
+      } catch (error) {
+        console.error('Error loading categories:', error);
+        toast({
+          title: 'Erreur',
+          description: 'Impossible de charger les catégories',
+          variant: 'destructive'
+        });
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
 
-  const subcategories = {
-    'Jardinage': ['Gazon', 'Terre', 'Bois', 'Arbre', 'Feuilles'],
-    'Bricolage': ['Construction', 'Électricité', 'Peinture', 'Vis et Boulons'],
-    'Nettoyage': ['Tissus', 'Eau', 'Poussière'],
-    'Événementiel': ['Son', 'Éclairage', 'Cuisine', 'Animation et Jeux', 'Décoration', 'Mobilier', 'Structure']
-  };
+    loadCategories();
+  }, []);
 
-  const handleSave = () => {
-    toast({
-      title: t('message.success'),
-      description: t('ads.success_message'),
+  // Load subcategories when category changes
+  useEffect(() => {
+    const loadSubcategories = async () => {
+      if (formData.category) {
+        try {
+          setLoadingSubcategories(true);
+          // Find category ID from name
+          const selectedCategory = categories.find(cat => cat.name === formData.category);
+          if (selectedCategory) {
+            const subcategories = await toolsService.getSubcategoriesByCategory(selectedCategory.id);
+            setSubcategories(subcategories || []);
+          }
+        } catch (error) {
+          console.error('Error loading subcategories:', error);
+          setSubcategories([]);
+        } finally {
+          setLoadingSubcategories(false);
+        }
+      } else {
+        setSubcategories([]);
+      }
+    };
+
+    if (categories.length > 0) {
+      loadSubcategories();
+    }
+  }, [formData.category, categories]);
+
+  const handleCategoryChange = (categoryName: string) => {
+    setFormData({
+      ...formData,
+      category: categoryName,
+      subcategory: '' // Reset subcategory when category changes
     });
+  };
+
+  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    const validFiles = files.filter(file => {
+        const isValidType = file.type.startsWith('image/');
+        const isValidSize = file.size <= 10 * 1024 * 1024; // 10MB
+        return isValidType && isValidSize;
+      });
+      
+      if (validFiles.length + existingPhotos.length + newPhotos.length > 5) {
+        toast({
+          title: t('general.error'),
+          description: 'Maximum 5 photos allowed',
+          variant: 'destructive'
+        });
+        return;
+      }
+      
+      setNewPhotos(prev => [...prev, ...validFiles]);
+      
+      // If this is the first photo and no existing primary photo, set it as primary
+      if (existingPhotos.length === 0 && newPhotos.length === 0 && validFiles.length > 0 && !primaryPhotoId) {
+        setNewPhotoPrimaryIndex(0);
+      }
+  };
+
+  const handleRemoveExistingPhoto = (photoId: string) => {
+    setPhotosToDelete(prev => [...prev, photoId]);
+    setExistingPhotos(prev => prev.filter(photo => photo.id !== photoId));
+    
+    // If removing the primary photo, clear the primary selection
+    if (primaryPhotoId === photoId) {
+      setPrimaryPhotoId(null);
+    }
+  };
+
+  const handleRemoveNewPhoto = (index: number) => {
+    setNewPhotos(prev => prev.filter((_, i) => i !== index));
+    // Reset primary selection if removing the primary photo
+    if (newPhotoPrimaryIndex === index) {
+      setNewPhotoPrimaryIndex(null);
+    } else if (newPhotoPrimaryIndex !== null && newPhotoPrimaryIndex > index) {
+      setNewPhotoPrimaryIndex(newPhotoPrimaryIndex - 1);
+    }
+  };
+
+  const handleSetExistingPhotoPrimary = (photoId: string) => {
+    setPrimaryPhotoId(photoId);
+    setNewPhotoPrimaryIndex(null); // Désélectionner toute nouvelle photo principale
+  };
+
+  const handleSetNewPhotoPrimary = (index: number) => {
+    setNewPhotoPrimaryIndex(index);
+    setPrimaryPhotoId(null); // Désélectionner toute photo existante principale
+  };
+
+  const handleSave = async () => {
+    setIsLoading(true);
+    try {
+      // Find category and subcategory IDs
+      const selectedCategory = categories.find(cat => cat.name === formData.category);
+      const selectedSubcategory = subcategories.find(sub => sub.name === formData.subcategory);
+      
+      // Prepare form data for API
+      const updateData = {
+        title: formData.title,
+        description: formData.description,
+        brand: formData.brand,
+        model: formData.model,
+        year: formData.year ? parseInt(formData.year) : undefined,
+        condition: parseInt(formData.condition),
+        basePrice: formData.price,
+        depositAmount: parseFloat(formData.deposit),
+        pickupAddress: formData.location,
+        ownerInstructions: formData.instructions,
+        categoryId: selectedCategory?.id,
+        subcategoryId: selectedSubcategory?.id
+      };
+
+      // Update tool data
+      await toolsService.updateTool(ad.id, updateData);
+      console.log('Tool data updated successfully');
+
+      // Handle photo deletions with error handling
+      const deletionResults = [];
+      for (const photoId of photosToDelete) {
+        try {
+          // Validate photo ID format
+          if (!photoId || typeof photoId !== 'string' || photoId.trim() === '') {
+            console.warn(`Invalid photo ID: ${photoId}`);
+            continue;
+          }
+          
+          console.log(`Attempting to delete photo: ${photoId}`);
+          await toolsService.deletePhoto(ad.id, photoId);
+          console.log(`Successfully deleted photo: ${photoId}`);
+          deletionResults.push({ photoId, success: true });
+        } catch (error) {
+          console.error(`Failed to delete photo ${photoId}:`, error);
+          deletionResults.push({ photoId, success: false, error: error.message });
+          // Continue with other deletions instead of failing completely
+        }
+      }
+
+      // Handle new photo uploads with error handling
+      const uploadResults = [];
+      let newPrimaryPhotoId = null;
+      if (newPhotos.length > 0) {
+        for (let i = 0; i < newPhotos.length; i++) {
+          const photo = newPhotos[i];
+          try {
+            console.log(`Uploading new photo ${i + 1}/${newPhotos.length}`);
+            const uploadedPhoto = await toolsService.addToolPhoto(ad.id, photo);
+            console.log(`Successfully uploaded photo ${i + 1}`);
+            uploadResults.push({ index: i, success: true, photoId: uploadedPhoto.id });
+            
+            // Store the ID of the photo that should be primary
+            if (newPhotoPrimaryIndex === i) {
+              newPrimaryPhotoId = uploadedPhoto.id;
+            }
+          } catch (error) {
+            console.error(`Failed to upload photo ${i + 1}:`, error);
+            uploadResults.push({ index: i, success: false, error: error.message });
+            // Continue with other uploads
+          }
+        }
+      }
+
+      // Handle primary photo setting
+      try {
+        if (primaryPhotoId) {
+          // Set existing photo as primary
+          await toolsService.setPhotoPrimary(primaryPhotoId);
+          console.log(`Set existing photo ${primaryPhotoId} as primary`);
+        } else if (newPrimaryPhotoId) {
+          // Set newly uploaded photo as primary
+          await toolsService.setPhotoPrimary(newPrimaryPhotoId);
+          console.log(`Set new photo ${newPrimaryPhotoId} as primary`);
+        }
+      } catch (error) {
+        console.error('Failed to set primary photo:', error);
+        // Don't fail the entire operation for this
+      }
+
+      // Check if there were any critical failures
+      const failedDeletions = deletionResults.filter(r => !r.success);
+      const failedUploads = uploadResults.filter(r => !r.success);
+      
+      let successMessage = t('ads.success_message');
+      if (failedDeletions.length > 0 || failedUploads.length > 0) {
+        const issues = [];
+        if (failedDeletions.length > 0) {
+          issues.push(`${failedDeletions.length} photo(s) could not be deleted`);
+        }
+        if (failedUploads.length > 0) {
+          issues.push(`${failedUploads.length} photo(s) could not be uploaded`);
+        }
+        successMessage += `. Note: ${issues.join(', ')}.`;
+      }
+
+      toast({
+        title: t('message.success'),
+        description: successMessage,
+      });
+      
+      onSave();
+      onClose();
+    } catch (error) {
+      console.error('Error updating tool:', error);
+      toast({
+        title: t('general.error'),
+        description: 'Failed to update tool',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
   const { t, language} = useLanguage();
   return (
@@ -166,13 +418,13 @@ const AdEditDialog = ({ ad }: AdEditDialogProps) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>{t('ads.category')} *</Label>
-              <Select value={formData.category} onValueChange={(value) => setFormData({...formData, category: value})}>
+              <Select value={formData.category} onValueChange={handleCategoryChange} disabled={loadingCategories}>
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue placeholder={loadingCategories ? "Chargement..." : "Sélectionner une catégorie"} />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(categories).map(([key, value]) => (
-                    <SelectItem key={key} value={value}>{value}</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.name}>{category.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -180,13 +432,13 @@ const AdEditDialog = ({ ad }: AdEditDialogProps) => {
             
             <div className="space-y-2">
               <Label>{t('ads.sub_category')}</Label>
-              <Select value={formData.subcategory} onValueChange={(value) => setFormData({...formData, subcategory: value})}>
+              <Select value={formData.subcategory} onValueChange={(value) => setFormData({...formData, subcategory: value})} disabled={loadingSubcategories || !formData.category}>
                 <SelectTrigger>
-                  <SelectValue placeholder={t('ads.sub_category_placeholder')} />
+                  <SelectValue placeholder={loadingSubcategories ? "Chargement..." : t('ads.sub_category_placeholder')} />
                 </SelectTrigger>
                 <SelectContent>
-                  {formData.category && subcategories[formData.category as keyof typeof subcategories]?.map((sub) => (
-                    <SelectItem key={sub} value={sub}>{sub}</SelectItem>
+                  {subcategories.map((subcategory) => (
+                    <SelectItem key={subcategory.id} value={subcategory.name}>{subcategory.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -200,10 +452,11 @@ const AdEditDialog = ({ ad }: AdEditDialogProps) => {
                 <SelectValue placeholder={t('ads.tool_condition')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="new">{t('add_tool.condition_new')}</SelectItem>
-                <SelectItem value="excellent">{t('add_tool.condition_excellent')}</SelectItem>
-                <SelectItem value="good">{t('add_tool.condition_good')}</SelectItem>
-                <SelectItem value="fair">{t('add_tool.condition_fair')}</SelectItem>
+                <SelectItem value="1">Neuf</SelectItem>
+                <SelectItem value="2">Comme neuf</SelectItem>
+                <SelectItem value="3">Bon état</SelectItem>
+                <SelectItem value="4">État correct</SelectItem>
+                <SelectItem value="5">Mauvais état</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -299,14 +552,114 @@ const AdEditDialog = ({ ad }: AdEditDialogProps) => {
             }
           </h3>
           
+          {/* Existing Photos */}
+          {existingPhotos.length > 0 && (
+            <div className="space-y-2">
+              <Label>Photos actuelles</Label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {existingPhotos.map((photo) => (
+                  <div key={photo.id} className="relative group">
+                    <img
+                      src={photo.url}
+                      alt={photo.filename}
+                      className="w-full h-32 object-cover rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveExistingPhoto(photo.id)}
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                    {primaryPhotoId === photo.id && (
+                      <div className="absolute bottom-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                        Principal
+                      </div>
+                    )}
+                    {primaryPhotoId !== photo.id && (
+                      <button
+                        type="button"
+                        onClick={() => handleSetExistingPhotoPrimary(photo.id)}
+                        className="absolute bottom-2 right-2 bg-green-500 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        Définir comme principale
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* New Photos Preview */}
+          {newPhotos.length > 0 && (
+            <div className="space-y-2">
+              <Label>Nouvelles photos</Label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {newPhotos.map((photo, index) => (
+                  <div key={index} className="relative group">
+                    <img
+                      src={URL.createObjectURL(photo)}
+                      alt={photo.name}
+                      className="w-full h-32 object-cover rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveNewPhoto(index)}
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                    {newPhotoPrimaryIndex === index && (
+                      <div className="absolute bottom-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                        Principal
+                      </div>
+                    )}
+                    {newPhotoPrimaryIndex !== index && (
+                      <button
+                        type="button"
+                        onClick={() => handleSetNewPhotoPrimary(index)}
+                        className="absolute bottom-2 right-2 bg-green-500 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        Définir comme principale
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Upload New Photos */}
           <div className="border-2 border-dashed rounded-lg p-6 text-center">
             <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
             <p className="text-sm text-muted-foreground mb-2">
               {t('ads.photos_placeholder')}
             </p>
-            <Button variant="outline" size="sm">
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handlePhotoUpload}
+              className="hidden"
+              id="photo-upload"
+            />
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => document.getElementById('photo-upload')?.click()}
+              disabled={existingPhotos.length + newPhotos.length >= 5}
+            >
               {t('ads.browse_files')}
             </Button>
+            <p className="text-xs text-muted-foreground mt-2">
+              PNG, JPG jusqu'à 10MB • {5 - existingPhotos.length - newPhotos.length} photos restantes
+            </p>
+            {existingPhotos.length === 0 && newPhotos.length === 0 && (
+              <p className="text-xs text-orange-600 mt-1">
+                Au moins une photo est requise
+              </p>
+            )}
           </div>
         </div>
 
@@ -341,8 +694,19 @@ const AdEditDialog = ({ ad }: AdEditDialogProps) => {
         </div>
         
         <div className="flex justify-end gap-2 pt-4 border-t">
-          <Button variant="outline">{t('action.cancel')}</Button>
-          <Button onClick={handleSave}>{t('action.save')}</Button>
+          <Button 
+            variant="outline" 
+            onClick={onClose}
+            disabled={isLoading}
+          >
+            {t('action.cancel')}
+          </Button>
+          <Button 
+            onClick={handleSave}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Sauvegarde...' : t('action.save')}
+          </Button>
         </div>
       </div>
     </DialogContent>

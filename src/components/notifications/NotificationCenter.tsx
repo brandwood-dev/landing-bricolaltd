@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Bell, X, Check, Clock, AlertCircle, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -85,8 +85,19 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   onMarkAllAsRead,
   onNotificationClick,
 }) => {
+  // Debug logs pour vérifier les props
+  console.log('🎯 [NotificationCenter] Component rendered with props:', {
+    notificationsCount: notifications?.length || 0,
+    notifications: notifications,
+    hasOnMarkAsRead: !!onMarkAsRead,
+    hasOnMarkAllAsRead: !!onMarkAllAsRead,
+    hasOnNotificationClick: !!onNotificationClick
+  });
+  
   const [isOpen, setIsOpen] = useState(false);
   const unreadCount = notifications.filter(n => !n.isRead).length;
+  
+  console.log('📊 [NotificationCenter] Calculated unreadCount:', unreadCount);
 
   const handleNotificationClick = (notification: Notification) => {
     if (!notification.isRead) {
@@ -95,6 +106,11 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     onNotificationClick(notification);
     setIsOpen(false);
   };
+
+  // Log when no notifications
+  if (notifications.length === 0) {
+    console.log('📭 [NotificationCenter] No notifications to display');
+  }
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -134,42 +150,45 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             </div>
           ) : (
             <div className="divide-y">
-              {notifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  className={cn(
-                    'p-4 cursor-pointer hover:bg-gray-50 transition-colors',
-                    !notification.isRead && 'bg-blue-50/50',
-                    getNotificationColor(notification.type)
-                  )}
-                  onClick={() => handleNotificationClick(notification)}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 mt-0.5">
-                      {getNotificationIcon(notification.type)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <p className={cn(
-                          'text-sm font-medium truncate',
-                          !notification.isRead && 'font-semibold'
-                        )}>
-                          {notification.title}
-                        </p>
-                        {!notification.isRead && (
-                          <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 ml-2" />
-                        )}
+              {notifications.map((notification) => {
+                console.log('📝 [NotificationCenter] Rendering notification:', notification);
+                return (
+                  <div
+                    key={notification.id}
+                    className={cn(
+                      'p-4 cursor-pointer hover:bg-gray-50 transition-colors',
+                      !notification.isRead && 'bg-blue-50/50',
+                      getNotificationColor(notification.type)
+                    )}
+                    onClick={() => handleNotificationClick(notification)}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0 mt-0.5">
+                        {getNotificationIcon(notification.type)}
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                        {notification.message}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-2">
-                        {formatTimeAgo(notification.createdAt)}
-                      </p>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <p className={cn(
+                            'text-sm font-medium truncate',
+                            !notification.isRead && 'font-semibold'
+                          )}>
+                            {notification.title}
+                          </p>
+                          {!notification.isRead && (
+                            <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 ml-2" />
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                          {notification.message}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-2">
+                          {formatTimeAgo(notification.createdAt)}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </ScrollArea>
@@ -183,7 +202,6 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                 size="sm" 
                 className="w-full text-xs"
                 onClick={() => {
-                  // Navigate to notifications page
                   setIsOpen(false);
                 }}
               >

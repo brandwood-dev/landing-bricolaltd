@@ -16,6 +16,7 @@ import { useFavorites } from '@/hooks/useFavorites';
 import { useAuth } from '@/contexts/AuthContext';
 import { Link, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { toolsService, Tool, Category, Subcategory, ToolFilters } from '../services/toolsService';
+import { ModerationStatus, ToolStatus } from '../types/bridge/enums';
 import { useToast } from '@/hooks/use-toast';
 import { useDebounce } from '@/hooks/useDebounce';
 
@@ -93,16 +94,24 @@ const Search = () => {
         minPrice: priceRange[0],
         maxPrice: priceRange[1],
         location: isRealTimeSearch ? debouncedLocationQuery : locationQuery || undefined,
-        isAvailable: true,
-        toolStatus: 'PUBLISHED',
+        toolStatus: ToolStatus.PUBLISHED,
+        moderationStatus: ModerationStatus.CONFIRMED,
         sortBy,
         sortOrder
       };
       
       const response = await toolsService.getTools(filters);
-    setTools(response.data || []);
-      setTotalPages(response.totalPages || 1);
-      setTotalItems(response.total || 0);
+      
+      if (response && response.data && Array.isArray(response.data)) {
+        setTools(response.data);
+        setTotalPages(response.totalPages || 1);
+        setTotalItems(response.total || response.data.length);
+      } else {
+        console.error('Invalid response structure:', response);
+        setTools([]);
+        setTotalPages(1);
+        setTotalItems(0);
+      }
       
       // Update URL params for better UX
       const newParams = new URLSearchParams();
@@ -672,10 +681,9 @@ const Search = () => {
                           <Button 
                             size="sm" 
                             className={`${isAuthenticated ? 'mr-2' : ''} flex-1`}
-                            disabled={!tool.isAvailable}
                             onClick={() => handleRentClick(tool.id)}
                           >
-                            {tool.isAvailable ? t('tools.rent') : 'Indisponible'}
+                            {t('tools.rent')}
                           </Button>
                           {isAuthenticated && (
                             <Button

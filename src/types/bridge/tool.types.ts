@@ -1,7 +1,7 @@
 // Tool types bridge - aligned with backend entities
 
 import { BaseEntity, Photo, Address, BaseFilters } from './common.types';
-import { ToolStatus, AvailabilityStatus, ToolCondition } from './enums';
+import { ToolStatus, AvailabilityStatus, ToolCondition, ModerationStatus } from './enums';
 import { UserProfile } from './user.types';
 
 // Category interface
@@ -38,6 +38,7 @@ export interface Tool extends BaseEntity {
   ownerInstructions?: string;
   toolStatus: ToolStatus;
   availabilityStatus: AvailabilityStatus;
+  moderationStatus: ModerationStatus;
   isAvailable: boolean; // Computed field
   
   // Relations
@@ -53,7 +54,6 @@ export interface Tool extends BaseEntity {
   
   // Timestamps
   publishedAt?: string;
-  moderatedAt?: string;
   
   // Statistics
   rating?: number;
@@ -64,6 +64,7 @@ export interface Tool extends BaseEntity {
 // Tool photo interface
 export interface ToolPhoto extends Photo {
   toolId: string;
+  
 }
 
 // Tool summary for listings
@@ -104,6 +105,8 @@ export interface ToolFilters extends BaseFilters {
   radius?: number; // in km
   isAvailable?: boolean;
   toolStatus?: ToolStatus;
+  moderationStatus?: ModerationStatus;
+  availabilityStatus?: AvailabilityStatus | number;
   ownerId?: string;
   hasPhotos?: boolean;
   minRating?: number;
@@ -160,12 +163,30 @@ export interface CreateToolData {
   ownerInstructions?: string;
   categoryId: string;
   subcategoryId: string;
+  ownerId: string;
   photos?: File[];
+  primaryPhotoIndex?: number;
 }
 
-export interface UpdateToolData extends Partial<CreateToolData> {
-  toolStatus?: ToolStatus;
-  availabilityStatus?: AvailabilityStatus;
+export interface UpdateToolData {
+  title?: string
+  description?: string
+  basePrice?: number
+  depositAmount?: number
+  brand?: string
+  model?: string
+  year?: number
+  condition?: ToolCondition
+  pickupAddress?: string
+  latitude?: number
+  longitude?: number
+  ownerInstructions?: string
+  categoryId?: string
+  subcategoryId?: string
+  toolStatus?: ToolStatus
+  availabilityStatus?: AvailabilityStatus
+  photos?: File[]
+  primaryPhotoIndex?: number
 }
 
 // Review types

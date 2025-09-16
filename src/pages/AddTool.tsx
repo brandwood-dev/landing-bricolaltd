@@ -197,6 +197,34 @@ const AddTool = () => {
   // File input handler
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
+    
+    // Vérifier la taille de chaque fichier (1MB maximum)
+    const maxSize = 1048576 // 1MB en bytes
+    const oversizedFiles = files.filter(file => file.size > maxSize)
+    
+    if (oversizedFiles.length > 0) {
+      toast({
+        title: "Fichier trop volumineux",
+        description: `Les images ne doivent pas dépasser 1MB. ${oversizedFiles.length} fichier(s) ignoré(s).`,
+        variant: "destructive"
+      })
+      // Filtrer les fichiers qui respectent la limite de taille
+      const validFiles = files.filter(file => file.size <= maxSize)
+      if (validFiles.length === 0) return
+      
+      // Continuer avec les fichiers valides
+      if (validFiles.length + selectedFiles.length > 10) {
+        toast({
+          title: "Limite atteinte",
+          description: "Vous ne pouvez ajouter que 10 photos maximum",
+          variant: "destructive"
+        })
+        return
+      }
+      setSelectedFiles(prev => [...prev, ...validFiles])
+      return
+    }
+    
     if (files.length + selectedFiles.length > 10) {
       toast({
         title: "Limite atteinte",
@@ -285,6 +313,24 @@ const AddTool = () => {
       return false
     }
     
+    if (formData.depositAmount !== undefined && formData.depositAmount < 0) {
+      toast({
+        title: "Dépôt invalide",
+        description: "Le montant du dépôt ne peut pas être négatif",
+        variant: "destructive"
+      })
+      return false
+    }
+    
+    if (formData.year !== undefined && (formData.year < 1900 || formData.year > 2030)) {
+      toast({
+        title: "Année invalide",
+        description: "L'année doit être comprise entre 1900 et 2030",
+        variant: "destructive"
+      })
+      return false
+    }
+    
     return true
   }
 
@@ -320,8 +366,8 @@ const AddTool = () => {
       localStorage.setItem('toolAdded', 'true')
       
       toast({
-        title: "Succès",
-        description: "Votre outil a été ajouté avec succès",
+        title: "Outil créé avec succès",
+        description: "Votre outil est en attente de modération. Il sera visible une fois approuvé par notre équipe.",
       })
       
       // Navigate to profile with my-ads tab
@@ -403,7 +449,45 @@ const AddTool = () => {
     e.preventDefault()
     e.stopPropagation()
     setDragActive(false)
-    // Handle file upload logic here
+    
+    const files = Array.from(e.dataTransfer.files)
+    
+    // Vérifier la taille de chaque fichier (1MB maximum)
+    const maxSize = 1048576 // 1MB en bytes
+    const oversizedFiles = files.filter(file => file.size > maxSize)
+    
+    if (oversizedFiles.length > 0) {
+      toast({
+        title: "Fichier trop volumineux",
+        description: `Les images ne doivent pas dépasser 1MB. ${oversizedFiles.length} fichier(s) ignoré(s).`,
+        variant: "destructive"
+      })
+      // Filtrer les fichiers qui respectent la limite de taille
+      const validFiles = files.filter(file => file.size <= maxSize)
+      if (validFiles.length === 0) return
+      
+      // Continuer avec les fichiers valides
+      if (validFiles.length + selectedFiles.length > 10) {
+        toast({
+          title: "Limite atteinte",
+          description: "Vous ne pouvez ajouter que 10 photos maximum",
+          variant: "destructive"
+        })
+        return
+      }
+      setSelectedFiles(prev => [...prev, ...validFiles])
+      return
+    }
+    
+    if (files.length + selectedFiles.length > 10) {
+      toast({
+        title: "Limite atteinte",
+        description: "Vous ne pouvez ajouter que 10 photos maximum",
+        variant: "destructive"
+      })
+      return
+    }
+    setSelectedFiles(prev => [...prev, ...files])
   }
 
   return (
@@ -457,7 +541,7 @@ const AddTool = () => {
                         id='title'
                         value={formData.title || ''}
                         onChange={(e) => handleInputChange('title', e.target.value)}
-                        placeholder={t('addtool.placeholder_text')}
+                        placeholder={t('add_tool.title_placeholder')}
                         className='h-12 text-base'
                       />
                       {/* DISABLED - uniqueness validation message removed */}
@@ -484,7 +568,7 @@ const AddTool = () => {
                         id='brand'
                         value={formData.brand || ''}
                         onChange={(e) => handleInputChange('brand', e.target.value)}
-                        placeholder={t('addtool.placeholder_text')}
+                        placeholder={t('add_tool.brand_placeholder')}
                         className='h-12 text-base'
                       />
                     </div>
@@ -502,7 +586,7 @@ const AddTool = () => {
                         id='model'
                         value={formData.model || ''}
                         onChange={(e) => handleInputChange('model', e.target.value)}
-                        placeholder={t('addtool.placeholder_text')}
+                        placeholder={t('add_tool.model_placeholder')}
                         className='h-12 text-base'
                       />
                     </div>
@@ -517,9 +601,11 @@ const AddTool = () => {
                       <Input
                         id='year'
                         type='number'
+                        min='1900'
+                        max='2030'
                         value={formData.year || ''}
                         onChange={(e) => handleInputChange('year', e.target.value ? parseInt(e.target.value) : undefined)}
-                        placeholder={t('addtool.placeholder_text')}
+                        placeholder={t('add_tool.year_placeholder')}
                         className='h-12 text-base'
                       />
                     </div>
@@ -536,7 +622,7 @@ const AddTool = () => {
                       id='description'
                       value={formData.description || ''}
                       onChange={(e) => handleInputChange('description', e.target.value)}
-                      placeholder={t('addtool.placeholder_text')}
+                      placeholder={t('add_tool.description_placeholder')}
                       className='min-h-[120px] resize-none text-base'
                     />
                   </div>
@@ -653,6 +739,8 @@ const AddTool = () => {
                         <Input
                           id='price'
                           type='number'
+                          min='0.01'
+                          step='0.01'
                           value={formData.basePrice || ''}
                           onChange={(e) => handleInputChange('basePrice', e.target.value ? parseFloat(e.target.value) : undefined)}
                           placeholder='25'
@@ -673,6 +761,8 @@ const AddTool = () => {
                         <Input
                           id='deposit'
                           type='number'
+                          min='0'
+                          step='0.01'
                           value={formData.depositAmount || ''}
                           onChange={(e) => handleInputChange('depositAmount', e.target.value ? parseFloat(e.target.value) : undefined)}
                           placeholder='100'

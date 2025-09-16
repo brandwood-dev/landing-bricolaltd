@@ -140,22 +140,24 @@ const CategoriesSection = () => {
               <Link
                 key={category.id}
                 to={`/search?categoryId=${category.id}`}
-                className="group relative overflow-hidden rounded-xl bg-white border border-gray-200 hover:shadow-lg transition-all duration-300"
+                className='group relative overflow-hidden rounded-xl bg-white border border-gray-200 hover:shadow-lg transition-all duration-300'
               >
-                <div className="aspect-square bg-gray-100 relative overflow-hidden">
+                <div className='aspect-square bg-gray-100 relative overflow-hidden'>
                   <img
                     src={categoryImage}
                     alt={category.displayName}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-300'
                   />
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
-                  <div className={`absolute top-4 left-4 p-2 rounded-lg ${categoryColor}`}>
-                    <IconComponent className="h-5 w-5" />
+                  <div className='absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors' />
+                  <div
+                    className={`absolute top-4 left-4 p-2 rounded-lg ${categoryColor}`}
+                  >
+                    <IconComponent className='h-5 w-5' />
                   </div>
                 </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 text-center">
-                    {category.displayName}
+                <div className='p-4'>
+                  <h3 className='font-semibold text-gray-900 text-center'>
+                    {t(`categories.${category.name}`)}
                   </h3>
                 </div>
               </Link>

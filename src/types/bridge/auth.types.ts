@@ -23,6 +23,8 @@ export interface RegisterData {
   longitude?: number
   bio?: string
   userType?: string
+  // Nouveaux champs ajoutés pour correspondre au formulaire
+  country?: string
 }
 
 export interface LoginResponse {
@@ -60,6 +62,11 @@ export interface AuthUser {
   longitude?: number
   bio?: string
   userType?: string
+  // Nouveaux champs ajoutés pour correspondre au formulaire
+  country?: string
+  adress?: string
+  prefix?: string
+  phone?: string
   createdAt: Date
   updatedAt: Date
 }
