@@ -81,7 +81,7 @@ const Blog = () => {
   const loadCategories = async () => {
     try {
       const categoriesData = await newsService.getNewsCategories();
-      setCategories(categoriesData || []);
+      setCategories(categoriesData.data || []);
     } catch (error: any) {
       console.warn('Failed to load categories:', error.message);
       setCategories([]);
