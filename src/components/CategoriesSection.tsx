@@ -78,7 +78,7 @@ const CategoriesSection = () => {
         setLoading(true);
         setError(null);
         const fetchedCategories = await toolsService.getCategories();
-        setCategories(fetchedCategories.slice(0, 4)); // Show only first 4 categories
+        setCategories(fetchedCategories.data.slice(0, 4)); // Show only first 4 categories
       } catch (err: any) {
         console.error('Error fetching categories:', err);
         setError(err.message);
