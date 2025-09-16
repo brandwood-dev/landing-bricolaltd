@@ -140,7 +140,7 @@ const Search = () => {
   const fetchCategories = async () => {
     try {
       const fetchedCategories = await toolsService.getCategories();
-      setCategories(fetchedCategories);
+      setCategories(fetchedCategories.data);
     } catch (err: any) {
       console.error('Error fetching categories:', err);
     }
@@ -151,7 +151,7 @@ const Search = () => {
     try {
       if (categoryId && categoryId !== 'all') {
         const fetchedSubcategories = await toolsService.getSubcategoriesByCategory(categoryId);
-        setSubcategories(fetchedSubcategories);
+        setSubcategories(fetchedSubcategories.data);
       } else {
         setSubcategories([]);
       }
