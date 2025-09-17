@@ -62,7 +62,7 @@ const ResetPassword = () => {
     setIsLoading(true);
     
     try {
-      await authService.resetPassword({ email, code: resetToken, newPassword: password });
+      await authService.resetPassword({ resetToken, newPassword: password });
       toast({
         title: t('resetpwd.popupsuccupdate'),
         description: t('resetpwd.txtsucc'),

@@ -86,7 +86,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
       try {
         setLoadingCategories(true);
         const categories = await toolsService.getCategories();
-        setCategories(categories || []);
+        setCategories(categories.data || []);
       } catch (error) {
         console.error('Error loading categories:', error);
         toast({
@@ -112,7 +112,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
           const selectedCategory = categories.find(cat => cat.name === formData.category);
           if (selectedCategory) {
             const subcategories = await toolsService.getSubcategoriesByCategory(selectedCategory.id);
-            setSubcategories(subcategories.data || []);
+            setSubcategories(subcategories || []);
           }
         } catch (error) {
           console.error('Error loading subcategories:', error);

@@ -18,8 +18,7 @@ export interface VerifyCodeData {
 }
 
 export interface ResetPasswordData {
-  email: string;
-  code: string;
+  resetToken: string;
   newPassword: string;
 }
 
@@ -152,9 +151,12 @@ export const authService = {
   },
 
   // Reset password
-  resetPassword: async (data: ResetPasswordData): Promise<{ message: string }> => {
+  resetPassword: async (data: { resetToken: string; newPassword: string }): Promise<{ message: string }> => {
     try {
-      const response = await api.post<{ message: string }>('/auth/reset-password', data);
+      const response = await api.post<{ message: string }>('/auth/reset-password', {
+        resetToken: data.resetToken,
+        newPassword: data.newPassword
+      });
       return response.data.data;
     } catch (error: any) {
       throw error;
@@ -208,6 +210,16 @@ export const authService = {
       return response.data.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to resend verification email');
+    }
+  },
+
+  // Get user info by email
+  getUserInfo: async (email: string): Promise<{ found: boolean; user?: { firstName: string; lastName: string; email: string }; message?: string }> => {
+    try {
+      const response = await api.post<{ found: boolean; user?: { firstName: string; lastName: string; email: string }; message?: string }>('/auth/get-user-info', { email });
+      return response.data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to get user info');
     }
   },
 

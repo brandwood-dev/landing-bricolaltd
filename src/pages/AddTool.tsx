@@ -187,7 +187,7 @@ const AddTool = () => {
   const loadSubcategories = async (categoryId: string) => {
     try {
       const subcategoriesData = await toolsService.getSubcategoriesByCategory(categoryId)
-      setSubcategories(subcategoriesData)
+      setSubcategories(subcategoriesData || [])
     } catch (error) {
       console.error('Error loading subcategories:', error)
       setSubcategories([])
