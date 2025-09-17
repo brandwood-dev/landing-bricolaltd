@@ -112,7 +112,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
           const selectedCategory = categories.find(cat => cat.name === formData.category);
           if (selectedCategory) {
             const subcategories = await toolsService.getSubcategoriesByCategory(selectedCategory.id);
-            setSubcategories(subcategories || []);
+            setSubcategories(subcategories.data || []);
           }
         } catch (error) {
           console.error('Error loading subcategories:', error);
