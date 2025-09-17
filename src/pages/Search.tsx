@@ -125,6 +125,9 @@ const Search = () => {
     } catch (err: any) {
       console.error('Error fetching tools:', err);
       setError(err.message);
+      setTools([]);
+      setTotalPages(1);
+      setTotalItems(0);
       toast({
         title: "Erreur",
         description: "Impossible de charger les outils. Veuillez réessayer.",
@@ -148,15 +151,19 @@ const Search = () => {
 
   // Fetch subcategories when category changes
   const fetchSubcategories = async (categoryId: string) => {
+    console.log('fetchSubcategories called with categoryId:', categoryId);
     try {
       if (categoryId && categoryId !== 'all') {
         const fetchedSubcategories = await toolsService.getSubcategoriesByCategory(categoryId);
-        setSubcategories(fetchedSubcategories.data);
+        console.log('fetchedSubcategories response:', fetchedSubcategories);
+        console.log('subcategories data:', fetchedSubcategories.data?.data || fetchedSubcategories);
+        setSubcategories(fetchedSubcategories.data?.data || fetchedSubcategories || []);
       } else {
         setSubcategories([]);
       }
     } catch (err: any) {
       console.error('Error fetching subcategories:', err);
+      setSubcategories([]);
     }
   };
 
@@ -418,11 +425,14 @@ const Search = () => {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="all">{t('catalog_section.all_sub_categories')}</SelectItem>
-                            {subcategories.map((subcategory) => (
-                              <SelectItem key={subcategory.id} value={subcategory.id}>
-                                {subcategory.displayName}
-                              </SelectItem>
-                            ))}
+                            {(() => {
+                              console.log('subcategories state:', subcategories);
+                              return (subcategories || []).map((subcategory) => (
+                                <SelectItem key={subcategory.id} value={subcategory.id}>
+                                  {subcategory.displayName}
+                                </SelectItem>
+                              ));
+                            })()}
                           </SelectContent>
                         </Select>
                       </div>
@@ -620,7 +630,7 @@ const Search = () => {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {tools.map((tool, index) => {
+                  {(tools || []).map((tool, index) => {
                    const displayPrice = calculateDisplayPrice(tool.basePrice);
                    return (
                      <div 
