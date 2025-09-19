@@ -108,7 +108,7 @@ const BlogSection = () => {
                 }}
               />
               <CardContent className="p-6">
-                <Badge className="mb-3">{post.categoryId || 'Non catégorisé'}</Badge>
+                <Badge className="mb-3">{post.category}</Badge>
                 <h3 className="text-xl font-semibold mb-3">
                   <Link to={`/blog/${post.id}`} className="hover:text-accent transition-colors">
                     {post.title}
