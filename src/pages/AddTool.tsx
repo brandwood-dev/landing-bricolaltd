@@ -174,7 +174,7 @@ const AddTool = () => {
       try {
         setLoadingCategories(true)
         const categoriesData = await toolsService.getCategories()
-        setCategories(categoriesData.data || [])
+        setCategories(categoriesData || [])
       } catch (error) {
         console.error('Error loading categories:', error)
         toast({
