@@ -26,7 +26,7 @@ export class NewsService {
         if (filters.page) params.append('page', filters.page.toString());
         if (filters.limit) params.append('limit', filters.limit.toString());
         if (filters.search) params.append('search', filters.search);
-        if (filters.categoryId) params.append('categoryId', filters.categoryId);
+        if (filters.category) params.append('category', filters.category);
         if (filters.isFeatured !== undefined) params.append('isFeatured', filters.isFeatured.toString());
         if (filters.sortBy) params.append('sortBy', filters.sortBy);
         if (filters.sortOrder) params.append('sortOrder', filters.sortOrder);
@@ -60,9 +60,9 @@ export class NewsService {
   }
 
   // Get news by category
-  async getNewsByCategory(categoryId: string, filters?: Omit<NewsFilters, 'categoryId'>): Promise<PaginatedNews> {
+  async getNewsByCategory(category: string, filters?: Omit<NewsFilters, 'category'>): Promise<PaginatedNews> {
     try {
-      const categoryFilters = { ...filters, categoryId };
+      const categoryFilters = { ...filters, category };
       return await this.getPublicNews(categoryFilters);
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch news by category');
@@ -80,14 +80,14 @@ export class NewsService {
   }
 
   // Get related articles (by category, excluding current article)
-  async getRelatedNews(currentId: string, categoryId?: string, limit: number = 4): Promise<News[]> {
+  async getRelatedNews(currentId: string, category?: string, limit: number = 4): Promise<News[]> {
     try {
       const params = new URLSearchParams();
       params.append('isPublic', 'true');
       params.append('limit', (limit + 1).toString()); // Get one extra to exclude current
       
-      if (categoryId) {
-        params.append('categoryId', categoryId);
+      if (category) {
+        params.append('category', category);
       }
       
       const response = await api.get<ApiResponse<PaginatedNews>>(`/news?${params.toString()}`);

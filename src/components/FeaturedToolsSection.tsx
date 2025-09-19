@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useFavorites } from '@/hooks/useFavorites';
+import { useAuth } from '@/contexts/AuthContext';
 import { Star, MapPin, Calendar, Heart, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toolsService, Tool } from '@/services/toolsService';
@@ -13,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 const FeaturedToolsSection = () => {
   const { t } = useLanguage();
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
+  const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [tools, setTools] = useState<Tool[]>([]);
   const [loading, setLoading] = useState(true);
@@ -163,16 +165,18 @@ const FeaturedToolsSection = () => {
                       {tool.subcategory.displayName}
                     </Badge>
                   </div>
-                  <button
-                    onClick={() => handleFavoriteToggle(tool)}
-                    className="absolute top-3 right-3 bg-white rounded-full p-1 hover:bg-gray-50"
-                  >
-                    <Heart 
-                      className={`h-4 w-4 ${
-                        isFavorite(tool.id) ? 'fill-red-500 text-red-500' : 'text-gray-400'
-                      }`} 
-                    />
-                  </button>
+                  {isAuthenticated && (
+                    <button
+                      onClick={() => handleFavoriteToggle(tool)}
+                      className="absolute top-3 right-3 bg-white rounded-full p-1 hover:bg-gray-50"
+                    >
+                      <Heart 
+                        className={`h-4 w-4 ${
+                          isFavorite(tool.id) ? 'fill-red-500 text-red-500' : 'text-gray-400'
+                        }`} 
+                      />
+                    </button>
+                  )}
                 </div>
 
                 {/* Content */}

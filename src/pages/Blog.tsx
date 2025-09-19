@@ -17,7 +17,21 @@ const Blog = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [articles, setArticles] = useState<News[]>([]);
   const [featuredArticle, setFeaturedArticle] = useState<News | null>(null);
-  const [categories, setCategories] = useState<NewsCategory[]>([]);
+  // Fixed categories list
+  const categories: NewsCategory[] = [
+    { id: '1', name: 'Jardinage', displayName: 'Jardinage' },
+    { id: '2', name: 'Entretien', displayName: 'Entretien' },
+    { id: '3', name: 'Transport', displayName: 'Transport' },
+    { id: '4', name: 'Bricolage', displayName: 'Bricolage' },
+    { id: '5', name: 'Électricité', displayName: 'Électricité' },
+    { id: '6', name: 'Éclairage', displayName: 'Éclairage' },
+    { id: '7', name: 'Peinture', displayName: 'Peinture' },
+    { id: '8', name: 'Construction', displayName: 'Construction' },
+    { id: '9', name: 'Plantes', displayName: 'Plantes' },
+    { id: '10', name: 'Nettoyage', displayName: 'Nettoyage' },
+    { id: '11', name: 'Décoration', displayName: 'Décoration' },
+    { id: '12', name: 'Guide', displayName: 'Guide' }
+  ];
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
   const [totalArticles, setTotalArticles] = useState(0);
@@ -36,7 +50,7 @@ const Blog = () => {
       };
       
       if (category) {
-        filters.categoryId = category;
+        filters.category = category;
       }
       
       const response = await newsService.getPublicNews(filters);
@@ -77,16 +91,7 @@ const Blog = () => {
     }
   };
 
-  // Load categories
-  const loadCategories = async () => {
-    try {
-      const categoriesData = await newsService.getNewsCategories();
-      setCategories(categoriesData.data || []);
-    } catch (error: any) {
-      console.warn('Failed to load categories:', error.message);
-      setCategories([]);
-    }
-  };
+
 
   // Initial load
   useEffect(() => {
@@ -94,8 +99,7 @@ const Blog = () => {
       setLoading(true);
       await Promise.all([
         loadArticles(),
-        loadFeaturedArticle(),
-        loadCategories()
+        loadFeaturedArticle()
       ]);
       setLoading(false);
     };
@@ -127,19 +131,19 @@ const Blog = () => {
     return 'Équipe Bricola';
   };
 
-  // Get category name
-  const getCategoryName = (categoryId?: string) => {
-    if (!categoryId) return t('blog.category.general');
-    const category = categories.find(cat => cat.id === categoryId);
-    return category?.displayName || category?.name || t('blog.category.general');
-  };
+  // // Get category name
+  // const getCategoryName = (categoryId?: string) => {
+  //   if (!categoryId) return t('blog.category.general');
+  //   const category = categories.find(cat => cat.id === categoryId);
+  //   return category?.displayName || category?.name || t('blog.category.general');
+  // };
 
   // Handle category filter
-  const handleCategoryFilter = (categoryId: string) => {
-    if (selectedCategory === categoryId) {
+  const handleCategoryFilter = (categoryName: string) => {
+    if (selectedCategory === categoryName) {
       setSelectedCategory('');
     } else {
-      setSelectedCategory(categoryId);
+      setSelectedCategory(categoryName);
     }
     setCurrentPage(1);
   };
@@ -183,7 +187,7 @@ const Blog = () => {
                   }}
                   />
                   <CardContent className="p-8">
-                    <Badge className="mb-4">{getCategoryName(featuredArticle.categoryId)}</Badge>
+                    <Badge className="mb-4">{featuredArticle.category || t('blog.category.general')}</Badge>
                     <h2 className="text-2xl font-bold mb-4">
                       <Link to={`/blog/${featuredArticle.id}`} className="hover:text-accent">
                         {featuredArticle.title}
@@ -224,7 +228,7 @@ const Blog = () => {
                 }}
                 />
                 <CardContent className="p-6">
-                  <Badge className="mb-3">{getCategoryName(article.categoryId)}</Badge>
+                  <Badge className="mb-3">{article.category || 'General' }</Badge>
                   <h3 className="text-xl font-semibold mb-3">
                     <Link to={`/blog/${article.id}`} className="hover:text-accent">
                       {article.title}
@@ -343,16 +347,16 @@ const Blog = () => {
           <div className="mt-16">
             <h2 className="text-2xl font-bold text-center mb-8">{t('blog.popular_categories')}</h2>
             <div className="flex flex-wrap justify-center gap-4">
-              {categories.slice(0, 5).map((category) => (
+              {categories.map((category) => (
                 <Badge 
                   key={category.id} 
-                  variant={selectedCategory === category.id ? "default" : "outline"}
+                  variant={selectedCategory === category.name ? "default" : "outline"}
                   className={`px-4 py-2 cursor-pointer transition-colors ${
-                    selectedCategory === category.id 
+                    selectedCategory === category.name 
                       ? 'bg-primary text-primary-foreground' 
                       : 'hover:bg-accent hover:text-white'
                   }`}
-                  onClick={() => handleCategoryFilter(category.id)}
+                  onClick={() => handleCategoryFilter(category.name)}
                 >
                   {category.displayName || category.name}
                 </Badge>

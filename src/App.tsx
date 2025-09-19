@@ -49,13 +49,13 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <LanguageProvider>
+        <Toaster />
+        <Sonner />
         <CurrencyProvider>
           <AuthProvider>
     
               <AgeVerificationProvider>
             <BrowserRouter>
-              <Toaster />
-              <Sonner />
               <ScrollToTop />
               <AgeVerificationDialog />
               <FloatingActionButton />

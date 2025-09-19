@@ -8,19 +8,27 @@ import { useLanguage } from '@/contexts/LanguageContext';
 interface ReviewDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (rating: number, comment: string) => void;
+  onSubmit: (rating: number, comment: string, bookingId?: string, toolId?: string, revieweeId?: string, reviewerId?: string) => void;
+  bookingId?: string;
+  toolId?: string;
+  revieweeId?: string;
+  reviewerId?: string;
 }
 
 const ReviewDialog: React.FC<ReviewDialogProps> = ({
   isOpen,
   onOpenChange,
-  onSubmit
+  onSubmit,
+  bookingId,
+  toolId,
+  revieweeId,
+  reviewerId
 }) => {
   const [rating, setRating] = useState(0);
   const [reviewComment, setReviewComment] = useState('');
 
   const handleSubmit = () => {
-    onSubmit(rating, reviewComment);
+    onSubmit(rating, reviewComment, bookingId, toolId, revieweeId, reviewerId);
     setRating(0);
     setReviewComment('');
   };
@@ -45,7 +53,7 @@ const ReviewDialog: React.FC<ReviewDialogProps> = ({
                 </button>
               ))}
             </div>
-          </div>
+          </div> 
           <div>
             <label className="block text-sm font-medium mb-2">{t('review.comment')}</label>
             <Textarea

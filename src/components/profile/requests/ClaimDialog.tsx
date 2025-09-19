@@ -235,30 +235,99 @@ const ClaimDialog: React.FC<ClaimDialogProps> = ({
                 />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value='damaged'>
-                  {t('request.claim.reason.damaged_tool')}
-                </SelectItem>
-                <SelectItem value='late-return'>
-                  {t('request.claim.reason.late_return')}
-                </SelectItem>
-                <SelectItem value='missing-parts'>
-                  {t('request.claim.reason.missing_parts')}
-                </SelectItem>
-                <SelectItem value='not-working'>
-                  {t('request.claim.reason.not_working')}
-                </SelectItem>
-                <SelectItem value='no-showup'>
-                  {t('request.claim.reason.no_showup')}
-                </SelectItem>
-                <SelectItem value='inappropriate-behavior'>
-                  {t('request.claim.reason.inappropriate_behavior')}
-                </SelectItem>
-                <SelectItem value='fraud-attempt'>
-                  {t('request.claim.reason.fraud_attempt')}
-                </SelectItem>
-                <SelectItem value='other'>
-                  {t('request.claim.reason.other')}
-                </SelectItem>
+                {language === 'en' ? (
+                  <>
+                    <SelectItem value='no-show'>
+                      Client did not show up at the appointment
+                    </SelectItem>
+                    <SelectItem value='late'>
+                      Client late for pickup or return
+                    </SelectItem>
+                    <SelectItem value='misuse'>
+                      Improper use of the tool (misuse, risk of damage)
+                    </SelectItem>
+                    <SelectItem value='damaged'>
+                      Return of a damaged or incomplete tool
+                    </SelectItem>
+                    <SelectItem value='payment'>
+                      Non-payment or payment issue
+                    </SelectItem>
+                    <SelectItem value='suspicious'>
+                      Suspicious or fraudulent request
+                    </SelectItem>
+                    <SelectItem value='behavior'>
+                      Inappropriate behavior of the client
+                    </SelectItem>
+                    <SelectItem value='terms'>
+                      Violation of terms of use
+                    </SelectItem>
+                    <SelectItem value='contact'>
+                      Incorrect / unreachable phone number
+                    </SelectItem>
+                    <SelectItem value='other'>Other</SelectItem>
+                  </>
+                ) : language === 'fr' ? (
+                  <>
+                    <SelectItem value='no-show'>
+                      Client non présent au rendez-vous
+                    </SelectItem>
+                    <SelectItem value='late'>
+                      Client en retard pour la prise ou le retour
+                    </SelectItem>
+                    <SelectItem value='misuse'>
+                      Utilisation inappropriée de l'outil (mauvais usage, risque
+                      de dommage)
+                    </SelectItem>
+                    <SelectItem value='damaged'>
+                      Retour d'un outil endommagé ou incomplet
+                    </SelectItem>
+                    <SelectItem value='payment'>
+                      Non-paiement ou problème de paiement
+                    </SelectItem>
+                    <SelectItem value='suspicious'>
+                      Demande suspecte ou frauduleuse
+                    </SelectItem>
+                    <SelectItem value='behavior'>
+                      Comportement inapproprié du client
+                    </SelectItem>
+                    <SelectItem value='terms'>
+                      Violation des conditions d'utilisation
+                    </SelectItem>
+                    <SelectItem value='contact'>
+                      Numéro de téléphone incorrect / injoignable
+                    </SelectItem>
+                    <SelectItem value='other'>Autre</SelectItem>
+                  </>
+                ) : (
+                  <>
+                    <SelectItem value='no-show'>
+                      العميل لم يحضر في الموعد
+                    </SelectItem>
+                    <SelectItem value='late'>
+                      تأخر العميل في الاستلام أو الإرجاع
+                    </SelectItem>
+                    <SelectItem value='misuse'>
+                      سوء استخدام الأداة (إساءة استخدام، خطر التلف)
+                    </SelectItem>
+                    <SelectItem value='damaged'>
+                      إرجاع أداة تالفة أو غير مكتملة
+                    </SelectItem>
+                    <SelectItem value='payment'>
+                      عدم الدفع أو مشكلة في الدفع
+                    </SelectItem>
+                    <SelectItem value='suspicious'>
+                      طلب مشبوه أو احتيالي
+                    </SelectItem>
+                    <SelectItem value='behavior'>
+                      سلوك غير لائق من العميل
+                    </SelectItem>
+                    <SelectItem value='terms'>انتهاك شروط الاستخدام</SelectItem>
+                    <SelectItem value='contact'>
+                      رقم هاتف غير صحيح / لا يمكن الوصول إليه
+                    </SelectItem>
+                    <SelectItem value='other'>أخرى</SelectItem>
+                  </>
+                )}
               </SelectContent>
             </Select>
           </div>

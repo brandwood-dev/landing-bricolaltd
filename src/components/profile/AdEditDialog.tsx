@@ -86,7 +86,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
       try {
         setLoadingCategories(true);
         const categories = await toolsService.getCategories();
-        setCategories(categories.data || []);
+        setCategories(categories || []);
       } catch (error) {
         console.error('Error loading categories:', error);
         toast({

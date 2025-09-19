@@ -54,6 +54,7 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import { generateRentalContract } from '@/utils/contractGenerator'
 import { disputeService } from '@/services/disputeService'
 import { notificationService } from '@/services/notificationService'
+import { reviewsService } from '@/services/reviewsService'
 
 const Requests = () => {
   const { user } = useAuth()
@@ -68,6 +69,7 @@ const Requests = () => {
   const { toast } = useToast()
 
   const [requests, setRequests] = useState<Request[]>([])
+  const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const transformBookingToRequest = (booking: Booking): Request => {
@@ -135,6 +137,7 @@ const Requests = () => {
       console.log('ownerBookings : ', ownerBookings)
 
       const transformedReq = ownerBookings.data.map(transformBookingToRequest)
+      setBookings(ownerBookings.data)
       setRequests(transformedReq)
     } catch (err: any) {
       setError(err.message || t('request.load_error'))
@@ -318,20 +321,46 @@ const Requests = () => {
     setIsClaimDialogOpen(true)
   }
 
-  const handleSubmitReview = (rating: number, comment: string) => {
-    setRequests((prev) =>
-      prev.map((req) =>
-        req.id === selectedRequestId ? { ...req, status: 'completed' } : req
+  const handleSubmitReview = async (rating: number, comment: string, bookingId?: string, toolId?: string, revieweeId?: string, reviewerId?: string) => {
+    if (!user?.id || !bookingId || !toolId || !revieweeId) {
+      toast({
+        title: t('general.error'),
+        description: 'Missing required information for review',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    try {
+      await reviewsService.createToolReview({
+        rating,
+        comment,
+        reviewerId: user.id,
+        revieweeId,
+        toolId,
+        bookingId,
+      })
+
+      setRequests((prev) =>
+        prev.map((req) =>
+          req.id === selectedRequestId ? { ...req, status: 'COMPLETED' } : req
+        )
       )
-    )
 
-    toast({
-      title: t('review.popuptitle'),
-      description: t('review.modalmsg'),
-    })
+      toast({
+        title: t('review.popuptitle'),
+        description: t('review.modalmsg'),
+      })
 
-    setIsReviewDialogOpen(false)
-    setSelectedRequestId('')
+      setIsReviewDialogOpen(false)
+      setSelectedRequestId('')
+    } catch (error: any) {
+      toast({
+        title: t('general.error'),
+        description: error.message || 'Failed to submit review',
+        variant: 'destructive',
+      })
+    }
   }
 
   const handleSubmitClaim = async (disputeData: any, images: File[]) => {
@@ -769,8 +798,12 @@ const Requests = () => {
           isOpen={isReviewDialogOpen}
           onOpenChange={setIsReviewDialogOpen}
           onSubmit={handleSubmitReview}
+          bookingId={selectedRequestId}
+          toolId={bookings.find(booking => booking.id === selectedRequestId)?.toolId}
+          revieweeId={bookings.find(booking => booking.id === selectedRequestId)?.renterId}
+          reviewerId={user?.id}
         />
-
+ 
         <ClaimDialog
           isOpen={isClaimDialogOpen}
           onOpenChange={setIsClaimDialogOpen}

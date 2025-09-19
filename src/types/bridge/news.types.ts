@@ -9,6 +9,7 @@ export interface News {
   isPublic: boolean;
   isFeatured: boolean;
   summary?: string;
+  category?: string;
   categoryId?: string;
   adminId?: string;
   createdAt: Date;
@@ -38,7 +39,7 @@ export interface NewsFilters {
   limit?: number;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
-  categoryId?: string;
+  category?: string;
   isFeatured?: boolean;
 }
 

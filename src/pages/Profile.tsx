@@ -77,12 +77,15 @@ const Profile = () => {
 
   // Transform user data for ProfileHeader component
   const userInfo = user ? {
+    id: user.id,
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
     verified: user.verifiedEmail,
     memberSince: userStats?.memberSince || user.createdAt,
-    accountType: user.userType === 'individual' ? 'Particulier' : 'Entreprise'
+    accountType: user.userType === 'individual' ? 'Particulier' : 'Entreprise',
+    profilePicture: user.profilePicture
+    
   } : null;
 
   const handleAccountDeletion = () => {

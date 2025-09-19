@@ -38,9 +38,9 @@ const BlogPost = () => {
       setArticle(articleData);
       
       // Load related articles from the same category
-      if (articleData.categoryId) {
+      if (articleData.category) {
         const relatedResponse = await newsService.getPublicNews({
-          categoryId: articleData.categoryId,
+          category: articleData.category,
           limit: 4,
           page: 1
         });
@@ -149,8 +149,8 @@ const BlogPost = () => {
         type="article"
         author={getAuthorName(post)}
         publishedTime={new Date(post.createdAt).toISOString()}
-        section={post.categoryId || 'blog'}
-        tags={[post.categoryId || 'blog', 'outils', 'bricolage', 'location']}
+        section={post.category || 'blog'}
+        tags={[post.category || 'blog', 'outils', 'bricolage', 'location']}
       />
       <Header />
       <main className="py-20">
@@ -164,7 +164,7 @@ const BlogPost = () => {
 
           <article>
             <header className="mb-8">
-              <Badge className="mb-4">{post.categoryId ? t(`blog.category.${categoryMap[post.categoryId]}`) : 'Non catégorisé'}</Badge>
+              <Badge className="mb-4">{post.category ? t(`blog.category.${categoryMap[post.categoryId]}`) : 'Non catégorisé'}</Badge>
               <h1 className="text-4xl font-bold mb-6">{post.title}</h1>
               
               <div className="flex items-center justify-between mb-6">
@@ -211,54 +211,7 @@ const BlogPost = () => {
               <div className="space-y-6 text-gray-700" dangerouslySetInnerHTML={{ __html: post.content }}>
               </div>
               
-              {!post.content && (
-              <div className="space-y-6 text-gray-700">
-                <h2 className="text-2xl font-semibold">Introduction</h2>
-                <p>
-                  Le choix d'une perceuse est crucial pour réussir ses projets de bricolage. 
-                  Que vous soyez débutant ou bricoleur expérimenté, il existe une perceuse 
-                  adaptée à vos besoins et à votre budget.
-                </p>
-
-                <h2 className="text-2xl font-semibold">Les différents types de perceuses</h2>
-                <h3 className="text-xl font-medium">1. Perceuse filaire</h3>
-                <p>
-                  La perceuse filaire offre une puissance constante et convient parfaitement 
-                  pour les gros travaux. Elle ne nécessite pas de recharge et peut être utilisée 
-                  en continu.
-                </p>
-
-                <h3 className="text-xl font-medium">2. Perceuse sans fil</h3>
-                <p>
-                  Plus pratique et maniable, la perceuse sans fil est idéale pour les travaux 
-                  en extérieur ou dans des endroits difficiles d'accès. L'autonomie de la 
-                  batterie est un critère important à considérer.
-                </p>
-
-                <h2 className="text-2xl font-semibold">Critères de choix</h2>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>Puissance et couple de serrage</li>
-                  <li>Type de mandrin (auto-serrant ou à clé)</li>
-                  <li>Vitesse de rotation variable</li>
-                  <li>Présence d'un mode percussion</li>
-                  <li>Ergonomie et poids</li>
-                  <li>Accessoires inclus</li>
-                </ul>
-
-                <h2 className="text-2xl font-semibold">Nos recommandations</h2>
-                <p>
-                  Pour débuter, nous recommandons une perceuse visseuse sans fil de 18V 
-                  avec deux batteries. Cela vous permettra de réaliser la plupart des 
-                  travaux domestiques sans contrainte.
-                </p>
-
-                <p>
-                  N'hésitez pas à louer différents modèles sur Bricola LTD pour tester 
-                  et trouver la perceuse qui correspond le mieux à vos besoins avant 
-                  de faire un achat.
-                </p>
-              </div>
-              )}
+              {!post.content && <p className="text-gray-600">Aucun contenu disponible.</p>}
             </div>
 
             {/* Articles similaires */}
@@ -278,7 +231,7 @@ const BlogPost = () => {
                       }}
                     />
                     <CardContent className="p-4">
-                      <Badge className="mb-2">{relatedPost.categoryId ? t(`blog.category.${categoryMap[relatedPost.categoryId]}`) : 'Non catégorisé'}</Badge>
+                      <Badge className="mb-2">{relatedPost.category || 'Non catégorisé'}</Badge>
                       <h3 className="font-semibold mb-2">
                         <Link to={`/blog/${relatedPost.id}`} className="hover:text-accent">
                           {relatedPost.title}

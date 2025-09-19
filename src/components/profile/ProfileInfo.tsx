@@ -1,39 +1,67 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Edit3, Check, X, Shield, Camera, Upload, Trash2, Loader2 } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { Country } from '@/types/bridge/common.types';
-import { authService } from '@/services/authService';
-import { countriesService } from '@/services/countriesService';
-import { useToast } from '@/hooks/use-toast';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import React, { useState, useEffect } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Edit3,
+  Check,
+  X,
+  Shield,
+  Camera,
+  Upload,
+  Trash2,
+  Loader2,
+} from 'lucide-react'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { useAuth } from '@/contexts/AuthContext'
+import { Country } from '@/types/bridge/common.types'
+import { authService } from '@/services/authService'
+import { countriesService } from '@/services/countriesService'
+import { useToast } from '@/hooks/use-toast'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import AddressAutocomplete from '@/components/AddressAutocomplete'
+import phonePrefixes from '@/data/phonePrefixes'
 
 const ProfileInfo = () => {
-  const { t, language } = useLanguage();
-  const { user, updateUser } = useAuth();
-  const { toast } = useToast();
-  const [isEditing, setIsEditing] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [countries, setCountries] = useState<Country[]>([]);
-  const [loadingCountries, setLoadingCountries] = useState(true);
+  const { t, language } = useLanguage()
+  const { user, updateUser } = useAuth()
+  const { toast } = useToast()
+  const [isEditing, setIsEditing] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [loadingCountries, setLoadingCountries] = useState(false)
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [passwordValidation, setPasswordValidation] = useState({
     minLength: false,
     hasUppercase: false,
     hasLowercase: false,
     hasNumber: false,
     hasSpecial: false,
-    isValid: false
-  });
+    isValid: false,
+  })
   const [userInfo, setUserInfo] = useState({
     firstName: '',
     lastName: '',
@@ -41,119 +69,264 @@ const ProfileInfo = () => {
     email: '',
     newEmail: '',
     phonePrefix: '+965',
-    phone: '',
+    phoneNumber: '',
     address: '',
     city: '',
     postalCode: '',
     latitude: null as number | null,
     longitude: null as number | null,
     bio: '',
-    country: 'KWD',
+    country: 'KW',
     verified: false,
     profileImage: '',
     accountType: 'individual',
     currentPassword: '',
-    newPassword: ''
-  });
+    newPassword: '',
+  })
+  const [isAddressSelected, setIsAddressSelected] = useState(false)
+  const [errors, setErrors] = useState<{ [key: string]: string }>({})
 
   // Initialize user data from AuthContext
   useEffect(() => {
     if (user) {
-      setUserInfo({
+      // Console.log all user information for debugging
+      console.log('=== USER INFORMATION ===')
+      console.log('Complete user object:', user)
+      console.log('User ID:', user.id)
+      console.log('User firstName:', user.firstName)
+      console.log('User lastName:', user.lastName)
+      console.log('User email:', user.email)
+      console.log('User phoneNumber:', user.phoneNumber)
+      console.log('User phonePrefix:', user.prefix)
+      console.log('User address:', user.address)
+      console.log('User city:', user.city)
+      console.log('User country:', user.country)
+      console.log('User countryId:', user.countryId)
+      console.log('User profilePicture:', user.profilePicture)
+      console.log('User userType:', user.userType)
+      console.log('User verified:', user.verifiedEmail)
+      console.log('User bio:', user.bio)
+      console.log('=========================')
+
+      // Extract phone number without prefix if it exists
+      const fullPhoneNumber = user.phoneNumber || ''
+      
+      // Map country ID to phone prefix
+      const countryId = user.country?.code || user.countryId || 'KW'
+      const prefixMap: { [key: string]: string } = {
+        KW: '+965',
+        SA: '+966',
+        BH: '+973',
+        OM: '+968',
+        QA: '+974',
+        AE: '+971',
+      }
+      
+      // Use the mapped prefix based on country, fallback to user.prefix or default
+      const userPrefix = user.prefix || prefixMap[countryId] || '+965'
+      const phoneNumberOnly = fullPhoneNumber.startsWith(userPrefix)
+        ? fullPhoneNumber.substring(userPrefix.length)
+        : fullPhoneNumber
+
+      const newUserInfo = {
         firstName: user.firstName || '',
         lastName: user.lastName || '',
         displayName: user.displayName || '',
         email: user.email || '',
         newEmail: user.newEmail || '',
-        phonePrefix: user.phonePrefix || '+965',
-        phone: user.phoneNumber || '',
+        phonePrefix: userPrefix,
+        phoneNumber: phoneNumberOnly,
         address: user.address || '',
         city: user.city || '',
         postalCode: user.postalCode || '',
         latitude: user.latitude || null,
         longitude: user.longitude || null,
         bio: user.bio || '',
-        country: user.country?.code || user.countryId || '',
+        country: countryId,
         verified: user.verifiedEmail || false,
         profileImage: user.profilePicture || '',
         accountType: user.userType || 'individual',
         currentPassword: '',
-        newPassword: ''
-      });
-    }
-  }, [user]);
-
-  // Fetch countries on component mount
-  useEffect(() => {
-    const fetchCountries = async () => {
-      try {
-        setLoadingCountries(true);
-        const countriesData = await countriesService.getActiveCountries();
-        setCountries(countriesData);
-      } catch (error) {
-        console.error('Failed to fetch countries:', error);
-        toast({
-          title: t('error.title'),
-          description: 'Failed to load countries',
-          variant: 'destructive',
-        });
-      } finally {
-        setLoadingCountries(false);
+        newPassword: '',
       }
-    };
 
-    fetchCountries();
-  }, [t, toast]);
+      setUserInfo(newUserInfo)
 
-  // Generate countries options from fetched data
-  const countryOptions = countries.map(country => ({
-    value: country.code,
-    label: country.name,
-    flag: country.code.toLowerCase()
-  }));
+      // Console.log the processed userInfo state
+      console.log('=== PROCESSED USER INFO STATE ===')
+      console.log('UserInfo object:', newUserInfo)
+      console.log('Profile image URL:', newUserInfo.profileImage)
+      console.log('=================================')
 
-  // Generate phone prefixes from fetched countries data
-  const phonePrefixes = countries.map(country => ({
-    value: country.phonePrefix,
-    label: `${country.phonePrefix} (${country.name})`,
-    flag: country.code.toLowerCase()
-  }));
+      // Set isAddressSelected to true if user already has an address
+      if (user.address && user.address.trim() !== '') {
+        setIsAddressSelected(true)
+      }
+    }
+  }, [user])
+
+  // Static countries list (same as Register.tsx)
+  const countries = [
+    { value: 'KW', label: 'kuwait', flag: '<span class="fi fi-kw"></span>' },
+    { value: 'SA', label: 'ksa', flag: '<span class="fi fi-sa"></span>' },
+    { value: 'BH', label: 'bahrain', flag: '<span class="fi fi-bh"></span>' },
+    { value: 'OM', label: 'oman', flag: '<span class="fi fi-om"></span>' },
+    { value: 'QA', label: 'qatar', flag: '<span class="fi fi-qa"></span>' },
+    { value: 'AE', label: 'uae', flag: '<span class="fi fi-ae"></span>' },
+  ]
+
+  // // Generate countries options from static data (same as Register.tsx)
+  // const countryOptions = countries.map((country) => ({
+  //   value: country.value,
+  //   label: t(`countries.${country.label}`),
+  //   flag: country.flag,
+  // }))
+
+  // Generate phone prefixes from phonePrefixes data (same as Register.tsx)
+  const phonePrefix = phonePrefixes.map((prefix) => ({
+    value: prefix.value,
+    label: prefix.value,
+    flag: prefix.flag,
+  }))
+
+  const handleInputChange = (field: string, value: string) => {
+    setUserInfo((prev) => ({ ...prev, [field]: value }))
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: '' }))
+    }
+  }
+
+  const handlePhonePrefixChange = (prefix: string) => {
+    setUserInfo((prev) => ({ ...prev, phonePrefix: prefix }))
+    if (errors.phoneNumber) {
+      setErrors((prev) => ({ ...prev, phoneNumber: '' }))
+    }
+  }
+
+  const handleCountryChange = (countryCode: string) => {
+    const selectedCountry = countries.find((c) => c.value === countryCode)
+    if (selectedCountry) {
+      // Find corresponding phone prefix for the country
+      const countryPrefix = phonePrefixes.find((p) => {
+        // Map country codes to their typical prefixes
+        const prefixMap: { [key: string]: string } = {
+          KW: '+965',
+          SA: '+966',
+          BH: '+973',
+          OM: '+968',
+          QA: '+974',
+          AE: '+971',
+        }
+        return p.value === prefixMap[countryCode]
+      })
+
+      setUserInfo((prev) => ({
+        ...prev,
+        country: countryCode,
+        phonePrefix: countryPrefix?.value || '+965',
+      }))
+      if (errors.country) {
+        setErrors((prev) => ({ ...prev, country: '' }))
+      }
+    }
+  }
+
+  const handleAddressChange = (address: string) => {
+    setUserInfo((prev) => ({ ...prev, address }))
+    setIsAddressSelected(false)
+    if (errors.address) {
+      setErrors((prev) => ({ ...prev, address: '' }))
+    }
+  }
+
+  const handleAddressSelected = (isSelected: boolean) => {
+    setIsAddressSelected(isSelected)
+    if (isSelected && errors.address) {
+      setErrors((prev) => ({ ...prev, address: '' }))
+    }
+  }
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {}
+
+    // Validate required fields
+    if (!userInfo.firstName.trim()) {
+      newErrors.firstName = t('register.firstNameRequired')
+    }
+    if (!userInfo.lastName.trim()) {
+      newErrors.lastName = t('register.lastNameRequired')
+    }
+    if (!userInfo.phoneNumber.trim()) {
+      newErrors.phoneNumber = t('register.phoneRequired')
+    }
+    if (!userInfo.country) {
+      newErrors.country = t('register.countryRequired')
+    }
+    if (!userInfo.address.trim()) {
+      newErrors.address = t('register.addressRequired')
+    } else if (
+      !isAddressSelected &&
+      userInfo.address !== (user?.address || '')
+    ) {
+      // Only require address selection if the address has been changed from the original
+      newErrors.address = t('register.addressSelectRequired')
+    }
+
+    // Validate phone number format
+    if (userInfo.phoneNumber && !/^\d{8,15}$/.test(userInfo.phoneNumber)) {
+      newErrors.phoneNumber = t('register.phoneInvalid')
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
   const handleSave = async () => {
-    if (!user) return;
+    if (!user) return
+
+    if (!validateForm()) {
+      toast({
+        title: t('register.validationError'),
+        description: t('register.validationErrorDesc'),
+        variant: 'destructive',
+      })
+      return
+    }
 
     try {
-      setIsSaving(true);
-      setError(null);
+      setIsSaving(true)
+      setError(null)
 
       // If both password fields are filled, handle password change
       if (userInfo.currentPassword && userInfo.newPassword) {
         if (!passwordValidation.isValid) {
           toast({
-            title: "Erreur de validation",
-            description: "Le nouveau mot de passe ne respecte pas les critères requis.",
-            variant: "destructive",
-          });
-          return;
+            title: 'Erreur de validation',
+            description:
+              'Le nouveau mot de passe ne respecte pas les critères requis.',
+            variant: 'destructive',
+          })
+          return
         }
 
         try {
           await authService.changePassword({
             currentPassword: userInfo.currentPassword,
-            newPassword: userInfo.newPassword
-          });
-          
+            newPassword: userInfo.newPassword,
+          })
+
           toast({
-            title: "Mot de passe modifié",
-            description: "Votre mot de passe a été modifié avec succès.",
-          });
+            title: 'Mot de passe modifié',
+            description: 'Votre mot de passe a été modifié avec succès.',
+          })
 
           // Clear password fields after successful change
           setUserInfo({
             ...userInfo,
             currentPassword: '',
-            newPassword: ''
-          });
-          
+            newPassword: '',
+          })
+
           // Reset password validation state
           setPasswordValidation({
             minLength: false,
@@ -161,82 +334,210 @@ const ProfileInfo = () => {
             hasLowercase: false,
             hasNumber: false,
             hasSpecial: false,
-            isValid: false
-          });
+            isValid: false,
+          })
         } catch (passwordError: any) {
           toast({
-            title: "Erreur",
-            description: passwordError.message || "Échec de la modification du mot de passe.",
-            variant: "destructive",
-          });
-          return;
+            title: 'Erreur',
+            description:
+              passwordError.message ||
+              'Échec de la modification du mot de passe.',
+            variant: 'destructive',
+          })
+          return
         }
       }
 
-      // Update profile information
+      // Combine phone prefix and number
+      const fullPhoneNumber = userInfo.phonePrefix + userInfo.phoneNumber
+
+      // Update profile information - only allowed fields
       const profileData: any = {
         firstName: userInfo.firstName,
         lastName: userInfo.lastName,
-        displayName: userInfo.displayName,
-        email: userInfo.email,
-        phoneNumber: userInfo.phone,
-        phonePrefix: userInfo.phonePrefix,
-        address: userInfo.address,
-        city: userInfo.city,
-        postalCode: userInfo.postalCode,
-        latitude: userInfo.latitude,
-        longitude: userInfo.longitude,
-        bio: userInfo.bio,
+        phoneNumber: fullPhoneNumber,
         countryId: userInfo.country,
-        userType: userInfo.accountType as 'individual' | 'business'
-      };
-
-      // Only include newEmail if it has a value
-      if (userInfo.newEmail && userInfo.newEmail.trim()) {
-        profileData.newEmail = userInfo.newEmail;
+        address: userInfo.address,
+        profilePicture: userInfo.profileImage,
       }
 
-      const updatedUser = await authService.updateProfile(profileData);
-      await updateUser(profileData);
-      
-      toast({
-        title: "Profil mis à jour",
-        description: "Vos informations ont été mises à jour avec succès.",
-      });
-      
-      setIsEditing(false);
-    } catch (err: any) {
-      console.error('Failed to update profile:', err);
-      setError(err.message || 'Échec de la mise à jour du profil');
-      toast({
-        title: "Erreur",
-        description: err.message || "Échec de la mise à jour du profil.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSaving(false);
-    }
-  };
+      // Only include password if it's being changed
+      if (userInfo.newPassword && passwordValidation.isValid) {
+        profileData.password = userInfo.newPassword
+      }
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setUserInfo({...userInfo, profileImage: e.target?.result as string});
-      };
-      reader.readAsDataURL(file);
+      // Call the profile update endpoint
+      const token = localStorage.getItem('authToken')
+      const response = await fetch('http://localhost:4000/api/users/me', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(profileData),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(
+          errorData.message || 'Échec de la mise à jour du profil'
+        )
+      }
+
+      const result = await response.json()
+      const updatedUser = result.data
+
+      // Update local user state
+      await updateUser({
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        phoneNumber: updatedUser.phoneNumber,
+      })
+
+      toast({
+        title: 'Profil mis à jour',
+        description: 'Vos informations ont été mises à jour avec succès.',
+      })
+
+      setIsEditing(false)
+    } catch (err: any) {
+      console.error('Failed to update profile:', err)
+      setError(err.message || 'Échec de la mise à jour du profil')
+      toast({
+        title: 'Erreur',
+        description: err.message || 'Échec de la mise à jour du profil.',
+        variant: 'destructive',
+      })
+    } finally {
+      setIsSaving(false)
     }
-  };
+  }
+
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0]
+    if (!file || !user) return
+
+    // Validate file type and size
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    if (!allowedTypes.includes(file.type)) {
+      toast({
+        title: 'Erreur',
+        description: 'Seuls les fichiers JPEG, PNG et WebP sont autorisés.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      // 5MB limit
+      toast({
+        title: 'Erreur',
+        description: 'La taille du fichier ne doit pas dépasser 5MB.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    try {
+      setUploadingImage(true)
+
+      // Create preview URL for immediate display
+      const previewUrl = URL.createObjectURL(file)
+      setImagePreview(previewUrl)
+
+      // Create FormData for file upload
+      const formData = new FormData()
+      formData.append('photo', file)
+
+      // Upload to backend API
+      const token = localStorage.getItem('authToken')
+      console.log('=== DEBUG Frontend Upload ===')
+      console.log('Token:', token ? 'Present' : 'Missing')
+      console.log('File details:', {
+        name: file.name,
+        type: file.type,
+        size: file.size,
+      })
+
+      const response = await fetch(
+        'http://localhost:4000/api/users/profile/upload-photo',
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      )
+
+      console.log('Response status:', response.status)
+      console.log('Response ok:', response.ok)
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('Error response:', errorText)
+        let errorMessage = "Échec de l'upload de l'image"
+
+        try {
+          const errorData = JSON.parse(errorText)
+          errorMessage = errorData.message || errorMessage
+        } catch (e) {
+          // If not JSON, use the text as error message
+          if (errorText) {
+            errorMessage = errorText
+          }
+        }
+
+        throw new Error(errorMessage)
+      }
+
+      const result = await response.json()
+      console.log('Upload result:', result)
+
+      // Handle the API response structure: {data: {data: {url: ...}}, message: ...}
+      const imageUrl = result.data?.data?.url
+      console.log('Extracted image URL:', imageUrl)
+
+      if (imageUrl) {
+        setUserInfo((prev) => ({ ...prev, profileImage: imageUrl }))
+        toast({
+          title: 'Succès',
+          description: 'Photo de profil mise à jour avec succès.',
+        })
+        console.log('=== END DEBUG Frontend Upload - SUCCESS ===')
+      } else {
+        console.error('No image URL in response')
+        throw new Error("URL de l'image non reçue du serveur")
+      }
+    } catch (error: any) {
+      console.error('Error uploading image:', error)
+      toast({
+        title: 'Erreur',
+        description: error.message || "Échec de l'upload de l'image.",
+        variant: 'destructive',
+      })
+    } finally {
+      setUploadingImage(false)
+      // Clean up preview URL and reset the input
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview)
+        setImagePreview(null)
+      }
+      event.target.value = ''
+    }
+  }
 
   // Password validation function
   const validatePassword = (password: string) => {
-    const minLength = password.length >= 8;
-    const hasUppercase = /[A-Z]/.test(password);
-    const hasLowercase = /[a-z]/.test(password);
-    const hasNumber = /\d/.test(password);
-    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-    const isValid = minLength && hasUppercase && hasLowercase && hasNumber && hasSpecial;
+    const minLength = password.length >= 8
+    const hasUppercase = /[A-Z]/.test(password)
+    const hasLowercase = /[a-z]/.test(password)
+    const hasNumber = /\d/.test(password)
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    const isValid =
+      minLength && hasUppercase && hasLowercase && hasNumber && hasSpecial
 
     const validation = {
       minLength,
@@ -244,127 +545,179 @@ const ProfileInfo = () => {
       hasLowercase,
       hasNumber,
       hasSpecial,
-      isValid
-    };
+      isValid,
+    }
 
-    setPasswordValidation(validation);
-    return validation;
-  };
+    setPasswordValidation(validation)
+    return validation
+  }
 
   // Handle password change with validation
   const handlePasswordChange = (password: string) => {
-    setUserInfo({...userInfo, newPassword: password});
-    validatePassword(password);
-  };
+    setUserInfo({ ...userInfo, newPassword: password })
+    validatePassword(password)
+  }
 
   const handleAccountDeletion = () => {
     // Here you would make an API call to delete the account
-    console.log('Deleting account...');
+    console.log('Deleting account...')
     // For now, just show a confirmation in the console
     // In a real implementation, you would:
     // 1. Make an API call to delete the account
     // 2. Show a success message
     // 3. Redirect the user to the home page or login page
-  };
+  }
 
   return (
     <Card>
-      <CardHeader className="p-4 sm:p-6">
-        <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-          <div className="flex flex-col items-center space-y-3 sm:flex-row sm:items-start sm:space-y-0 sm:space-x-4">
-            <div className="relative flex-shrink-0">
-              <Avatar className="h-16 w-16 sm:h-20 sm:w-20">
-                <AvatarImage src={userInfo.profileImage} />
-                <AvatarFallback className="text-lg sm:text-xl">{userInfo.firstName[0]}{userInfo.lastName[0]}</AvatarFallback>
+      <CardHeader className='p-4 sm:p-6'>
+        <div className='flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0'>
+          <div className='flex flex-col items-center space-y-3 sm:flex-row sm:items-start sm:space-y-0 sm:space-x-4'>
+            <div className='relative flex-shrink-0'>
+              <Avatar className='h-16 w-16 sm:h-20 sm:w-20'>
+                <AvatarImage src={imagePreview || userInfo.profileImage} />
+
+                <AvatarFallback className='text-lg sm:text-xl'>
+                  {userInfo.firstName[0]}
+                  {userInfo.lastName[0]}
+                </AvatarFallback>
               </Avatar>
+              {uploadingImage && (
+                <span className='absolute inset-0 flex items-center justify-center bg-black/50 rounded-full text-white text-xs'>
+                  Upload...
+                </span>
+              )}
               {isEditing && (
-                <div className="absolute -bottom-2 -right-2">
-                  <label htmlFor="profile-image-upload" className="cursor-pointer">
-                    <div className="bg-primary text-primary-foreground rounded-full p-1.5 shadow-lg hover:bg-primary/90 transition-colors">
-                      <Camera className="h-3 w-3" />
+                <div className='absolute -bottom-2 -right-2'>
+                  <label
+                    htmlFor='profile-image-upload'
+                    className={`cursor-pointer ${
+                      uploadingImage ? 'pointer-events-none' : ''
+                    }`}
+                  >
+                    <div className='bg-primary text-primary-foreground rounded-full p-1.5 shadow-lg hover:bg-primary/90 transition-colors'>
+                      {uploadingImage ? (
+                        <Loader2 className='h-3 w-3 animate-spin' />
+                      ) : (
+                        <Camera className='h-3 w-3' />
+                      )}
                     </div>
                   </label>
                   <input
-                    id="profile-image-upload"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
+                    id='profile-image-upload'
+                    type='file'
+                    accept='image/jpeg,image/jpg,image/png,image/webp'
+                    className='hidden'
                     onChange={handleImageUpload}
+                    disabled={uploadingImage}
                   />
                 </div>
               )}
             </div>
-            <div className="text-center sm:text-left ">
-              <CardTitle className="text-lg sm:text-xl">
+            <div className='text-center sm:text-left '>
+              <CardTitle className='text-lg sm:text-xl'>
                 {userInfo.firstName} {userInfo.lastName}
               </CardTitle>
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-2">
+              <div className='flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-2'>
                 {userInfo.verified && (
-                  <Badge variant="default" className="flex items-center gap-1 text-xs">
-                    <Shield className="h-3 w-3" />
+                  <Badge
+                    variant='default'
+                    className='flex items-center gap-1 text-xs'
+                  >
+                    <Shield className='h-3 w-3' />
                     {t('profile.verified')}
                   </Badge>
                 )}
-                <Badge variant="secondary" className="text-xs">
-                  {userInfo.accountType === 'individual' ? t('profile.account_type_individual') : t('profile.account_type_business')}
+                <Badge variant='secondary' className='text-xs'>
+                  {userInfo.accountType === 'individual'
+                    ? t('profile.account_type_individual')
+                    : t('profile.account_type_business')}
                 </Badge>
               </div>
-              <p className="text-sm text-muted-foreground mt-1">
-                {t('profile.member_since').replace('{date}', language === 'fr' ? 'janvier 2024' : language === 'ar' ? 'يناير 2024' : 'January 2024')}
+              <p className='text-sm text-muted-foreground mt-1'>
+                {t('profile.member_since').replace(
+                  '{date}',
+                  language === 'fr'
+                    ? 'janvier 2024'
+                    : language === 'ar'
+                    ? 'يناير 2024'
+                    : 'January 2024'
+                )}
               </p>
             </div>
           </div>
-          <div className="w-full sm:w-auto sm:flex-shrink-0 ">
+          <div className='w-full sm:w-auto sm:flex-shrink-0 '>
             {!isEditing ? (
-              <Button 
-                variant="outline" 
+              <Button
+                variant='outline'
                 onClick={() => setIsEditing(true)}
-                className="w-full sm:w-auto"
+                className='w-full sm:w-auto'
               >
-                <Edit3 className="h-4 w-4 mr-2" />
+                <Edit3 className='h-4 w-4 mr-2' />
                 {t('profile.edit')}
               </Button>
             ) : (
-              <div className="flex gap-2 w-full sm:w-auto">
-                <Button size="sm" onClick={handleSave} disabled={isSaving} className="flex-1 sm:flex-none">
+              <div className='flex gap-2 w-full sm:w-auto'>
+                <Button
+                  size='sm'
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  className='flex-1 sm:flex-none'
+                >
                   {isSaving ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Loader2 className='h-4 w-4 animate-spin' />
                   ) : (
-                    <Check className="h-4 w-4" />
+                    <Check className='h-4 w-4' />
                   )}
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => setIsEditing(false)} disabled={isSaving} className="flex-1 sm:flex-none">
-                  <X className="h-4 w-4" />
+                <Button
+                  variant='outline'
+                  size='sm'
+                  onClick={() => setIsEditing(false)}
+                  disabled={isSaving}
+                  className='flex-1 sm:flex-none'
+                >
+                  <X className='h-4 w-4' />
                 </Button>
               </div>
             )}
           </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="firstName">{t('profile.first_name')}</Label>
-            <Input 
-              id="firstName" 
+      <CardContent className='space-y-4'>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <div className='space-y-2'>
+            <Label htmlFor='firstName'>{t('profile.first_name')}</Label>
+            <Input
+              id='firstName'
               value={userInfo.firstName}
               disabled={!isEditing}
-              onChange={(e) => setUserInfo({...userInfo, firstName: e.target.value})}
-              className={language === 'ar' ? 'text-right' : ''}
+              onChange={(e) => handleInputChange('firstName', e.target.value)}
+              className={`${language === 'ar' ? 'text-right' : ''} ${
+                errors.firstName ? 'border-red-500' : ''
+              }`}
             />
+            {errors.firstName && (
+              <p className='text-sm text-red-500'>{errors.firstName}</p>
+            )}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="lastName">{t('profile.last_name')}</Label>
-            <Input 
-              id="lastName" 
+          <div className='space-y-2'>
+            <Label htmlFor='lastName'>{t('profile.last_name')}</Label>
+            <Input
+              id='lastName'
               value={userInfo.lastName}
               disabled={!isEditing}
-              onChange={(e) => setUserInfo({...userInfo, lastName: e.target.value})}
-              className={language === 'ar' ? 'text-right' : ''}
+              onChange={(e) => handleInputChange('lastName', e.target.value)}
+              className={`${language === 'ar' ? 'text-right' : ''} ${
+                errors.lastName ? 'border-red-500' : ''
+              }`}
             />
+            {errors.lastName && (
+              <p className='text-sm text-red-500'>{errors.lastName}</p>
+            )}
           </div>
         </div>
-        <div className="space-y-2">
+        {/* <div className="space-y-2">
           <Label htmlFor="displayName">Display Name</Label>
           <Input 
             id="displayName" 
@@ -374,67 +727,105 @@ const ProfileInfo = () => {
             placeholder="Enter your display name"
             className={language === 'ar' ? 'text-right' : ''}
           />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="currentPassword">{t('profile.current_password')}</Label>
-            <Input 
-              id="currentPassword" 
-              type="password"
+        </div> */}
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <div className='space-y-2'>
+            <Label htmlFor='currentPassword'>
+              {t('profile.current_password')}
+            </Label>
+            <Input
+              id='currentPassword'
+              type='password'
               value={userInfo.currentPassword}
               disabled={!isEditing}
-              onChange={(e) => setUserInfo({...userInfo, currentPassword: e.target.value})}
+              onChange={(e) =>
+                setUserInfo({ ...userInfo, currentPassword: e.target.value })
+              }
               className={language === 'ar' ? 'text-right' : ''}
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="newPassword">{t('profile.new_password')}</Label>
-            <Input 
-              id="newPassword" 
-              type="password"
+          <div className='space-y-2'>
+            <Label htmlFor='newPassword'>{t('profile.new_password')}</Label>
+            <Input
+              id='newPassword'
+              type='password'
               value={userInfo.newPassword}
               disabled={!isEditing}
               onChange={(e) => handlePasswordChange(e.target.value)}
               className={language === 'ar' ? 'text-right' : ''}
             />
             {/* Password requirements - only show when editing, password has content, and NOT all requirements are met */}
-            {isEditing && userInfo.newPassword.length > 0 && !passwordValidation.isValid && (
-              <div className="text-xs space-y-1 mt-2">
-                <p className={`flex items-center gap-1 ${passwordValidation.minLength ? 'text-green-600' : 'text-red-500'}`}>
-                  <span>{passwordValidation.minLength ? '✓' : '✗'}</span>
-                  {t('password.min_length')}
-                </p>
-                <p className={`flex items-center gap-1 ${passwordValidation.hasUppercase ? 'text-green-600' : 'text-red-500'}`}>
-                  <span>{passwordValidation.hasUppercase ? '✓' : '✗'}</span>
-                  {t('password.uppercase')}
-                </p>
-                <p className={`flex items-center gap-1 ${passwordValidation.hasLowercase ? 'text-green-600' : 'text-red-500'}`}>
-                  <span>{passwordValidation.hasLowercase ? '✓' : '✗'}</span>
-                  {t('password.lowercase')}
-                </p>
-                <p className={`flex items-center gap-1 ${passwordValidation.hasNumber ? 'text-green-600' : 'text-red-500'}`}>
-                  <span>{passwordValidation.hasNumber ? '✓' : '✗'}</span>
-                  {t('password.number')}
-                </p>
-                <p className={`flex items-center gap-1 ${passwordValidation.hasSpecial ? 'text-green-600' : 'text-red-500'}`}>
-                  <span>{passwordValidation.hasSpecial ? '✓' : '✗'}</span>
-                  {t('password.special_char')}
-                </p>
-              </div>
-            )}
+            {isEditing &&
+              userInfo.newPassword.length > 0 &&
+              !passwordValidation.isValid && (
+                <div className='text-xs space-y-1 mt-2'>
+                  <p
+                    className={`flex items-center gap-1 ${
+                      passwordValidation.minLength
+                        ? 'text-green-600'
+                        : 'text-red-500'
+                    }`}
+                  >
+                    <span>{passwordValidation.minLength ? '✓' : '✗'}</span>
+                    {t('password.min_length')}
+                  </p>
+                  <p
+                    className={`flex items-center gap-1 ${
+                      passwordValidation.hasUppercase
+                        ? 'text-green-600'
+                        : 'text-red-500'
+                    }`}
+                  >
+                    <span>{passwordValidation.hasUppercase ? '✓' : '✗'}</span>
+                    {t('password.uppercase')}
+                  </p>
+                  <p
+                    className={`flex items-center gap-1 ${
+                      passwordValidation.hasLowercase
+                        ? 'text-green-600'
+                        : 'text-red-500'
+                    }`}
+                  >
+                    <span>{passwordValidation.hasLowercase ? '✓' : '✗'}</span>
+                    {t('password.lowercase')}
+                  </p>
+                  <p
+                    className={`flex items-center gap-1 ${
+                      passwordValidation.hasNumber
+                        ? 'text-green-600'
+                        : 'text-red-500'
+                    }`}
+                  >
+                    <span>{passwordValidation.hasNumber ? '✓' : '✗'}</span>
+                    {t('password.number')}
+                  </p>
+                  <p
+                    className={`flex items-center gap-1 ${
+                      passwordValidation.hasSpecial
+                        ? 'text-green-600'
+                        : 'text-red-500'
+                    }`}
+                  >
+                    <span>{passwordValidation.hasSpecial ? '✓' : '✗'}</span>
+                    {t('password.special_char')}
+                  </p>
+                </div>
+              )}
           </div>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="email">{t('profile.email')}</Label>
-          <Input 
-            id="email" 
-            type="email" 
+        <div className='space-y-2'>
+          <Label htmlFor='email'>{t('profile.email')}</Label>
+          <Input
+            id='email'
+            type='email'
             value={userInfo.email}
-            disabled={!isEditing}
-            onChange={(e) => setUserInfo({...userInfo, email: e.target.value})}
+            disabled
+            onChange={(e) =>
+              setUserInfo({ ...userInfo, email: e.target.value })
+            }
           />
         </div>
-        <div className="space-y-2">
+        {/* <div className="space-y-2">
           <Label htmlFor="newEmail">New Email</Label>
           <Input 
             id="newEmail" 
@@ -445,89 +836,101 @@ const ProfileInfo = () => {
             placeholder="Enter new email address"
             className={language === 'ar' ? 'text-right' : ''}
           />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="phone">{t('profile.phone')}</Label>
-          <div className="flex gap-2">
-            <Select 
-              value={userInfo.phonePrefix} 
-              onValueChange={(value) => setUserInfo({...userInfo, phonePrefix: value})}
-              disabled={!isEditing || loadingCountries}
+        </div> */}
+        <div className='space-y-2'>
+          <Label htmlFor='phoneNumber'>{t('profile.phone')}</Label>
+          <div className='flex gap-2'>
+            <Select
+              value={userInfo.phonePrefix}
+              onValueChange={handlePhonePrefixChange}
+              disabled={!isEditing}
             >
-              <SelectTrigger className="w-32">
+              <SelectTrigger className='w-32'>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {loadingCountries ? (
-                  <SelectItem value="loading" disabled>
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    {t('common.loading')}
+                {phonePrefixes.map((prefix, index) => (
+                  <SelectItem key={index} value={prefix.value}>
+                    <span
+                      className='mx-2'
+                      dangerouslySetInnerHTML={{ __html: prefix.flag }}
+                    />
+                    {prefix.value}
                   </SelectItem>
-                ) : (
-                  phonePrefixes.map((prefix) => (
-                    <SelectItem key={prefix.value} value={prefix.value}>
-                    <span className={`fi fi-${prefix.flag} mx-2`}></span>
-                    {prefix.label}
-                  </SelectItem>
-                  ))
-                )}
+                ))}
               </SelectContent>
             </Select>
-            <Input 
-              id="phone" 
-              value={userInfo.phone}
+            <Input
+              id='phoneNumber'
+              type='tel'
+              value={userInfo.phoneNumber}
               disabled={!isEditing}
-              onChange={(e) => setUserInfo({...userInfo, phone: e.target.value})}
-              className="flex-1"
+              onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+              className={`flex-1 ${errors.phoneNumber ? 'border-red-500' : ''}`}
+              placeholder='123456789'
             />
           </div>
+          {errors.phoneNumber && (
+            <p className='text-sm text-red-500'>{errors.phoneNumber}</p>
+          )}
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="country">{t('profile.country')}</Label>
-            <Select 
-              value={userInfo.country} 
-              onValueChange={(value) => setUserInfo({...userInfo, country: value})}
-              disabled={!isEditing || loadingCountries}
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <div className='space-y-2'>
+            <Label htmlFor='country'>{t('profile.country')}</Label>
+            <Select
+              value={userInfo.country}
+              onValueChange={handleCountryChange}
+              disabled={!isEditing}
             >
-              <SelectTrigger>
-                <SelectValue placeholder={loadingCountries ? t('common.loading') : t('profile.select_country')} />
+              <SelectTrigger className={errors.country ? 'border-red-500' : ''}>
+                <SelectValue placeholder={t('profile.select_country')} />
               </SelectTrigger>
               <SelectContent>
-                {loadingCountries ? (
-                  <SelectItem value="loading" disabled>
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    {t('common.loading')}
+                {countries.map((country, index) => (
+                  <SelectItem key={index} value={country.value}>
+                    <span
+                      className='mx-2'
+                      dangerouslySetInnerHTML={{ __html: country.flag }}
+                    />
+                    {t(`country.${country.label}`)}
                   </SelectItem>
-                ) : (
-                  countryOptions.map((country) => (
-                    <SelectItem key={country.value} value={country.value}>
-                    <span className={`fi fi-${country.flag} mx-2`}></span>
-                    {country.label}
-                  </SelectItem>
-                  ))
-                )}
+                ))}
               </SelectContent>
             </Select>
+            {errors.country && (
+              <p className='text-sm text-red-500'>{errors.country}</p>
+            )}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="address">{t('profile.address')}</Label>
-            <Input 
-              id="address" 
-              value={userInfo.address}
-              disabled={!isEditing}
-              onChange={(e) => setUserInfo({...userInfo, address: e.target.value})}
-              placeholder={t('profile.address_placeholder')}
-              className={language === 'ar' ? 'text-right' : ''}
-            />
+          <div className='space-y-2'>
+            <Label htmlFor='address'>{t('profile.address')}</Label>
+            {isEditing ? (
+              <AddressAutocomplete
+                onChange={handleAddressChange}
+                onAddressSelected={handleAddressSelected}
+                selectedCountry={userInfo.country}
+                value={userInfo.address}
+                className={errors.address ? 'border-red-500' : ''}
+              />
+            ) : (
+              <Input
+                id='address'
+                value={userInfo.address}
+                disabled={true}
+                placeholder={t('profile.address_placeholder')}
+                className={language === 'ar' ? 'text-right' : ''}
+              />
+            )}
+            {errors.address && (
+              <p className='text-sm text-red-500'>{errors.address}</p>
+            )}
             {isEditing && (
-              <p className="text-xs text-muted-foreground">
+              <p className='text-xs text-muted-foreground'>
                 {t('profile.address_hint')}
               </p>
             )}
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="city">City</Label>
             <Input 
@@ -550,8 +953,8 @@ const ProfileInfo = () => {
               className={language === 'ar' ? 'text-right' : ''}
             />
           </div>
-        </div>
-        <div className="space-y-2">
+        </div> */}
+        {/* <div className="space-y-2">
           <Label htmlFor="bio">Bio</Label>
           <textarea 
             id="bio" 
@@ -562,8 +965,8 @@ const ProfileInfo = () => {
             className={`min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${language === 'ar' ? 'text-right' : ''}`}
             rows={4}
           />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        </div> */}
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="latitude">Latitude</Label>
             <Input 
@@ -590,52 +993,64 @@ const ProfileInfo = () => {
               className={language === 'ar' ? 'text-right' : ''}
             />
           </div>
-        </div>
+        </div> */}
         {/* Delete account button */}
-          <div className="flex justify-center sm:justify-end">
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground w-full sm:w-auto"
+        {/* <div className='flex justify-center sm:justify-end'>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant='outline'
+                size='sm'
+                className='text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground w-full sm:w-auto'
+              >
+                <Trash2 className='h-4 w-4 mr-2' />
+                <span className='sm:hidden'>{t('profile.delete_account')}</span>
+                <span className='hidden sm:inline'>
+                  {t('profile.delete_account')}
+                </span>
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader
+                className={`flex flex-row flex-wrap items-center ${
+                  language === 'ar' ? 'justify-end' : ''
+                }`}
+              >
+                <AlertDialogTitle>
+                  {t('profile.delete_confirm')}
+                </AlertDialogTitle>
+                <AlertDialogDescription
+                  className={`text-left space-y-2${
+                    language === 'ar' ? ' text-right' : ''
+                  }`}
                 >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  <span className="sm:hidden">{t('profile.delete_account')}</span>
-                  <span className="hidden sm:inline">{t('profile.delete_account')}</span>
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader className={`flex flex-row flex-wrap items-center ${language === 'ar' ? 'justify-end' : ''}`}>
-                  <AlertDialogTitle>{t('profile.delete_confirm')}</AlertDialogTitle>
-                  <AlertDialogDescription className={`text-left space-y-2${language === 'ar' ? ' text-right' : ''}`}>
-                    <div>{t('profile.delete_description')}</div>
-                    <div>{t('profile.delete_processing')}</div>
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>{t('action.cancel')}</AlertDialogCancel>
-                  <AlertDialogAction 
-                    onClick={handleAccountDeletion}
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  >
-                    {t('action.confirm')}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
+                  <div>{t('profile.delete_description')}</div>
+                  <div>{t('profile.delete_processing')}</div>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t('action.cancel')}</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleAccountDeletion}
+                  className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
+                >
+                  {t('action.confirm')}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div> */}
         {!isEditing && (
-          <div className="pt-4 border-t">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Upload className="h-4 w-4" />
+          <div className='pt-4 border-t'>
+            <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+              <Upload className='h-4 w-4' />
               <span>{t('profile.edit_profile_photo')}</span>
             </div>
           </div>
         )}
       </CardContent>
     </Card>
-  );
-};
+  )
+}
 
-export default ProfileInfo;
+export default ProfileInfo

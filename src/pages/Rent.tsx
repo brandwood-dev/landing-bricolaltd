@@ -131,11 +131,11 @@ const Rent = () => {
     fetchTool()
   }, [id])
 
-  useEffect(() => {
-    if (!user) {
-      navigate('/login', { state: { from: location } })
-    }
-  }, [user, navigate])
+  // useEffect(() => {
+  //   if (!user) {
+  //     navigate('/login', { state: { from: location } })
+  //   }
+  // }, [user, navigate])
 
   const isDateUnavailable = (date: Date) => {
     return unavailableDates.some(
@@ -169,17 +169,32 @@ const Rent = () => {
       console.error('Failed to fetch pricing:', err)
       // Fallback to manual calculation
       const days = calculateDays()
-      const basePrice = tool.basePrice || 25
+      const basePrice = tool.basePrice
       const subtotal = basePrice * days
-      const fees = subtotal * 0.05 // 5% fees
-      const deposit = 50
+      const fees = subtotal * 0.06 // 6% fees
+      const deposit = tool.depositAmount
       setPricing({
+        toolId: tool.id,
         basePrice,
         totalDays: days,
         subtotal,
-        fees,
+        taxes: fees,
         deposit,
         totalAmount: subtotal + fees + deposit,
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0],
+        serviceFee: fees,
+        currency: 'EUR',
+        breakdown: {
+          dailyRate: basePrice,
+          numberOfDays: days,
+          subtotal: subtotal,
+          serviceFeePercentage: 17,
+          serviceFeeAmount: fees,
+          taxPercentage: 6,
+          taxAmount: basePrice * 0.06,
+          depositAmount: deposit,
+        },
       })
     } finally {
       setPricingLoading(false)
@@ -197,8 +212,8 @@ const Rent = () => {
   )
   const days = Math.max(Number(pricing?.totalDays || calculateDays()) || 1, 1)
   const totalPrice = Math.max(Number(pricing?.subtotal) || basePrice * days, 0)
-  const totalFees = Math.max(Number(pricing?.fees) || totalPrice * 0.05, 0)
-  const deposit = Math.max(Number(pricing?.deposit) || 50, 0)
+  const totalFees = Math.max(Number(pricing?.taxes) || totalPrice * 0.06, 0)
+  const deposit = Math.max(Number(pricing?.deposit) || tool?.depositAmount || 0, 0)
   const displayPrice = basePrice
   const totalToPay = Math.max(
     Number(pricing?.totalAmount) || totalPrice + totalFees + deposit,

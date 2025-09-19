@@ -330,6 +330,44 @@ const translations = {
     'validation.condition_required': "L'état de l'outil est obligatoire",
     'validation.price_invalid': 'Le prix par jour doit être supérieur à 0',
     'validation.limit_reached': 'Vous ne pouvez ajouter que 10 photos maximum',
+    'validation.first_name_required': 'Le prénom est obligatoire',
+    'validation.last_name_required': 'Le nom de famille est obligatoire',
+    'validation.email_required': "L'adresse email est obligatoire",
+    'validation.password_required': 'Le mot de passe est obligatoire',
+    'validation.terms_required':
+      "Vous devez accepter les conditions d'utilisation",
+    'validation.privacy_required':
+      'Vous devez accepter la politique de confidentialité',
+    'register.select_prefix': 'Sélectionnez le préfixe',
+    // Contact form validation
+    'contact.validation.firstName_required': 'Le prénom est obligatoire.',
+    'contact.validation.firstName_min_length':
+      'Le prénom doit contenir au moins 2 caractères.',
+    'contact.validation.lastName_required': 'Le nom est obligatoire.',
+    'contact.validation.lastName_min_length':
+      'Le nom doit contenir au moins 2 caractères.',
+    'contact.validation.email_required': "L'email est obligatoire.",
+    'contact.validation.email_invalid':
+      "Le format de l'email n'est pas valide.",
+    'contact.validation.phone_invalid':
+      "Le format du numéro de téléphone n'est pas valide.",
+    'contact.validation.subject_required': 'Le sujet est obligatoire.',
+    'contact.validation.subject_min_length':
+      'Le sujet doit contenir au moins 5 caractères.',
+    'contact.validation.message_required': 'Le message est obligatoire.',
+    'contact.validation.message_min_length':
+      'Le message doit contenir au moins 10 caractères.',
+    'contact.validation.category_required': 'La catégorie est obligatoire.',
+
+    // Contact form categories
+    'contact.category.label': 'Catégorie *',
+    'contact.category.placeholder': 'Sélectionnez une catégorie',
+    'contact.category.technical': 'Technique',
+    'contact.category.payment': 'Paiement',
+    'contact.category.account': 'Compte',
+    'contact.category.dispute': 'Litige',
+    'contact.category.suggestion': 'Suggestion',
+    'contact.category.other': 'Autre',
     'placeholder.tool_title': 'Ex: Perceuse électrique Bosch Professional',
     'placeholder.brand': 'Ex: Bosch',
     'placeholder.model': 'Ex: GSB 13 RE',
@@ -577,6 +615,9 @@ const translations = {
     'general.rejected': 'Rejeté',
     'general.list': 'Liste',
     'general.grid': 'Grille',
+    'general.status': 'Statut',
+    'general.public': 'Public',
+    'general.categories': 'Catégories',
 
     // bookings
     'booking.cancelled': 'Réservation annulée',
@@ -1025,6 +1066,12 @@ const translations = {
     'tools.remove_from_favorites': 'Retirer des favoris',
     'tools.instructions': 'Consigne du propriétaire',
     'tools.reviews': 'Avis des locataires',
+    'tools.condition_new': 'Neuf',
+    'tools.condition_like_new': 'Comme neuf',
+    'tools.condition_good': 'Bon état',
+    'tools.condition_fair': 'État correct',
+    'tools.condition_poor': 'Mauvais état',
+    'tools.condition_unknown': 'Inconnu',
 
     // Forms
     'form.first_name': 'Prénom',
@@ -1173,7 +1220,16 @@ const translations = {
     'contact.last_name': 'Nom',
     'contact.subject': 'Sujet',
     'contact.message': 'Message',
+    'contact.phone': 'Téléphone',
+    'contact.phone_placeholder': '+33 1 23 45 67 89',
+    'contact.sending': 'Envoi en cours...',
     'contact.send': 'Envoyer le message',
+    'contact.error_title': 'Erreur',
+    'contact.error_message':
+      "Une erreur est survenue lors de l'envoi de votre message. Veuillez réessayer.",
+    'contact.success_title': 'Message envoyé !',
+    'contact.success_message':
+      'Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.',
     'contact.email_title': 'Email',
     'contact.phone_title': 'Téléphone',
     'contact.address_title': 'Adresse',
@@ -2117,6 +2173,9 @@ const translations = {
     'general.location': 'Rentals',
     'general.list': 'List',
     'general.grid': 'Grid',
+    'general.status': 'Status',
+    'general.public': 'Public',
+    'general.categories': 'Categories',
     'general.published': 'Published',
     'general.unpublished': 'Unpublished',
     'general.view_details': 'View Details',
@@ -2578,6 +2637,52 @@ const translations = {
     'addtool.error_create_tool': 'Error creating tool',
     'addtool.success_created': 'Tool successfully created!',
     'addtool.success_updated': 'Tool successfully updated!',
+
+    // validation
+    'validation.checking': 'Checking...',
+    'validation.name_available': 'Name available ✓',
+    'validation.name_taken': 'This name is already taken',
+    'validation.verification_error': 'Verification error',
+    'validation.service_unavailable': 'Verification service unavailable',
+    'validation.server_error': 'Server error, please try again',
+    'validation.title_required': 'Title is required',
+    'validation.name_invalid': 'Tool name must be unique',
+    'validation.category_required': 'Category is required',
+    'validation.condition_required': 'Tool condition is required',
+    'validation.price_invalid': 'Price per day must be greater than 0',
+    'validation.limit_reached': 'You can add a maximum of 10 photos',
+    'validation.first_name_required': 'First name is required',
+    'validation.last_name_required': 'Last name is required',
+    'validation.email_required': 'Email address is required',
+    'validation.password_required': 'Password is required',
+    'validation.terms_required': 'You must accept the terms of use',
+    'validation.privacy_required': 'You must accept the privacy policy',
+
+    // Contact form validation
+    'contact.validation.firstName_required': 'First name is required.',
+    'contact.validation.firstName_min_length':
+      'First name must be at least 2 characters.',
+    'contact.validation.lastName_required': 'Last name is required.',
+    'contact.validation.lastName_min_length':
+      'Last name must be at least 2 characters.',
+    'contact.validation.email_required': 'Email is required.',
+    'contact.validation.email_invalid': 'Email format is invalid.',
+    'contact.validation.phone_invalid': 'Phone number format is invalid.',
+    'contact.validation.subject_required': 'Subject is required.',
+    'contact.validation.subject_min_length':
+      'Subject must be at least 5 characters.',
+    'contact.validation.message_required': 'Message is required.',
+    'contact.validation.message_min_length':
+      'Message must be at least 10 characters.',
+    'contact.validation.category_required': 'Category is required.',
+    'contact.category.label': 'Category *',
+    'contact.category.placeholder': 'Select a category',
+    'contact.category.technical': 'Technical',
+    'contact.category.payment': 'Payment',
+    'contact.category.account': 'Account',
+    'contact.category.dispute': 'Dispute',
+    'contact.category.suggestion': 'Suggestion',
+    'contact.category.other': 'Other',
     'addtool.name_placeholder': 'Tool name',
     'addtool.description_placeholder': 'Describe your tool...',
     'addtool.category_gardening': 'Gardening',
@@ -2608,6 +2713,12 @@ const translations = {
     'tools.desc': 'Description',
     'tools.instructions': "Owner's Instructions",
     'tools.reviews': 'Renter Reviews',
+    'tools.condition_new': 'New',
+    'tools.condition_like_new': 'Like New',
+    'tools.condition_good': 'Good',
+    'tools.condition_fair': 'Fair',
+    'tools.condition_poor': 'Poor',
+    'tools.condition_unknown': 'Unknown',
 
     // Forms
     'form.first_name': 'First name',
@@ -2757,7 +2868,16 @@ const translations = {
     'contact.last_name': 'Last name',
     'contact.subject': 'Subject',
     'contact.message': 'Message',
+    'contact.phone': 'Phone',
+    'contact.phone_placeholder': '+44 20 1234 5678',
+    'contact.sending': 'Sending...',
     'contact.send': 'Send message',
+    'contact.error_title': 'Error',
+    'contact.error_message':
+      'An error occurred while sending your message. Please try again.',
+    'contact.success_title': 'Message sent!',
+    'contact.success_message':
+      'Your message has been sent successfully. We will respond to you as soon as possible.',
     'contact.email_title': 'Email',
     'contact.phone_title': 'Phone',
     'contact.address_title': 'Address',
@@ -3211,9 +3331,11 @@ const translations = {
 
     'privacy.section10.p3':
       'Continued use of our services implies acceptance of the updated terms.',
+    'register.select_prefix': 'Choose prefix',
   },
   ar: {
     // AgeVerificationDialog
+    'register.select_prefix': 'اختر فكس',
     'ageVerification.title': 'التحقق من العمر',
     'ageVerification.description':
       'منصتنا متاحة عبر تطبيقات الويب والهاتف المحمول. وهي مخصصة حصرياً للمستخدمين الذين تبلغ أعمارهم 18 عاماً أو أكثر والذين يتمتعون بالأهلية القانونية لاستخدام خدماتنا.',
@@ -3671,6 +3793,9 @@ const translations = {
 
     'general.list': 'قائمة',
     'general.grid': 'شبكة',
+    'general.status': 'الحالة',
+    'general.public': 'عام',
+    'general.categories': 'الفئات',
     'general.published': 'تم النشر',
     'general.unpublished': 'غير منشور',
     'general.view_details': 'عرض التفاصيل',
@@ -4091,6 +4216,12 @@ const translations = {
     'tools.desc': 'الوصف',
     'tools.instructions': 'تعليمات المؤجر',
     'tools.reviews': 'تقييمات المستأجرين',
+    'tools.condition_new': 'جديد',
+    'tools.condition_like_new': 'كالجديد',
+    'tools.condition_good': 'حالة جيدة',
+    'tools.condition_fair': 'حالة مقبولة',
+    'tools.condition_poor': 'حالة سيئة',
+    'tools.condition_unknown': 'غير معروف',
 
     // Profile translations
     'profile.first_name': 'الاسم',
@@ -4271,7 +4402,16 @@ const translations = {
     'contact.last_name': 'الاسم الأخير',
     'contact.subject': 'الموضوع',
     'contact.message': 'الرسالة',
+    'contact.phone': 'الهاتف',
+    'contact.phone_placeholder': '+966 11 234 5678',
+    'contact.sending': 'جاري الإرسال...',
     'contact.send': 'إرسال الرسالة',
+    'contact.error_title': 'خطأ',
+    'contact.error_message':
+      'حدث خطأ أثناء إرسال رسالتك. يرجى المحاولة مرة أخرى.',
+    'contact.success_title': 'تم إرسال الرسالة!',
+    'contact.success_message':
+      'تم إرسال رسالتك بنجاح. سنرد عليك في أقرب وقت ممكن.',
     'contact.email_title': 'البريد الإلكتروني',
     'contact.phone_title': 'الهاتف',
     'contact.address_title': 'العنوان',
@@ -4611,6 +4751,60 @@ const translations = {
       'سيتم إعلام المستخدمين بأي تعديل جوهري عبر البريد الإلكتروني أو الإشعار عبر التطبيق.',
     'privacy.section10.p3':
       'استمرار استخدام المنصة بعد التعديل يعني القبول الضمني للنسخة الجديدة.',
+
+    // validation
+    'validation.checking': 'جاري التحقق...',
+    'validation.name_available': 'الاسم متاح',
+    'validation.name_taken': 'الاسم مُستخدم بالفعل',
+    'validation.first_name_required': 'الاسم الأول مطلوب',
+    'validation.last_name_required': 'الاسم الأخير مطلوب',
+    'validation.email_required': 'البريد الإلكتروني مطلوب',
+    'validation.password_required': 'كلمة المرور مطلوبة',
+    'validation.terms_required': 'يجب الموافقة على الشروط والأحكام',
+    'validation.privacy_required': 'يجب الموافقة على سياسة الخصوصية',
+
+    // Contact form validation
+    'contact.validation.firstName_required': 'الاسم الأول مطلوب.',
+    'contact.validation.firstName_min_length':
+      'يجب أن يحتوي الاسم الأول على حرفين على الأقل.',
+    'contact.validation.lastName_required': 'اسم العائلة مطلوب.',
+    'contact.validation.lastName_min_length':
+      'يجب أن يحتوي اسم العائلة على حرفين على الأقل.',
+    'contact.validation.email_required': 'البريد الإلكتروني مطلوب.',
+    'contact.validation.email_invalid': 'تنسيق البريد الإلكتروني غير صحيح.',
+    'contact.validation.phone_invalid': 'تنسيق رقم الهاتف غير صحيح.',
+    'contact.validation.subject_required': 'الموضوع مطلوب.',
+    'contact.validation.subject_min_length':
+      'يجب أن يحتوي الموضوع على 5 أحرف على الأقل.',
+    'contact.validation.message_required': 'الرسالة مطلوبة.',
+    'contact.validation.message_min_length':
+      'يجب أن تحتوي الرسالة على 10 أحرف على الأقل.',
+    'contact.validation.category_required': 'الفئة مطلوبة.',
+    'contact.category.label': 'الفئة *',
+    'contact.category.placeholder': 'اختر فئة',
+    'contact.category.technical': 'تقني',
+    'contact.category.payment': 'دفع',
+    'contact.category.account': 'حساب',
+    'contact.category.dispute': 'نزاع',
+    'contact.category.suggestion': 'اقتراح',
+    'contact.category.other': 'أخرى',
+    'validation.title_required': 'العنوان مطلوب',
+    'validation.description_required': 'الوصف مطلوب',
+    'validation.price_required': 'السعر مطلوب',
+    'validation.category_required': 'الفئة مطلوبة',
+    'validation.location_required': 'الموقع مطلوب',
+    'validation.images_required': 'الصور مطلوبة',
+    'validation.deposit_required': 'مبلغ التأمين مطلوب',
+    'validation.phone_required': 'رقم الهاتف مطلوب',
+    'validation.address_required': 'العنوان مطلوب',
+    'validation.country_required': 'البلد مطلوب',
+    'validation.invalid_email': 'البريد الإلكتروني غير صحيح',
+    'validation.invalid_phone': 'رقم الهاتف غير صحيح',
+    'validation.password_too_short':
+      'كلمة المرور قصيرة جداً (8 أحرف على الأقل)',
+    'validation.passwords_dont_match': 'كلمات المرور غير متطابقة',
+    'validation.invalid_price': 'السعر غير صحيح',
+    'validation.invalid_deposit': 'مبلغ التأمين غير صحيح',
   },
 }
 

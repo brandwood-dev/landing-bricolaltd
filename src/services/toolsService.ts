@@ -302,9 +302,19 @@ export class ToolsService {
   async getCategories(): Promise<Category[]> {
     try {
       const response = await api.get<ApiResponse<Category[]>>('/categories');
-      return response.data.data;
+      // Handle nested data structure: response.data.data.data or response.data.data
+      const categories = response.data.data?.data || response.data.data;
+      
+      // Ensure we return an array
+      if (!Array.isArray(categories)) {
+        console.warn('Categories response is not an array:', categories);
+        return [];
+      }
+      
+      return categories;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to fetch categories');
+      console.error('Error fetching categories:', error);
+      return []; // Return empty array instead of throwing to prevent component crashes
     }
   }
 

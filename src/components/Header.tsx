@@ -160,18 +160,19 @@ const Header = () => {
                         {t('nav.profile')}
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/wallet" className="flex items-center">
-                        <Wrench className="mr-2 h-4 w-4" />
-                        {t('nav.wallet')}
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/settings" className="flex items-center">
-                        <Settings className="mr-2 h-4 w-4" />
-                        {t('nav.settings')}
-                      </Link>
-                    </DropdownMenuItem>
+                      {/* <DropdownMenuItem asChild>
+                        <Link to="/wallet" className="flex items-center">
+                          <Wrench className="mr-2 h-4 w-4" />
+                          {t('nav.wallet')}
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/settings" className="flex items-center">
+                          <Settings className="mr-2 h-4 w-4" />
+                          {t('nav.settings')}
+                        </Link>
+                      </DropdownMenuItem>  */}
+                      
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout} className="text-red-600">
                       <LogOut className="mr-2 h-4 w-4" />

@@ -39,7 +39,7 @@ const AddTool = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { toast } = useToast()
-  
+
   // Form state
   const [formData, setFormData] = useState<Partial<CreateToolData>>({
     title: '',
@@ -53,29 +53,29 @@ const AddTool = () => {
     basePrice: undefined,
     depositAmount: undefined,
     pickupAddress: '',
-    ownerInstructions: ''
+    ownerInstructions: '',
   })
-  
+
   // File upload state
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [primaryPhotoIndex, setPrimaryPhotoIndex] = useState<number>(0)
-  
+
   // UI state
   const [dragActive, setDragActive] = useState(false)
   const [loading, setLoading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
-  
+
   // Categories state
   const [categories, setCategories] = useState<any[]>([])
   const [subcategories, setSubcategories] = useState<any[]>([])
   const [loadingCategories, setLoadingCategories] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState('')
-  
+
   // Name validation state
   const [nameValidation, setNameValidation] = useState<{
-    isChecking: boolean;
-    isUnique: boolean | null;
-    message: string;
+    isChecking: boolean
+    isUnique: boolean | null
+    message: string
   }>({ isChecking: false, isUnique: null, message: '' })
 
   // Check name uniqueness
@@ -84,25 +84,29 @@ const AddTool = () => {
       setNameValidation({ isChecking: false, isUnique: null, message: '' })
       return
     }
-    
-    setNameValidation({ isChecking: true, isUnique: null, message: t('addtool.verification_in_progress') })
-    
+
+    setNameValidation({
+      isChecking: true,
+      isUnique: null,
+      message: t('addtool.verification_in_progress'),
+    })
+
     try {
       console.log('🔍 Checking name uniqueness for:', name.trim())
       const result = await toolsService.checkNameUniqueness(name.trim())
       console.log('🔍 Name uniqueness result:', result)
-      
+
       if (result.isUnique) {
-        setNameValidation({ 
-          isChecking: false, 
-          isUnique: true, 
-          message: t('addtool.name_available') 
+        setNameValidation({
+          isChecking: false,
+          isUnique: true,
+          message: t('addtool.name_available'),
         })
       } else {
-        setNameValidation({ 
-          isChecking: false, 
-          isUnique: false, 
-          message: t('addtool.name_already_used') 
+        setNameValidation({
+          isChecking: false,
+          isUnique: false,
+          message: t('addtool.name_already_used'),
         })
       }
     } catch (error: any) {
@@ -110,9 +114,9 @@ const AddTool = () => {
       console.error('🔍 Error details:', {
         message: error.message,
         response: error.response?.data,
-        status: error.response?.status
+        status: error.response?.status,
       })
-      
+
       let errorMessage = t('addtool.error_occurred')
       if (error.response?.status === 404) {
         errorMessage = t('addtool.error_occurred')
@@ -121,32 +125,35 @@ const AddTool = () => {
       } else if (error.message) {
         errorMessage = t('addtool.error_occurred')
       }
-      
-      setNameValidation({ 
-        isChecking: false, 
-        isUnique: null, 
-        message: errorMessage 
+
+      setNameValidation({
+        isChecking: false,
+        isUnique: null,
+        message: errorMessage,
       })
     }
   }
 
   // Input change handler
   const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-    
+    setFormData((prev) => ({ ...prev, [field]: value }))
+
     // Handle category change to load subcategories
     if (field === 'categoryId' && value) {
       loadSubcategories(value)
-      setFormData(prev => ({ ...prev, subcategoryId: '' })) // Reset subcategory
+      setFormData((prev) => ({ ...prev, subcategoryId: '' })) // Reset subcategory
     }
   }
 
   // Redirect to login if user is not authenticated
-  useEffect(() => {
-    if (!user) {
-      navigate('/login', { state: { from: location } })
-    }
-  }, [user, navigate])
+  // useEffect(() => {
+  //   ///waiting 3 secondes
+  //   setTimeout(() => {
+  //     if (!user) {
+  //       navigate('/login', { state: { from: location } })
+  //     }
+  //   }, 6000)
+  // }, [user, navigate])
 
   // Effect to handle name uniqueness check with debounce - DISABLED
   // useEffect(() => {
@@ -171,22 +178,24 @@ const AddTool = () => {
       } catch (error) {
         console.error('Error loading categories:', error)
         toast({
-          title: "Erreur",
-          description: "Impossible de charger les catégories",
-          variant: "destructive"
+          title: 'Erreur',
+          description: 'Impossible de charger les catégories',
+          variant: 'destructive',
         })
       } finally {
         setLoadingCategories(false)
       }
     }
-    
+
     loadCategories()
   }, [])
 
   // Load subcategories when category changes
   const loadSubcategories = async (categoryId: string) => {
     try {
-      const subcategoriesData = await toolsService.getSubcategoriesByCategory(categoryId)
+      const subcategoriesData = await toolsService.getSubcategoriesByCategory(
+        categoryId
+      )
       setSubcategories(subcategoriesData || [])
     } catch (error) {
       console.error('Error loading subcategories:', error)
@@ -197,53 +206,53 @@ const AddTool = () => {
   // File input handler
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
-    
+
     // Vérifier la taille de chaque fichier (1MB maximum)
     const maxSize = 1048576 // 1MB en bytes
-    const oversizedFiles = files.filter(file => file.size > maxSize)
-    
+    const oversizedFiles = files.filter((file) => file.size > maxSize)
+
     if (oversizedFiles.length > 0) {
       toast({
-        title: "Fichier trop volumineux",
+        title: 'Fichier trop volumineux',
         description: `Les images ne doivent pas dépasser 1MB. ${oversizedFiles.length} fichier(s) ignoré(s).`,
-        variant: "destructive"
+        variant: 'destructive',
       })
       // Filtrer les fichiers qui respectent la limite de taille
-      const validFiles = files.filter(file => file.size <= maxSize)
+      const validFiles = files.filter((file) => file.size <= maxSize)
       if (validFiles.length === 0) return
-      
+
       // Continuer avec les fichiers valides
       if (validFiles.length + selectedFiles.length > 10) {
         toast({
-          title: "Limite atteinte",
-          description: "Vous ne pouvez ajouter que 10 photos maximum",
-          variant: "destructive"
+          title: 'Limite atteinte',
+          description: 'Vous ne pouvez ajouter que 10 photos maximum',
+          variant: 'destructive',
         })
         return
       }
-      setSelectedFiles(prev => [...prev, ...validFiles])
+      setSelectedFiles((prev) => [...prev, ...validFiles])
       return
     }
-    
+
     if (files.length + selectedFiles.length > 10) {
       toast({
-        title: "Limite atteinte",
-        description: "Vous ne pouvez ajouter que 10 photos maximum",
-        variant: "destructive"
+        title: 'Limite atteinte',
+        description: 'Vous ne pouvez ajouter que 10 photos maximum',
+        variant: 'destructive',
       })
       return
     }
-    setSelectedFiles(prev => [...prev, ...files])
+    setSelectedFiles((prev) => [...prev, ...files])
   }
 
   // Remove file
   const removeFile = (index: number) => {
-    setSelectedFiles(prev => prev.filter((_, i) => i !== index))
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index))
     // Adjust primary photo index if necessary
     if (index === primaryPhotoIndex) {
       setPrimaryPhotoIndex(0) // Reset to first photo
     } else if (index < primaryPhotoIndex) {
-      setPrimaryPhotoIndex(prev => prev - 1) // Shift index down
+      setPrimaryPhotoIndex((prev) => prev - 1) // Shift index down
     }
   }
 
@@ -269,13 +278,13 @@ const AddTool = () => {
   const validateForm = () => {
     if (!formData.title?.trim()) {
       toast({
-        title: "Champ requis",
-        description: "Le titre est obligatoire",
-        variant: "destructive"
+        title: 'Champ requis',
+        description: 'Le titre est obligatoire',
+        variant: 'destructive',
       })
       return false
     }
-    
+
     // DISABLED - uniqueness validation removed
     // if (nameValidation.isUnique !== true) {
     //   toast({
@@ -285,64 +294,67 @@ const AddTool = () => {
     //   })
     //   return false
     // }
-    
+
     if (!formData.categoryId) {
       toast({
-        title: "Champ requis",
-        description: "La catégorie est obligatoire",
-        variant: "destructive"
+        title: 'Champ requis',
+        description: 'La catégorie est obligatoire',
+        variant: 'destructive',
       })
       return false
     }
-    
+
     if (!formData.condition) {
       toast({
-        title: "Champ requis",
+        title: 'Champ requis',
         description: "L'état de l'outil est obligatoire",
-        variant: "destructive"
+        variant: 'destructive',
       })
       return false
     }
-    
+
     if (!formData.basePrice || formData.basePrice <= 0) {
       toast({
-        title: "Prix invalide",
-        description: "Le prix par jour doit être supérieur à 0",
-        variant: "destructive"
+        title: 'Prix invalide',
+        description: 'Le prix par jour doit être supérieur à 0',
+        variant: 'destructive',
       })
       return false
     }
-    
+
     if (formData.depositAmount !== undefined && formData.depositAmount < 0) {
       toast({
-        title: "Dépôt invalide",
-        description: "Le montant du dépôt ne peut pas être négatif",
-        variant: "destructive"
+        title: 'Dépôt invalide',
+        description: 'Le montant du dépôt ne peut pas être négatif',
+        variant: 'destructive',
       })
       return false
     }
-    
-    if (formData.year !== undefined && (formData.year < 1900 || formData.year > 2030)) {
+
+    if (
+      formData.year !== undefined &&
+      (formData.year < 1900 || formData.year > 2030)
+    ) {
       toast({
-        title: "Année invalide",
+        title: 'Année invalide',
         description: "L'année doit être comprise entre 1900 et 2030",
-        variant: "destructive"
+        variant: 'destructive',
       })
       return false
     }
-    
+
     return true
   }
 
   // Form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!validateForm()) return
-    
+
     try {
       setSubmitting(true)
-      
+
       const toolData: CreateToolData = {
         title: formData.title!,
         brand: formData.brand,
@@ -357,27 +369,29 @@ const AddTool = () => {
         pickupAddress: formData.pickupAddress,
         ownerInstructions: formData.ownerInstructions,
         ownerId: user?.id!,
-        primaryPhotoIndex: selectedFiles.length > 0 ? primaryPhotoIndex : undefined
+        primaryPhotoIndex:
+          selectedFiles.length > 0 ? primaryPhotoIndex : undefined,
       }
-      
+
       await toolsService.createTool(toolData, selectedFiles)
-      
+
       // Set localStorage flag for MyAds refresh
       localStorage.setItem('toolAdded', 'true')
-      
+
       toast({
-        title: "Outil créé avec succès",
-        description: "Votre outil est en attente de modération. Il sera visible une fois approuvé par notre équipe.",
+        title: 'Outil créé avec succès',
+        description:
+          'Votre outil est en attente de modération. Il sera visible une fois approuvé par notre équipe.',
       })
-      
+
       // Navigate to profile with my-ads tab
       navigate('/profile?tab=my-ads')
     } catch (error: any) {
       console.error('Error creating tool:', error)
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: error.message || "Impossible de créer l'outil",
-        variant: "destructive"
+        variant: 'destructive',
       })
     } finally {
       setSubmitting(false)
@@ -449,45 +463,45 @@ const AddTool = () => {
     e.preventDefault()
     e.stopPropagation()
     setDragActive(false)
-    
+
     const files = Array.from(e.dataTransfer.files)
-    
+
     // Vérifier la taille de chaque fichier (1MB maximum)
     const maxSize = 1048576 // 1MB en bytes
-    const oversizedFiles = files.filter(file => file.size > maxSize)
-    
+    const oversizedFiles = files.filter((file) => file.size > maxSize)
+
     if (oversizedFiles.length > 0) {
       toast({
-        title: "Fichier trop volumineux",
+        title: 'Fichier trop volumineux',
         description: `Les images ne doivent pas dépasser 1MB. ${oversizedFiles.length} fichier(s) ignoré(s).`,
-        variant: "destructive"
+        variant: 'destructive',
       })
       // Filtrer les fichiers qui respectent la limite de taille
-      const validFiles = files.filter(file => file.size <= maxSize)
+      const validFiles = files.filter((file) => file.size <= maxSize)
       if (validFiles.length === 0) return
-      
+
       // Continuer avec les fichiers valides
       if (validFiles.length + selectedFiles.length > 10) {
         toast({
-          title: "Limite atteinte",
-          description: "Vous ne pouvez ajouter que 10 photos maximum",
-          variant: "destructive"
+          title: 'Limite atteinte',
+          description: 'Vous ne pouvez ajouter que 10 photos maximum',
+          variant: 'destructive',
         })
         return
       }
-      setSelectedFiles(prev => [...prev, ...validFiles])
+      setSelectedFiles((prev) => [...prev, ...validFiles])
       return
     }
-    
+
     if (files.length + selectedFiles.length > 10) {
       toast({
-        title: "Limite atteinte",
-        description: "Vous ne pouvez ajouter que 10 photos maximum",
-        variant: "destructive"
+        title: 'Limite atteinte',
+        description: 'Vous ne pouvez ajouter que 10 photos maximum',
+        variant: 'destructive',
       })
       return
     }
-    setSelectedFiles(prev => [...prev, ...files])
+    setSelectedFiles((prev) => [...prev, ...files])
   }
 
   return (
@@ -540,7 +554,9 @@ const AddTool = () => {
                       <Input
                         id='title'
                         value={formData.title || ''}
-                        onChange={(e) => handleInputChange('title', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange('title', e.target.value)
+                        }
                         placeholder={t('add_tool.title_placeholder')}
                         className='h-12 text-base'
                       />
@@ -567,7 +583,9 @@ const AddTool = () => {
                       <Input
                         id='brand'
                         value={formData.brand || ''}
-                        onChange={(e) => handleInputChange('brand', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange('brand', e.target.value)
+                        }
                         placeholder={t('add_tool.brand_placeholder')}
                         className='h-12 text-base'
                       />
@@ -585,7 +603,9 @@ const AddTool = () => {
                       <Input
                         id='model'
                         value={formData.model || ''}
-                        onChange={(e) => handleInputChange('model', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange('model', e.target.value)
+                        }
                         placeholder={t('add_tool.model_placeholder')}
                         className='h-12 text-base'
                       />
@@ -604,7 +624,14 @@ const AddTool = () => {
                         min='1900'
                         max='2030'
                         value={formData.year || ''}
-                        onChange={(e) => handleInputChange('year', e.target.value ? parseInt(e.target.value) : undefined)}
+                        onChange={(e) =>
+                          handleInputChange(
+                            'year',
+                            e.target.value
+                              ? parseInt(e.target.value)
+                              : undefined
+                          )
+                        }
                         placeholder={t('add_tool.year_placeholder')}
                         className='h-12 text-base'
                       />
@@ -621,7 +648,9 @@ const AddTool = () => {
                     <Textarea
                       id='description'
                       value={formData.description || ''}
-                      onChange={(e) => handleInputChange('description', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange('description', e.target.value)
+                      }
                       placeholder={t('add_tool.description_placeholder')}
                       className='min-h-[120px] resize-none text-base'
                     />
@@ -639,14 +668,20 @@ const AddTool = () => {
                       <Label className='text-sm font-medium text-foreground'>
                         {t('add_tool.category')} *
                       </Label>
-                      <Select 
-                        value={formData.categoryId || ''} 
-                        onValueChange={(value) => handleInputChange('categoryId', value)}
+                      <Select
+                        value={formData.categoryId || ''}
+                        onValueChange={(value) =>
+                          handleInputChange('categoryId', value)
+                        }
                         disabled={loadingCategories}
                       >
                         <SelectTrigger className='h-12 text-base'>
                           <SelectValue
-                            placeholder={loadingCategories ? t('addtool.verification_in_progress') : t('add_tool.choose_category')}
+                            placeholder={
+                              loadingCategories
+                                ? t('addtool.verification_in_progress')
+                                : t('add_tool.choose_category')
+                            }
                           />
                         </SelectTrigger>
                         <SelectContent>
@@ -663,19 +698,30 @@ const AddTool = () => {
                       <Label className='text-sm font-medium text-foreground'>
                         {t('add_tool.subcategory')}
                       </Label>
-                      <Select 
-                        value={formData.subcategoryId || ''} 
-                        onValueChange={(value) => handleInputChange('subcategoryId', value)}
-                        disabled={!formData.categoryId || subcategories.length === 0}
+                      <Select
+                        value={formData.subcategoryId || ''}
+                        onValueChange={(value) =>
+                          handleInputChange('subcategoryId', value)
+                        }
+                        disabled={
+                          !formData.categoryId || subcategories.length === 0
+                        }
                       >
                         <SelectTrigger className='h-12 text-base'>
                           <SelectValue
-                            placeholder={!formData.categoryId ? t('add_tool.choose_category') : t('add_tool.choose_subcategory')}
+                            placeholder={
+                              !formData.categoryId
+                                ? t('add_tool.choose_category')
+                                : t('add_tool.choose_subcategory')
+                            }
                           />
                         </SelectTrigger>
                         <SelectContent>
                           {subcategories.map((subcategory) => (
-                            <SelectItem key={subcategory.id} value={subcategory.id}>
+                            <SelectItem
+                              key={subcategory.id}
+                              value={subcategory.id}
+                            >
                               {subcategory.displayName}
                             </SelectItem>
                           ))}
@@ -688,29 +734,21 @@ const AddTool = () => {
                     <Label className='text-sm font-medium text-foreground'>
                       {t('add_tool.condition')} *
                     </Label>
-                    <Select 
-                      value={formData.condition?.toString() || ''} 
-                      onValueChange={(value) => handleInputChange('condition', parseInt(value))}
+                    <Select
+                      value={formData.condition?.toString() || ''}
+                      onValueChange={(value) =>
+                        handleInputChange('condition', parseInt(value))
+                      }
                     >
                       <SelectTrigger className='h-12 text-base'>
                         <SelectValue placeholder={t('add_tool.condition')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value='1'>
-                          Neuf
-                        </SelectItem>
-                        <SelectItem value='2'>
-                          Comme neuf
-                        </SelectItem>
-                        <SelectItem value='3'>
-                          Bon état
-                        </SelectItem>
-                        <SelectItem value='4'>
-                          État correct
-                        </SelectItem>
-                        <SelectItem value='5'>
-                          Mauvais état
-                        </SelectItem>
+                        <SelectItem value='1'>Neuf</SelectItem>
+                        <SelectItem value='2'>Comme neuf</SelectItem>
+                        <SelectItem value='3'>Bon état</SelectItem>
+                        <SelectItem value='4'>État correct</SelectItem>
+                        <SelectItem value='5'>Mauvais état</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -742,7 +780,14 @@ const AddTool = () => {
                           min='0.01'
                           step='0.01'
                           value={formData.basePrice || ''}
-                          onChange={(e) => handleInputChange('basePrice', e.target.value ? parseFloat(e.target.value) : undefined)}
+                          onChange={(e) =>
+                            handleInputChange(
+                              'basePrice',
+                              e.target.value
+                                ? parseFloat(e.target.value)
+                                : undefined
+                            )
+                          }
                           placeholder='25'
                           className='h-12 text-base pl-8'
                         />
@@ -764,7 +809,14 @@ const AddTool = () => {
                           min='0'
                           step='0.01'
                           value={formData.depositAmount || ''}
-                          onChange={(e) => handleInputChange('depositAmount', e.target.value ? parseFloat(e.target.value) : undefined)}
+                          onChange={(e) =>
+                            handleInputChange(
+                              'depositAmount',
+                              e.target.value
+                                ? parseFloat(e.target.value)
+                                : undefined
+                            )
+                          }
                           placeholder='100'
                           className='h-12 text-base pl-8'
                         />
@@ -795,7 +847,9 @@ const AddTool = () => {
                     <Input
                       id='location'
                       value={formData.pickupAddress || ''}
-                      onChange={(e) => handleInputChange('pickupAddress', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange('pickupAddress', e.target.value)
+                      }
                       placeholder='Paris 15ème'
                       className='h-12 text-base'
                     />
@@ -846,7 +900,9 @@ const AddTool = () => {
                         type='button'
                         variant='outline'
                         size='lg'
-                        onClick={() => document.getElementById('file-upload')?.click()}
+                        onClick={() =>
+                          document.getElementById('file-upload')?.click()
+                        }
                         className='border-accent text-accent hover:bg-accent hover:text-accent-foreground'
                       >
                         {t('add_tool.browse_files')}
@@ -856,7 +912,7 @@ const AddTool = () => {
                       </p>
                     </div>
                   </div>
-                  
+
                   {/* Selected Files Preview */}
                   {selectedFiles.length > 0 && (
                     <div className='mt-4'>
@@ -864,15 +920,16 @@ const AddTool = () => {
                         Fichiers sélectionnés ({selectedFiles.length}/10):
                       </p>
                       <p className='text-xs text-muted-foreground mb-3'>
-                        Cliquez sur une image pour la définir comme photo principale
+                        Cliquez sur une image pour la définir comme photo
+                        principale
                       </p>
                       <div className='grid grid-cols-2 md:grid-cols-4 gap-3'>
                         {selectedFiles.map((file, index) => (
                           <div key={index} className='relative group'>
-                            <div 
+                            <div
                               className={`aspect-square bg-muted rounded-lg flex items-center justify-center overflow-hidden cursor-pointer border-2 transition-colors ${
-                                index === primaryPhotoIndex 
-                                  ? 'border-primary ring-2 ring-primary/20' 
+                                index === primaryPhotoIndex
+                                  ? 'border-primary ring-2 ring-primary/20'
                                   : 'border-transparent hover:border-primary/50'
                               }`}
                               onClick={() => setPrimaryPhoto(index)}
@@ -926,7 +983,9 @@ const AddTool = () => {
                     <Textarea
                       id='instructions'
                       value={formData.ownerInstructions || ''}
-                      onChange={(e) => handleInputChange('ownerInstructions', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange('ownerInstructions', e.target.value)
+                      }
                       placeholder='Ex: Prévoir une rallonge électrique, nettoyer après usage, manipulation délicate...'
                       className='min-h-[100px] resize-none text-base'
                     />

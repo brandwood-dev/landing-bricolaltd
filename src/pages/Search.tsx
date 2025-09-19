@@ -143,7 +143,7 @@ const Search = () => {
   const fetchCategories = async () => {
     try {
       const fetchedCategories = await toolsService.getCategories();
-      setCategories(fetchedCategories.data);
+      setCategories(fetchedCategories);
     } catch (err: any) {
       console.error('Error fetching categories:', err);
     }
@@ -252,13 +252,13 @@ const Search = () => {
 
   // Handle rent button click
   const handleRentClick = (toolId: string) => {
-    if (!isAuthenticated) {
-      // Redirect to login with the current page as return destination
-      navigate('/login', { state: { from: location } });
-    } else {
-      // Navigate to tool details page
+    // if (!isAuthenticated) {
+    //   // Redirect to login with the current page as return destination
+    //   navigate('/login', { state: { from: location } });
+    // } else {
+    //   // Navigate to tool details page
       navigate(`/tool/${toolId}`);
-    }
+    // }
   };
 
   // Handle refresh

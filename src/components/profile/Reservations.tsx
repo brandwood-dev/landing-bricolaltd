@@ -64,17 +64,24 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext'
 import { bookingService } from '@/services/bookingService'
 import { disputeService } from '@/services/disputeService'
+import { reviewsService } from '@/services/reviewsService'
+import { api } from '@/services/api'
 import { Booking, BookingStatus } from '@/types/bridge'
+//usenavigate
+
 interface Reservation {
   id: string
   referenceId: string
+  toolId: string
   toolName: string
   toolDescription: string
   toolImage: string
   pickupAddress: string
+  ownerId: string
   owner: string
   ownerEmail: string
   ownerPhone: string
+  renterId: string
   renterName: string
   renterEmail: string
   renterPhone: string
@@ -120,6 +127,8 @@ const Reservations = () => {
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false)
   const [isClaimDialogOpen, setIsClaimDialogOpen] = useState(false)
   const [selectedReservationId, setSelectedReservationId] = useState('')
+  const [reviewType, setReviewType] = useState<'tool' | 'app'>('tool')
+  const [hasReviewedApp, setHasReviewedApp] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [filteredReservations, setFilteredReservations] = useState<
@@ -127,6 +136,7 @@ const Reservations = () => {
   >([])
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(5)
+
   //loading
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -142,16 +152,19 @@ const Reservations = () => {
     return {
       id: booking.id,
       referenceId: `RES-${booking.id}`,
+      toolId: booking.tool?.id || '',
       toolName: booking.tool?.title || t('general.tool_not_specified'),
       toolDescription: booking.tool?.description || '',
       pickupAddress: booking.tool?.pickupAddress || '',
       toolImage,
+      ownerId: booking.tool?.owner?.id || '',
       owner:
         `${booking.tool?.owner?.firstName || ''} ${
           booking.tool?.owner?.lastName || ''
         }`.trim() || t('general.unknown_owner'),
       ownerEmail: booking.tool?.owner?.email || '',
       ownerPhone: booking.tool?.owner?.phone_number || '',
+      renterId: booking.renter?.id || '',
       renterName:
         `${booking.renter?.firstName || ''} ${
           booking.renter?.lastName || ''
@@ -176,6 +189,21 @@ const Reservations = () => {
       renterHasReturned: booking.renterHasReturned,
       hasUsedReturnButton: booking.hasUsedReturnButton,
       pickupTool: booking.pickupTool,
+    }
+  }
+  console.log('toolId', reservations[0]?.toolId)
+  // Vérifier si l'utilisateur a déjà noté l'application
+  const checkUserAppReview = async () => {
+    if (!user?.id) return
+
+    try {
+      const result = await reviewsService.checkUserAppReview(user.id)
+      setHasReviewedApp(result.hasReviewed)
+    } catch (error) {
+      console.error(
+        "Erreur lors de la vérification de l'avis d'application:",
+        error
+      )
     }
   }
 
@@ -218,6 +246,7 @@ const Reservations = () => {
   useEffect(() => {
     if (user?.id) {
       loadBookings()
+      checkUserAppReview()
     }
   }, [user?.id])
 
@@ -301,6 +330,7 @@ const Reservations = () => {
   const handleDownloadContract = (reservation: Reservation) => {
     const contractData = {
       referenceId: reservation.referenceId,
+      toolId: reservation.toolId,
       toolName: reservation.toolName,
       toolDescription: reservation.toolDescription,
       toolBrand: reservation.toolBrand || 'Brand',
@@ -308,10 +338,12 @@ const Reservations = () => {
       serialNumber: reservation.serialNumber || '142587963hytd',
       condition: reservation.condition || 'New',
       accessories: '',
+      ownerId: reservation.ownerId,
       ownerName: reservation.owner,
       ownerAddress: reservation.ownerAddress || reservation.location,
       ownerEmail: reservation.ownerEmail,
       ownerPhone: reservation.ownerPhone,
+      renterId: reservation.renterId,
       renterName: reservation.renterName,
       renterAddress: reservation.renterAddress || reservation.location,
       renterEmail: reservation.renterEmail,
@@ -334,7 +366,10 @@ const Reservations = () => {
         'Le contrat de location a été généré et téléchargé avec succès.',
     })
   }
-
+  const handleDetailClick = (toolId: string) => {
+    navigate(`/tool/${toolId}`)
+    // }
+  }
   //doit etre dynamic
   const handleReport = async (reservationId: string) => {
     if (!reportReason || !reportMessage) {
@@ -668,6 +703,83 @@ const Reservations = () => {
     setFilteredReservations(data)
     setCurrentPage(1) // Retour à la première page lors d'un changement de filtre
   }
+
+  const handleOpenReview = (reservationId: string) => {
+    setSelectedReservationId(reservationId)
+    setIsReviewDialogOpen(true)
+  }
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedReservationId || !user?.id) return
+
+    try {
+      if (reviewType === 'app') {
+        // Créer un avis d'application
+        await reviewsService.createAppReview({
+          rating: rating,
+          comment: reviewComment,
+          reviewerId: user.id,
+        })
+
+        toast({
+          title: t('review.success'),
+          description: "Merci pour votre avis sur l'application !",
+        })
+
+        // Mettre à jour l'état pour cacher le bouton
+        setHasReviewedApp(true)
+      } else {
+        // Créer un avis d'outil avec tous les paramètres requis
+        const selectedReservation = reservations.find(r => r.id === selectedReservationId)
+        if (!selectedReservation) {
+          console.error('Selected reservation not found')
+          return
+        }
+
+        await reviewsService.createToolReview({
+          bookingId: selectedReservation.id,
+          toolId: selectedReservation.toolId,
+          reviewerId: user.id,
+          revieweeId: selectedReservation.ownerId,
+          rating: rating,
+          comment: reviewComment,
+        })
+
+        toast({
+          title: t('review.success'),
+          description: t('review.success_message'),
+        })
+      }
+
+      setReviewComment('')
+      setRating(0)
+      setIsReviewDialogOpen(false)
+
+      // Actualiser la liste des réservations si nécessaire
+      if (reviewType === 'tool') {
+        const updatedReservations = await api.get('/reservations')
+        handleFilteredDataChange(updatedReservations.data)
+      }
+    } catch (error) {
+      console.error('Error creating review:', error)
+      
+      // Vérifier si c'est l'erreur spécifique "A tool review already exists for this booking"
+      if (error.response?.data?.message?.includes('A tool review already exists for this booking')) {
+        toast({
+          title: 'Avis déjà existant',
+          description: 'Vous avez déjà laissé un avis pour cette réservation',
+          variant: 'destructive',
+        })
+      } else {
+        // Gestion générique des autres erreurs
+        toast({
+          title: t('review.error'),
+          description: t('review.error_message'),
+          variant: 'destructive',
+        })
+      }
+    }
+  }
   const { t, language } = useLanguage()
 
   return (
@@ -694,11 +806,16 @@ const Reservations = () => {
                 <div className='flex flex-col md:flex-row'>
                   {/* Image de l'outil */}
                   <div className='w-full md:w-32 h-48 md:h-32 flex-shrink-0'>
-                    <img
-                      src={reservation.toolImage}
-                      alt={reservation.toolName}
-                      className='w-full h-full object-cover'
-                    />
+                    <Link
+                      to={`/tool/${reservation.toolId}`}
+                      className='block w-full h-full'
+                    >
+                      <img
+                        src={reservation.toolImage}
+                        alt={reservation.toolName}
+                        className='w-full h-full object-cover hover:opacity-90 transition-opacity cursor-pointer'
+                      />
+                    </Link>
                   </div>
 
                   {/* Contenu principal */}
@@ -706,15 +823,21 @@ const Reservations = () => {
                     <div className='flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4'>
                       <div className='flex-1'>
                         <div className='flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2'>
-                          <h3 className='text-lg font-semibold text-gray-900'>
-                            {reservation.toolName}
-                          </h3>
+                          <Link
+                            to={`/tool/${reservation.toolId}`}
+                            className='hover:text-blue-600 transition-colors'
+                          >
+                            <h3 className='text-lg font-semibold text-gray-900 cursor-pointer'>
+                              {reservation.toolName}
+                            </h3>
+                          </Link>
                           <Badge className={getStatusColor(reservation.status)}>
                             {t(`status.${reservation.status.toLowerCase()}`)}
                           </Badge>
                           {(reservation.status === 'ONGOING' ||
                             reservation.status === 'ACCEPTED') &&
-                            reservation.renterHasReturned && !reservation.pickupTool && (
+                            reservation.renterHasReturned &&
+                            !reservation.pickupTool && (
                               <Badge
                                 variant='outline'
                                 className='bg-blue-50 text-blue-800 border-blue-200'
@@ -722,7 +845,16 @@ const Reservations = () => {
                                 {t('booking.wait')}
                               </Badge>
                             )}
-                          {reservation.status === 'ONGOING'  &&
+                          {reservation.status === 'ONGOING' &&
+                            reservation.hasActiveClaim && (
+                              <Badge
+                                variant='outline'
+                                className='bg-orange-50 text-orange-800 border-orange-200'
+                              >
+                                {t('claim.in_progress')}
+                              </Badge>
+                            )}
+                          {reservation.status === 'ACCEPTED' &&
                             reservation.hasActiveClaim && (
                               <Badge
                                 variant='outline'
@@ -1087,20 +1219,99 @@ const Reservations = () => {
                                     />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value='no-response'>
-                                      {t('booking.report.reason.no_answer')}
-                                    </SelectItem>
-                                    <SelectItem value='wrong-number'>
-                                      {t('booking.report.reason.wrong_number')}
-                                    </SelectItem>
-                                    <SelectItem value='inappropriate'>
-                                      {t(
-                                        'booking.report.reason.inappropriate_behavior'
-                                      )}
-                                    </SelectItem>
-                                    <SelectItem value='other'>
-                                      {t('booking.report.reason.other')}
-                                    </SelectItem>
+                                    {language === 'en' ? (
+                                      <>
+                                        <SelectItem value='not-compliant'>
+                                          Tool not compliant with the listing
+                                        </SelectItem>
+                                        <SelectItem value='poor-condition'>
+                                          Tool in poor condition or defective
+                                        </SelectItem>
+                                        <SelectItem value='delay'>
+                                          Delay in delivery / pickup
+                                        </SelectItem>
+                                        <SelectItem value='unsafe'>
+                                          Dangerous / unsafe tool
+                                        </SelectItem>
+                                        <SelectItem value='inappropriate'>
+                                          Inappropriate behavior of the provider
+                                        </SelectItem>
+                                        <SelectItem value='fraud'>
+                                          Suspicion of scam or fraud
+                                        </SelectItem>
+                                        <SelectItem value='no-response'>
+                                          No response from the provider
+                                        </SelectItem>
+                                        <SelectItem value='wrong-contact'>
+                                          Incorrect / unreachable phone number
+                                        </SelectItem>
+                                        <SelectItem value='other'>
+                                          Other
+                                        </SelectItem>
+                                      </>
+                                    ) : language === 'fr' ? (
+                                      <>
+                                        <SelectItem value='not-compliant'>
+                                          Outil non conforme à l'annonce
+                                        </SelectItem>
+                                        <SelectItem value='poor-condition'>
+                                          Outil en mauvais état ou défectueux
+                                        </SelectItem>
+                                        <SelectItem value='delay'>
+                                          Retard de livraison / récupération
+                                        </SelectItem>
+                                        <SelectItem value='unsafe'>
+                                          Outil dangereux / non sécurisé
+                                        </SelectItem>
+                                        <SelectItem value='inappropriate'>
+                                          Comportement inapproprié du
+                                          propriétaire
+                                        </SelectItem>
+                                        <SelectItem value='fraud'>
+                                          Suspicion d'arnaque ou fraude
+                                        </SelectItem>
+                                        <SelectItem value='no-response'>
+                                          Pas de réponse du propriétaire
+                                        </SelectItem>
+                                        <SelectItem value='wrong-contact'>
+                                          Numéro incorrect / injoignable
+                                        </SelectItem>
+                                        <SelectItem value='other'>
+                                          Autre
+                                        </SelectItem>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <SelectItem value='not-compliant'>
+                                          الأداة غير مطابقة للإعلان
+                                        </SelectItem>
+                                        <SelectItem value='poor-condition'>
+                                          أداة في حالة سيئة أو معطلة
+                                        </SelectItem>
+                                        <SelectItem value='delay'>
+                                          تأخير في التسليم / الاستلام
+                                        </SelectItem>
+                                        <SelectItem value='unsafe'>
+                                          أداة خطرة / غير آمنة
+                                        </SelectItem>
+                                        <SelectItem value='inappropriate'>
+                                          سلوك غير لائق من المزود
+                                        </SelectItem>
+                                        <SelectItem value='fraud'>
+                                          شبهة احتيال أو نصب
+                                        </SelectItem>
+                                        <SelectItem value='no-response'>
+                                          لا يوجد رد من المزود
+                                        </SelectItem>
+                                        <SelectItem value='wrong-contact'>
+                                          رقم هاتف غير صحيح / لا يمكن الوصول
+                                          إليه
+                                        </SelectItem>
+                                        <SelectItem value='other'>
+                                          أخرى
+                                        </SelectItem>
+                                      </>
+                                    )}
                                   </SelectContent>
                                 </Select>
                                 <Textarea
@@ -1384,6 +1595,37 @@ const Reservations = () => {
                           )}
                         </div>
                       )}
+                    {/* review if status completed  */}
+                    {reservation.status === 'COMPLETED' && (
+                      <div className='flex gap-2'>
+                        <Button
+                          variant='outline'
+                          size='sm'
+                          onClick={() => {
+                            setReviewType('tool')
+                            handleOpenReview(reservation.id)
+                          }}
+                          className='flex items-center gap-2'
+                        >
+                          <Star className='h-4 w-4 mr-1' />
+                          {t('booking.rate_tool')}
+                        </Button>
+                        {!hasReviewedApp && (
+                          <Button
+                            variant='outline'
+                            size='sm'
+                            onClick={() => {
+                              setReviewType('app')
+                              handleOpenReview(reservation.id)
+                            }}
+                            className='flex items-center gap-2'
+                          >
+                            <Star className='h-4 w-4 mr-1' />
+                            {t('booking.rate_app')}
+                          </Button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -1486,17 +1728,91 @@ const Reservations = () => {
                     <SelectValue placeholder='Sélectionnez le type de problème' />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value='damaged'>Outil endommagé</SelectItem>
-                    <SelectItem value='late-return'>
-                      Retard de restitution
-                    </SelectItem>
-                    <SelectItem value='missing-parts'>
-                      Pièces manquantes
-                    </SelectItem>
-                    <SelectItem value='not-working'>
-                      Outil ne fonctionne pas
-                    </SelectItem>
-                    <SelectItem value='other'>Autre</SelectItem>
+                    {language === 'en' ? (
+                      <>
+                        <SelectItem value='not-compliant'>
+                          Tool not compliant with the listing
+                        </SelectItem>
+                        <SelectItem value='poor-condition'>
+                          Tool in poor condition or defective
+                        </SelectItem>
+                        <SelectItem value='delay'>
+                          Delay in delivery / pickup
+                        </SelectItem>
+                        <SelectItem value='unsafe'>
+                          Dangerous / unsafe tool
+                        </SelectItem>
+                        <SelectItem value='inappropriate'>
+                          Inappropriate behavior of the provider
+                        </SelectItem>
+                        <SelectItem value='fraud'>
+                          Suspicion of scam or fraud
+                        </SelectItem>
+                        <SelectItem value='no-response'>
+                          No response from the provider
+                        </SelectItem>
+                        <SelectItem value='wrong-contact'>
+                          Incorrect / unreachable phone number
+                        </SelectItem>
+                        <SelectItem value='other'>Other</SelectItem>
+                      </>
+                    ) : language === 'fr' ? (
+                      <>
+                        <SelectItem value='not-compliant'>
+                          Outil non conforme à l'annonce
+                        </SelectItem>
+                        <SelectItem value='poor-condition'>
+                          Outil en mauvais état ou défectueux
+                        </SelectItem>
+                        <SelectItem value='delay'>
+                          Retard de livraison / récupération
+                        </SelectItem>
+                        <SelectItem value='unsafe'>
+                          Outil dangereux / non sécurisé
+                        </SelectItem>
+                        <SelectItem value='inappropriate'>
+                          Comportement inapproprié du propriétaire
+                        </SelectItem>
+                        <SelectItem value='fraud'>
+                          Suspicion d'arnaque ou fraude
+                        </SelectItem>
+                        <SelectItem value='no-response'>
+                          Pas de réponse du propriétaire
+                        </SelectItem>
+                        <SelectItem value='wrong-contact'>
+                          Numéro incorrect / injoignable
+                        </SelectItem>
+                        <SelectItem value='other'>Autre</SelectItem>
+                      </>
+                    ) : (
+                      <>
+                        <SelectItem value='not-compliant'>
+                          الأداة غير مطابقة للإعلان
+                        </SelectItem>
+                        <SelectItem value='poor-condition'>
+                          أداة في حالة سيئة أو معطلة
+                        </SelectItem>
+                        <SelectItem value='delay'>
+                          تأخير في التسليم / الاستلام
+                        </SelectItem>
+                        <SelectItem value='unsafe'>
+                          أداة خطرة / غير آمنة
+                        </SelectItem>
+                        <SelectItem value='inappropriate'>
+                          سلوك غير لائق من المزود
+                        </SelectItem>
+                        <SelectItem value='fraud'>
+                          شبهة احتيال أو نصب
+                        </SelectItem>
+                        <SelectItem value='no-response'>
+                          لا يوجد رد من المزود
+                        </SelectItem>
+                        <SelectItem value='wrong-contact'>
+                          رقم هاتف غير صحيح / لا يمكن الوصول إليه
+                        </SelectItem>
+                        <SelectItem value='other'>أخرى</SelectItem>
+                      </>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -1580,6 +1896,57 @@ const Reservations = () => {
                 disabled={isSubmitting}
               >
                 {isSubmitting ? 'Envoi en cours...' : 'Envoyer la réclamation'}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={isReviewDialogOpen} onOpenChange={setIsReviewDialogOpen}>
+          <DialogContent>
+            <DialogHeader
+              className={language === 'ar' ? '[direction:ltr]' : ''}
+            >
+              <DialogTitle>
+                {reviewType === 'app'
+                  ? t('review.app_title')
+                  : t('review.modaltitle')}
+              </DialogTitle>
+            </DialogHeader>
+            <div className={'space-y-4'}>
+              <div>
+                <label className='block text-sm font-medium mb-2'>
+                  {t('review.rate')}
+                </label>
+                <div
+                  className={
+                    'flex gap-1 ' + (language === 'ar' ? '[direction:ltr]' : '')
+                  }
+                >
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      onClick={() => setRating(star)}
+                      className={`p-1 ${
+                        star <= rating ? 'text-yellow-500' : 'text-gray-300'
+                      }`}
+                    >
+                      <Star className='h-6 w-6 fill-current' />
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className='block text-sm font-medium mb-2'>
+                  {t('review.comment')}
+                </label>
+                <Textarea
+                  placeholder={t('review.placeholdercomm')}
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                />
+              </div>
+              <Button onClick={handleSubmitReview} className='w-full'>
+                {t('review.submitbtn')}
               </Button>
             </div>
           </DialogContent>

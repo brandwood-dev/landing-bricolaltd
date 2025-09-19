@@ -1,17 +1,22 @@
-
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import { CheckIcon, XIcon, Loader2 } from 'lucide-react';
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { useAuth } from '@/contexts/AuthContext'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import Header from '@/components/Header'
+import Footer from '@/components/Footer'
+import { CheckIcon, XIcon, Loader2 } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -19,12 +24,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import phonePrefixes from '@/data/phonePrefixes'
+import AddressAutocomplete from '@/components/AddressAutocomplete'
 
 const Register = () => {
-  const { t, language } = useLanguage();
-  const { register, isLoading } = useAuth();
-  const navigate = useNavigate();
-  
+  const { t, language } = useLanguage()
+  const { register, isLoading } = useAuth()
+  const navigate = useNavigate()
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -36,58 +43,43 @@ const Register = () => {
     phonePrefix: '',
     phoneNumber: '',
   })
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [salesConditionsAccepted, setSalesConditionsAccepted] = useState(false);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [apiError, setApiError] = useState('');
-  const [emailError, setEmailError] = useState('');
+  const [termsAccepted, setTermsAccepted] = useState(false)
+  const [salesConditionsAccepted, setSalesConditionsAccepted] = useState(false)
+  const [isAddressSelected, setIsAddressSelected] = useState(false)
+  const [errors, setErrors] = useState<{ [key: string]: string }>({})
+  const [apiError, setApiError] = useState('')
+  const [emailError, setEmailError] = useState('')
   const countries = [
-    { value: 'KWD', label: 'kuwait', flag: '<span class="fi fi-kw"></span>' },
-    { value: 'SAR', label: 'ksa', flag: '<span class="fi fi-sa"></span>' },
-    { value: 'BHD', label: 'bahrain', flag: '<span class="fi fi-bh"></span>' },
-    { value: 'OMR', label: 'oman', flag: '<span class="fi fi-om"></span>' },
-    { value: 'QAR', label: 'qatar', flag: '<span class="fi fi-qa"></span>' },
-    { value: 'AED', label: 'uae', flag: '<span class="fi fi-ae"></span>' },
+    { value: 'KW', label: 'kuwait', flag: '<span class="fi fi-kw"></span>' },
+    { value: 'SA', label: 'ksa', flag: '<span class="fi fi-sa"></span>' },
+    { value: 'BH', label: 'bahrain', flag: '<span class="fi fi-bh"></span>' },
+    { value: 'OM', label: 'oman', flag: '<span class="fi fi-om"></span>' },
+    { value: 'QA', label: 'qatar', flag: '<span class="fi fi-qa"></span>' },
+    { value: 'AE', label: 'uae', flag: '<span class="fi fi-ae"></span>' },
   ]
 
-  const phonePrefixes = [
-    {
-      value: '+965',
-      label: `+965 (${t('country.kuwait')})`,
-      flag: '<span class="fi fi-kw"></span>',
-    },
-    {
-      value: '+966',
-      label: `+966 (${t('country.ksa')})`,
-      flag: '<span class="fi fi-sa"></span>',
-    },
-    {
-      value: '+971',
-      label: `+971 (${t('country.uae')})`,
-      flag: '<span class="fi fi-ae"></span>',
-    },
-    {
-      value: '+974',
-      label: `+974 (${t('country.qatar')})`,
-      flag: '<span class="fi fi-qa"></span>',
-    },
-    {
-      value: '+973',
-      label: `+973 (${t('country.bahrain')})`,
-      flag: '<span class="fi fi-bh"></span>',
-    },
-    {
-      value: '+968',
-      label: `+968 (${t('country.oman')})`,
-      flag: '<span class="fi fi-om"></span>',
-    },
-  ]
-  const ValidationIndicator = ({ isValid, text }: { isValid: boolean; text: string }) => (
-    <div className={`flex items-center space-x-2 text-sm ${isValid ? 'text-green-600 ' : 'text-red-600 '}` + (language === 'ar' ? 'justify-end' : '')}>
-      {isValid ? <CheckIcon className="h-4 w-4" /> : <XIcon className="h-4 w-4" />}
+  const ValidationIndicator = ({
+    isValid,
+    text,
+  }: {
+    isValid: boolean
+    text: string
+  }) => (
+    <div
+      className={
+        `flex items-center space-x-2 text-sm ${
+          isValid ? 'text-green-600 ' : 'text-red-600 '
+        }` + (language === 'ar' ? 'justify-end' : '')
+      }
+    >
+      {isValid ? (
+        <CheckIcon className='h-4 w-4' />
+      ) : (
+        <XIcon className='h-4 w-4' />
+      )}
       <span>{text}</span>
     </div>
-  );
+  )
 
   const passwordValidation = {
     minLength: formData.password.length >= 8,
@@ -95,146 +87,166 @@ const Register = () => {
     hasLowerCase: /[a-z]/.test(formData.password),
     hasNumber: /\d/.test(formData.password),
     hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(formData.password),
-  };
+  }
 
   const validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
-    
+    const newErrors: { [key: string]: string } = {}
+
     if (!formData.firstName.trim()) {
-      newErrors.firstName = t('validation.first_name_required');
+      newErrors.firstName = t('validation.first_name_required')
     }
-    
+
     if (!formData.lastName.trim()) {
-      newErrors.lastName = t('validation.last_name_required');
+      newErrors.lastName = t('validation.last_name_required')
     }
-    
+
     if (!formData.email) {
-      newErrors.email = t('validation.email_required');
+      newErrors.email = t('validation.email_required')
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = t('validation.email_invalid');
+      newErrors.email = t('validation.email_invalid')
     }
-    
+
     if (!formData.password) {
-      newErrors.password = t('validation.password_required');
+      newErrors.password = t('validation.password_required')
     } else {
-      const isPasswordValid = Object.values(passwordValidation).every(Boolean);
+      const isPasswordValid = Object.values(passwordValidation).every(Boolean)
       if (!isPasswordValid) {
-        newErrors.password = t('validation.password_criteria_not_met');
+        newErrors.password = t('validation.password_criteria_not_met')
       }
     }
-    
+
     if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = t('validation.passwords_dont_match');
+      newErrors.confirmPassword = t('validation.passwords_dont_match')
     }
-    
+
     if (!termsAccepted) {
-      newErrors.terms = t('validation.terms_required');
+      newErrors.terms = t('validation.terms_required')
     }
-    
+
     if (!salesConditionsAccepted) {
-      newErrors.salesConditions = t('validation.privacy_required');
+      newErrors.salesConditions = t('validation.privacy_required')
     }
-    
+
+    // Vérifier qu'une adresse suggérée a été sélectionnée
+    if (!isAddressSelected || !formData.address.trim()) {
+      newErrors.address =
+        'Veuillez sélectionner une adresse depuis les suggestions'
+    }
+
     // Also check if there's an email error from the onBlur validation
     if (emailError) {
-      newErrors.email = emailError;
+      newErrors.email = emailError
     }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-  
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
+    setFormData((prev) => ({ ...prev, [field]: value }))
+
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+      setErrors((prev) => ({ ...prev, [field]: '' }))
     }
-    
+
     // Clear email error when user starts typing in email field
     if (field === 'email' && emailError) {
-      setEmailError('');
+      setEmailError('')
     }
-    
+
     // API error will be cleared on next form submission
-  };
+  }
 
   const handleEmailBlur = async () => {
-    console.log('Email blur event triggered for:', formData.email);
-    
+    console.log('Email blur event triggered for:', formData.email)
+
     if (!formData.email || !formData.email.includes('@')) {
-      console.log('Email validation skipped - invalid email format');
-      return; // Don't check if email is empty or invalid format
+      console.log('Email validation skipped - invalid email format')
+      return // Don't check if email is empty or invalid format
     }
 
     try {
-      console.log('Checking email existence for:', formData.email);
-      const emailCheckResponse = await fetch('http://localhost:4000/api/auth/check-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: formData.email }),
-      });
-      
-      console.log('Email check response status:', emailCheckResponse.status);
-      console.log('Email check response ok:', emailCheckResponse.ok);
-      
+      console.log('Checking email existence for:', formData.email)
+      const emailCheckResponse = await fetch(
+        'http://localhost:4000/api/auth/check-email',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email: formData.email }),
+        }
+      )
+
+      console.log('Email check response status:', emailCheckResponse.status)
+      console.log('Email check response ok:', emailCheckResponse.ok)
+
       if (!emailCheckResponse.ok) {
-        console.error('Email check failed with status:', emailCheckResponse.status);
-        const errorText = await emailCheckResponse.text();
-        console.error('Error response:', errorText);
-        setEmailError(''); // Clear error on API failure
-        return;
+        console.error(
+          'Email check failed with status:',
+          emailCheckResponse.status
+        )
+        const errorText = await emailCheckResponse.text()
+        console.error('Error response:', errorText)
+        setEmailError('') // Clear error on API failure
+        return
       }
-      
-      const emailCheckData = await emailCheckResponse.json();
-      console.log('Email check response data:', emailCheckData);
-      console.log('emailCheckData.success:', emailCheckData.success);
-      console.log('emailCheckData.data:', emailCheckData.data);
-      console.log('emailCheckData.data?.exists:', emailCheckData.data?.exists);
-      
+
+      const emailCheckData = await emailCheckResponse.json()
+      console.log('Email check response data:', emailCheckData)
+      console.log('emailCheckData.success:', emailCheckData.success)
+      console.log('emailCheckData.data:', emailCheckData.data)
+      console.log('emailCheckData.data?.exists:', emailCheckData.data?.exists)
+
       // For testing: always show error for test@example.com
       if (formData.email === 'test@example.com') {
-        console.log('Test email detected, showing error');
-        setEmailError('This email is already registered. Please use a different email or try logging in.');
-        return;
+        console.log('Test email detected, showing error')
+        setEmailError(
+          'This email is already registered. Please use a different email or try logging in.'
+        )
+        return
       }
-      
-      if (emailCheckData.success && emailCheckData.data && emailCheckData.data.exists) {
-        console.log('Email already exists, setting error');
-        setEmailError('This email is already registered. Please use a different email or try logging in.');
+
+      if (
+        emailCheckData.success &&
+        emailCheckData.data &&
+        emailCheckData.data.exists
+      ) {
+        console.log('Email already exists, setting error')
+        setEmailError(
+          'This email is already registered. Please use a different email or try logging in.'
+        )
       } else {
-        console.log('Email is available');
-        setEmailError('');
+        console.log('Email is available')
+        setEmailError('')
       }
     } catch (error) {
-      console.error('Error checking email:', error);
+      console.error('Error checking email:', error)
       // Don't show error to user for network issues during email check
       // But clear any existing email error to allow form submission
-      setEmailError('');
+      setEmailError('')
     }
-  };
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Registration form submitted for:', formData.email);
-    
+    e.preventDefault()
+    console.log('Registration form submitted for:', formData.email)
+
     // Clear any previous API error
-    setApiError('');
+    setApiError('')
     // Don't clear emailError here - keep the onBlur validation result
-    
+
     if (!validateForm()) {
-      console.log('Form validation failed');
-      return;
+      console.log('Form validation failed')
+      return
     }
-    
+
     if (emailError) {
-      console.log('Email error exists, stopping registration:', emailError);
-      return;
+      console.log('Email error exists, stopping registration:', emailError)
+      return
     }
-    
+
     try {
       // Proceed with registration
       const registrationData = {
@@ -245,35 +257,38 @@ const Register = () => {
         countryId: formData.country,
         address: formData.address,
         prefix: formData.phonePrefix,
+        // Combine prefix and phone number
         phoneNumber: formData.phoneNumber,
       }
-      
-      await register(registrationData);
-      console.log('Registration completed, redirecting to email verification');
-      
+
+      await register(registrationData)
+      console.log('Registration completed, redirecting to email verification')
+
       // Redirect to email verification page with user's email
-      navigate(`/verify-email?email=${encodeURIComponent(formData.email)}`);
+      navigate(`/verify-email?email=${encodeURIComponent(formData.email)}`)
     } catch (error: any) {
-      console.error('Registration failed:', error.message);
-      
+      console.error('Registration failed:', error.message)
+
       // Handle specific error cases
       if (error.message && error.message.includes('Email already exists')) {
-        setEmailError('This email is already registered. Please use a different email or try logging in.');
-        setApiError('');
+        setEmailError(
+          'This email is already registered. Please use a different email or try logging in.'
+        )
+        setApiError('')
       } else {
         // Handle any other errors
-        setApiError(error.message || 'Registration failed. Please try again.');
+        setApiError(error.message || 'Registration failed. Please try again.')
       }
     }
-  };
+  }
 
-  const handleTermsChange = (checked: boolean | "indeterminate") => {
-    setTermsAccepted(checked === true);
-  };
+  const handleTermsChange = (checked: boolean | 'indeterminate') => {
+    setTermsAccepted(checked === true)
+  }
 
-  const handleSalesConditionsChange = (checked: boolean | "indeterminate") => {
-    setSalesConditionsAccepted(checked === true);
-  };
+  const handleSalesConditionsChange = (checked: boolean | 'indeterminate') => {
+    setSalesConditionsAccepted(checked === true)
+  }
 
   return (
     <div className='min-h-screen bg-background'>
@@ -336,7 +351,7 @@ const Register = () => {
                   <Input
                     id='email'
                     type='email'
-                    placeholder='votre@email.com (try: test@example.com to test validation)'
+                    placeholder='votre@email.com'
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
                     onBlur={handleEmailBlur}
@@ -359,16 +374,18 @@ const Register = () => {
                       }
                     >
                       <SelectTrigger className='w-32'>
-                        <SelectValue />
+                        <SelectValue
+                          placeholder={t('register.select_prefix')}
+                        />
                       </SelectTrigger>
                       <SelectContent>
-                        {phonePrefixes.map((prefix) => (
-                          <SelectItem key={prefix.value} value={prefix.value}>
+                        {phonePrefixes.map((prefix, index) => (
+                          <SelectItem key={index} value={prefix.value}>
                             <span
                               className='mx-2'
                               dangerouslySetInnerHTML={{ __html: prefix.flag }}
                             />
-                            {prefix.label}
+                            {prefix.value}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -376,24 +393,33 @@ const Register = () => {
                     <Input
                       id='phone'
                       type='tel'
-                      placeholder='12 34 56 78'
+                      placeholder='12345678'
                       className='flex-1'
                       value={formData.phoneNumber}
-                      onChange={(e) =>
-                        setFormData({ ...formData, phoneNumber: e.target.value })
-                      }
+                      onChange={(e) => {
+                        // Ne garder que les chiffres (0-9)
+                        const digitsOnly = e.target.value.replace(/[^0-9]/g, '')
+                        setFormData({
+                          ...formData,
+                          phoneNumber: digitsOnly,
+                        })
+                      }}
                     />
                   </div>
                 </div>
 
-                <div className='grid grid-cols-2 gap-4'>
+                <div className='space-y-4'>
                   <div className='space-y-2'>
                     <Label htmlFor='country'>{t('register.country')}</Label>
                     <Select
                       value={formData.country}
-                      onValueChange={(value) =>
-                        setFormData({ ...formData, country: value })
-                      }
+                      onValueChange={(value) => {
+                        setFormData({
+                          ...formData,
+                          country: value,
+                          address: '',
+                        })
+                      }}
                     >
                       <SelectTrigger>
                         <SelectValue
@@ -401,8 +427,8 @@ const Register = () => {
                         />
                       </SelectTrigger>
                       <SelectContent>
-                        {countries.map((country) => (
-                          <SelectItem key={country.value} value={country.value}>
+                        {countries.map((country, index) => (
+                          <SelectItem key={index} value={country.value}>
                             <span
                               className='mx-2'
                               dangerouslySetInnerHTML={{ __html: country.flag }}
@@ -410,23 +436,70 @@ const Register = () => {
                             {t(`country.${country.label}`)}
                           </SelectItem>
                         ))}
-                     </SelectContent>
+                      </SelectContent>
                     </Select>
                   </div>
-                  <div className='space-y-2'>
-                    <Label htmlFor='address'>{t('register.address')}</Label>
-                    <Input
-                      id='address'
-                      placeholder='123 Rue de la Paix, Paris'
-                      value={formData.address}
-                      onChange={(e) =>
-                        setFormData({ ...formData, address: e.target.value })
-                      }
-                    />
-                    <p className='text-xs text-muted-foreground'>
-                      {t('register.address_help')}
-                    </p>
-                  </div>
+
+                  {formData.country ? (
+                    <div className='space-y-2'>
+                      <Label htmlFor='address'>{t('register.address')}</Label>
+                      <AddressAutocomplete
+                        value={formData.address}
+                        onChange={(value) => {
+                          setFormData({ ...formData, address: value })
+                          // Réinitialiser l'état de sélection seulement si l'utilisateur modifie manuellement
+                          // (pas quand c'est déclenché par une sélection de suggestion)
+                          if (isAddressSelected && value !== formData.address) {
+                            setIsAddressSelected(false)
+                          }
+                        }}
+                        onAddressSelected={(isSelected) => {
+                          setIsAddressSelected(isSelected)
+                          // Effacer l'erreur d'adresse si une adresse est sélectionnée
+                          if (isSelected && errors.address) {
+                            setErrors((prev) => ({ ...prev, address: '' }))
+                          }
+                        }}
+                        selectedCountry={formData.country}
+                        placeholder={`123 Rue de la Paix, ${
+                          formData.country === 'KW'
+                            ? 'Koweït'
+                            : formData.country === 'SA'
+                            ? 'Arabie Saoudite'
+                            : formData.country === 'BH'
+                            ? 'Bahreïn'
+                            : formData.country === 'OM'
+                            ? 'Oman'
+                            : formData.country === 'QA'
+                            ? 'Qatar'
+                            : formData.country === 'AE'
+                            ? 'Émirats Arabes Unis'
+                            : 'Ville, Pays'
+                        }`}
+                      />
+                      {errors.address && (
+                        <p className='text-sm text-red-500'>{errors.address}</p>
+                      )}
+                      <p className='text-xs text-muted-foreground'>
+                        {t('register.address_help')}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className='space-y-2'>
+                      <Label
+                        htmlFor='address'
+                        className='text-muted-foreground'
+                      >
+                        {t('register.address')}
+                      </Label>
+                      <div className='p-3 border border-dashed border-muted-foreground/30 rounded-md bg-muted/20'>
+                        <p className='text-sm text-muted-foreground text-center'>
+                          Veuillez d'abord sélectionner un pays pour saisir
+                          votre adresse
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className='space-y-2'>
                   <Label htmlFor='password'>{t('register.password')}</Label>
@@ -577,6 +650,6 @@ const Register = () => {
       <Footer />
     </div>
   )
-};
+}
 
-export default Register;
+export default Register
