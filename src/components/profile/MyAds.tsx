@@ -64,7 +64,14 @@ const MyAds = () => {
           return 'pending'
       }
     }
-    console.log('transformToolToAd  : ', tool)
+    console.log('🔍 transformToolToAd - Input tool:', {
+      id: tool.id,
+      title: tool.title,
+      category: tool.category,
+      categoryId: tool.categoryId,
+      subcategory: tool.subcategory,
+      subcategoryId: tool.subcategoryId
+    })
     return {
       id: tool.id,
       title: tool.title,
@@ -93,7 +100,9 @@ const MyAds = () => {
     try {
       setLoading(true)
       const tools = await toolsService.getToolsByUser(user.id)
+      console.log('🔍 MyAds - Raw tools from API:', tools)
       const transformedAds = tools.map(transformToolToAd)
+      console.log('🔍 MyAds - Transformed ads:', transformedAds)
       setAds(transformedAds)
     } catch (error) {
       console.error('Error fetching user tools:', error)

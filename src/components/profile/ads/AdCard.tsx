@@ -61,6 +61,7 @@ const AdCard = ({
   }
 
   const handleEditSave = () => {
+    console.log('🔍 AdCard - handleEditSave called, refreshing data...')
     onRefresh()
     setIsEditDialogOpen(false)
   }
@@ -69,6 +70,13 @@ const AdCard = ({
     setIsEditDialogOpen(false)
     setToolData(null)
   }
+  console.log('🔍 AdCard - Rendering with ad data:', {
+    id: ad.id,
+    title: ad.title,
+    category: ad.category,
+    categoryId: ad.categoryId
+  })
+  
   return (
     <div className='border rounded-lg p-4'>
       <div className='flex flex-col sm:flex-row items-start gap-4'>

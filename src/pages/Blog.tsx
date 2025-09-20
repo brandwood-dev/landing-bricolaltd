@@ -228,7 +228,7 @@ const Blog = () => {
                 }}
                 />
                 <CardContent className="p-6">
-                  <Badge className="mb-3">{article.category || 'General' }</Badge>
+                  <Badge className="mb-3">{article.category || t('blog.category.general')}</Badge>
                   <h3 className="text-xl font-semibold mb-3">
                     <Link to={`/blog/${article.id}`} className="hover:text-accent">
                       {article.title}

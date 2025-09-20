@@ -153,8 +153,20 @@ export class ToolsService {
   // Get tools by user ID
   async getToolsByUser(userId: string): Promise<Tool[]> {
     try {
+      console.log('🔍 ToolsService.getToolsByUser - Fetching tools for user:', userId);
       const response = await api.get<ApiResponse<Tool[]>>(`/tools/user/${userId}`);
-      return response.data.data?.data || response.data.data;
+      const tools = response.data.data?.data || response.data.data;
+      console.log('🔍 ToolsService.getToolsByUser - Raw API response:', response.data);
+      console.log('🔍 ToolsService.getToolsByUser - Extracted tools:', tools);
+      console.log('🔍 ToolsService.getToolsByUser - Tools with categories:', tools.map(tool => ({
+        id: tool.id,
+        title: tool.title,
+        categoryId: tool.categoryId,
+        category: tool.category,
+        subcategoryId: tool.subcategoryId,
+        subcategory: tool.subcategory
+      })));
+      return tools;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch user tools');
     }
@@ -198,8 +210,19 @@ export class ToolsService {
   // Update tool
   async updateTool(id: string, updateData: UpdateToolData): Promise<Tool> {
     try {
+      console.log('🔍 ToolsService.updateTool - Updating tool:', id, 'with data:', updateData);
       const response = await api.patch<ApiResponse<Tool>>(`/tools/${id}`, updateData);
-      return response.data.data;
+      const updatedTool = response.data.data;
+      console.log('🔍 ToolsService.updateTool - Updated tool response:', updatedTool);
+      console.log('🔍 ToolsService.updateTool - Updated tool category info:', {
+        id: updatedTool.id,
+        title: updatedTool.title,
+        categoryId: updatedTool.categoryId,
+        category: updatedTool.category,
+        subcategoryId: updatedTool.subcategoryId,
+        subcategory: updatedTool.subcategory
+      });
+      return updatedTool;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to update tool');
     }

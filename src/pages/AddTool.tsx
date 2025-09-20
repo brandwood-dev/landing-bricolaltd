@@ -32,6 +32,7 @@ import {
 } from 'lucide-react'
 import { toolsService } from '@/services/toolsService'
 import { CreateToolData } from '@/types/bridge/tool.types'
+import AddressAutocomplete from '@/components/AddressAutocomplete'
 
 const AddTool = () => {
   const { t, language } = useLanguage()
@@ -64,6 +65,7 @@ const AddTool = () => {
   const [dragActive, setDragActive] = useState(false)
   const [loading, setLoading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [isAddressSelected, setIsAddressSelected] = useState(false)
 
   // Categories state
   const [categories, setCategories] = useState<any[]>([])
@@ -145,6 +147,8 @@ const AddTool = () => {
     }
   }
 
+  // Address selection is now handled directly by onChange and onAddressSelected props
+
   // Redirect to login if user is not authenticated
   // useEffect(() => {
   //   ///waiting 3 secondes
@@ -174,7 +178,10 @@ const AddTool = () => {
       try {
         setLoadingCategories(true)
         const categoriesData = await toolsService.getCategories()
-        setCategories(categoriesData.data || [])
+        setCategories(categoriesData || [])
+        
+        // Debug: Log user country for Mapbox configuration
+        console.log('🌍 User country for Mapbox suggestions:', user?.country || 'KW (default)')
       } catch (error) {
         console.error('Error loading categories:', error)
         toast({
@@ -188,7 +195,7 @@ const AddTool = () => {
     }
 
     loadCategories()
-  }, [])
+  }, [user])
 
   // Load subcategories when category changes
   const loadSubcategories = async (categoryId: string) => {
@@ -268,7 +275,8 @@ const AddTool = () => {
       formData.categoryId &&
       formData.condition &&
       formData.basePrice &&
-      formData.basePrice > 0
+      formData.basePrice > 0 &&
+      isAddressSelected
       // nameValidation.isUnique === true && // DISABLED - uniqueness check removed
       // !nameValidation.isChecking // DISABLED - uniqueness check removed
     )
@@ -317,6 +325,15 @@ const AddTool = () => {
       toast({
         title: 'Prix invalide',
         description: 'Le prix par jour doit être supérieur à 0',
+        variant: 'destructive',
+      })
+      return false
+    }
+
+    if (!isAddressSelected) {
+      toast({
+        title: 'Adresse requise',
+        description: 'Veuillez sélectionner une adresse depuis les suggestions',
         variant: 'destructive',
       })
       return false
@@ -844,14 +861,13 @@ const AddTool = () => {
                     >
                       {t('add_tool.address')} *
                     </Label>
-                    <Input
-                      id='location'
+                    <AddressAutocomplete
                       value={formData.pickupAddress || ''}
-                      onChange={(e) =>
-                        handleInputChange('pickupAddress', e.target.value)
-                      }
+                      onChange={(value) => handleInputChange('pickupAddress', value)}
+                      onAddressSelected={(isSelected) => setIsAddressSelected(isSelected)}
                       placeholder='Paris 15ème'
                       className='h-12 text-base'
+                      selectedCountry={user?.country || 'KW'}
                     />
                   </div>
                 </div>

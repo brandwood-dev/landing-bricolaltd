@@ -170,8 +170,8 @@ const Rent = () => {
       // Fallback to manual calculation
       const days = calculateDays()
       const basePrice = tool.basePrice
-      const subtotal = basePrice * days
-      const fees = subtotal * 0.06 // 6% fees
+      const subtotal = Number(basePrice) * Number(days)
+      const fees = Number(subtotal) * 0.06 // 6% fees
       const deposit = tool.depositAmount
       setPricing({
         toolId: tool.id,
@@ -180,20 +180,20 @@ const Rent = () => {
         subtotal,
         taxes: fees,
         deposit,
-        totalAmount: subtotal + fees + deposit,
+        totalAmount: Number(subtotal) + Number(fees) + Number(deposit),
         startDate: startDate.toISOString().split('T')[0],
         endDate: endDate.toISOString().split('T')[0],
         serviceFee: fees,
         currency: 'EUR',
         breakdown: {
-          dailyRate: basePrice,
+          dailyRate: Number(basePrice),
           numberOfDays: days,
-          subtotal: subtotal,
+          subtotal: Number(subtotal),
           serviceFeePercentage: 17,
-          serviceFeeAmount: fees,
+          serviceFeeAmount: Number(fees),
           taxPercentage: 6,
-          taxAmount: basePrice * 0.06,
-          depositAmount: deposit,
+          taxAmount: Number(basePrice) * 0.06,
+          depositAmount: Number(deposit),
         },
       })
     } finally {

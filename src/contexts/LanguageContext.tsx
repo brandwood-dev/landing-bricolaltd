@@ -16,6 +16,7 @@ interface LanguageContextType {
 
 const translations = {
   fr: {
+    'blog.category.general': 'Général',
     // AgeVerificationDialog
     'ageVerification.title': "Vérification de l'âge",
     'ageVerification.description':
@@ -1699,6 +1700,8 @@ const translations = {
       'L’usage continu de la plateforme après modification vaut acceptation tacite de la nouvelle version.',
   },
   en: {
+    'blog.category.general': 'General',
+
     // AgeVerificationDialog
     'ageVerification.title': 'Age Verification',
     'ageVerification.description':
@@ -3334,6 +3337,8 @@ const translations = {
     'register.select_prefix': 'Choose prefix',
   },
   ar: {
+    'blog.category.general': 'عام',
+
     // AgeVerificationDialog
     'register.select_prefix': 'اختر فكس',
     'ageVerification.title': 'التحقق من العمر',

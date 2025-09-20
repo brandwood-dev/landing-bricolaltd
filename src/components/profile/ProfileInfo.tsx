@@ -281,6 +281,53 @@ const ProfileInfo = () => {
     return Object.keys(newErrors).length === 0
   }
 
+  // Separate function to handle profile image update
+  const handleProfileImageUpdate = async (imageUrl: string) => {
+    if (!user) return
+
+    try {
+      const token = localStorage.getItem('authToken')
+      const response = await fetch('http://localhost:4000/api/users/me', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          profilePicture: imageUrl,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(
+          errorData.message || 'Échec de la mise à jour de la photo de profil'
+        )
+      }
+
+      const result = await response.json()
+      const updatedUser = result.data
+
+      // Update local user state with new profile picture
+      await updateUser({
+        profilePicture: updatedUser.profilePicture,
+      })
+
+      toast({
+        title: 'Photo de profil mise à jour',
+        description: 'Votre photo de profil a été mise à jour avec succès.',
+      })
+    } catch (error: any) {
+      console.error('Error updating profile image:', error)
+      toast({
+        title: 'Erreur',
+        description: error.message || 'Échec de la mise à jour de la photo de profil.',
+        variant: 'destructive',
+      })
+      throw error // Re-throw to handle in calling function
+    }
+  }
+
   const handleSave = async () => {
     if (!user) return
 
@@ -351,14 +398,13 @@ const ProfileInfo = () => {
       // Combine phone prefix and number
       const fullPhoneNumber = userInfo.phonePrefix + userInfo.phoneNumber
 
-      // Update profile information - only allowed fields
+      // Update profile information - excluding profilePicture (handled separately)
       const profileData: any = {
         firstName: userInfo.firstName,
         lastName: userInfo.lastName,
         phoneNumber: fullPhoneNumber,
         countryId: userInfo.country,
         address: userInfo.address,
-        profilePicture: userInfo.profileImage,
       }
 
       // Only include password if it's being changed
@@ -387,7 +433,7 @@ const ProfileInfo = () => {
       const result = await response.json()
       const updatedUser = result.data
 
-      // Update local user state
+      // Update local user state (excluding profile picture)
       await updateUser({
         firstName: updatedUser.firstName,
         lastName: updatedUser.lastName,
@@ -501,11 +547,12 @@ const ProfileInfo = () => {
       console.log('Extracted image URL:', imageUrl)
 
       if (imageUrl) {
+        // Update local state immediately for UI feedback
         setUserInfo((prev) => ({ ...prev, profileImage: imageUrl }))
-        toast({
-          title: 'Succès',
-          description: 'Photo de profil mise à jour avec succès.',
-        })
+        
+        // Call the separate function to update profile image in backend and context
+        await handleProfileImageUpdate(imageUrl)
+        
         console.log('=== END DEBUG Frontend Upload - SUCCESS ===')
       } else {
         console.error('No image URL in response')

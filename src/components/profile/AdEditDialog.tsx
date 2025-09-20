@@ -9,7 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { Upload, Euro, MapPin, Tag, FileText, Camera, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { toolsService } from '@/services/toolsService';
+import AddressAutocomplete from '@/components/AddressAutocomplete';
 
 interface ToolPhoto {
   id: string;
@@ -53,13 +55,18 @@ interface AdEditDialogProps {
 
 const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
   const { toast } = useToast();
+  const { user } = useAuth();
+  
+  // Log de débogage pour le pays de l'utilisateur
+  console.log('User country for address suggestions:', user?.country || 'KW');
+  
   const [formData, setFormData] = useState({
     title: ad.title,
     brand: ad.brand || '',
     model: ad.model || '',
     year: ad.year?.toString() || '',
-    category: ad.category.name,
-    subcategory: ad.subcategory.name,
+    category: ad.category.id,
+    subcategory: ad.subcategory.id,
     condition: ad.condition.toString(),
     price: ad.basePrice,
     deposit: ad.depositAmount.toString(),
@@ -108,12 +115,8 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
       if (formData.category) {
         try {
           setLoadingSubcategories(true);
-          // Find category ID from name
-          const selectedCategory = categories.find(cat => cat.name === formData.category);
-          if (selectedCategory) {
-            const subcategories = await toolsService.getSubcategoriesByCategory(selectedCategory.id);
-            setSubcategories(subcategories || []);
-          }
+          const subcategories = await toolsService.getSubcategoriesByCategory(formData.category);
+          setSubcategories(subcategories || []);
         } catch (error) {
           console.error('Error loading subcategories:', error);
           setSubcategories([]);
@@ -130,12 +133,15 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
     }
   }, [formData.category, categories]);
 
-  const handleCategoryChange = (categoryName: string) => {
+  const handleCategoryChange = (categoryId: string) => {
+    console.log('🔧 Category changed to:', categoryId);
     setFormData({
       ...formData,
-      category: categoryName,
+      category: categoryId,
       subcategory: '' // Reset subcategory when category changes
     });
+    // Clear subcategories list to force reload
+    setSubcategories([]);
   };
 
   const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -196,10 +202,6 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
   const handleSave = async () => {
     setIsLoading(true);
     try {
-      // Find category and subcategory IDs
-      const selectedCategory = categories.find(cat => cat.name === formData.category);
-      const selectedSubcategory = subcategories.find(sub => sub.name === formData.subcategory);
-      
       // Prepare form data for API
       const updateData = {
         title: formData.title,
@@ -212,9 +214,16 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
         depositAmount: parseFloat(formData.deposit),
         pickupAddress: formData.location,
         ownerInstructions: formData.instructions,
-        categoryId: selectedCategory?.id,
-        subcategoryId: selectedSubcategory?.id
+        categoryId: formData.category,
+        subcategoryId: formData.subcategory || null // Send null if empty string
       };
+
+      // Debug logs
+      console.log('🔧 FormData before update:', {
+        category: formData.category,
+        subcategory: formData.subcategory
+      });
+      console.log('🔧 UpdateData being sent to API:', updateData);
 
       // Update tool data
       await toolsService.updateTool(ad.id, updateData);
@@ -424,7 +433,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.name}>{category.name}</SelectItem>
+                    <SelectItem key={category.id} value={category.id}>{category.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -432,13 +441,16 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
             
             <div className="space-y-2">
               <Label>{t('ads.sub_category')}</Label>
-              <Select value={formData.subcategory} onValueChange={(value) => setFormData({...formData, subcategory: value})} disabled={loadingSubcategories || !formData.category}>
+              <Select value={formData.subcategory} onValueChange={(value) => {
+                console.log('🔧 Subcategory changed to:', value);
+                setFormData({...formData, subcategory: value});
+              }} disabled={loadingSubcategories || !formData.category}>
                 <SelectTrigger>
                   <SelectValue placeholder={loadingSubcategories ? "Chargement..." : t('ads.sub_category_placeholder')} />
                 </SelectTrigger>
                 <SelectContent>
                   {subcategories.map((subcategory) => (
-                    <SelectItem key={subcategory.id} value={subcategory.name}>{subcategory.name}</SelectItem>
+                    <SelectItem key={subcategory.id} value={subcategory.id}>{subcategory.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -524,11 +536,12 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
           
           <div className="space-y-2">
             <Label htmlFor="location">{t('ads.location')} *</Label>
-            <Input
-              id="location"
+            <AddressAutocomplete
               value={formData.location}
-              onChange={(e) => setFormData({...formData, location: e.target.value})}
+              onChange={(value) => setFormData({...formData, location: value})}
+              onAddressSelected={(isSelected) => console.log('Address selected:', isSelected)}
               placeholder={t('ads.location_placeholder')}
+              selectedCountry={user?.country || 'KW'}
             />
           </div>
         </div>
