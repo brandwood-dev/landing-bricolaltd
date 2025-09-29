@@ -209,7 +209,7 @@ const FeaturedToolsSection = () => {
                         <div className='flex items-center justify-between mb-2'>
                           <div className='flex items-center text-sm text-gray-500'>
                             <Star className='h-4 w-4 text-yellow-400 fill-current mr-1' />
-                            {tool.rating} ({tool.reviewCount})
+                            {tool.rating || 0} ({tool.reviewCount || 0})
                           </div>
                         </div>
 

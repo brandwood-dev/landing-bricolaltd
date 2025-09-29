@@ -8,6 +8,7 @@ export interface CreateContactData {
   email: string;
   phone?: string;
   subject: string;
+  category: 'technical' | 'payment' | 'account' | 'dispute' | 'suggestion' | 'other';
   message: string;
 }
 
@@ -20,7 +21,7 @@ export interface Contact {
   subject: string;
   message: string;
   status: 'new' | 'in_progress' | 'resolved' | 'closed';
-  category: 'general' | 'technical' | 'billing' | 'account' | 'booking' | 'other';
+  category: 'technical' | 'payment' | 'account' | 'dispute' | 'suggestion' | 'other';
   priority: 'low' | 'medium' | 'high' | 'urgent';
   assignedTo?: string;
   response?: string;

@@ -47,7 +47,7 @@ export interface Booking extends BaseEntity {
     firstName: string
     lastName: string
     phone: string
-    phonePrefix: string
+    phone_prefix: string
   }
 
   // Relations
@@ -58,6 +58,45 @@ export interface Booking extends BaseEntity {
   owner?: User
 }
 
+export interface Reservation {
+  id: string
+  referenceId: string
+  toolId: string
+  toolName: string
+  toolDescription: string
+  toolImage: string
+  toolBrand: string
+  toolModel: string
+  toolCondition: string
+  pickupAddress: string
+  ownerId: string
+  owner: string
+  ownerEmail: string
+  ownerPhone: string
+  ownerAddress: string
+  renterId: string
+  renterName: string
+  renterEmail: string
+  renterPhone: string
+  renterAddress: string
+  startDate: string
+  endDate: string
+  pickupHour: string
+  status: BookingStatus
+  price: number
+  dailyPrice: number
+  location: string
+  message: string
+  validationCode?: string
+  hasActiveClaim?: boolean
+  cancellationReason?: string
+  cancellationMessage?: string
+  refusalReason?: string
+  refusalMessage?: string
+  renterHasReturned?: boolean
+  hasUsedReturnButton?: boolean
+  pickupTool?: boolean
+}
 // Booking creation data
 export interface CreateBookingData {
   toolId: string
@@ -205,15 +244,30 @@ export interface BookingReview {
 // Request interface for UI components (extends Booking with additional UI properties)
 export interface Request extends BaseEntity {
   // Core booking information
+  referenceId: string
   toolId: string
   renterId: string
   ownerId: string
-
+  toolName: string
+  toolDescription: string
+  toolImage: string
+  toolBrand: string
+  toolModel: string
+  toolCondition: string
+  ownerName: string
+  ownerEmail: string
+  ownerPhone: string
+  ownerAddress: string
+  renterName: string
+  renterEmail: string
+  renterPhone: string
+  renterAddress: string
   // Dates and timing
   startDate: string
   endDate: string
   pickupHour: string
-
+  pickupAddress: string
+  location : string
   // Pricing
   totalDays: number
   basePrice: number
@@ -244,7 +298,7 @@ export interface Request extends BaseEntity {
     firstName: string
     lastName: string
     phone: string
-    phonePrefix: string
+    phone_prefix: string
   }
 
   // Relations

@@ -58,7 +58,7 @@ export interface Address {
 // Contact information
 export interface ContactInfo {
   phone?: string;
-  phonePrefix?: string;
+  phone_prefix?: string;
   email?: string;
 }
 

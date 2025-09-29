@@ -58,7 +58,7 @@ export interface Tool extends BaseEntity {
   // Statistics
   rating?: number;
   totalBookings?: number;
-  totalReviews?: number;
+  reviewCount?: number;
 }
 
 // Tool photo interface
@@ -75,7 +75,7 @@ export interface ToolSummary {
   condition: ToolCondition;
   isAvailable: boolean;
   rating?: number;
-  totalReviews?: number;
+  reviewCount?: number;
   primaryPhoto?: string;
   owner: {
     id: string;
@@ -142,7 +142,7 @@ export interface ToolStats {
   completedBookings: number;
   cancelledBookings: number;
   averageRating: number;
-  totalReviews: number;
+  reviewCount: number;
   totalEarnings: number;
   occupancyRate: number; // percentage
 }

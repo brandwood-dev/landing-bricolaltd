@@ -22,6 +22,8 @@ import {
   Download,
   Loader2,
 } from 'lucide-react'
+import { Link } from 'react-router-dom'
+
 import { useToast } from '@/hooks/use-toast'
 import { useAuth } from '@/contexts/AuthContext'
 import RequestsAndReservationsFilters from './RequestsAndReservationsFilters'
@@ -55,6 +57,9 @@ import { generateRentalContract } from '@/utils/contractGenerator'
 import { disputeService } from '@/services/disputeService'
 import { notificationService } from '@/services/notificationService'
 import { reviewsService } from '@/services/reviewsService'
+import { toolsService, Tool } from '@/services/toolsService'
+import AdViewDialog from './AdViewDialog'
+import { Dialog } from '@/components/ui/dialog'
 
 const Requests = () => {
   const { user } = useAuth()
@@ -66,6 +71,9 @@ const Requests = () => {
   const [filteredRequests, setFilteredRequests] = useState<Request[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(3)
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
+  const [viewToolData, setViewToolData] = useState<Tool | null>(null)
+  const [isLoadingView, setIsLoadingView] = useState(false)
   const { toast } = useToast()
 
   const [requests, setRequests] = useState<Request[]>([])
@@ -88,24 +96,26 @@ const Requests = () => {
       pickupAddress: booking.tool?.pickupAddress || '',
       toolImage,
       ownerName:
-        `${booking.tool?.owner?.firstName || ''} ${
-          booking.tool?.owner?.lastName || ''
+        `${booking.owner?.firstName || ''} ${
+          booking.owner?.lastName || ''
         }`.trim() || t('general.unknown_owner'),
-      ownerEmail: booking.tool?.owner?.email || '',
-      ownerPhone: booking.tool?.owner?.phone_number || '',
+      ownerEmail: booking.owner?.email || '',
+      ownerPhone: booking.owner?.phoneNumber || '',
+      ownerAddress: booking.owner?.address || '',
       renterName:
         `${booking.renter?.firstName || ''} ${
           booking.renter?.lastName || ''
         }`.trim() || t('general.unknown_renter'),
       renterEmail: booking.renter?.email || '',
-      renterPhone: booking.renter?.phone_number || '',
+      renterPhone: booking.renter?.phoneNumber || '',
+      renterAddress: booking.renter?.address || '',
       pickupHour: booking.pickupHour,
       startDate: booking.startDate,
       endDate: booking.endDate,
       message: booking.message,
       status: booking.status,
-      price: booking.totalPrice || 0,
-      dailyPrice: booking.tool?.basePrice || 0,
+      totalPrice: booking.totalPrice || 0,
+      basePrice: booking.tool?.basePrice || 0,
       location:
         booking.tool?.pickupAddress || t('general.location_not_specified'),
       validationCode: booking.validationCode,
@@ -117,9 +127,24 @@ const Requests = () => {
       renterHasReturned: booking.renterHasReturned,
       hasUsedReturnButton: booking.hasUsedReturnButton,
       pickupTool: booking.pickupTool,
+      toolBrand: booking.tool.brand,
+      toolModel: booking.tool.model,
+      toolCondition:
+        booking.tool?.condition === 1
+          ? 'NEW'
+          : booking.tool?.condition === 2
+          ? 'LIKE_NEW'
+          : booking.tool?.condition === 3
+          ? 'GOOD'
+          : booking.tool?.condition === 4
+          ? 'FAIR'
+          : booking.tool?.condition === 5
+          ? 'POOR'
+          : '',
     }
   }
   const { t, language } = useLanguage()
+
   const fetchBookings = async () => {
     if (!user?.id) {
       setError(t('auth.user_not_found'))
@@ -321,7 +346,14 @@ const Requests = () => {
     setIsClaimDialogOpen(true)
   }
 
-  const handleSubmitReview = async (rating: number, comment: string, bookingId?: string, toolId?: string, revieweeId?: string, reviewerId?: string) => {
+  const handleSubmitReview = async (
+    rating: number,
+    comment: string,
+    bookingId?: string,
+    toolId?: string,
+    revieweeId?: string,
+    reviewerId?: string
+  ) => {
     if (!user?.id || !bookingId || !toolId || !revieweeId) {
       toast({
         title: t('general.error'),
@@ -454,32 +486,46 @@ const Requests = () => {
     setFilteredRequests(data)
     setCurrentPage(1) // Retour à la première page lors d'un changement de filtre
   }
+
+  const calculateRentalDuration = (startDate: string, endDate: string) => {
+    const start = new Date(startDate)
+    const end = new Date(endDate)
+    const diffTime = end.getTime() - start.getTime()
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    return diffDays
+  }
   const handleDownloadContract = (request: Request) => {
     const contractData = {
-      referenceId: request.referenceId,
-      toolName: request.toolName,
-      toolDescription: request.toolDescription,
-      toolBrand: request.toolBrand || 'Brand',
-      toolModel: request.toolModel || 'Model',
-      serialNumber: request.serialNumber || '142587963hytd',
-      condition: request.condition || 'New',
-      accessories: '',
-      ownerName: request.ownerName,
-      ownerAddress: request.ownerAddress || request.location,
-      ownerEmail: request.ownerEmail,
-      ownerPhone: request.ownerPhone,
-      renterName: request.renterName,
-      renterAddress: request.renterAddress || request.location,
-      renterEmail: request.renterEmail,
-      renterPhone: request.renterPhone,
-      startDate: request.pickupHour,
-      endDate: request.pickupHour,
-      pickupHour: request.pickupHour,
-      handoverLocation: request.handoverLocation || request.location,
-      returnLocation: request.returnLocation || request.location,
-      totalPrice: request.price,
-      rentalDuration: request.rentalDuration || '5',
-      deposit: request.price / 10 || 0,
+      referenceId: request.id,
+      toolName: request.toolName || '',
+      toolDescription: request.toolDescription || '',
+      toolBrand: request.toolBrand || '',
+      toolModel: request.toolModel || '',
+      serialNumber: request.toolBrand + request.toolModel + '2025',
+      condition: request.toolCondition || '',
+      accessories: 'no accessories',
+      ownerName: request.ownerName || '',
+      ownerAddress: request.ownerAddress || '',
+      ownerEmail: request.ownerEmail || '',
+      ownerPhone: request.ownerPhone || '',
+      renterName: request.renterName || '',
+      renterAddress: request.renterAddress || '',
+      renterEmail: request.renterEmail || '',
+      renterPhone: request.renterPhone || '',
+      startDate: request.startDate || '',
+      endDate: request.endDate || '',
+      pickupHour: request.pickupHour || '',
+      handoverLocation: request.pickupAddress || '',
+      returnLocation: request.pickupAddress || '',
+      // rentalDuration = endate - startdate
+      rentalDuration:
+        calculateRentalDuration(request.startDate, request.endDate) + ' days',
+      // total Price = (basePrice + 6%) * RentalDuration
+      totalPrice: Math.round(
+        (request.basePrice + request.basePrice * 0.06) *
+          Number(calculateRentalDuration(request.startDate, request.endDate))
+      ),
+      deposit: request.deposit || 0,
     }
 
     generateRentalContract(contractData)
@@ -523,14 +569,21 @@ const Requests = () => {
                 <div className='flex gap-4'>
                   {/* Tool image */}
                   <div className='w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0'>
-                    <img
-                      src={req.toolImage}
-                      alt={req.toolName}
-                      className='w-full h-full object-cover'
-                    />
+                    <Link to={`/tool/${req.toolId}`}>
+                      <img
+                        src={req.toolImage}
+                        alt={req.toolName}
+                        className='w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity'
+                      />
+                    </Link>
                   </div>
                   <div className='space-y-1'>
-                    <h3 className='font-semibold'>{req.toolName}</h3>
+                    <Link
+                      to={`/tool/${req.toolId}`}
+                      className='font-semibold cursor-pointer hover:text-primary transition-colors'
+                    >
+                      {req.toolName}
+                    </Link>
                     <div className='flex items-center gap-2 text-sm text-muted-foreground'>
                       <User className='h-4 w-4' />
                       {req.renterName}
@@ -576,7 +629,15 @@ const Requests = () => {
                   <Clock className='h-4 w-4' />
                   {t('request.pickup_time')} : {req.pickupHour}
                 </div>
-                <div className='font-semibold text-primary'>{req.price}€</div>
+                <div className='font-semibold text-primary'>
+                  {Math.round(
+                    (req.basePrice + req.basePrice * 0.06) *
+                      Number(
+                        calculateRentalDuration(req.startDate, req.endDate)
+                      )
+                  )}
+                  €
+                </div>
               </div>
 
               {req.message && (
@@ -799,11 +860,16 @@ const Requests = () => {
           onOpenChange={setIsReviewDialogOpen}
           onSubmit={handleSubmitReview}
           bookingId={selectedRequestId}
-          toolId={bookings.find(booking => booking.id === selectedRequestId)?.toolId}
-          revieweeId={bookings.find(booking => booking.id === selectedRequestId)?.renterId}
+          toolId={
+            bookings.find((booking) => booking.id === selectedRequestId)?.toolId
+          }
+          revieweeId={
+            bookings.find((booking) => booking.id === selectedRequestId)
+              ?.renterId
+          }
           reviewerId={user?.id}
         />
- 
+
         <ClaimDialog
           isOpen={isClaimDialogOpen}
           onOpenChange={setIsClaimDialogOpen}
@@ -811,6 +877,15 @@ const Requests = () => {
           onSubmit={handleSubmitClaim}
           onRefresh={fetchBookings}
         />
+
+        {/* Modal de vue des détails de l'outil */}
+        {viewToolData && (
+          <AdViewDialog
+            isOpen={isViewDialogOpen}
+            onClose={handleViewClose}
+            ad={viewToolData}
+          />
+        )}
       </CardContent>
     </Card>
   )

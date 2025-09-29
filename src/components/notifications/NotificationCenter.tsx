@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Bell, X, Check, Clock, AlertCircle, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -95,6 +96,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   });
   
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
   const unreadCount = notifications.filter(n => !n.isRead).length;
   
   console.log('📊 [NotificationCenter] Calculated unreadCount:', unreadCount);
@@ -105,6 +107,16 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     }
     onNotificationClick(notification);
     setIsOpen(false);
+    navigate('/notifications');
+  };
+
+  const handleMarkAllAsRead = () => {
+    onMarkAllAsRead();
+  };
+
+  const handleViewAllNotifications = () => {
+    setIsOpen(false);
+    navigate('/notifications');
   };
 
   // Log when no notifications
@@ -134,7 +146,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             <Button 
               variant="ghost" 
               size="sm" 
-              onClick={onMarkAllAsRead}
+              onClick={handleMarkAllAsRead}
               className="text-xs"
             >
               Tout marquer comme lu
@@ -201,9 +213,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                 variant="ghost" 
                 size="sm" 
                 className="w-full text-xs"
-                onClick={() => {
-                  setIsOpen(false);
-                }}
+                onClick={handleViewAllNotifications}
               >
                 Voir toutes les notifications
               </Button>

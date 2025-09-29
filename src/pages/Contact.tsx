@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -8,7 +8,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Mail, Phone, MapPin, Clock } from 'lucide-react';
+import { Mail, Phone, MapPin, Search } from 'lucide-react';
+import { 
+  countries, 
+  getCountryByCode, 
+  validatePhoneNumber, 
+  formatPhoneNumber, 
+  getFullPhoneNumber,
+  getDefaultCountry,
+  getPopularCountries,
+  getSortedCountries,
+  searchCountries
+} from '@/services/countriesService';
 import { useToast } from '@/hooks/use-toast';
 import { contactService, CreateContactData } from '@/services/contactService';
 
@@ -17,22 +28,58 @@ const Contact = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<{[key: string]: string}>({});
+  const [countrySearch, setCountrySearch] = useState('');
+  const [isCountrySelectOpen, setIsCountrySelectOpen] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
-    phone: '',
+    phonePrefix: getDefaultCountry().code,
+    phoneNumber: '',
     category: '',
     subject: '',
     message: ''
   });
 
+  // Mémorisation des pays filtrés pour optimiser les performances
+  const filteredCountries = useMemo(() => {
+    if (!countrySearch.trim()) {
+      const popularCountries = getPopularCountries();
+      const allCountries = getSortedCountries();
+      // Afficher les pays populaires en premier, puis le reste
+      const otherCountries = allCountries.filter(
+        country => !popularCountries.some(popular => popular.code === country.code)
+      );
+      return [...popularCountries, ...otherCountries];
+    }
+    
+    return searchCountries(countrySearch);
+  }, [countrySearch]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    // Gestion spéciale pour le numéro de téléphone avec limitation
+    if (name === 'phoneNumber') {
+      const selectedCountry = getCountryByCode(formData.phonePrefix);
+      const maxDigits = selectedCountry?.maxLength || 15;
+      
+      // Ne garder que les chiffres
+      const numericValue = value.replace(/\D/g, '');
+      
+      // Limiter au nombre maximum de chiffres
+      if (numericValue.length <= maxDigits) {
+        setFormData(prev => ({
+          ...prev,
+          [name]: numericValue
+        }));
+      }
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
     
     // Clear field error when user starts typing
     if (fieldErrors[name as keyof typeof fieldErrors]) {
@@ -42,6 +89,11 @@ const Contact = () => {
 
   const handleSelectChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Si on change le préfixe téléphonique, vider le numéro pour éviter les erreurs
+    if (name === 'phonePrefix') {
+      setFormData(prev => ({ ...prev, phoneNumber: '' }));
+    }
     
     // Clear field error when user selects a value
     if (fieldErrors[name as keyof typeof fieldErrors]) {
@@ -95,11 +147,14 @@ const Contact = () => {
           return t('contact.validation.message_min_length') || 'Le message doit contenir au moins 10 caractères.';
         }
         break;
-      case 'phone':
+      case 'phoneNumber':
         if (value.trim()) {
-          const phoneRegex = /^[\+]?[1-9][\d\s\-\(\)]{7,15}$/;
-          if (!phoneRegex.test(value.trim())) {
-            return t('contact.validation.phone_invalid') || 'Le format du numéro de téléphone n\'est pas valide.';
+          const selectedCountry = getCountryByCode(formData.phonePrefix);
+          if (selectedCountry) {
+            const validationResult = validatePhoneNumber(value, selectedCountry);
+            if (!validationResult.isValid) {
+              return validationResult.error || t('contact.validation.phone_invalid') || 'Le numéro de téléphone n\'est pas valide.';
+            }
           }
         }
         break;
@@ -113,7 +168,7 @@ const Contact = () => {
       firstName: validateField('firstName', formData.firstName),
       lastName: validateField('lastName', formData.lastName),
       email: validateField('email', formData.email),
-      phone: validateField('phone', formData.phone),
+      phoneNumber: validateField('phoneNumber', formData.phoneNumber),
       category: validateField('category', formData.category),
       subject: validateField('subject', formData.subject),
       message: validateField('message', formData.message)
@@ -152,17 +207,17 @@ const Contact = () => {
     }
 
     setIsSubmitting(true);
-    
+ 
     try {
       const contactData: CreateContactData = {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.email,
-      phone: formData.phone || undefined,
-      category: formData.category,
-      subject: formData.subject,
-      message: formData.message
-    };
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phoneNumber ? getFullPhoneNumber(formData.phoneNumber, getCountryByCode(formData.phonePrefix)!) : undefined,
+        category: formData.category as 'technical' | 'payment' | 'account' | 'dispute' | 'suggestion' | 'other',
+        subject: formData.subject,
+        message: formData.message
+      };
 
       await contactService.createContact(contactData);
       
@@ -177,11 +232,13 @@ const Contact = () => {
         firstName: '',
         lastName: '',
         email: '',
-        phone: '',
+        phonePrefix: getDefaultCountry().code,
+        phoneNumber: '',
         category: '',
         subject: '',
         message: ''
       });
+      setCountrySearch('');
     } catch (error: any) {
       console.error('Error sending contact message:', error);
       toast({
@@ -275,18 +332,94 @@ const Contact = () => {
                     <label className='block text-sm font-medium mb-2'>
                       {t('contact.phone')}
                     </label>
-                    <Input
-                      name='phone'
-                      type='tel'
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      onBlur={(e) => handleFieldBlur('phone', e.target.value)}
-                      placeholder={t('contact.phone_placeholder')}
-                      className={fieldErrors.phone ? 'border-red-500' : ''}
-                    />
-                    {fieldErrors.phone && (
-                      <p className="mt-1 text-sm text-red-600">{fieldErrors.phone}</p>
+                    <div className='flex gap-2'>
+                      <Select
+                        value={formData.phonePrefix}
+                        onValueChange={(value) => {
+                          handleSelectChange('phonePrefix', value);
+                          setCountrySearch('');
+                          setIsCountrySelectOpen(false);
+                        }}
+                        open={isCountrySelectOpen}
+                        onOpenChange={setIsCountrySelectOpen}
+                      >
+                        <SelectTrigger className='w-[200px]'>
+                          <SelectValue>
+                            {(() => {
+                              const selectedCountry = getCountryByCode(formData.phonePrefix);
+                              return selectedCountry ? (
+                                <div className='flex items-center gap-2'>
+                                  <span>{selectedCountry.flag}</span>
+                                  <span>{selectedCountry.dialCode}</span>
+                                  <span className='text-sm text-gray-500 truncate'>({selectedCountry.name})</span>
+                                </div>
+                              ) : formData.phonePrefix;
+                            })()} 
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent className='max-h-[300px]'>
+                          <div className='sticky top-0 bg-white border-b p-2'>
+                            <div className='relative'>
+                              <Search className='absolute left-2 top-2.5 h-4 w-4 text-gray-400' />
+                              <Input
+                                placeholder='Rechercher un pays...'
+                                value={countrySearch}
+                                onChange={(e) => setCountrySearch(e.target.value)}
+                                className='pl-8 h-9'
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                            </div>
+                          </div>
+                          <div className='max-h-[200px] overflow-y-auto'>
+                            {filteredCountries.length > 0 ? (
+                              filteredCountries.map((country) => (
+                                <SelectItem key={country.code} value={country.code}>
+                                  <div className='flex items-center gap-2 w-full'>
+                                    <span className='text-lg'>{country.flag}</span>
+                                    <span className='font-medium'>{country.dialCode}</span>
+                                    <span className='text-sm text-gray-600 truncate flex-1'>{country.name}</span>
+                                  </div>
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <div className='p-2 text-sm text-gray-500 text-center'>
+                                Aucun pays trouvé
+                              </div>
+                            )}
+                          </div>
+                        </SelectContent>
+                      </Select>
+                      <div className='flex-1'>
+                        <Input
+                          name='phoneNumber'
+                          type='tel'
+                          value={formData.phoneNumber}
+                          onChange={handleInputChange}
+                          onBlur={(e) => handleFieldBlur('phoneNumber', e.target.value)}
+                          placeholder={(() => {
+                            const country = getCountryByCode(formData.phonePrefix);
+                            return country ? `Numéro local (${country.minLength}-${country.maxLength} chiffres)` : 'Numéro de téléphone';
+                          })()}
+                          className={fieldErrors.phoneNumber ? 'border-red-500' : ''}
+                          maxLength={getCountryByCode(formData.phonePrefix)?.maxLength || 15}
+                        />
+                      </div>
+                    </div>
+                    {fieldErrors.phoneNumber && (
+                      <p className="mt-1 text-sm text-red-600">{fieldErrors.phoneNumber}</p>
                     )}
+                    {(() => {
+                      const country = getCountryByCode(formData.phonePrefix);
+                      const formattedNumber = formData.phoneNumber ? formatPhoneNumber(formData.phoneNumber, getCountryByCode(formData.phonePrefix)!) : '';
+                      return (
+                        <div className="mt-1 text-xs text-gray-500 space-y-1">
+                          <p>Longueur: {country ? `${country.minLength}-${country.maxLength}` : '8-15'} chiffres</p>
+                          {formattedNumber && (
+                            <p>Aperçu: <span className="font-medium">{formattedNumber}</span></p>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </div>
                   <div>
                     <label className='block text-sm font-medium mb-2'>

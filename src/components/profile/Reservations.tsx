@@ -66,43 +66,10 @@ import { bookingService } from '@/services/bookingService'
 import { disputeService } from '@/services/disputeService'
 import { reviewsService } from '@/services/reviewsService'
 import { api } from '@/services/api'
-import { Booking, BookingStatus } from '@/types/bridge'
-//usenavigate
+import { Booking, BookingStatus, Reservation } from '@/types/bridge'
 
-interface Reservation {
-  id: string
-  referenceId: string
-  toolId: string
-  toolName: string
-  toolDescription: string
-  toolImage: string
-  pickupAddress: string
-  ownerId: string
-  owner: string
-  ownerEmail: string
-  ownerPhone: string
-  renterId: string
-  renterName: string
-  renterEmail: string
-  renterPhone: string
-  startDate: string
-  endDate: string
-  pickupHour: string
-  status: BookingStatus
-  price: number
-  dailyPrice: number
-  location: string
-  message: string
-  validationCode?: string
-  hasActiveClaim?: boolean
-  cancellationReason?: string
-  cancellationMessage?: string
-  refusalReason?: string
-  refusalMessage?: string
-  renterHasReturned?: boolean
-  hasUsedReturnButton?: boolean
-  pickupTool?: boolean
-}
+
+
 
 const Reservations = () => {
   //user
@@ -157,20 +124,37 @@ const Reservations = () => {
       toolDescription: booking.tool?.description || '',
       pickupAddress: booking.tool?.pickupAddress || '',
       toolImage,
+      toolBrand: booking.tool?.brand || '',
+      toolModel: booking.tool?.model || '',
+      //  NEW = 1,      LIKE_NEW = 2,      GOOD = 3,      FAIR = 4,      POOR = 5,
+      toolCondition:
+        booking.tool?.condition === 1
+          ? 'NEW'
+          : booking.tool?.condition === 2
+          ? 'LIKE_NEW'
+          : booking.tool?.condition === 3
+          ? 'GOOD'
+          : booking.tool?.condition === 4
+          ? 'FAIR'
+          : booking.tool?.condition === 5
+          ? 'POOR'
+          : '',
       ownerId: booking.tool?.owner?.id || '',
       owner:
         `${booking.tool?.owner?.firstName || ''} ${
           booking.tool?.owner?.lastName || ''
         }`.trim() || t('general.unknown_owner'),
       ownerEmail: booking.tool?.owner?.email || '',
-      ownerPhone: booking.tool?.owner?.phone_number || '',
+      ownerPhone: booking.tool?.owner?.phoneNumber || '',
+      ownerAddress: booking.tool?.owner?.address || '',
       renterId: booking.renter?.id || '',
       renterName:
         `${booking.renter?.firstName || ''} ${
           booking.renter?.lastName || ''
         }`.trim() || t('general.unknown_renter'),
       renterEmail: booking.renter?.email || '',
-      renterPhone: booking.renter?.phone_number || '',
+      renterPhone: booking.renter?.phoneNumber || '',
+      renterAddress: booking.renter?.address || '',
       pickupHour: booking.pickupHour,
       startDate: booking.startDate,
       endDate: booking.endDate,
@@ -326,7 +310,13 @@ const Reservations = () => {
       })
     }
   }
-
+  const calculateRentalDuration = (startDate: string, endDate: string) => {
+    const start = new Date(startDate)
+    const end = new Date(endDate)
+    const diffTime = end.getTime() - start.getTime()
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    return diffDays
+  }
   const handleDownloadContract = (reservation: Reservation) => {
     const contractData = {
       referenceId: reservation.referenceId,
@@ -335,26 +325,34 @@ const Reservations = () => {
       toolDescription: reservation.toolDescription,
       toolBrand: reservation.toolBrand || 'Brand',
       toolModel: reservation.toolModel || 'Model',
-      serialNumber: reservation.serialNumber || '142587963hytd',
-      condition: reservation.condition || 'New',
+      serialNumber: reservation.toolBrand + reservation.toolModel + '2025',
+      condition: reservation.toolCondition || 'New',
       accessories: '',
       ownerId: reservation.ownerId,
       ownerName: reservation.owner,
-      ownerAddress: reservation.ownerAddress || reservation.location,
+      ownerAddress: reservation.ownerAddress,
       ownerEmail: reservation.ownerEmail,
       ownerPhone: reservation.ownerPhone,
       renterId: reservation.renterId,
       renterName: reservation.renterName,
-      renterAddress: reservation.renterAddress || reservation.location,
+      renterAddress: reservation.renterAddress,
       renterEmail: reservation.renterEmail,
       renterPhone: reservation.renterPhone,
       startDate: reservation.pickupHour,
       endDate: reservation.pickupHour,
       pickupHour: reservation.pickupHour,
-      handoverLocation: reservation.handoverLocation || reservation.location,
-      returnLocation: reservation.returnLocation || reservation.location,
-      totalPrice: reservation.price,
-      rentalDuration: reservation.rentalDuration || '5',
+      handoverLocation: reservation.pickupAddress,
+      returnLocation: reservation.pickupAddress,
+      // rentalDuration = endate - startdate
+      rentalDuration:
+        calculateRentalDuration(reservation.startDate, reservation.endDate) +
+        ' days',
+      // total Price = (basePrice + 6%) * RentalDuration
+      totalPrice:
+        (reservation.dailyPrice + reservation.dailyPrice * 0.06) *
+        Number(
+          calculateRentalDuration(reservation.startDate, reservation.endDate)
+        ),
       deposit: reservation.price / 10 || 0,
     }
 

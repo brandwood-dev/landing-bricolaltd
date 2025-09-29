@@ -22,7 +22,7 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import { ModerationStatus } from '@/types/bridge/enums'
 import { toolsService, Tool } from '@/services/toolsService'
 import { useToast } from '@/hooks/use-toast'
-
+import { Link } from 'react-router-dom'
 interface AdCardProps {
   ad: any
   onPublishToggle: (adId: string, published: boolean) => void
@@ -43,7 +43,10 @@ const AdCard = ({
   const { t, language } = useLanguage()
   const { toast } = useToast()
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
   const [toolData, setToolData] = useState<Tool | null>(null)
+  const [viewToolData, setViewToolData] = useState<Tool | null>(null)
+  const [isLoadingView, setIsLoadingView] = useState(false)
 
   const handleEditClick = async () => {
     try {
@@ -70,32 +73,64 @@ const AdCard = ({
     setIsEditDialogOpen(false)
     setToolData(null)
   }
+
+  const handleViewClick = async () => {
+    try {
+      setIsLoadingView(true)
+      const tool = await toolsService.getTool(ad.id)
+      setViewToolData(tool)
+      setIsViewDialogOpen(true)
+    } catch (error) {
+      console.error('Error fetching tool details:', error)
+      toast({
+        title: 'Erreur',
+        description: "Impossible de charger les détails de l'outil",
+        variant: 'destructive',
+      })
+    } finally {
+      setIsLoadingView(false)
+    }
+  }
+
+  const handleViewClose = () => {
+    setIsViewDialogOpen(false)
+    setViewToolData(null)
+  }
   console.log('🔍 AdCard - Rendering with ad data:', {
     id: ad.id,
     title: ad.title,
     category: ad.category,
-    categoryId: ad.categoryId
+    categoryId: ad.categoryId,
   })
-  
+
   return (
     <div className='border rounded-lg p-4'>
       <div className='flex flex-col sm:flex-row items-start gap-4'>
-        <img
-          src={ad.image}
-          alt={ad.title}
-          className='w-full sm:w-20 h-48 sm:h-20 rounded-lg object-cover'
-        />
+        <Link to={`/tool/${ad.id}`}>
+          <img
+            src={ad.image}
+            alt={ad.title}
+            className='w-full sm:w-20 h-48 sm:h-20 rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity'
+            onClick={handleViewClick}
+          />
+        </Link>
         <div className='flex-1 space-y-3 w-full sm:w-auto'>
           <div className='flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3'>
             <div className='flex-1'>
-              <h3 className='font-semibold'>{ad.title}</h3>
+              <Link
+                to={`/tool/${ad.id}`}
+                className='font-semibold cursor-pointer hover:text-primary transition-colors'
+                onClick={handleViewClick}
+              >
+                {ad.title}
+              </Link>
               <p className='text-sm text-muted-foreground'>{ad.category}</p>
             </div>
             <div className='flex flex-col sm:flex-row items-start sm:items-center gap-2'>
               <Badge className={getValidationStatusColor(ad.validationStatus)}>
                 {getValidationStatusText(ad.validationStatus)}
               </Badge>
-             
+
               {ad.moderationStatus === ModerationStatus.CONFIRMED && (
                 <div className='flex items-center space-x-2 gap-3'>
                   <Switch
@@ -118,7 +153,7 @@ const AdCard = ({
           <div className='flex items-center gap-4 text-sm text-muted-foreground'>
             <div className='flex items-center gap-1'>
               <Star className='h-4 w-4 fill-yellow-400 text-yellow-400' />
-              {ad.rating}
+              {ad.rating || 0}
             </div>
             <div>
               {ad.totalRentals} {t('general.location')}
@@ -148,15 +183,24 @@ const AdCard = ({
                 </Dialog>
               )}
 
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant='outline' size='sm'>
-                    <Eye className='h-4 w-4 mr-1' />
-                    {t('general.see')}
-                  </Button>
-                </DialogTrigger>
-                <AdViewDialog ad={ad} />
-              </Dialog>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={handleViewClick}
+                disabled={isLoadingView}
+              >
+                <Eye className='h-4 w-4 mr-1' />
+                {isLoadingView ? t('general.loading') : t('general.see')}
+              </Button>
+
+              {viewToolData && (
+                <Dialog
+                  open={isViewDialogOpen}
+                  onOpenChange={setIsViewDialogOpen}
+                >
+                  <AdViewDialog ad={viewToolData} onClose={handleViewClose} />
+                </Dialog>
+              )}
 
               <AlertDialog>
                 <AlertDialogTrigger asChild>

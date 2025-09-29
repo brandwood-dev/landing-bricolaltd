@@ -59,7 +59,7 @@ export const useNotifications = (): UseNotificationsReturn => {
 
   const markAsRead = useCallback(async (id: string) => {
     try {
-      await apiClient.patch(`/notifications/${id}/read`);
+      await apiClient.patch(`/notifications/${id}/mark-read`);
       
       setNotifications(prev => 
         prev.map(notification => 
@@ -77,7 +77,7 @@ export const useNotifications = (): UseNotificationsReturn => {
 
   const markAllAsRead = useCallback(async () => {
     try {
-      await apiClient.patch('/notifications/mark-all-read');
+      await apiClient.patch('/notifications/my/mark-all-read');
       
       setNotifications(prev => 
         prev.map(notification => ({ ...notification, isRead: true }))

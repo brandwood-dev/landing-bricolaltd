@@ -113,7 +113,7 @@ export const authService = {
   // Get user profile
   getProfile: async (): Promise<User> => {
     try {
-      const response = await api.get<User>('/auth/profile');
+      const response = await api.get<ApiResponse<User>>('/auth/profile');
       return response.data.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch profile');

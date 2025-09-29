@@ -40,7 +40,7 @@ const Register = () => {
     confirmPassword: '',
     country: '',
     address: '',
-    phonePrefix: '',
+    phone_prefix: '',
     phoneNumber: '',
   })
   const [termsAccepted, setTermsAccepted] = useState(false)
@@ -256,7 +256,7 @@ const Register = () => {
         lastName: formData.lastName,
         countryId: formData.country,
         address: formData.address,
-        prefix: formData.phonePrefix,
+        prefix: formData.phone_prefix,
         // Combine prefix and phone number
         phoneNumber: formData.phoneNumber,
       }
@@ -368,9 +368,9 @@ const Register = () => {
                   <Label htmlFor='phone'>{t('register.phone')}</Label>
                   <div className='flex space-x-2'>
                     <Select
-                      value={formData.phonePrefix}
+                      value={formData.phone_prefix}
                       onValueChange={(value) =>
-                        setFormData({ ...formData, phonePrefix: value })
+                        setFormData({ ...formData, phone_prefix: value })
                       }
                     >
                       <SelectTrigger className='w-32'>

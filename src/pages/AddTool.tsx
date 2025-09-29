@@ -179,6 +179,9 @@ const AddTool = () => {
         setLoadingCategories(true)
         const categoriesData = await toolsService.getCategories()
         setCategories(categoriesData || [])
+        
+        // Debug: Log user country for Mapbox configuration
+        console.log('🌍 User country for Mapbox suggestions:', user?.country || 'KW (default)')
       } catch (error) {
         console.error('Error loading categories:', error)
         toast({

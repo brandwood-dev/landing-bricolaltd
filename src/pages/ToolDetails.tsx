@@ -29,6 +29,8 @@ import {
   ArrowLeft,
   Heart,
   Loader2,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { fr, enUS, arSA } from 'date-fns/locale'
@@ -50,6 +52,7 @@ const ToolDetails = () => {
   const [totalReviewPages, setTotalReviewPages] = useState(1)
   const [totalReviews, setTotalReviews] = useState(0)
   const reviewsPerPage = 3
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
   // Fetch tool details
   const fetchTool = async () => {
@@ -179,6 +182,23 @@ const ToolDetails = () => {
         variant: 'destructive',
       })
     }
+  }
+
+  // Carousel navigation functions
+  const nextImage = () => {
+    if (!tool) return
+    const allPhotos = getAllPhotoUrls(tool)
+    setCurrentImageIndex((prev) => (prev + 1) % allPhotos.length)
+  }
+
+  const prevImage = () => {
+    if (!tool) return
+    const allPhotos = getAllPhotoUrls(tool)
+    setCurrentImageIndex((prev) => (prev - 1 + allPhotos.length) % allPhotos.length)
+  }
+
+  const goToImage = (index: number) => {
+    setCurrentImageIndex(index)
   }
 
   if (loading) {
@@ -313,23 +333,79 @@ const ToolDetails = () => {
           </Card>
 
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8'>
-            {/* Images */}
+            {/* Carousel */}
             <div>
-              <img
-                src={primaryPhotoUrl}
-                alt={tool.title}
-                className='w-full h-96 object-cover rounded-lg mb-4'
-              />
-              <div className='grid grid-cols-4 gap-2'>
-                {allPhotoUrls.slice(1, 5).map((photo, index) => (
-                  <img
-                    key={index}
-                    src={photo}
-                    alt={`${tool.title} ${index + 2}`}
-                    className='w-full h-20 object-cover rounded cursor-pointer hover:opacity-80'
-                  />
-                ))}
+              {/* Main Image with Navigation */}
+              <div className='relative mb-4'>
+                <img
+                  src={allPhotoUrls[currentImageIndex]}
+                  alt={`${tool.title} ${currentImageIndex + 1}`}
+                  className='w-full h-96 object-cover rounded-lg'
+                />
+                
+                {/* Navigation Buttons */}
+                {allPhotoUrls.length > 1 && (
+                  <>
+                    <Button
+                      variant='outline'
+                      size='icon'
+                      className='absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white'
+                      onClick={prevImage}
+                    >
+                      <ChevronLeft className='h-4 w-4' />
+                    </Button>
+                    <Button
+                      variant='outline'
+                      size='icon'
+                      className='absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white'
+                      onClick={nextImage}
+                    >
+                      <ChevronRight className='h-4 w-4' />
+                    </Button>
+                  </>
+                )}
+                
+                {/* Image Counter */}
+                <div className='absolute bottom-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-sm'>
+                  {currentImageIndex + 1} / {allPhotoUrls.length}
+                </div>
               </div>
+              
+              {/* Thumbnails */}
+              {allPhotoUrls.length > 1 && (
+                <div className='grid grid-cols-4 gap-2'>
+                  {allPhotoUrls.slice(0, 4).map((photo, index) => (
+                    <img
+                      key={index}
+                      src={photo}
+                      alt={`${tool.title} ${index + 1}`}
+                      className={`w-full h-20 object-cover rounded cursor-pointer transition-all ${
+                        currentImageIndex === index
+                          ? 'ring-2 ring-accent opacity-100'
+                          : 'hover:opacity-80 opacity-70'
+                      }`}
+                      onClick={() => goToImage(index)}
+                    />
+                  ))}
+                </div>
+              )}
+              
+              {/* Dots Indicator */}
+              {allPhotoUrls.length > 4 && (
+                <div className='flex justify-center mt-4 space-x-2'>
+                  {allPhotoUrls.map((_, index) => (
+                    <button
+                      key={index}
+                      className={`w-2 h-2 rounded-full transition-all ${
+                        currentImageIndex === index
+                          ? 'bg-accent'
+                          : 'bg-gray-300 hover:bg-gray-400'
+                      }`}
+                      onClick={() => goToImage(index)}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Tool Information */}

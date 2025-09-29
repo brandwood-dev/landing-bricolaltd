@@ -48,7 +48,7 @@ export class NotificationService {
   // Mark notification as read
   async markAsRead(notificationId: string): Promise<Notification> {
     try {
-      const response = await api.patch<ApiResponse<Notification>>(`/notifications/${notificationId}/read`);
+      const response = await api.patch<ApiResponse<Notification>>(`/notifications/${notificationId}/mark-read`);
       return response.data.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to mark notification as read');

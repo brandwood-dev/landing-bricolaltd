@@ -18,7 +18,7 @@ export interface RegisterData {
   countryId?: string
   profilePicture?: string
   displayName?: string
-  phonePrefix?: string
+  phone_prefix?: string
   latitude?: number
   longitude?: number
   bio?: string
@@ -57,7 +57,7 @@ export interface AuthUser {
   countryId?: string
   profilePicture?: string
   displayName?: string
-  phonePrefix?: string
+  phone_prefix?: string
   latitude?: number
   longitude?: number
   bio?: string

@@ -65,14 +65,22 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
     brand: ad.brand || '',
     model: ad.model || '',
     year: ad.year?.toString() || '',
-    category: ad.category.id,
-    subcategory: ad.subcategory.id,
+    category: ad.category?.id || '',
+    subcategory: ad.subcategory?.id || '',
     condition: ad.condition.toString(),
     price: ad.basePrice,
     deposit: ad.depositAmount.toString(),
     location: ad.pickupAddress,
     description: ad.description,
     instructions: ad.ownerInstructions || ''
+  });
+  
+  // Debug logs pour l'initialisation
+  console.log('🔧 AdEditDialog - Initial data:', {
+    category: ad.category,
+    subcategory: ad.subcategory,
+    formData_category: ad.category?.id || '',
+    formData_subcategory: ad.subcategory?.id || ''
   });
   const [existingPhotos, setExistingPhotos] = useState<ToolPhoto[]>(ad.photos || []);
   const [newPhotos, setNewPhotos] = useState<File[]>([]);
@@ -112,10 +120,12 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
   // Load subcategories when category changes
   useEffect(() => {
     const loadSubcategories = async () => {
+      console.log('🔧 Loading subcategories for category:', formData.category);
       if (formData.category) {
         try {
           setLoadingSubcategories(true);
           const subcategories = await toolsService.getSubcategoriesByCategory(formData.category);
+          console.log('🔧 Loaded subcategories:', subcategories);
           setSubcategories(subcategories || []);
         } catch (error) {
           console.error('Error loading subcategories:', error);
@@ -124,22 +134,32 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
           setLoadingSubcategories(false);
         }
       } else {
+        console.log('🔧 No category selected, clearing subcategories');
         setSubcategories([]);
+        setLoadingSubcategories(false);
       }
     };
 
-    if (categories.length > 0) {
+    // Load subcategories if we have categories loaded and a category is selected
+    if (categories.length > 0 && formData.category) {
       loadSubcategories();
+    } else if (!formData.category) {
+      // Clear subcategories if no category is selected
+      setSubcategories([]);
+      setLoadingSubcategories(false);
     }
   }, [formData.category, categories]);
 
   const handleCategoryChange = (categoryId: string) => {
     console.log('🔧 Category changed to:', categoryId);
-    setFormData({
+    console.log('🔧 Previous formData:', formData);
+    const newFormData = {
       ...formData,
       category: categoryId,
       subcategory: '' // Reset subcategory when category changes
-    });
+    };
+    console.log('🔧 New formData:', newFormData);
+    setFormData(newFormData);
     // Clear subcategories list to force reload
     setSubcategories([]);
   };
@@ -432,9 +452,12 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                   <SelectValue placeholder={loadingCategories ? "Chargement..." : "Sélectionner une catégorie"} />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>{category.name}</SelectItem>
-                  ))}
+                  {categories.map((category) => {
+                    console.log('🔧 Rendering category:', category, 'Selected:', formData.category === category.id);
+                    return (
+                      <SelectItem key={category.id} value={category.id}>{category.name}</SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
@@ -443,15 +466,22 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
               <Label>{t('ads.sub_category')}</Label>
               <Select value={formData.subcategory} onValueChange={(value) => {
                 console.log('🔧 Subcategory changed to:', value);
-                setFormData({...formData, subcategory: value});
+                console.log('🔧 Available subcategories:', subcategories);
+                console.log('🔧 Current formData before subcategory change:', formData);
+                const newFormData = {...formData, subcategory: value};
+                console.log('🔧 New formData after subcategory change:', newFormData);
+                setFormData(newFormData);
               }} disabled={loadingSubcategories || !formData.category}>
                 <SelectTrigger>
                   <SelectValue placeholder={loadingSubcategories ? "Chargement..." : t('ads.sub_category_placeholder')} />
                 </SelectTrigger>
                 <SelectContent>
-                  {subcategories.map((subcategory) => (
-                    <SelectItem key={subcategory.id} value={subcategory.id}>{subcategory.name}</SelectItem>
-                  ))}
+                  {subcategories.map((subcategory) => {
+                    console.log('🔧 Rendering subcategory:', subcategory, 'Selected:', formData.subcategory === subcategory.id);
+                    return (
+                      <SelectItem key={subcategory.id} value={subcategory.id}>{subcategory.name}</SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>

@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { api } from '@/services/api';
 import { authService } from '@/services/authService';
 import { User, Country } from '@/types/bridge/user.types';
+import SuspensionModal from '@/components/SuspensionModal';
 
 // Auth context interface
 interface AuthContextType {
@@ -43,6 +44,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [suspensionModal, setSuspensionModal] = useState<{ isOpen: boolean; reason: string }>({ isOpen: false, reason: '' });
 
   const isAuthenticated = !!user;
 
@@ -54,12 +56,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const storedUser = localStorage.getItem('user');
         
         if (token && storedUser) {
-          const userData = JSON.parse(storedUser);
-          setUser(userData);
-          
-          // Verify token is still valid
+          // Verify token is still valid and get fresh user data
           try {
-            await api.get('/auth/verify');
+            const response = await api.get('/auth/verify');
+            // Get complete user profile with all fields
+            const profileResponse = await api.get('/auth/profile');
+            const completeUserData = profileResponse.data.data;
+            
+            // Update localStorage with complete user data
+            localStorage.setItem('user', JSON.stringify(completeUserData));
+            setUser(completeUserData);
           } catch (error) {
             // Token is invalid, clear auth data
             localStorage.removeItem('authToken');
@@ -85,11 +91,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authService.login({ email, password });
       const { user: userData, token } = response;
       
-      // Store auth data
+      // Store auth token
       localStorage.setItem('authToken', token);
-      localStorage.setItem('user', JSON.stringify(userData));
       
-      setUser(userData);
+      // Get complete user profile with all fields
+      const profileResponse = await api.get('/auth/profile');
+      const completeUserData = profileResponse.data.data;
+      
+      // Store complete user data
+      localStorage.setItem('user', JSON.stringify(completeUserData));
+      setUser(completeUserData);
       
     } catch (error: any) {
       // Don't clear user state on login errors since user wasn't authenticated to begin with
@@ -97,7 +108,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.removeItem('authToken');
       localStorage.removeItem('user');
       
-      // Re-throw the error to maintain the same behavior
+      // Check if this is a suspension error
+      const errorMessage = error.response?.data?.message || error.message || '';
+      if (error.response?.status === 401 && errorMessage.includes('suspended')) {
+        // Extract suspension reason from the error message
+        // Format: 'Your account access has been suspended. Reason: [reason]. You cannot access the application.'
+        const reasonMatch = errorMessage.match(/Reason: (.+?)\. You cannot access/);
+        const suspensionReason = reasonMatch ? reasonMatch[1] : 'Aucune raison spécifiée';
+        
+        // Show suspension modal
+        setSuspensionModal({ isOpen: true, reason: suspensionReason });
+        
+        // Don't re-throw the error for suspension cases
+        return;
+      }
+      
+      // Re-throw the error to maintain the same behavior for other errors
       throw error;
     }
   };
@@ -137,6 +163,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('user');
     setUser(null);
+  };
+
+  const closeSuspensionModal = (): void => {
+    setSuspensionModal({ isOpen: false, reason: '' });
   };
 
   const updateUser = async (userData: Partial<User>): Promise<void> => {
@@ -237,6 +267,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   return (
     <AuthContext.Provider value={value}>
       {children}
+      <SuspensionModal
+        isOpen={suspensionModal.isOpen}
+        onClose={closeSuspensionModal}
+        reason={suspensionModal.reason}
+      />
     </AuthContext.Provider>
   );
 };

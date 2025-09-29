@@ -8,8 +8,8 @@ export interface User extends BaseEntity {
   firstName: string
   lastName: string
   email: string
-  phone_number?: string
-  phonePrefix?: string
+  phoneNumber?: string
+  phone_prefix?: string
   dateOfBirth?: string
   profilePicture?: string
   isEmailVerified: boolean
@@ -53,7 +53,7 @@ export interface UserProfile {
   firstName: string
   lastName: string
   profilePicture?: string
-  phone_number?: string
+  phoneNumber?: string
   rating?: number
   completedRentals?: number
   isIdentityVerified?: boolean

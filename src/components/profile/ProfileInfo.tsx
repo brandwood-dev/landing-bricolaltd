@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -21,12 +21,15 @@ import {
   Upload,
   Trash2,
   Loader2,
+  Eye,
+  EyeOff,
 } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { Country } from '@/types/bridge/common.types'
 import { authService } from '@/services/authService'
-import { countriesService } from '@/services/countriesService'
+import { getActiveCountries } from '@/services/countriesService'
+import { api } from '@/services/api'
 import { useToast } from '@/hooks/use-toast'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
@@ -62,26 +65,30 @@ const ProfileInfo = () => {
     hasSpecial: false,
     isValid: false,
   })
+  const [currentPasswordValid, setCurrentPasswordValid] = useState(false)
+  const [currentPasswordChecked, setCurrentPasswordChecked] = useState(false)
+  const [confirmPasswordValid, setConfirmPasswordValid] = useState(false)
+  // Password visibility states
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [userInfo, setUserInfo] = useState({
     firstName: '',
     lastName: '',
-    displayName: '',
     email: '',
-    newEmail: '',
-    phonePrefix: '+965',
+    phonePrefix: '+966',
     phoneNumber: '',
     address: '',
     city: '',
     postalCode: '',
     latitude: null as number | null,
     longitude: null as number | null,
-    bio: '',
-    country: 'KW',
+    country: 'SA',
     verified: false,
     profileImage: '',
-    accountType: 'individual',
     currentPassword: '',
     newPassword: '',
+    confirmPassword: '',
   })
   const [isAddressSelected, setIsAddressSelected] = useState(false)
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
@@ -97,64 +104,75 @@ const ProfileInfo = () => {
       console.log('User lastName:', user.lastName)
       console.log('User email:', user.email)
       console.log('User phoneNumber:', user.phoneNumber)
-      console.log('User phonePrefix:', user.prefix)
+      console.log('User phone_prefix:', user.phone_prefix)
       console.log('User address:', user.address)
       console.log('User city:', user.city)
       console.log('User country:', user.country)
-      console.log('User countryId:', user.countryId)
       console.log('User profilePicture:', user.profilePicture)
-      console.log('User userType:', user.userType)
-      console.log('User verified:', user.verifiedEmail)
-      console.log('User bio:', user.bio)
+      console.log('User isEmailVerified:', user.isEmailVerified)
       console.log('=========================')
 
-      // Extract phone number without prefix if it exists
-      const fullPhoneNumber = user.phoneNumber || ''
+      // Get country from user object - use countryId directly from user object
+      const countryId = user.countryId || 'SA' // Default to Saudi Arabia
       
-      // Map country ID to phone prefix
-      const countryId = user.country?.code || user.countryId || 'KW'
-      const prefixMap: { [key: string]: string } = {
-        KW: '+965',
-        SA: '+966',
-        BH: '+973',
-        OM: '+968',
-        QA: '+974',
-        AE: '+971',
+      // Map country to correct phone prefix
+      const getPhonePrefixByCountry = (countryCode: string): string => {
+        const countryPrefixMap: { [key: string]: string } = {
+          'SA': '+966', // Saudi Arabia
+          'KW': '+965', // Kuwait
+          'BH': '+973', // Bahrain
+          'OM': '+968', // Oman
+          'QA': '+974', // Qatar
+          'AE': '+971', // UAE
+        }
+        return countryPrefixMap[countryCode] || '+966' // Default to Saudi Arabia
       }
       
-      // Use the mapped prefix based on country, fallback to user.prefix or default
-      const userPrefix = user.prefix || prefixMap[countryId] || '+965'
-      const phoneNumberOnly = fullPhoneNumber.startsWith(userPrefix)
-        ? fullPhoneNumber.substring(userPrefix.length)
-        : fullPhoneNumber
+      // Get phone prefix - use from database if available, otherwise map from country
+      const phonePrefix = user.phone_prefix || getPhonePrefixByCountry(countryId)
+      
+      // Get phone number and clean it from any prefix if combined
+      let phoneNumber = user.phoneNumber || ''
+      
+      // If phoneNumber contains a prefix, extract just the number part
+      if (phoneNumber.startsWith('+')) {
+        // Find where the actual number starts (after the prefix)
+        const prefixMatch = phoneNumber.match(/^\+\d{1,4}/)
+        if (prefixMatch) {
+          phoneNumber = phoneNumber.substring(prefixMatch[0].length)
+        }
+      }
 
       const newUserInfo = {
         firstName: user.firstName || '',
         lastName: user.lastName || '',
-        displayName: user.displayName || '',
         email: user.email || '',
-        newEmail: user.newEmail || '',
-        phonePrefix: userPrefix,
-        phoneNumber: phoneNumberOnly,
+        phonePrefix: phonePrefix,
+        phoneNumber: phoneNumber,
         address: user.address || '',
         city: user.city || '',
         postalCode: user.postalCode || '',
         latitude: user.latitude || null,
         longitude: user.longitude || null,
-        bio: user.bio || '',
         country: countryId,
-        verified: user.verifiedEmail || false,
+        verified: user.isEmailVerified || false,
         profileImage: user.profilePicture || '',
-        accountType: user.userType || 'individual',
         currentPassword: '',
         newPassword: '',
+        confirmPassword: '',
       }
 
       setUserInfo(newUserInfo)
+      console.log('=== STATE UPDATE COMPLETE ===');
+      console.log('userInfo state has been updated with:', newUserInfo);
+      console.log('============================');
 
       // Console.log the processed userInfo state
       console.log('=== PROCESSED USER INFO STATE ===')
       console.log('UserInfo object:', newUserInfo)
+      console.log('Phone prefix from DB:', phonePrefix)
+      console.log('Phone number from DB:', phoneNumber)
+      console.log('Country ID from DB:', countryId)
       console.log('Profile image URL:', newUserInfo.profileImage)
       console.log('=================================')
 
@@ -164,6 +182,16 @@ const ProfileInfo = () => {
       }
     }
   }, [user])
+
+  // Debug: Monitor userInfo state changes
+  useEffect(() => {
+    console.log('=== USERINFO STATE CHANGED ===');
+    console.log('Current userInfo state:', userInfo);
+    console.log('phonePrefix:', userInfo.phonePrefix);
+    console.log('phoneNumber:', userInfo.phoneNumber);
+    console.log('country:', userInfo.country);
+    console.log('==============================');
+  }, [userInfo])
 
   // Static countries list (same as Register.tsx)
   const countries = [
@@ -207,24 +235,11 @@ const ProfileInfo = () => {
   const handleCountryChange = (countryCode: string) => {
     const selectedCountry = countries.find((c) => c.value === countryCode)
     if (selectedCountry) {
-      // Find corresponding phone prefix for the country
-      const countryPrefix = phonePrefixes.find((p) => {
-        // Map country codes to their typical prefixes
-        const prefixMap: { [key: string]: string } = {
-          KW: '+965',
-          SA: '+966',
-          BH: '+973',
-          OM: '+968',
-          QA: '+974',
-          AE: '+971',
-        }
-        return p.value === prefixMap[countryCode]
-      })
-
+      // Only update the country, do NOT change phone prefix
+      // Phone prefix should be independent from country selection
       setUserInfo((prev) => ({
         ...prev,
         country: countryCode,
-        phonePrefix: countryPrefix?.value || '+965',
       }))
       if (errors.country) {
         setErrors((prev) => ({ ...prev, country: '' }))
@@ -328,7 +343,8 @@ const ProfileInfo = () => {
     }
   }
 
-  const handleSave = async () => {
+  // Separate function to handle profile information update (without password)
+  const handleSaveProfile = async () => {
     if (!user) return
 
     if (!validateForm()) {
@@ -344,72 +360,15 @@ const ProfileInfo = () => {
       setIsSaving(true)
       setError(null)
 
-      // If both password fields are filled, handle password change
-      if (userInfo.currentPassword && userInfo.newPassword) {
-        if (!passwordValidation.isValid) {
-          toast({
-            title: 'Erreur de validation',
-            description:
-              'Le nouveau mot de passe ne respecte pas les critères requis.',
-            variant: 'destructive',
-          })
-          return
-        }
-
-        try {
-          await authService.changePassword({
-            currentPassword: userInfo.currentPassword,
-            newPassword: userInfo.newPassword,
-          })
-
-          toast({
-            title: 'Mot de passe modifié',
-            description: 'Votre mot de passe a été modifié avec succès.',
-          })
-
-          // Clear password fields after successful change
-          setUserInfo({
-            ...userInfo,
-            currentPassword: '',
-            newPassword: '',
-          })
-
-          // Reset password validation state
-          setPasswordValidation({
-            minLength: false,
-            hasUppercase: false,
-            hasLowercase: false,
-            hasNumber: false,
-            hasSpecial: false,
-            isValid: false,
-          })
-        } catch (passwordError: any) {
-          toast({
-            title: 'Erreur',
-            description:
-              passwordError.message ||
-              'Échec de la modification du mot de passe.',
-            variant: 'destructive',
-          })
-          return
-        }
-      }
-
-      // Combine phone prefix and number
-      const fullPhoneNumber = userInfo.phonePrefix + userInfo.phoneNumber
-
-      // Update profile information - excluding profilePicture (handled separately)
-      const profileData: any = {
+      // Update profile information - excluding profilePicture and password
+      // Send phone prefix and phone number separately
+      const profileData = {
         firstName: userInfo.firstName,
         lastName: userInfo.lastName,
-        phoneNumber: fullPhoneNumber,
-        countryId: userInfo.country,
+        phoneNumber: userInfo.phoneNumber,
+        phone_prefix: userInfo.phonePrefix,
         address: userInfo.address,
-      }
-
-      // Only include password if it's being changed
-      if (userInfo.newPassword && passwordValidation.isValid) {
-        profileData.password = userInfo.newPassword
+        countryId: userInfo.country,
       }
 
       // Call the profile update endpoint
@@ -433,11 +392,13 @@ const ProfileInfo = () => {
       const result = await response.json()
       const updatedUser = result.data
 
-      // Update local user state (excluding profile picture)
+      // Update local user state
       await updateUser({
         firstName: updatedUser.firstName,
         lastName: updatedUser.lastName,
         phoneNumber: updatedUser.phoneNumber,
+        phone_prefix: updatedUser.phone_prefix,
+        countryId: updatedUser.countryId,
       })
 
       toast({
@@ -452,6 +413,94 @@ const ProfileInfo = () => {
       toast({
         title: 'Erreur',
         description: err.message || 'Échec de la mise à jour du profil.',
+        variant: 'destructive',
+      })
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  // Separate function to handle password change
+  const handleChangePassword = async () => {
+    if (!user) return
+
+    if (!userInfo.currentPassword || !userInfo.newPassword || !userInfo.confirmPassword) {
+      toast({
+        title: 'Erreur de validation',
+        description: 'Veuillez remplir tous les champs de mot de passe.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    if (!currentPasswordValid) {
+      toast({
+        title: 'Erreur de validation',
+        description: 'Le mot de passe actuel est incorrect.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    if (!passwordValidation.isValid) {
+      toast({
+        title: 'Erreur de validation',
+        description:
+          'Le nouveau mot de passe ne respecte pas les critères requis.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    if (!confirmPasswordValid) {
+      toast({
+        title: 'Erreur de validation',
+        description: 'La confirmation du mot de passe ne correspond pas.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    try {
+      setIsSaving(true)
+      setError(null)
+
+      await authService.changePassword({
+        currentPassword: userInfo.currentPassword,
+        newPassword: userInfo.newPassword,
+      })
+
+      toast({
+        title: 'Mot de passe modifié',
+        description: 'Votre mot de passe a été modifié avec succès.',
+      })
+
+      // Clear password fields after successful change
+      setUserInfo({
+        ...userInfo,
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      })
+
+      // Reset password validation state
+      setPasswordValidation({
+        minLength: false,
+        hasUppercase: false,
+        hasLowercase: false,
+        hasNumber: false,
+        hasSpecial: false,
+        isValid: false,
+      })
+      setCurrentPasswordValid(false)
+      setCurrentPasswordChecked(false)
+      setConfirmPasswordValid(false)
+    } catch (passwordError: any) {
+      toast({
+        title: 'Erreur',
+        description:
+          passwordError.message ||
+          'Échec de la modification du mot de passe.',
         variant: 'destructive',
       })
     } finally {
@@ -603,28 +652,115 @@ const ProfileInfo = () => {
   const handlePasswordChange = (password: string) => {
     setUserInfo({ ...userInfo, newPassword: password })
     validatePassword(password)
+    // Re-validate confirm password when new password changes
+    if (userInfo.confirmPassword) {
+      setConfirmPasswordValid(password === userInfo.confirmPassword)
+    }
   }
 
-  const handleAccountDeletion = () => {
-    // Here you would make an API call to delete the account
-    console.log('Deleting account...')
-    // For now, just show a confirmation in the console
-    // In a real implementation, you would:
-    // 1. Make an API call to delete the account
-    // 2. Show a success message
-    // 3. Redirect the user to the home page or login page
+  // Handle confirm password change
+  const handleConfirmPasswordChange = (confirmPassword: string) => {
+    setUserInfo({ ...userInfo, confirmPassword })
+    setConfirmPasswordValid(userInfo.newPassword === confirmPassword)
+  }
+
+  // Validate current password
+  const validateCurrentPassword = async (currentPassword: string) => {
+    console.log('=== FRONTEND PASSWORD VALIDATION DEBUG ===')
+    console.log('Timestamp:', new Date().toISOString())
+    console.log('Current password entered:', currentPassword)
+    console.log('Password length:', currentPassword.length)
+    console.log('User ID from context:', user?.id)
+    console.log('Auth token present:', !!localStorage.getItem('authToken'))
+    
+    if (!currentPassword.trim()) {
+      console.log('Password is empty, skipping validation')
+      setCurrentPasswordValid(false)
+      setCurrentPasswordChecked(false)
+      return
+    }
+
+    try {
+      const requestPayload = { password: currentPassword }
+      
+      console.log('Making API request to validate password using api service:')
+      console.log('Request payload:', requestPayload)
+      
+      // Use the api service instead of fetch directly (like admin does)
+      const response = await api.post<{ valid: boolean }>('/auth/validate-password', requestPayload)
+
+      console.log('Response received from api service:')
+      console.log('Full response:', response)
+      console.log('Response data:', response.data)
+      console.log('Response data.data:', response.data.data)
+      console.log('Response data.data.data:', response.data.data?.data)
+      console.log('Response data.data.data.valid:', response.data.data?.data?.valid)
+      console.log('Response data.message:', response.data.message)
+      
+      // Access data via response.data.data.data.valid according to API structure
+      if (response.data.data?.data?.valid) {
+        console.log('✅ Password validation SUCCESS')
+        setCurrentPasswordValid(true)
+        setCurrentPasswordChecked(true)
+      } else {
+        console.log('❌ Password validation FAILED')
+        console.log('Data valid:', response.data.data?.data?.valid)
+        setCurrentPasswordValid(false)
+        setCurrentPasswordChecked(true)
+        toast({
+          title: 'Mot de passe incorrect',
+          description: 'Le mot de passe actuel est incorrect.',
+          variant: 'destructive',
+        })
+      }
+    } catch (error: any) {
+      console.error('❌ Password validation ERROR:', error)
+      console.error('Error details:', {
+        name: error?.name,
+        message: error?.message,
+        response: error?.response?.data
+      })
+      setCurrentPasswordValid(false)
+      setCurrentPasswordChecked(true)
+      toast({
+        title: 'Erreur de validation',
+        description: 'Impossible de vérifier le mot de passe actuel.',
+        variant: 'destructive',
+      })
+    }
+    
+    console.log('=== END FRONTEND PASSWORD VALIDATION DEBUG ===')
+  }
+
+  // Handle current password blur
+  const handleCurrentPasswordBlur = () => {
+    if (userInfo.currentPassword) {
+      validateCurrentPassword(userInfo.currentPassword)
+    }
   }
 
   return (
-    <Card>
-      <CardHeader className='p-4 sm:p-6'>
-        <div className='flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0'>
-          <div className='flex flex-col items-center space-y-3 sm:flex-row sm:items-start sm:space-y-0 sm:space-x-4'>
-            <div className='relative flex-shrink-0'>
-              <Avatar className='h-16 w-16 sm:h-20 sm:w-20'>
+    <div className='w-full max-w-4xl mx-auto space-y-6'>
+      {/* Section 1: Photo de profil */}
+      <Card>
+        <CardHeader className='pb-4'>
+          <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
+            <div>
+              <CardTitle className='text-xl font-semibold'>
+                {t('profile.photo_title')}
+              </CardTitle>
+              <CardDescription className='text-sm text-muted-foreground mt-1'>
+                {t('profile.photo_description')}
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className='space-y-6'>
+          <div className='flex flex-col items-center space-y-4'>
+            <div className='relative'>
+              <Avatar className='h-24 w-24'>
                 <AvatarImage src={imagePreview || userInfo.profileImage} />
-
-                <AvatarFallback className='text-lg sm:text-xl'>
+                <AvatarFallback className='text-2xl'>
                   {userInfo.firstName[0]}
                   {userInfo.lastName[0]}
                 </AvatarFallback>
@@ -634,38 +770,36 @@ const ProfileInfo = () => {
                   Upload...
                 </span>
               )}
-              {isEditing && (
-                <div className='absolute -bottom-2 -right-2'>
-                  <label
-                    htmlFor='profile-image-upload'
-                    className={`cursor-pointer ${
-                      uploadingImage ? 'pointer-events-none' : ''
-                    }`}
-                  >
-                    <div className='bg-primary text-primary-foreground rounded-full p-1.5 shadow-lg hover:bg-primary/90 transition-colors'>
-                      {uploadingImage ? (
-                        <Loader2 className='h-3 w-3 animate-spin' />
-                      ) : (
-                        <Camera className='h-3 w-3' />
-                      )}
-                    </div>
-                  </label>
-                  <input
-                    id='profile-image-upload'
-                    type='file'
-                    accept='image/jpeg,image/jpg,image/png,image/webp'
-                    className='hidden'
-                    onChange={handleImageUpload}
-                    disabled={uploadingImage}
-                  />
-                </div>
-              )}
+              <div className='absolute -bottom-2 -right-2'>
+                <label
+                  htmlFor='profile-image-upload'
+                  className={`cursor-pointer ${
+                    uploadingImage ? 'pointer-events-none' : ''
+                  }`}
+                >
+                  <div className='bg-primary text-primary-foreground rounded-full p-2 shadow-lg hover:bg-primary/90 transition-colors'>
+                    {uploadingImage ? (
+                      <Loader2 className='h-4 w-4 animate-spin' />
+                    ) : (
+                      <Camera className='h-4 w-4' />
+                    )}
+                  </div>
+                </label>
+                <input
+                  id='profile-image-upload'
+                  type='file'
+                  accept='image/jpeg,image/jpg,image/png,image/webp'
+                  className='hidden'
+                  onChange={handleImageUpload}
+                  disabled={uploadingImage}
+                />
+              </div>
             </div>
-            <div className='text-center sm:text-left '>
-              <CardTitle className='text-lg sm:text-xl'>
+            <div className='text-center'>
+              <h3 className='text-lg font-semibold'>
                 {userInfo.firstName} {userInfo.lastName}
-              </CardTitle>
-              <div className='flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-2'>
+              </h3>
+              <div className='flex flex-wrap items-center justify-center gap-2 mt-2'>
                 {userInfo.verified && (
                   <Badge
                     variant='default'
@@ -676,9 +810,7 @@ const ProfileInfo = () => {
                   </Badge>
                 )}
                 <Badge variant='secondary' className='text-xs'>
-                  {userInfo.accountType === 'individual'
-                    ? t('profile.account_type_individual')
-                    : t('profile.account_type_business')}
+                  {t('profile.account_type_individual')}
                 </Badge>
               </div>
               <p className='text-sm text-muted-foreground mt-1'>
@@ -693,45 +825,30 @@ const ProfileInfo = () => {
               </p>
             </div>
           </div>
-          <div className='w-full sm:w-auto sm:flex-shrink-0 '>
-            {!isEditing ? (
-              <Button
-                variant='outline'
-                onClick={() => setIsEditing(true)}
-                className='w-full sm:w-auto'
-              >
-                <Edit3 className='h-4 w-4 mr-2' />
-                {t('profile.edit')}
-              </Button>
-            ) : (
-              <div className='flex gap-2 w-full sm:w-auto'>
-                <Button
-                  size='sm'
-                  onClick={handleSave}
-                  disabled={isSaving}
-                  className='flex-1 sm:flex-none'
-                >
-                  {isSaving ? (
-                    <Loader2 className='h-4 w-4 animate-spin' />
-                  ) : (
-                    <Check className='h-4 w-4' />
-                  )}
-                </Button>
-                <Button
-                  variant='outline'
-                  size='sm'
-                  onClick={() => setIsEditing(false)}
-                  disabled={isSaving}
-                  className='flex-1 sm:flex-none'
-                >
-                  <X className='h-4 w-4' />
-                </Button>
-              </div>
-            )}
+        </CardContent>
+      </Card>
+
+      {/* Section 2: Informations personnelles */}
+      <Card>
+        <CardHeader className='pb-4'>
+          <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
+            <div>
+              <CardTitle className='text-xl font-semibold'>
+                {t('profile.personal_info_title')}
+              </CardTitle>
+              <CardDescription className='text-sm text-muted-foreground mt-1'>
+                {t('profile.personal_info_description')}
+              </CardDescription>
+            </div>
+
           </div>
-        </div>
-      </CardHeader>
-      <CardContent className='space-y-4'>
+          {error && (
+            <div className='mt-4 p-3 bg-destructive/10 border border-destructive/20 rounded-md'>
+              <p className='text-sm text-destructive'>{error}</p>
+            </div>
+          )}
+        </CardHeader>
+        <CardContent className='space-y-4'>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <div className='space-y-2'>
             <Label htmlFor='firstName'>{t('profile.first_name')}</Label>
@@ -764,102 +881,8 @@ const ProfileInfo = () => {
             )}
           </div>
         </div>
-        {/* <div className="space-y-2">
-          <Label htmlFor="displayName">Display Name</Label>
-          <Input 
-            id="displayName" 
-            value={userInfo.displayName}
-            disabled={!isEditing}
-            onChange={(e) => setUserInfo({...userInfo, displayName: e.target.value})}
-            placeholder="Enter your display name"
-            className={language === 'ar' ? 'text-right' : ''}
-          />
-        </div> */}
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <div className='space-y-2'>
-            <Label htmlFor='currentPassword'>
-              {t('profile.current_password')}
-            </Label>
-            <Input
-              id='currentPassword'
-              type='password'
-              value={userInfo.currentPassword}
-              disabled={!isEditing}
-              onChange={(e) =>
-                setUserInfo({ ...userInfo, currentPassword: e.target.value })
-              }
-              className={language === 'ar' ? 'text-right' : ''}
-            />
-          </div>
-          <div className='space-y-2'>
-            <Label htmlFor='newPassword'>{t('profile.new_password')}</Label>
-            <Input
-              id='newPassword'
-              type='password'
-              value={userInfo.newPassword}
-              disabled={!isEditing}
-              onChange={(e) => handlePasswordChange(e.target.value)}
-              className={language === 'ar' ? 'text-right' : ''}
-            />
-            {/* Password requirements - only show when editing, password has content, and NOT all requirements are met */}
-            {isEditing &&
-              userInfo.newPassword.length > 0 &&
-              !passwordValidation.isValid && (
-                <div className='text-xs space-y-1 mt-2'>
-                  <p
-                    className={`flex items-center gap-1 ${
-                      passwordValidation.minLength
-                        ? 'text-green-600'
-                        : 'text-red-500'
-                    }`}
-                  >
-                    <span>{passwordValidation.minLength ? '✓' : '✗'}</span>
-                    {t('password.min_length')}
-                  </p>
-                  <p
-                    className={`flex items-center gap-1 ${
-                      passwordValidation.hasUppercase
-                        ? 'text-green-600'
-                        : 'text-red-500'
-                    }`}
-                  >
-                    <span>{passwordValidation.hasUppercase ? '✓' : '✗'}</span>
-                    {t('password.uppercase')}
-                  </p>
-                  <p
-                    className={`flex items-center gap-1 ${
-                      passwordValidation.hasLowercase
-                        ? 'text-green-600'
-                        : 'text-red-500'
-                    }`}
-                  >
-                    <span>{passwordValidation.hasLowercase ? '✓' : '✗'}</span>
-                    {t('password.lowercase')}
-                  </p>
-                  <p
-                    className={`flex items-center gap-1 ${
-                      passwordValidation.hasNumber
-                        ? 'text-green-600'
-                        : 'text-red-500'
-                    }`}
-                  >
-                    <span>{passwordValidation.hasNumber ? '✓' : '✗'}</span>
-                    {t('password.number')}
-                  </p>
-                  <p
-                    className={`flex items-center gap-1 ${
-                      passwordValidation.hasSpecial
-                        ? 'text-green-600'
-                        : 'text-red-500'
-                    }`}
-                  >
-                    <span>{passwordValidation.hasSpecial ? '✓' : '✗'}</span>
-                    {t('password.special_char')}
-                  </p>
-                </div>
-              )}
-          </div>
-        </div>
+   
+
         <div className='space-y-2'>
           <Label htmlFor='email'>{t('profile.email')}</Label>
           <Input
@@ -872,20 +895,10 @@ const ProfileInfo = () => {
             }
           />
         </div>
-        {/* <div className="space-y-2">
-          <Label htmlFor="newEmail">New Email</Label>
-          <Input 
-            id="newEmail" 
-            type="email" 
-            value={userInfo.newEmail}
-            disabled={!isEditing}
-            onChange={(e) => setUserInfo({...userInfo, newEmail: e.target.value})}
-            placeholder="Enter new email address"
-            className={language === 'ar' ? 'text-right' : ''}
-          />
-        </div> */}
+      
         <div className='space-y-2'>
           <Label htmlFor='phoneNumber'>{t('profile.phone')}</Label>
+         
           <div className='flex gap-2'>
             <Select
               value={userInfo.phonePrefix}
@@ -977,126 +990,294 @@ const ProfileInfo = () => {
             )}
           </div>
         </div>
-        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="city">City</Label>
-            <Input 
-              id="city" 
-              value={userInfo.city}
-              disabled={!isEditing}
-              onChange={(e) => setUserInfo({...userInfo, city: e.target.value})}
-              placeholder="Enter your city"
-              className={language === 'ar' ? 'text-right' : ''}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="postalCode">Postal Code</Label>
-            <Input 
-              id="postalCode" 
-              value={userInfo.postalCode}
-              disabled={!isEditing}
-              onChange={(e) => setUserInfo({...userInfo, postalCode: e.target.value})}
-              placeholder="Enter postal code"
-              className={language === 'ar' ? 'text-right' : ''}
-            />
-          </div>
-        </div> */}
-        {/* <div className="space-y-2">
-          <Label htmlFor="bio">Bio</Label>
-          <textarea 
-            id="bio" 
-            value={userInfo.bio}
-            disabled={!isEditing}
-            onChange={(e) => setUserInfo({...userInfo, bio: e.target.value})}
-            placeholder="Tell us about yourself"
-            className={`min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${language === 'ar' ? 'text-right' : ''}`}
-            rows={4}
-          />
-        </div> */}
-        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="latitude">Latitude</Label>
-            <Input 
-              id="latitude" 
-              type="number"
-              step="any"
-              value={userInfo.latitude || ''}
-              disabled={!isEditing}
-              onChange={(e) => setUserInfo({...userInfo, latitude: e.target.value ? parseFloat(e.target.value) : null})}
-              placeholder="Enter latitude"
-              className={language === 'ar' ? 'text-right' : ''}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="longitude">Longitude</Label>
-            <Input 
-              id="longitude" 
-              type="number"
-              step="any"
-              value={userInfo.longitude || ''}
-              disabled={!isEditing}
-              onChange={(e) => setUserInfo({...userInfo, longitude: e.target.value ? parseFloat(e.target.value) : null})}
-              placeholder="Enter longitude"
-              className={language === 'ar' ? 'text-right' : ''}
-            />
-          </div>
-        </div> */}
-        {/* Delete account button */}
-        {/* <div className='flex justify-center sm:justify-end'>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
+    
+
+        
+        {/* Boutons de modification du profil */}
+        <div className='pt-4 border-t'>
+          <div className='flex items-center justify-end gap-2'>
+            {!isEditing ? (
               <Button
-                variant='outline'
+                onClick={() => setIsEditing(true)}
                 size='sm'
-                className='text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground w-full sm:w-auto'
+                className='w-full sm:w-auto'
               >
-                <Trash2 className='h-4 w-4 mr-2' />
-                <span className='sm:hidden'>{t('profile.delete_account')}</span>
-                <span className='hidden sm:inline'>
-                  {t('profile.delete_account')}
-                </span>
+                <Edit3 className='h-4 w-4 mr-2' />
+                {t('profile.edit_button')}
               </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader
-                className={`flex flex-row flex-wrap items-center ${
-                  language === 'ar' ? 'justify-end' : ''
-                }`}
-              >
-                <AlertDialogTitle>
-                  {t('profile.delete_confirm')}
-                </AlertDialogTitle>
-                <AlertDialogDescription
-                  className={`text-left space-y-2${
-                    language === 'ar' ? ' text-right' : ''
-                  }`}
+            ) : (
+              <div className='flex gap-2 w-full sm:w-auto'>
+                <Button
+                  onClick={() => setIsEditing(false)}
+                  variant='outline'
+                  size='sm'
+                  className='flex-1 sm:flex-none'
                 >
-                  <div>{t('profile.delete_description')}</div>
-                  <div>{t('profile.delete_processing')}</div>
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>{t('action.cancel')}</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleAccountDeletion}
-                  className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
+                  {t('profile.cancel_button')}
+                </Button>
+                <Button
+                  onClick={handleSaveProfile}
+                  size='sm'
+                  disabled={isSaving}
+                  className='flex-1 sm:flex-none'
                 >
-                  {t('action.confirm')}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div> */}
-        {!isEditing && (
-          <div className='pt-4 border-t'>
-            <div className='flex items-center gap-2 text-sm text-muted-foreground'>
-              <Upload className='h-4 w-4' />
-              <span>{t('profile.edit_profile_photo')}</span>
-            </div>
+                  {isSaving ? (
+                    <>
+                      <Loader2 className='h-4 w-4 mr-2 animate-spin' />
+                      {t('profile.saving')}
+                    </>
+                  ) : (
+                    <>
+                      <Check className='h-4 w-4 mr-2' />
+                      {t('profile.save_button')}
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </CardContent>
     </Card>
+
+    {/* Section 3: Changement de mot de passe */}
+    <Card>
+      <CardHeader className='pb-4'>
+        <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
+          <div>
+            <CardTitle className='text-xl font-semibold'>
+              {t('profile.change_password')}
+            </CardTitle>
+            <CardDescription className='text-sm text-muted-foreground mt-1'>
+              {t('profile.change_password_description')}
+            </CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className='space-y-4'>
+        <div className='grid grid-cols-1 gap-4'>
+          <div className='space-y-2'>
+            <Label htmlFor='currentPassword'>
+              {t('profile.current_password')}
+            </Label>
+            <div className='relative'>
+              <Input
+                id='currentPassword'
+                type={showCurrentPassword ? 'text' : 'password'}
+                value={userInfo.currentPassword}
+                onChange={(e) => {
+                  setUserInfo({ ...userInfo, currentPassword: e.target.value })
+                  // Reset validation states when user types
+                  if (currentPasswordChecked) {
+                    setCurrentPasswordValid(false)
+                    setCurrentPasswordChecked(false)
+                  }
+                }}
+                onBlur={handleCurrentPasswordBlur}
+                className={`pr-20 ${language === 'ar' ? 'text-right' : ''} ${
+                  currentPasswordChecked
+                    ? currentPasswordValid
+                      ? 'border-green-500'
+                      : 'border-red-500'
+                    : ''
+                }`}
+                placeholder={t('profile.current_password_placeholder')}
+              />
+              <div className='absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-2'>
+                <Button
+                  type='button'
+                  variant='ghost'
+                  size='sm'
+                  className='h-auto p-0 hover:bg-transparent'
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                >
+                  {showCurrentPassword ? (
+                    <EyeOff className='h-4 w-4 text-gray-500' />
+                  ) : (
+                    <Eye className='h-4 w-4 text-gray-500' />
+                  )}
+                </Button>
+                {currentPasswordChecked && (
+                  <div>
+                    {currentPasswordValid ? (
+                      <span className='text-green-500'>✓</span>
+                    ) : (
+                      <span className='text-red-500'>✗</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+            {currentPasswordChecked && !currentPasswordValid && (
+              <p className='text-sm text-red-500'>{t('profile.current_password_incorrect')}</p>
+            )}
+          </div>
+          
+          <div className='space-y-2'>
+            <Label htmlFor='newPassword'>{t('profile.new_password')}</Label>
+            <div className='relative'>
+              <Input
+                id='newPassword'
+                type={showNewPassword ? 'text' : 'password'}
+                value={userInfo.newPassword}
+                onChange={(e) => handlePasswordChange(e.target.value)}
+                disabled={!currentPasswordValid}
+                className={`pr-10 ${language === 'ar' ? 'text-right' : ''} ${
+                  !currentPasswordValid ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+                placeholder={currentPasswordValid ? t('profile.new_password_placeholder') : t('profile.current_password_validation')}
+              />
+              <Button
+                type='button'
+                variant='ghost'
+                size='sm'
+                className='absolute right-3 top-1/2 transform -translate-y-1/2 h-auto p-0 hover:bg-transparent'
+                onClick={() => setShowNewPassword(!showNewPassword)}
+                disabled={!currentPasswordValid}
+              >
+                {showNewPassword ? (
+                  <EyeOff className='h-4 w-4 text-gray-500' />
+                ) : (
+                  <Eye className='h-4 w-4 text-gray-500' />
+                )}
+              </Button>
+            </div>
+            {/* Password requirements - only show when password has content and NOT all requirements are met */}
+            {userInfo.newPassword.length > 0 &&
+              !passwordValidation.isValid && (
+                <div className='text-xs space-y-1 mt-2'>
+                  <p
+                    className={`flex items-center gap-1 ${
+                      passwordValidation.minLength
+                        ? 'text-green-600'
+                        : 'text-red-500'
+                    }`}
+                  >
+                    <span>{passwordValidation.minLength ? '✓' : '✗'}</span>
+                    {t('password.min_length')}
+                  </p>
+                  <p
+                    className={`flex items-center gap-1 ${
+                      passwordValidation.hasUppercase
+                        ? 'text-green-600'
+                        : 'text-red-500'
+                    }`}
+                  >
+                    <span>{passwordValidation.hasUppercase ? '✓' : '✗'}</span>
+                    {t('password.uppercase')}
+                  </p>
+                  <p
+                    className={`flex items-center gap-1 ${
+                      passwordValidation.hasLowercase
+                        ? 'text-green-600'
+                        : 'text-red-500'
+                    }`}
+                  >
+                    <span>{passwordValidation.hasLowercase ? '✓' : '✗'}</span>
+                    {t('password.lowercase')}
+                  </p>
+                  <p
+                    className={`flex items-center gap-1 ${
+                      passwordValidation.hasNumber
+                        ? 'text-green-600'
+                        : 'text-red-500'
+                    }`}
+                  >
+                    <span>{passwordValidation.hasNumber ? '✓' : '✗'}</span>
+                    {t('password.number')}
+                  </p>
+                  <p
+                    className={`flex items-center gap-1 ${
+                      passwordValidation.hasSpecial
+                        ? 'text-green-600'
+                        : 'text-red-500'
+                    }`}
+                  >
+                    <span>{passwordValidation.hasSpecial ? '✓' : '✗'}</span>
+                    {t('password.special_char')}
+                  </p>
+                </div>
+              )}
+          </div>
+          
+          <div className='space-y-2'>
+            <Label htmlFor='confirmPassword'>{t('profile.confirm_new_password')}</Label>
+            <div className='relative'>
+              <Input
+                id='confirmPassword'
+                type={showConfirmPassword ? 'text' : 'password'}
+                value={userInfo.confirmPassword}
+                onChange={(e) => handleConfirmPasswordChange(e.target.value)}
+                disabled={!currentPasswordValid || !userInfo.newPassword}
+                className={`pr-20 ${language === 'ar' ? 'text-right' : ''} ${
+                  !currentPasswordValid || !userInfo.newPassword ? 'opacity-50 cursor-not-allowed' : ''
+                } ${
+                  userInfo.confirmPassword
+                    ? confirmPasswordValid
+                      ? 'border-green-500'
+                      : 'border-red-500'
+                    : ''
+                }`}
+                placeholder={currentPasswordValid && userInfo.newPassword ? t('profile.confirm_new_password_placeholder') : t('profile.new_password_first')}
+              />
+              <div className='absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-2'>
+                <Button
+                  type='button'
+                  variant='ghost'
+                  size='sm'
+                  className='h-auto p-0 hover:bg-transparent'
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  disabled={!currentPasswordValid || !userInfo.newPassword}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className='h-4 w-4 text-gray-500' />
+                  ) : (
+                    <Eye className='h-4 w-4 text-gray-500' />
+                  )}
+                </Button>
+                {userInfo.confirmPassword && (
+                  <div>
+                    {confirmPasswordValid ? (
+                      <span className='text-green-500'>✓</span>
+                    ) : (
+                      <span className='text-red-500'>✗</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+            {userInfo.confirmPassword && !confirmPasswordValid && (
+              <p className='text-sm text-red-500'>{t('profile.passwords_no_match')}</p>
+            )}
+          </div>
+        </div>
+        <div className='flex justify-end mt-4'>
+          <Button
+            onClick={handleChangePassword}
+            disabled={
+              !userInfo.currentPassword ||
+              !userInfo.newPassword ||
+              !userInfo.confirmPassword ||
+              !currentPasswordValid ||
+              !passwordValidation.isValid ||
+              !confirmPasswordValid ||
+              isSaving
+            }
+            className='bg-blue-600 hover:bg-blue-700'
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className='h-4 w-4 mr-2 animate-spin' />
+                {t('profile.changing_password')}
+              </>
+            ) : (
+              t('profile.change_password')
+            )}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+    </div>
   )
 }
 

@@ -26,7 +26,8 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { toolsService } from '@/services/toolsService'
 import { bookingService } from '@/services/bookingService'
-import { countriesService } from '@/services/countriesService'
+import { getActiveCountries } from '@/services/countriesService'
+
 import { Tool } from '@/types/bridge/tool.types'
 import { CreateBookingData, BookingPricing } from '@/types/bridge/booking.types'
 import { Country } from '@/types/bridge/common.types'
@@ -37,6 +38,13 @@ import {
   Shield,
   Check,
   Loader2,
+  Star,
+  MapPin,
+  User,
+  Info,
+  AlertCircle,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
@@ -56,6 +64,12 @@ const Rent = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [unavailableDates, setUnavailableDates] = useState<Date[]>([])
+  const [existingBookings, setExistingBookings] = useState<any[]>([])
+  const [bookingDates, setBookingDates] = useState<{
+    confirmed: Date[],
+    pending: Date[],
+    inProgress: Date[]
+  }>({ confirmed: [], pending: [], inProgress: [] })
   const [pricing, setPricing] = useState<BookingPricing | null>(null)
   const [pricingLoading, setPricingLoading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -71,11 +85,12 @@ const Rent = () => {
   const [loadingCountries, setLoadingCountries] = useState(true)
   const [startDate, setStartDate] = useState<Date>()
   const [endDate, setEndDate] = useState<Date>()
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
   useEffect(() => {
     const fetchCountries = async () => {
       try {
-        const countriesData = await countriesService.getActiveCountries()
+        const countriesData = await getActiveCountries()
         setCountries(countriesData)
       } catch (error) {
         console.error('Failed to fetch countries:', error)
@@ -94,21 +109,88 @@ const Rent = () => {
 
   // Generate phone prefixes from fetched countries data
   const phonePrefixes = countries.map((country) => ({
-    value: country.phonePrefix,
-    label: `${country.phonePrefix} (${country.name})`,
+    value: country.phone_prefix,
+    label: `${country.phone_prefix} (${country.name})`,
     flag: country.code.toLowerCase(),
   }))
 
-  // Fetch tool data
-  const fetchTool = async () => {
-    if (!id) return
-
+  // Fetch existing bookings for the tool
+  const fetchExistingBookings = async (toolId: string) => {
     try {
-      setLoading(true)
-      const toolData = await toolsService.getTool(id)
-      setTool(toolData)
-
-      // Mock unavailable dates for development
+      // Récupérer le token d'authentification
+      const token = localStorage.getItem('authToken')
+      
+      // Si pas de token, utiliser les dates mock
+      if (!token) {
+        console.warn('No authentication token found, using mock data')
+        const mockUnavailableDates = [
+          '2024-01-15',
+          '2024-01-16',
+          '2024-01-20',
+          '2024-01-25',
+          '2024-02-01',
+          '2024-02-02',
+          '2024-02-10',
+        ]
+        const dates = mockUnavailableDates.map((dateStr) => new Date(dateStr))
+        setUnavailableDates(dates)
+        return
+      }
+      
+      // Récupérer les réservations existantes depuis l'API avec authentification
+      const response = await fetch(`http://localhost:4000/api/bookings/tool/${toolId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch existing bookings')
+      }
+      
+      const result = await response.json()
+      const bookings = result.data || []
+      
+      setExistingBookings(bookings)
+      
+      // Organiser les dates par statut
+      const confirmedDates: Date[] = []
+      const pendingDates: Date[] = []
+      const inProgressDates: Date[] = []
+      const allUnavailableDates: Date[] = []
+      
+      bookings.forEach((booking: any) => {
+        const startDate = new Date(booking.startDate)
+        const endDate = new Date(booking.endDate)
+        
+        // Générer toutes les dates entre startDate et endDate
+        const currentDate = new Date(startDate)
+        while (currentDate <= endDate) {
+          const dateToAdd = new Date(currentDate)
+          allUnavailableDates.push(dateToAdd)
+          
+          if (booking.status === 'confirmed' || booking.status === 'in_progress') {
+            confirmedDates.push(new Date(dateToAdd))
+          } else if (booking.status === 'pending' || booking.status === 'accepted') {
+            pendingDates.push(new Date(dateToAdd))
+          }
+          
+          if (booking.status === 'in_progress') {
+            inProgressDates.push(new Date(dateToAdd))
+          }
+          
+          currentDate.setDate(currentDate.getDate() + 1)
+        }
+      })
+      
+      setBookingDates({ confirmed: confirmedDates, pending: pendingDates, inProgress: inProgressDates })
+      setUnavailableDates(allUnavailableDates)
+      
+    } catch (error) {
+      console.error('Error fetching existing bookings:', error)
+      // En cas d'erreur, utiliser des dates mock pour le développement
       const mockUnavailableDates = [
         '2024-01-15',
         '2024-01-16',
@@ -120,6 +202,21 @@ const Rent = () => {
       ]
       const dates = mockUnavailableDates.map((dateStr) => new Date(dateStr))
       setUnavailableDates(dates)
+    }
+  }
+
+  // Fetch tool data
+  const fetchTool = async () => {
+    if (!id) return
+
+    try {
+      setLoading(true)
+      const toolData = await toolsService.getTool(id)
+      setTool(toolData)
+      
+      // Récupérer les réservations existantes
+      await fetchExistingBookings(id)
+      
     } catch (err: any) {
       setError(err.message || 'Failed to fetch tool data')
     } finally {
@@ -143,10 +240,73 @@ const Rent = () => {
     )
   }
 
+  // Fonctions pour vérifier les différents types de dates
+  const isDateConfirmed = (date: Date) => {
+    return bookingDates.confirmed.some(
+      (confirmedDate) => date.toDateString() === confirmedDate.toDateString()
+    )
+  }
+
+  const isDatePending = (date: Date) => {
+    return bookingDates.pending.some(
+      (pendingDate) => date.toDateString() === pendingDate.toDateString()
+    )
+  }
+
+  const isDateInProgress = (date: Date) => {
+    return bookingDates.inProgress.some(
+      (inProgressDate) => date.toDateString() === inProgressDate.toDateString()
+    )
+  }
+
+  // Fonction pour vérifier si la sélection dépasse 5 jours
+  const isDateExceeding5Days = (date: Date, referenceDate: Date) => {
+    const diffTime = Math.abs(date.getTime() - referenceDate.getTime())
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1
+    return diffDays > 5
+  }
+
+  // Fonction pour vérifier si une période contient des dates indisponibles
+  const isPeriodUnavailable = (start: Date, end: Date) => {
+    const currentDate = new Date(start)
+    while (currentDate <= end) {
+      if (isDateUnavailable(currentDate)) {
+        return true
+      }
+      currentDate.setDate(currentDate.getDate() + 1)
+    }
+    return false
+  }
+
+  // Fonction personnalisée pour setStartDate avec validation
+  const handleStartDateChange = (date: Date | undefined) => {
+    setStartDate(date)
+    // Si la nouvelle date de début est postérieure à la date de fin, réinitialiser la date de fin
+    if (date && endDate && date > endDate) {
+      setEndDate(undefined)
+    }
+  }
+
+  // Fonction personnalisée pour setEndDate avec validation de période
+  const handleEndDateChange = (date: Date | undefined) => {
+    if (date && startDate) {
+      // Vérifier si la période contient des dates indisponibles
+      if (isPeriodUnavailable(startDate, date)) {
+        toast({
+          title: 'Période non disponible',
+          description: 'La période sélectionnée contient des dates déjà réservées. Veuillez choisir une autre période.',
+          variant: 'destructive',
+        })
+        return
+      }
+    }
+    setEndDate(date)
+  }
+
   const calculateDays = () => {
     if (!startDate || !endDate) return 0
     const diffTime = Math.abs(endDate.getTime() - startDate.getTime())
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1
     return diffDays
   }
 
@@ -205,6 +365,37 @@ const Rent = () => {
     fetchPricing()
   }, [tool, startDate, endDate])
 
+  // Get all photo URLs with primary photo first
+  const getAllPhotoUrls = (tool: Tool) => {
+    if (tool.photos && tool.photos.length > 0) {
+      // Sort photos to put primary photo first
+      const sortedPhotos = [...tool.photos].sort((a, b) => {
+        if (a.isPrimary) return -1
+        if (b.isPrimary) return 1
+        return 0
+      })
+      return sortedPhotos.map((photo) => photo.url)
+    }
+    return ['https://picsum.photos/800/600?random=990&tool']
+  }
+
+  // Carousel navigation functions
+  const nextImage = () => {
+    if (!tool) return
+    const allPhotos = getAllPhotoUrls(tool)
+    setCurrentImageIndex((prev) => (prev + 1) % allPhotos.length)
+  }
+
+  const prevImage = () => {
+    if (!tool) return
+    const allPhotos = getAllPhotoUrls(tool)
+    setCurrentImageIndex((prev) => (prev - 1 + allPhotos.length) % allPhotos.length)
+  }
+
+  const goToImage = (index: number) => {
+    setCurrentImageIndex(index)
+  }
+
   // Pricing values with fallbacks and validation
   const basePrice = Math.max(
     Number(pricing?.basePrice || tool?.basePrice) || 25,
@@ -223,23 +414,80 @@ const Rent = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Validation
+    // Validation des dates
     if (!startDate || !endDate) {
       toast({
         title: t('errors.validation_error'),
-        description: t('reservation.select_dates'),
+        description: 'Veuillez sélectionner les dates de début et de fin de location',
         variant: 'destructive',
       })
       return
     }
 
-    // Validate rental period does not exceed 5 days
-    const diffTime = Math.abs(endDate.getTime() - startDate.getTime())
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    if (diffDays > 5) {
+    if (startDate > endDate) {
       toast({
         title: t('errors.validation_error'),
-        description: 'La période de location ne peut pas dépasser 5 jours',
+        description: 'La date de début ne peut pas être postérieure à la date de fin',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    // Vérifier la durée de location (maximum 5 jours) - Validation stricte
+    const daysDifference = calculateDays()
+    
+    if (daysDifference > 5) {
+      toast({
+        title: t('errors.validation_error'),
+        description: `La durée de location ne peut pas dépasser 5 jours consécutifs. Vous avez sélectionné ${daysDifference} jours.`,
+        variant: 'destructive',
+      })
+      return
+    }
+
+    // Vérifier qu'aucune date de la période n'est réservée ou indisponible
+    const currentDate = new Date(startDate)
+    while (currentDate <= endDate) {
+      if (isDateUnavailable(currentDate)) {
+        toast({
+          title: t('errors.validation_error'),
+          description: 'Une ou plusieurs dates de la période sélectionnée sont indisponibles',
+          variant: 'destructive',
+        })
+        return
+      }
+      if (isDateConfirmed(currentDate)) {
+        toast({
+          title: t('errors.validation_error'),
+          description: 'Une ou plusieurs dates de la période sélectionnée sont déjà confirmées',
+          variant: 'destructive',
+        })
+        return
+      }
+      if (isDatePending(currentDate)) {
+        toast({
+          title: t('errors.validation_error'),
+          description: 'Une ou plusieurs dates de la période sélectionnée sont en attente de confirmation',
+          variant: 'destructive',
+        })
+        return
+      }
+      if (isDateInProgress(currentDate)) {
+        toast({
+          title: t('errors.validation_error'),
+          description: 'Une ou plusieurs dates de la période sélectionnée sont actuellement en cours de location',
+          variant: 'destructive',
+        })
+        return
+      }
+      currentDate.setDate(currentDate.getDate() + 1)
+    }
+
+    // Vérifier la disponibilité de l'outil pour toute la période
+    if (isPeriodUnavailable(startDate, endDate)) {
+      toast({
+        title: t('errors.validation_error'),
+        description: 'La période sélectionnée contient des dates non disponibles. Veuillez choisir d\'autres dates.',
         variant: 'destructive',
       })
       return
@@ -423,6 +671,182 @@ const Rent = () => {
             </Link>
           </div>
 
+          {/* Section détaillée de l'outil */}
+          {tool && (
+            <div className='mb-8'>
+              <Card>
+                <CardContent className='p-6'>
+                  <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
+                    {/* Carrousel d'images */}
+                    <div className='space-y-4'>
+                      {/* Image principale avec navigation */}
+                      <div className='relative'>
+                        <div className='aspect-video rounded-lg overflow-hidden'>
+                          <img
+                            src={getAllPhotoUrls(tool)[currentImageIndex]}
+                            alt={`${tool.title} ${currentImageIndex + 1}`}
+                            className='w-full h-full object-cover'
+                          />
+                        </div>
+                        
+                        {/* Boutons de navigation */}
+                        {getAllPhotoUrls(tool).length > 1 && (
+                          <>
+                            <Button
+                              variant='outline'
+                              size='icon'
+                              className='absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white'
+                              onClick={prevImage}
+                            >
+                              <ChevronLeft className='h-4 w-4' />
+                            </Button>
+                            <Button
+                              variant='outline'
+                              size='icon'
+                              className='absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white'
+                              onClick={nextImage}
+                            >
+                              <ChevronRight className='h-4 w-4' />
+                            </Button>
+                          </>
+                        )}
+                        
+                        {/* Compteur d'images */}
+                        <div className='absolute bottom-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-sm'>
+                          {currentImageIndex + 1} / {getAllPhotoUrls(tool).length}
+                        </div>
+                      </div>
+                      
+                      {/* Miniatures */}
+                      {getAllPhotoUrls(tool).length > 1 && (
+                        <div className='grid grid-cols-4 gap-2'>
+                          {getAllPhotoUrls(tool).slice(0, 4).map((photo, index) => (
+                            <div key={index} className='aspect-square rounded overflow-hidden'>
+                              <img
+                                src={photo}
+                                alt={`${tool.title} ${index + 1}`}
+                                className={`w-full h-full object-cover cursor-pointer transition-all ${
+                                  currentImageIndex === index
+                                    ? 'ring-2 ring-accent opacity-100'
+                                    : 'hover:opacity-80 opacity-70'
+                                }`}
+                                onClick={() => goToImage(index)}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {/* Indicateurs de points pour plus de 4 images */}
+                      {getAllPhotoUrls(tool).length > 4 && (
+                        <div className='flex justify-center space-x-2'>
+                          {getAllPhotoUrls(tool).map((_, index) => (
+                            <button
+                              key={index}
+                              className={`w-2 h-2 rounded-full transition-all ${
+                                currentImageIndex === index
+                                  ? 'bg-accent'
+                                  : 'bg-gray-300 hover:bg-gray-400'
+                              }`}
+                              onClick={() => goToImage(index)}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Informations détaillées */}
+                    <div className='space-y-6'>
+                      <div>
+                        <h1 className='text-2xl font-bold mb-2'>{tool.title}</h1>
+                        <div className='flex items-center gap-2 text-gray-600 mb-4'>
+                          <MapPin className='h-4 w-4' />
+                          <span>{tool.pickupAddress}</span>
+                        </div>
+                        <div className='flex items-center gap-4 mb-4'>
+                          <div className='flex items-center gap-1'>
+                            <Star className='h-4 w-4 fill-yellow-400 text-yellow-400' />
+                            <span className='font-medium'>{tool.rating || 0}</span>
+                            <span className='text-gray-600'>({tool.reviewCount || 0} avis)</span>
+                          </div>
+                          <div className='text-2xl font-bold text-green-600'>
+                            {displayPrice.toFixed(1)}€/jour
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Description */}
+                      <div>
+                        <h3 className='font-semibold mb-2 flex items-center gap-2'>
+                          <Info className='h-4 w-4' />
+                          Description
+                        </h3>
+                        <p className='text-gray-700 leading-relaxed'>
+                          {tool.description || 'Outil professionnel de haute qualité, parfait pour vos projets de bricolage et de construction. Entretenu régulièrement et en excellent état de fonctionnement.'}
+                        </p>
+                      </div>
+
+                      {/* Spécifications */}
+                      <div>
+                        <h3 className='font-semibold mb-3'>Spécifications techniques</h3>
+                        <div className='grid grid-cols-2 gap-4 text-sm'>
+                          <div className='space-y-2'>
+                            <div className='flex justify-between'>
+                              <span className='text-gray-600'>Catégorie:</span>
+                              <span className='font-medium'>{tool.category?.name || 'Outillage'}</span>
+                            </div>
+                            <div className='flex justify-between'>
+                              <span className='text-gray-600'>État:</span>
+                              <span className='font-medium text-green-600'>Excellent</span>
+                            </div>
+                            <div className='flex justify-between'>
+                              <span className='text-gray-600'>Disponibilité:</span>
+                              <span className='font-medium'>Immédiate</span>
+                            </div>
+                          </div>
+                          <div className='space-y-2'>
+                            <div className='flex justify-between'>
+                              <span className='text-gray-600'>Caution:</span>
+                              <span className='font-medium'>{tool.depositAmount}€</span>
+                            </div>
+                            <div className='flex justify-between'>
+                              <span className='text-gray-600'>Durée max:</span>
+                              <span className='font-medium'>5 jours</span>
+                            </div>
+                            <div className='flex justify-between'>
+                              <span className='text-gray-600'>Livraison:</span>
+                              <span className='font-medium'>Sur place</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Propriétaire */}
+                      <div className='border-t pt-4'>
+                        <h3 className='font-semibold mb-3 flex items-center gap-2'>
+                          <User className='h-4 w-4' />
+                          Propriétaire
+                        </h3>
+                        <div className='flex items-center gap-3'>
+                          <div className='w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center'>
+                            <User className='h-6 w-6 text-gray-600' />
+                          </div>
+                          <div>
+                            <p className='font-medium'>{tool.owner?.firstName || 'Propriétaire'} {tool.owner?.lastName || 'Vérifié'}</p>
+                            <div className='flex items-center gap-1 text-sm text-gray-600'>
+                              <Star className='h-3 w-3 fill-yellow-400 text-yellow-400' />
+                              <span>4.9 • Membre depuis 2022</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
           <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
             {/* Formulaire de réservation */}
             <div className='lg:col-span-2'>
@@ -444,58 +868,40 @@ const Rent = () => {
                 </CardHeader>
                 <CardContent>
                   <form className='space-y-6'>
-                    {/* Outil sélectionné */}
-                    <div className='flex items-center gap-4 p-4 bg-gray-50 rounded-lg justify-end'>
-                      {language === 'ar' ? (
-                        <>
-                          <div>
-                            <h3 className='font-semibold'>{tool.title}</h3>
-                            <p className='text-sm text-gray-600'>
-                              {displayPrice.toFixed(1)}€/{t('general.day')}
-                            </p>
-                            <p className='text-sm text-gray-600'>
-                              {tool.pickupAddress}
-                            </p>
-                          </div>
-                          <img
-                            src={
-                              tool.photos?.find((p) => p.isPrimary)?.url ||
-                              tool.photos?.[0]?.url ||
-                              '/placeholder-tool.jpg'
-                            }
-                            alt={tool.title}
-                            className='w-16 h-16 object-cover rounded'
-                          />
-                        </>
-                      ) : (
-                        <>
-                          <img
-                            src={
-                              tool.photos?.find((p) => p.isPrimary)?.url ||
-                              tool.photos?.[0]?.url ||
-                              '/placeholder-tool.jpg'
-                            }
-                            alt={tool.title}
-                            className='w-16 h-16 object-cover rounded'
-                          />
-                          <div>
-                            <h3 className='font-semibold'>{tool.title}</h3>
-                            <p className='text-sm text-gray-600'>
-                              {displayPrice.toFixed(1)}€/{t('general.day')}
-                            </p>
-                            <p className='text-sm text-gray-600'>
-                              {tool.pickupAddress}
-                            </p>
-                          </div>
-                        </>
-                      )}
-                    </div>
+
 
                     {/* Dates de location */}
                     <div className='space-y-4'>
                       <h3 className='font-semibold text-lg'>
                         {t('reservation.rental_period')}
                       </h3>
+                      
+                      {/* Légende du calendrier */}
+                      <div className='bg-blue-50 p-4 rounded-lg'>
+                        <h4 className='font-medium text-sm mb-3 flex items-center gap-2'>
+                          <Info className='h-4 w-4' />
+                          Légende du calendrier
+                        </h4>
+                        <div className='grid grid-cols-2 gap-3 text-xs'>
+                          <div className='flex items-center gap-2'>
+                            <div className='w-4 h-4 bg-red-600 rounded'></div>
+                            <span>Réservé/En cours</span>
+                          </div>
+                          <div className='flex items-center gap-2'>
+                            <div className='w-4 h-4 bg-orange-500 rounded'></div>
+                            <span>En attente/Accepté</span>
+                          </div>
+                          <div className='flex items-center gap-2'>
+                            <div className='w-4 h-4 bg-gray-300 rounded'></div>
+                            <span>Indisponible</span>
+                          </div>
+                          <div className='flex items-center gap-2'>
+                            <AlertCircle className='h-4 w-4 text-amber-600' />
+                            <span>Max 5 jours consécutifs</span>
+                          </div>
+                        </div>
+                      </div>
+
                       <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                         <div className='space-y-2'>
                           <Label>{t('reservation.start_date')} *</Label>
@@ -518,20 +924,42 @@ const Rent = () => {
                               <Calendar
                                 mode='single'
                                 selected={startDate}
-                                onSelect={setStartDate}
+                                onSelect={handleStartDateChange}
                                 disabled={(date) => {
                                   return (
-                                    date < new Date() || isDateUnavailable(date)
+                                    date < new Date() ||
+                                    isDateUnavailable(date) ||
+                                    isDateConfirmed(date) ||
+                                    isDatePending(date) ||
+                                    isDateInProgress(date)
                                   )
                                 }}
                                 modifiers={{
                                   unavailable: unavailableDates,
+                                  confirmed: (date) => isDateConfirmed(date),
+                                  pending: (date) => isDatePending(date),
+                                  inProgress: (date) => isDateInProgress(date),
                                 }}
                                 modifiersStyles={{
                                   unavailable: {
-                                    backgroundColor: '#fecaca',
-                                    color: '#dc2626',
+                                    backgroundColor: '#d1d5db',
+                                    color: '#6b7280',
                                     textDecoration: 'line-through',
+                                  },
+                                  confirmed: {
+                                    backgroundColor: '#dc2626',
+                                    color: 'white',
+                                    fontWeight: 'bold',
+                                  },
+                                  pending: {
+                                    backgroundColor: '#f97316',
+                                    color: 'white',
+                                    fontWeight: 'bold',
+                                  },
+                                  inProgress: {
+                                    backgroundColor: '#7c2d12',
+                                    color: 'white',
+                                    fontWeight: 'bold',
                                   },
                                 }}
                                 initialFocus
@@ -546,50 +974,90 @@ const Rent = () => {
                             <PopoverTrigger asChild>
                               <Button
                                 variant='outline'
+                                disabled={!startDate}
                                 className={cn(
                                   'w-full justify-start text-left font-normal',
-                                  !endDate && 'text-muted-foreground'
+                                  !endDate && 'text-muted-foreground',
+                                  !startDate && 'opacity-50 cursor-not-allowed'
                                 )}
                               >
                                 <CalendarIcon className='mr-2 h-4 w-4' />
                                 {endDate
                                   ? format(endDate, 'PPP', { locale: fr })
-                                  : t('reservation.select_date')}
+                                  : startDate 
+                                    ? t('reservation.select_date')
+                                    : 'Sélectionnez d\'abord une date de début'}
                               </Button>
                             </PopoverTrigger>
                             <PopoverContent className='w-auto p-0'>
                               <Calendar
                                 mode='single'
                                 selected={endDate}
-                                onSelect={setEndDate}
+                                onSelect={handleEndDateChange}
                                 disabled={(date) => {
+                                  if (!startDate) {
+                                    return true
+                                  }
+                                  
                                   if (
-                                    date < (startDate || new Date()) ||
-                                    isDateUnavailable(date)
+                                    date < startDate ||
+                                    isDateUnavailable(date) ||
+                                    isDateConfirmed(date) ||
+                                    isDatePending(date) ||
+                                    isDateInProgress(date)
                                   ) {
                                     return true
                                   }
 
                                   // Disable dates that would exceed 5 days rental period
-                                  if (startDate) {
-                                    const diffTime = Math.abs(
-                                      date.getTime() - startDate.getTime()
-                                    )
-                                    const diffDays = Math.ceil(
-                                      diffTime / (1000 * 60 * 60 * 24)
-                                    )
-                                    return diffDays > 5
+                                  const diffTime = Math.abs(
+                                    date.getTime() - startDate.getTime()
+                                  )
+                                  const diffDays = Math.floor(
+                                    diffTime / (1000 * 60 * 60 * 24)
+                                  ) + 1
+                                  if (diffDays > 5) {
+                                    return true
+                                  }
+
+                                  // Disable if the period between startDate and this date contains unavailable dates
+                                  if (isPeriodUnavailable(startDate, date)) {
+                                    return true
                                   }
 
                                   return false
                                 }}
                                 modifiers={{
                                   unavailable: unavailableDates,
+                                  confirmed: (date) => isDateConfirmed(date),
+                                  pending: (date) => isDatePending(date),
+                                  inProgress: (date) => isDateInProgress(date),
+                                  exceeding: (date) => startDate && isDateExceeding5Days(startDate, date),
                                 }}
                                 modifiersStyles={{
                                   unavailable: {
-                                    backgroundColor: '#fecaca',
-                                    color: '#dc2626',
+                                    backgroundColor: '#d1d5db',
+                                    color: '#6b7280',
+                                    textDecoration: 'line-through',
+                                  },
+                                  confirmed: {
+                                    backgroundColor: '#dc2626',
+                                    color: 'white',
+                                    fontWeight: 'bold',
+                                  },
+                                  pending: {
+                                    backgroundColor: '#f97316',
+                                    color: 'white',
+                                    fontWeight: 'bold',
+                                  },
+                                  inProgress: {
+                                    backgroundColor: '#7c2d12',
+                                    color: 'white',
+                                    fontWeight: 'bold',
+                                  },
+                                  exceeding: {
+                                    backgroundColor: '#fef3c7',
+                                    color: '#d97706',
                                     textDecoration: 'line-through',
                                   },
                                 }}
@@ -643,6 +1111,22 @@ const Rent = () => {
                         }
                       />
                     </div>
+
+                    {/* Error Messages */}
+                    {error && (
+                      <div className='bg-red-50 border border-red-200 rounded-lg p-4'>
+                        <div className='flex items-center'>
+                          <div className='flex-shrink-0'>
+                            <svg className='h-5 w-5 text-red-400' viewBox='0 0 20 20' fill='currentColor'>
+                              <path fillRule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z' clipRule='evenodd' />
+                            </svg>
+                          </div>
+                          <div className='ml-3'>
+                            <p className='text-sm text-red-800'>{error}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Mode de paiement */}
                     <div className='space-y-4'>
