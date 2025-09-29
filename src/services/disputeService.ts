@@ -52,8 +52,6 @@ class DisputeService {
 
   async createDispute(disputeData: CreateDisputeData, images?: File[]): Promise<Dispute> {
     try {
-      console.log('🔥 Creating dispute:', disputeData, images);
-      
       // If images are provided, use the multipart endpoint
       if (images && images.length > 0) {
         return await this.createDisputeWithImages(disputeData, images);
@@ -71,18 +69,15 @@ class DisputeService {
       
       // Otherwise, use the regular JSON endpoint
       const response = await api.post<Dispute>(this.baseUrl, backendData);
-      console.log('🔥 Dispute created successfully:', response.data);
+
       return response.data.data;
     } catch (error) {
-      console.error('🔥 Error creating dispute:', error);
       throw error;
     }
   }
 
   async createDisputeWithImages(disputeData: CreateDisputeData, images: File[]): Promise<Dispute> {
     try {
-      console.log('🔥 Creating dispute with images:', disputeData, images);
-      
       // Validate image sizes (max 1MB each)
       for (const image of images) {
         if (image.size > 1024 * 1024) {
@@ -113,46 +108,35 @@ class DisputeService {
         },
       });
       
-      console.log('🔥 Dispute with images created successfully:', response.data);
       return response.data.data;
     } catch (error) {
-      console.error('🔥 Error creating dispute with images:', error);
       throw error;
     }
   }
 
   async getUserDisputes(userId: string): Promise<Dispute[]> {
     try {
-      console.log('🔥 Fetching disputes for user:', userId);
       const response = await api.get<Dispute[]>(`${this.baseUrl}/user/${userId}`);
-      console.log('🔥 User disputes fetched successfully:', response.data);
       return response.data.data;
     } catch (error) {
-      console.error('🔥 Error fetching user disputes:', error);
       throw error;
     }
   }
 
   async getDisputeByBookingId(bookingId: string): Promise<Dispute> {
     try {
-      console.log('🔥 Fetching dispute for booking:', bookingId);
       const response = await api.get<Dispute>(`${this.baseUrl}/booking/${bookingId}`);
-      console.log('🔥 Booking dispute fetched successfully:', response.data);
       return response.data.data;
     } catch (error) {
-      console.error('🔥 Error fetching booking dispute:', error);
       throw error;
     }
   }
 
   async getDispute(disputeId: string): Promise<Dispute> {
     try {
-      console.log('🔥 Fetching dispute:', disputeId);
       const response = await api.get<Dispute>(`${this.baseUrl}/${disputeId}`);
-      console.log('🔥 Dispute fetched successfully:', response.data);
       return response.data.data;
     } catch (error) {
-      console.error('🔥 Error fetching dispute:', error);
       throw error;
     }
   }
@@ -168,7 +152,6 @@ class DisputeService {
     }
   ): Promise<DisputesResponse> {
     try {
-      console.log('🔥 Fetching all disputes with filters:', { page, limit, filters });
       const params = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
@@ -179,33 +162,25 @@ class DisputeService {
       });
       
       const response = await api.get<DisputesResponse>(`${this.baseUrl}?${params}`);
-      console.log('🔥 All disputes fetched successfully:', response.data);
       return response.data.data;
     } catch (error) {
-      console.error('🔥 Error fetching all disputes:', error);
       throw error;
     }
   }
 
   async updateDispute(disputeId: string, updateData: Partial<Dispute>): Promise<Dispute> {
     try {
-      console.log('🔥 Updating dispute:', disputeId, updateData);
       const response = await api.patch<Dispute>(`${this.baseUrl}/${disputeId}`, updateData);
-      console.log('🔥 Dispute updated successfully:', response.data);
       return response.data.data;
     } catch (error) {
-      console.error('🔥 Error updating dispute:', error);
       throw error;
     }
   }
 
   async deleteDispute(disputeId: string): Promise<void> {
     try {
-      console.log('🔥 Deleting dispute:', disputeId);
       await api.delete(`${this.baseUrl}/${disputeId}`);
-      console.log('🔥 Dispute deleted successfully');
     } catch (error) {
-      console.error('🔥 Error deleting dispute:', error);
       throw error;
     }
   }

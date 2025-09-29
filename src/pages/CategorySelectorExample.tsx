@@ -4,11 +4,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 
 const CategorySelectorExample: React.FC = () => {
   const handleCategoryChange = (categoryId: string) => {
-    console.log('📂 Catégorie sélectionnée:', categoryId);
+
   };
 
   const handleSubcategoryChange = (subcategoryId: string) => {
-    console.log('📁 Sous-catégorie sélectionnée:', subcategoryId);
+
   };
 
   return (

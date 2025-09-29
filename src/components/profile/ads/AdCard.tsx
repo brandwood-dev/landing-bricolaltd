@@ -54,7 +54,6 @@ const AdCard = ({
       setToolData(tool)
       setIsEditDialogOpen(true)
     } catch (error) {
-      console.error('Error fetching tool details:', error)
       toast({
         title: 'Erreur',
         description: "Impossible de charger les détails de l'outil",
@@ -64,7 +63,6 @@ const AdCard = ({
   }
 
   const handleEditSave = () => {
-    console.log('🔍 AdCard - handleEditSave called, refreshing data...')
     onRefresh()
     setIsEditDialogOpen(false)
   }
@@ -81,7 +79,6 @@ const AdCard = ({
       setViewToolData(tool)
       setIsViewDialogOpen(true)
     } catch (error) {
-      console.error('Error fetching tool details:', error)
       toast({
         title: 'Erreur',
         description: "Impossible de charger les détails de l'outil",
@@ -96,13 +93,6 @@ const AdCard = ({
     setIsViewDialogOpen(false)
     setViewToolData(null)
   }
-  console.log('🔍 AdCard - Rendering with ad data:', {
-    id: ad.id,
-    title: ad.title,
-    category: ad.category,
-    categoryId: ad.categoryId,
-  })
-
   return (
     <div className='border rounded-lg p-4'>
       <div className='flex flex-col sm:flex-row items-start gap-4'>

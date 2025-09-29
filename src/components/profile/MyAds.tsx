@@ -64,14 +64,7 @@ const MyAds = () => {
           return 'pending'
       }
     }
-    console.log('🔍 transformToolToAd - Input tool:', {
-      id: tool.id,
-      title: tool.title,
-      category: tool.category,
-      categoryId: tool.categoryId,
-      subcategory: tool.subcategory,
-      subcategoryId: tool.subcategoryId
-    })
+
     return {
       id: tool.id,
       title: tool.title,
@@ -100,12 +93,9 @@ const MyAds = () => {
     try {
       setLoading(true)
       const tools = await toolsService.getToolsByUser(user.id)
-      console.log('🔍 MyAds - Raw tools from API:', tools)
       const transformedAds = tools.map(transformToolToAd)
-      console.log('🔍 MyAds - Transformed ads:', transformedAds)
       setAds(transformedAds)
     } catch (error) {
-      console.error('Error fetching user tools:', error)
       toast({
         title: 'Erreur',
         description: 'Impossible de charger vos annonces',
@@ -226,7 +216,6 @@ const MyAds = () => {
           : 'Outil retiré de la publication',
       })
     } catch (error) {
-      console.error('Error updating tool availability:', error)
       toast({
         title: 'Erreur',
         description: 'Impossible de modifier le statut de publication',
@@ -244,7 +233,6 @@ const MyAds = () => {
         description: t('ads.delete.success'),
       })
     } catch (error) {
-      console.error('Error deleting tool:', error)
       toast({
         title: 'Erreur',
         description: "Impossible de supprimer l'annonce",

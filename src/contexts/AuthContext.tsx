@@ -131,10 +131,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const register = async (userData: RegisterData): Promise<void> => {
     try {
       setIsLoading(true);
-      console.log('Starting registration for email:', userData.email);
       
       const response = await api.post('/auth/register', userData);
-      console.log('Registration successful, status:', response.status);
       
       // Registration successful - API returns user and token data
       if (response.data && response.data.data) {
@@ -146,12 +144,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         
         // Set user in context
         setUser(registeredUser);
-        
-        console.log('User registered and logged in successfully');
       }
     } catch (error: any) {
-      console.error('Registration error:', error.response?.status, error.response?.data?.message);
-      
       const errorMessage = error.response?.data?.message || 'Registration failed';
       throw new Error(errorMessage);
     } finally {

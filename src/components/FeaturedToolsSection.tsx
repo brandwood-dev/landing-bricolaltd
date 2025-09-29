@@ -37,11 +37,9 @@ const FeaturedToolsSection = () => {
         if (Array.isArray(featuredTools)) {
           setTools(featuredTools)
         } else {
-          console.warn('Featured tools is not an array:', featuredTools)
           setTools([])
         }
       } catch (err: any) {
-        console.error('Error fetching featured tools:', err)
         setError(err.message)
         setTools([])
       } finally {

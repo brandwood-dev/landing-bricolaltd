@@ -159,15 +159,11 @@ const Register = () => {
   }
 
   const handleEmailBlur = async () => {
-    console.log('Email blur event triggered for:', formData.email)
-
     if (!formData.email || !formData.email.includes('@')) {
-      console.log('Email validation skipped - invalid email format')
       return // Don't check if email is empty or invalid format
     }
 
     try {
-      console.log('Checking email existence for:', formData.email)
       const emailCheckResponse = await fetch(
         'http://localhost:4000/api/auth/check-email',
         {
@@ -179,29 +175,15 @@ const Register = () => {
         }
       )
 
-      console.log('Email check response status:', emailCheckResponse.status)
-      console.log('Email check response ok:', emailCheckResponse.ok)
-
       if (!emailCheckResponse.ok) {
-        console.error(
-          'Email check failed with status:',
-          emailCheckResponse.status
-        )
-        const errorText = await emailCheckResponse.text()
-        console.error('Error response:', errorText)
         setEmailError('') // Clear error on API failure
         return
       }
 
       const emailCheckData = await emailCheckResponse.json()
-      console.log('Email check response data:', emailCheckData)
-      console.log('emailCheckData.success:', emailCheckData.success)
-      console.log('emailCheckData.data:', emailCheckData.data)
-      console.log('emailCheckData.data?.exists:', emailCheckData.data?.exists)
 
       // For testing: always show error for test@example.com
       if (formData.email === 'test@example.com') {
-        console.log('Test email detected, showing error')
         setEmailError(
           'This email is already registered. Please use a different email or try logging in.'
         )
@@ -213,16 +195,13 @@ const Register = () => {
         emailCheckData.data &&
         emailCheckData.data.exists
       ) {
-        console.log('Email already exists, setting error')
         setEmailError(
           'This email is already registered. Please use a different email or try logging in.'
         )
       } else {
-        console.log('Email is available')
         setEmailError('')
       }
     } catch (error) {
-      console.error('Error checking email:', error)
       // Don't show error to user for network issues during email check
       // But clear any existing email error to allow form submission
       setEmailError('')
@@ -231,19 +210,16 @@ const Register = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Registration form submitted for:', formData.email)
 
     // Clear any previous API error
     setApiError('')
     // Don't clear emailError here - keep the onBlur validation result
 
     if (!validateForm()) {
-      console.log('Form validation failed')
       return
     }
 
     if (emailError) {
-      console.log('Email error exists, stopping registration:', emailError)
       return
     }
 
@@ -262,13 +238,10 @@ const Register = () => {
       }
 
       await register(registrationData)
-      console.log('Registration completed, redirecting to email verification')
 
       // Redirect to email verification page with user's email
       navigate(`/verify-email?email=${encodeURIComponent(formData.email)}`)
     } catch (error: any) {
-      console.error('Registration failed:', error.message)
-
       // Handle specific error cases
       if (error.message && error.message.includes('Email already exists')) {
         setEmailError(

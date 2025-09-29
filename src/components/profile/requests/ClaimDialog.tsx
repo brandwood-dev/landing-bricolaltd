@@ -127,7 +127,6 @@ const ClaimDialog: React.FC<ClaimDialogProps> = ({
       await disputeService.createDispute(disputeData, selectedImages)
       disputeCreated = true
       setIsCreatingDispute(false)
-      console.log('Dispute created')
 
       // Step 2: Update booking to set pickupTool to true
       setIsUpdatingBooking(true)
@@ -136,7 +135,6 @@ const ClaimDialog: React.FC<ClaimDialogProps> = ({
       })
       bookingUpdated = true
       setIsUpdatingBooking(false)
-      console.log('Booking updated')
 
       // // Step 3: Send notification
       // setIsSendingNotification(true);
@@ -171,8 +169,6 @@ const ClaimDialog: React.FC<ClaimDialogProps> = ({
       onOpenChange(false)
       // onSubmit(disputeData, selectedImages)
     } catch (error: any) {
-      console.error('Error creating dispute:', error)
-
       // Determine which step failed and show appropriate error message
       let errorMessage =
         'Une erreur est survenue lors de la création de la dispute'

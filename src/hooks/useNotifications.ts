@@ -28,30 +28,21 @@ export const useNotifications = (): UseNotificationsReturn => {
     try {
       setLoading(true);
       setError(null);
-      console.log('🔍 [useNotifications] Fetching notifications for authenticated user');
-      
       const response = await apiClient.get('/notifications/my');
-      console.log('📡 [useNotifications] API Response:', response);
-      console.log('📊 [useNotifications] Response data structure:', response.data);
       
       // L'API retourne {data: {data: Array, total: number, page: number, limit: number}}
       const apiData = response.data.data || {};
-      console.log('📋 [useNotifications] API data object:', apiData);
       
       // Extraire le tableau de notifications
       const notificationsArray = apiData.data || [];
-      console.log('📝 [useNotifications] Notifications array:', notificationsArray);
-      console.log('📊 [useNotifications] Total notifications available:', apiData.total);
       
       // Ensure notificationsArray is an array
       const finalNotifications = Array.isArray(notificationsArray) ? notificationsArray : [];
-      console.log('✅ [useNotifications] Setting notifications:', finalNotifications);
-      console.log('🔄 [useNotifications] About to update notifications state from:', notifications.length, 'to:', finalNotifications.length);
       setNotifications(finalNotifications);
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Erreur lors du chargement des notifications';
       setError(errorMessage);
-      console.error('❌ [useNotifications] Error fetching notifications:', err);
+
     } finally {
       setLoading(false);
     }
@@ -71,7 +62,7 @@ export const useNotifications = (): UseNotificationsReturn => {
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Erreur lors de la mise à jour';
       toast.error(errorMessage);
-      console.error('Error marking notification as read:', err);
+
     }
   }, []);
 
@@ -87,7 +78,7 @@ export const useNotifications = (): UseNotificationsReturn => {
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Erreur lors de la mise à jour';
       toast.error(errorMessage);
-      console.error('Error marking all notifications as read:', err);
+
     }
   }, []);
 
@@ -100,7 +91,7 @@ export const useNotifications = (): UseNotificationsReturn => {
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Erreur lors de la suppression';
       toast.error(errorMessage);
-      console.error('Error deleting notification:', err);
+
     }
   }, []);
 
@@ -113,13 +104,12 @@ export const useNotifications = (): UseNotificationsReturn => {
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Erreur lors de la suppression';
       toast.error(errorMessage);
-      console.error('Error clearing all notifications:', err);
+
     }
   }, []);
 
   // Auto-fetch notifications on mount and clear when logged out
   useEffect(() => {
-    console.log('🚀 [useNotifications] Effect triggered, isAuthenticated:', isAuthenticated);
     if (isAuthenticated) {
       fetchNotifications();
     } else {
@@ -142,21 +132,7 @@ export const useNotifications = (): UseNotificationsReturn => {
 
   const unreadCount = (notifications || []).filter(n => !n.isRead).length;
 
-  // Log when notifications state changes
-  useEffect(() => {
-    console.log('🔄 [useNotifications] Notifications state updated:', {
-      count: notifications.length,
-      notifications: notifications,
-      loading: loading
-    });
-  }, [notifications, loading]);
 
-  console.log('📤 [useNotifications] Returning state:', {
-    notificationsCount: notifications.length,
-    notifications,
-    loading,
-    unreadCount: notifications.filter(n => !n.isRead).length
-  });
 
   return {
     notifications,

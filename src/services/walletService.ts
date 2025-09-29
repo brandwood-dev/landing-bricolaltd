@@ -15,21 +15,10 @@ class WalletService {
   // Get user balance
   async getUserBalance(userId: string): Promise<UserBalance> {
     try {
-      console.log('🔗 WalletService.getUserBalance called with userId:', userId);
-      console.log('🔗 Making GET request to:', `/wallets/user/${userId}/balance`);
-      
       const response = await api.get<ApiResponse<UserBalance>>(`/wallets/user/${userId}/balance`);
-      
-      console.log('🔗 Balance API response status:', response.status);
-      console.log('🔗 Balance API response data:', response.data);
       
       return response.data.data;
     } catch (error) {
-      console.error('🔗 Error fetching user balance:');
-      console.error('🔗 Error object:', error);
-      console.error('🔗 Error response:', error?.response);
-      console.error('🔗 Error response data:', error?.response?.data);
-      console.error('🔗 Error status:', error?.response?.status);
       throw error;
     }
   }
@@ -37,21 +26,10 @@ class WalletService {
   // Get user wallet statistics
   async getUserStats(userId: string): Promise<UserStats> {
     try {
-      console.log('🔗 WalletService.getUserStats called with userId:', userId);
-      console.log('🔗 Making GET request to:', `/wallets/user/${userId}/stats`);
-      
       const response = await api.get<ApiResponse<UserStats>>(`/wallets/user/${userId}/stats`);
-      
-      console.log('🔗 Stats API response status:', response.status);
-      console.log('🔗 Stats API response data:', response.data);
       
       return response.data.data;
     } catch (error) {
-      console.error('🔗 Error fetching user stats:');
-      console.error('🔗 Error object:', error);
-      console.error('🔗 Error response:', error?.response);
-      console.error('🔗 Error response data:', error?.response?.data);
-      console.error('🔗 Error status:', error?.response?.status);
       throw error;
     }
   }
@@ -65,7 +43,6 @@ class WalletService {
       });
       return response.data.data;
     } catch (error) {
-      console.error('Error creating withdrawal request:', error);
       throw error;
     }
   }
@@ -83,11 +60,6 @@ class WalletService {
     limit: number;
   }> {
     try {
-      console.log('🔗 WalletService.getUserTransactions called with:');
-      console.log('🔗 - userId:', userId);
-      console.log('🔗 - params:', params);
-      console.log('🔗 Making GET request to: /users/me/transactions');
-      
       const response = await api.get<ApiResponse<{
         data: Transaction[];
         total: number;
@@ -95,16 +67,8 @@ class WalletService {
         limit: number;
       }>>('/users/me/transactions', { params });
       
-      console.log('🔗 Transactions API response status:', response.status);
-      console.log('🔗 Transactions API response data:', response.data);
-      
       return response.data.data;
     } catch (error) {
-      console.error('🔗 Error fetching user transactions:');
-      console.error('🔗 Error object:', error);
-      console.error('🔗 Error response:', error?.response);
-      console.error('🔗 Error response data:', error?.response?.data);
-      console.error('🔗 Error status:', error?.response?.status);
       throw error;
     }
   }
@@ -134,7 +98,6 @@ class WalletService {
       });
       return response.data.data;
     } catch (error) {
-      console.error('Error fetching withdrawal history:', error);
       throw error;
     }
   }

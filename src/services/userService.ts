@@ -19,7 +19,6 @@ class UserService {
       const response = await api.get<ApiResponse<any>>('/auth/profile');
       return response.data.data;
     } catch (error) {
-      console.error('Error fetching user profile:', error);
       throw error;
     }
   }
@@ -29,7 +28,6 @@ class UserService {
       const response = await api.patch<ApiResponse<any>>(`/users/${userId}`, userData);
       return response.data.data;
     } catch (error) {
-      console.error('Error updating user profile:', error);
       throw error;
     }
   }
@@ -37,16 +35,19 @@ class UserService {
   async uploadProfilePicture(userId: string, file: File) {
     try {
       const formData = new FormData();
-      formData.append('profilePicture', file);
+      formData.append('photo', file);
       
-      const response = await api.post<ApiResponse<any>>(`/users/${userId}/upload-profile`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      return response.data.data;
+      const response = await api.post<ApiResponse<any>>(
+        `/users/profile/upload-photo`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      )
+      return response;
     } catch (error) {
-      console.error('Error uploading profile picture:', error);
       throw error;
     }
   }
@@ -58,7 +59,6 @@ class UserService {
       });
       return response.data.data;
     } catch (error) {
-      console.error('Error fetching user activities:', error);
       throw error;
     }
   }
@@ -70,7 +70,6 @@ class UserService {
       });
       return response.data.data;
     } catch (error) {
-      console.error('Error fetching user transactions:', error);
       throw error;
     }
   }
@@ -108,7 +107,6 @@ class UserService {
         memberSince: userProfile.createdAt
       };
     } catch (error) {
-      console.error('Error calculating user stats:', error);
       throw error;
     }
   }

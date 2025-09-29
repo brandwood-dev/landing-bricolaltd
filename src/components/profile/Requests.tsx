@@ -159,7 +159,6 @@ const Requests = () => {
         page: 1,
         limit: 100,
       })
-      console.log('ownerBookings : ', ownerBookings)
 
       const transformedReq = ownerBookings.data.map(transformBookingToRequest)
       setBookings(ownerBookings.data)
@@ -275,8 +274,6 @@ const Requests = () => {
 
       setValidationCode('')
     } catch (error: any) {
-      console.error('Validation code error:', error)
-
       // Handle specific error messages
       let errorTitle = t('request.validation_code_rejected')
       let errorDescription = t('request.validation_code_rejected_message')
@@ -448,7 +445,6 @@ const Requests = () => {
       setIsClaimDialogOpen(false)
       setSelectedRequestId('')
     } catch (error: any) {
-      console.error('Error submitting claim:', error)
       toast({
         title: t('general.error'),
         description: error.message || 'Failed to report pickup issue',

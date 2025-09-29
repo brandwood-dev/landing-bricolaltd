@@ -62,7 +62,6 @@ const BlogPost = () => {
         setRelatedArticles(related)
       }
     } catch (error: any) {
-      console.error('Failed to load article:', error)
       setNotFound(true)
       toast({
         title: 'Erreur',

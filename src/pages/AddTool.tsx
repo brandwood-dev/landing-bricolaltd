@@ -94,9 +94,9 @@ const AddTool = () => {
     })
 
     try {
-      console.log('🔍 Checking name uniqueness for:', name.trim())
+
       const result = await toolsService.checkNameUniqueness(name.trim())
-      console.log('🔍 Name uniqueness result:', result)
+
 
       if (result.isUnique) {
         setNameValidation({
@@ -112,13 +112,6 @@ const AddTool = () => {
         })
       }
     } catch (error: any) {
-      console.error('🔍 Error checking name uniqueness:', error)
-      console.error('🔍 Error details:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-      })
-
       let errorMessage = t('addtool.error_occurred')
       if (error.response?.status === 404) {
         errorMessage = t('addtool.error_occurred')
@@ -181,9 +174,7 @@ const AddTool = () => {
         setCategories(categoriesData || [])
         
         // Debug: Log user country for Mapbox configuration
-        console.log('🌍 User country for Mapbox suggestions:', user?.country || 'KW (default)')
       } catch (error) {
-        console.error('Error loading categories:', error)
         toast({
           title: 'Erreur',
           description: 'Impossible de charger les catégories',
@@ -205,7 +196,6 @@ const AddTool = () => {
       )
       setSubcategories(subcategoriesData || [])
     } catch (error) {
-      console.error('Error loading subcategories:', error)
       setSubcategories([])
     }
   }
@@ -404,7 +394,6 @@ const AddTool = () => {
       // Navigate to profile with my-ads tab
       navigate('/profile?tab=my-ads')
     } catch (error: any) {
-      console.error('Error creating tool:', error)
       toast({
         title: 'Erreur',
         description: error.message || "Impossible de créer l'outil",

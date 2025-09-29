@@ -25,16 +25,9 @@ import { walletService, Transaction, UserStats } from '@/services/walletService'
 import { useToast } from '@/hooks/use-toast';
 
 const Wallet = () => {
-  console.log('🚀 WALLET COMPONENT RENDERED');
   const { t, language } = useLanguage();
   const { user } = useAuth();
   const { toast } = useToast();
-  
-  console.log('🚀 WALLET COMPONENT - Initial state:');
-  console.log('🚀 - user from useAuth:', user);
-  console.log('🚀 - user exists:', !!user);
-  console.log('🚀 - localStorage authToken:', localStorage.getItem('authToken'));
-  console.log('🚀 - localStorage user:', localStorage.getItem('user'));
   const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
@@ -52,26 +45,12 @@ const Wallet = () => {
   // Fetch wallet data from backend
   useEffect(() => {
     const fetchWalletData = async () => {
-      console.log('=== WALLET USEEFFECT START ===');
-      console.log('Current user object:', user);
-      console.log('User authenticated:', !!user);
-      console.log('User ID:', user?.id);
-      console.log('User email:', user?.email);
-      console.log('Auth token exists:', !!localStorage.getItem('authToken'));
-      
       if (!user) {
-        console.log('❌ No user found, skipping wallet data fetch');
         return;
       }
       
       try {
         setLoading(true);
-        console.log('🔄 Starting wallet data fetch for user:', user.id);
-        console.log('Current page:', currentPage);
-        console.log('Items per page:', itemsPerPage);
-        console.log('Transaction type filter:', transactionType);
-        
-        console.log('📞 Making API calls...');
         const [balanceData, transactionsData, statsData] = await Promise.all([
           walletService.getUserBalance(user.id),
           walletService.getUserTransactions(user.id, {
@@ -82,25 +61,6 @@ const Wallet = () => {
           walletService.getUserStats(user.id)
         ]);
         
-        console.log('💰 Balance API Response:');
-        console.log('- Raw balance data:', balanceData);
-        console.log('- Balance value:', balanceData?.balance);
-        console.log('- Balance type:', typeof balanceData?.balance);
-        
-        console.log('📊 Transactions API Response:');
-        console.log('- Raw transactions data:', transactionsData);
-        console.log('- Transactions data array:', transactionsData?.data);
-        console.log('- Transactions data type:', typeof transactionsData?.data);
-        console.log('- Is transactions data array:', Array.isArray(transactionsData?.data));
-        console.log('- Transactions count:', transactionsData?.data?.length);
-        console.log('- Total transactions:', transactionsData?.total);
-        
-        console.log('📈 Stats API Response:');
-        console.log('- Raw stats data:', statsData);
-        console.log('- Cumulative balance:', statsData?.cumulativeBalance);
-        console.log('- Available balance:', statsData?.availableBalance);
-        console.log('- Successful transactions count:', statsData?.successfulTransactionsCount);
-        
         const finalBalance = balanceData?.balance || 0;
         const finalTransactions = Array.isArray(transactionsData?.data) ? transactionsData.data : [];
         const finalTotal = transactionsData?.total || 0;
@@ -110,26 +70,11 @@ const Wallet = () => {
           successfulTransactionsCount: 0
         };
         
-        console.log('🎯 Setting state:');
-        console.log('- Setting balance to:', finalBalance);
-        console.log('- Setting transactions to:', finalTransactions);
-        console.log('- Setting total transactions to:', finalTotal);
-        console.log('- Setting stats to:', finalStats);
-        
         setBalance(finalBalance);
         setTransactions(finalTransactions);
         setTotalTransactions(finalTotal);
         setStats(finalStats);
-        
-        console.log('✅ Wallet data fetch completed successfully');
       } catch (error) {
-        console.error('❌ Error fetching wallet data:');
-        console.error('- Error object:', error);
-        console.error('- Error message:', error?.message);
-        console.error('- Error response:', error?.response);
-        console.error('- Error response data:', error?.response?.data);
-        console.error('- Error status:', error?.response?.status);
-        
         setTransactions([]);
         setTotalTransactions(0);
         toast({

@@ -116,7 +116,6 @@ class AccountDeletionService {
       )
       return response.data.data || []
     } catch (error) {
-      console.warn('Failed to fetch user bookings:', error)
       return []
     }
   }
@@ -129,7 +128,6 @@ class AccountDeletionService {
       )
       return response.data.data || []
     } catch (error) {
-      console.warn('Failed to fetch owner bookings:', error)
       return []
     }
   }
@@ -142,7 +140,6 @@ class AccountDeletionService {
       )
       return response.data.data || []
     } catch (error) {
-      console.warn('Failed to fetch user disputes:', error)
       return []
     }
   }
@@ -156,27 +153,18 @@ class AccountDeletionService {
       )
 
       // Debug logs to see what we receive
-      console.log('=== DEBUG Frontend validatePassword ===')
-      console.log('Full response:', response)
-      console.log('response.data:', response.data)
-      console.log('response.data.data:', response.data.data)
-      console.log('response.data.data.valid:', response.data.data.data?.valid)
-      console.log('=== END DEBUG Frontend ===')
 
       // Handle the nested response structure
       const isValid = response.data?.data.data?.valid
 
       if (typeof isValid !== 'boolean') {
-        console.error(
-          'Invalid response structure - valid field is not boolean:',
-          isValid
-        )
+
         throw new Error('Invalid response from password validation')
       }
 
       return isValid
     } catch (error: any) {
-      console.error('Password validation error:', error)
+
       throw new Error(
         error.response?.data?.message || 'Password validation failed'
       )

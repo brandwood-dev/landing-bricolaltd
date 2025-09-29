@@ -93,7 +93,6 @@ const Rent = () => {
         const countriesData = await getActiveCountries()
         setCountries(countriesData)
       } catch (error) {
-        console.error('Failed to fetch countries:', error)
         toast({
           title: 'Error',
           description: 'Failed to load countries. Please refresh the page.',
@@ -122,7 +121,6 @@ const Rent = () => {
       
       // Si pas de token, utiliser les dates mock
       if (!token) {
-        console.warn('No authentication token found, using mock data')
         const mockUnavailableDates = [
           '2024-01-15',
           '2024-01-16',
@@ -189,7 +187,6 @@ const Rent = () => {
       setUnavailableDates(allUnavailableDates)
       
     } catch (error) {
-      console.error('Error fetching existing bookings:', error)
       // En cas d'erreur, utiliser des dates mock pour le développement
       const mockUnavailableDates = [
         '2024-01-15',
@@ -326,7 +323,6 @@ const Rent = () => {
       )
       setPricing(pricingData)
     } catch (err: any) {
-      console.error('Failed to fetch pricing:', err)
       // Fallback to manual calculation
       const days = calculateDays()
       const basePrice = tool.basePrice
@@ -543,8 +539,6 @@ const Rent = () => {
         navigate('/profile?tab=bookings')
       }, 2000)
     } catch (err: any) {
-      console.error('Booking creation failed:', err)
-
       // Function to get user-friendly error message
       const getErrorMessage = (error: any) => {
         const errorMessage =
@@ -672,14 +666,14 @@ const Rent = () => {
           </div>
 
           {/* Section détaillée de l'outil */}
-          {tool && (
+          {/* {tool && (
             <div className='mb-8'>
               <Card>
                 <CardContent className='p-6'>
                   <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
-                    {/* Carrousel d'images */}
+                    
                     <div className='space-y-4'>
-                      {/* Image principale avec navigation */}
+                     
                       <div className='relative'>
                         <div className='aspect-video rounded-lg overflow-hidden'>
                           <img
@@ -689,7 +683,7 @@ const Rent = () => {
                           />
                         </div>
                         
-                        {/* Boutons de navigation */}
+                     
                         {getAllPhotoUrls(tool).length > 1 && (
                           <>
                             <Button
@@ -711,13 +705,13 @@ const Rent = () => {
                           </>
                         )}
                         
-                        {/* Compteur d'images */}
+                       
                         <div className='absolute bottom-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-sm'>
                           {currentImageIndex + 1} / {getAllPhotoUrls(tool).length}
                         </div>
                       </div>
                       
-                      {/* Miniatures */}
+                     
                       {getAllPhotoUrls(tool).length > 1 && (
                         <div className='grid grid-cols-4 gap-2'>
                           {getAllPhotoUrls(tool).slice(0, 4).map((photo, index) => (
@@ -737,7 +731,7 @@ const Rent = () => {
                         </div>
                       )}
                       
-                      {/* Indicateurs de points pour plus de 4 images */}
+                    
                       {getAllPhotoUrls(tool).length > 4 && (
                         <div className='flex justify-center space-x-2'>
                           {getAllPhotoUrls(tool).map((_, index) => (
@@ -755,7 +749,7 @@ const Rent = () => {
                       )}
                     </div>
 
-                    {/* Informations détaillées */}
+                
                     <div className='space-y-6'>
                       <div>
                         <h1 className='text-2xl font-bold mb-2'>{tool.title}</h1>
@@ -775,7 +769,7 @@ const Rent = () => {
                         </div>
                       </div>
 
-                      {/* Description */}
+                    
                       <div>
                         <h3 className='font-semibold mb-2 flex items-center gap-2'>
                           <Info className='h-4 w-4' />
@@ -786,7 +780,7 @@ const Rent = () => {
                         </p>
                       </div>
 
-                      {/* Spécifications */}
+                    
                       <div>
                         <h3 className='font-semibold mb-3'>Spécifications techniques</h3>
                         <div className='grid grid-cols-2 gap-4 text-sm'>
@@ -821,7 +815,7 @@ const Rent = () => {
                         </div>
                       </div>
 
-                      {/* Propriétaire */}
+                     
                       <div className='border-t pt-4'>
                         <h3 className='font-semibold mb-3 flex items-center gap-2'>
                           <User className='h-4 w-4' />
@@ -845,7 +839,7 @@ const Rent = () => {
                 </CardContent>
               </Card>
             </div>
-          )}
+          )} */}
 
           <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
             {/* Formulaire de réservation */}
@@ -890,10 +884,6 @@ const Rent = () => {
                           <div className='flex items-center gap-2'>
                             <div className='w-4 h-4 bg-orange-500 rounded'></div>
                             <span>En attente/Accepté</span>
-                          </div>
-                          <div className='flex items-center gap-2'>
-                            <div className='w-4 h-4 bg-gray-300 rounded'></div>
-                            <span>Indisponible</span>
                           </div>
                           <div className='flex items-center gap-2'>
                             <AlertCircle className='h-4 w-4 text-amber-600' />

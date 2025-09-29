@@ -57,8 +57,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
   const { toast } = useToast();
   const { user } = useAuth();
   
-  // Log de débogage pour le pays de l'utilisateur
-  console.log('User country for address suggestions:', user?.country || 'KW');
+
   
   const [formData, setFormData] = useState({
     title: ad.title,
@@ -75,13 +74,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
     instructions: ad.ownerInstructions || ''
   });
   
-  // Debug logs pour l'initialisation
-  console.log('🔧 AdEditDialog - Initial data:', {
-    category: ad.category,
-    subcategory: ad.subcategory,
-    formData_category: ad.category?.id || '',
-    formData_subcategory: ad.subcategory?.id || ''
-  });
+
   const [existingPhotos, setExistingPhotos] = useState<ToolPhoto[]>(ad.photos || []);
   const [newPhotos, setNewPhotos] = useState<File[]>([]);
   const [photosToDelete, setPhotosToDelete] = useState<string[]>([]);
@@ -103,7 +96,6 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
         const categories = await toolsService.getCategories();
         setCategories(categories || []);
       } catch (error) {
-        console.error('Error loading categories:', error);
         toast({
           title: 'Erreur',
           description: 'Impossible de charger les catégories',
@@ -120,21 +112,17 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
   // Load subcategories when category changes
   useEffect(() => {
     const loadSubcategories = async () => {
-      console.log('🔧 Loading subcategories for category:', formData.category);
       if (formData.category) {
         try {
           setLoadingSubcategories(true);
           const subcategories = await toolsService.getSubcategoriesByCategory(formData.category);
-          console.log('🔧 Loaded subcategories:', subcategories);
           setSubcategories(subcategories || []);
         } catch (error) {
-          console.error('Error loading subcategories:', error);
           setSubcategories([]);
         } finally {
           setLoadingSubcategories(false);
         }
       } else {
-        console.log('🔧 No category selected, clearing subcategories');
         setSubcategories([]);
         setLoadingSubcategories(false);
       }
@@ -151,14 +139,11 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
   }, [formData.category, categories]);
 
   const handleCategoryChange = (categoryId: string) => {
-    console.log('🔧 Category changed to:', categoryId);
-    console.log('🔧 Previous formData:', formData);
     const newFormData = {
       ...formData,
       category: categoryId,
       subcategory: '' // Reset subcategory when category changes
     };
-    console.log('🔧 New formData:', newFormData);
     setFormData(newFormData);
     // Clear subcategories list to force reload
     setSubcategories([]);
@@ -238,16 +223,10 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
         subcategoryId: formData.subcategory || null // Send null if empty string
       };
 
-      // Debug logs
-      console.log('🔧 FormData before update:', {
-        category: formData.category,
-        subcategory: formData.subcategory
-      });
-      console.log('🔧 UpdateData being sent to API:', updateData);
+
 
       // Update tool data
       await toolsService.updateTool(ad.id, updateData);
-      console.log('Tool data updated successfully');
 
       // Handle photo deletions with error handling
       const deletionResults = [];
@@ -255,16 +234,12 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
         try {
           // Validate photo ID format
           if (!photoId || typeof photoId !== 'string' || photoId.trim() === '') {
-            console.warn(`Invalid photo ID: ${photoId}`);
             continue;
           }
           
-          console.log(`Attempting to delete photo: ${photoId}`);
           await toolsService.deletePhoto(ad.id, photoId);
-          console.log(`Successfully deleted photo: ${photoId}`);
           deletionResults.push({ photoId, success: true });
         } catch (error) {
-          console.error(`Failed to delete photo ${photoId}:`, error);
           deletionResults.push({ photoId, success: false, error: error.message });
           // Continue with other deletions instead of failing completely
         }
@@ -277,9 +252,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
         for (let i = 0; i < newPhotos.length; i++) {
           const photo = newPhotos[i];
           try {
-            console.log(`Uploading new photo ${i + 1}/${newPhotos.length}`);
             const uploadedPhoto = await toolsService.addToolPhoto(ad.id, photo);
-            console.log(`Successfully uploaded photo ${i + 1}`);
             uploadResults.push({ index: i, success: true, photoId: uploadedPhoto.id });
             
             // Store the ID of the photo that should be primary
@@ -287,7 +260,6 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
               newPrimaryPhotoId = uploadedPhoto.id;
             }
           } catch (error) {
-            console.error(`Failed to upload photo ${i + 1}:`, error);
             uploadResults.push({ index: i, success: false, error: error.message });
             // Continue with other uploads
           }
@@ -299,14 +271,11 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
         if (primaryPhotoId) {
           // Set existing photo as primary
           await toolsService.setPhotoPrimary(primaryPhotoId);
-          console.log(`Set existing photo ${primaryPhotoId} as primary`);
         } else if (newPrimaryPhotoId) {
           // Set newly uploaded photo as primary
           await toolsService.setPhotoPrimary(newPrimaryPhotoId);
-          console.log(`Set new photo ${newPrimaryPhotoId} as primary`);
         }
       } catch (error) {
-        console.error('Failed to set primary photo:', error);
         // Don't fail the entire operation for this
       }
 
@@ -334,7 +303,6 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
       onSave();
       onClose();
     } catch (error) {
-      console.error('Error updating tool:', error);
       toast({
         title: t('general.error'),
         description: 'Failed to update tool',
@@ -452,12 +420,9 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                   <SelectValue placeholder={loadingCategories ? "Chargement..." : "Sélectionner une catégorie"} />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((category) => {
-                    console.log('🔧 Rendering category:', category, 'Selected:', formData.category === category.id);
-                    return (
-                      <SelectItem key={category.id} value={category.id}>{category.name}</SelectItem>
-                    );
-                  })}
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>{category.name}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -465,23 +430,15 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
             <div className="space-y-2">
               <Label>{t('ads.sub_category')}</Label>
               <Select value={formData.subcategory} onValueChange={(value) => {
-                console.log('🔧 Subcategory changed to:', value);
-                console.log('🔧 Available subcategories:', subcategories);
-                console.log('🔧 Current formData before subcategory change:', formData);
-                const newFormData = {...formData, subcategory: value};
-                console.log('🔧 New formData after subcategory change:', newFormData);
-                setFormData(newFormData);
+                setFormData({...formData, subcategory: value});
               }} disabled={loadingSubcategories || !formData.category}>
                 <SelectTrigger>
                   <SelectValue placeholder={loadingSubcategories ? "Chargement..." : t('ads.sub_category_placeholder')} />
                 </SelectTrigger>
                 <SelectContent>
-                  {subcategories.map((subcategory) => {
-                    console.log('🔧 Rendering subcategory:', subcategory, 'Selected:', formData.subcategory === subcategory.id);
-                    return (
-                      <SelectItem key={subcategory.id} value={subcategory.id}>{subcategory.name}</SelectItem>
-                    );
-                  })}
+                  {subcategories.map((subcategory) => (
+                    <SelectItem key={subcategory.id} value={subcategory.id}>{subcategory.name}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -569,7 +526,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
             <AddressAutocomplete
               value={formData.location}
               onChange={(value) => setFormData({...formData, location: value})}
-              onAddressSelected={(isSelected) => console.log('Address selected:', isSelected)}
+              onAddressSelected={(isSelected) => {}}
               placeholder={t('ads.location_placeholder')}
               selectedCountry={user?.country || 'KW'}
             />

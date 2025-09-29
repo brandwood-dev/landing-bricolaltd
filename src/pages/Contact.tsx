@@ -240,7 +240,6 @@ const Contact = () => {
       });
       setCountrySearch('');
     } catch (error: any) {
-      console.error('Error sending contact message:', error);
       toast({
         title: t('contact.error_title') || 'Erreur',
         description: error.message || t('contact.error_message') || 'Une erreur est survenue lors de l\'envoi de votre message. Veuillez réessayer.',

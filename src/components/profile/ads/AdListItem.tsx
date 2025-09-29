@@ -34,7 +34,6 @@ const AdListItem = ({ ad, onPublishToggle, onDeleteAd, onRefresh, getValidationS
       setToolData(tool);
       setIsEditDialogOpen(true);
     } catch (error) {
-      console.error('Error fetching tool details:', error);
       toast({
         title: 'Erreur',
         description: 'Impossible de charger les détails de l\'outil',

@@ -65,7 +65,6 @@ const MapView = ({ searchQuery }: { searchQuery: string }) => {
           })
         },
         (error) => {
-          console.log('Error getting location:', error)
           // Fallback to Paris coordinates
           setUserLocation({ lat: 48.8566, lng: 2.3522 })
         }

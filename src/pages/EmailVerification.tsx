@@ -28,108 +28,59 @@ const EmailVerification = () => {
   const [countdown, setCountdown] = useState(0);
   const [hasVerified, setHasVerified] = useState(false);
 
-  // Debug state changes
-  console.log('=== CURRENT STATE ===');
-  console.log('Verification Code:', verificationCode);
-  console.log('Is Loading:', isLoading);
-  console.log('Is Resending:', isResending);
-  console.log('Error:', error);
-  console.log('Success:', success);
-  console.log('Countdown:', countdown);
-  console.log('Has Verified:', hasVerified);
+
   
   const token = searchParams.get('token');
   const email = searchParams.get('email') || user?.email || '';
   const from = searchParams.get('from') || '/profile';
 
-  // Debug logging for user experience tracking
-  console.log('=== EMAIL VERIFICATION PAGE LOADED ===');
-  console.log('User data:', user);
-  console.log('URL Parameters:', {
-    token,
-    email,
-    from,
-    fullURL: window.location.href
-  });
-  console.log('Search params:', Object.fromEntries(searchParams.entries()));
+
 
   // Auto-verify if token is provided in URL
   useEffect(() => {
-    console.log('=== AUTO-VERIFICATION EFFECT ===');
-    console.log('Token present:', !!token);
-    console.log('Has verified:', hasVerified);
-    console.log('Will auto-verify:', !!(token && !hasVerified));
-    
     if (token && !hasVerified) {
-      console.log('Starting auto-verification with token:', token);
       verifyEmailWithToken(token);
     }
   }, [token, hasVerified]);
 
   // Countdown timer for resend button
   useEffect(() => {
-    console.log('=== COUNTDOWN EFFECT ===');
-    console.log('Current countdown:', countdown);
-    
     if (countdown > 0) {
-      console.log('Setting countdown timer for:', countdown - 1);
       const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
       return () => clearTimeout(timer);
-    } else {
-      console.log('Countdown finished or not active');
     }
   }, [countdown]);
 
   const verifyEmailWithToken = async (verificationToken: string) => {
-    console.log('=== VERIFY EMAIL WITH TOKEN ===');
-    console.log('Token:', verificationToken);
-    console.log('Has verified check:', hasVerified);
-    
     if (hasVerified) {
-      console.log('Already verified, skipping...');
       return;
     }
     
     try {
-      console.log('Starting token verification...');
       setIsLoading(true);
       setError('');
       setHasVerified(true);
       
-      console.log('Verifying token using AuthContext:', verificationToken);
       // Use the AuthContext function to ensure proper state management
       await verifyEmail(verificationToken);
       
-      console.log('Verification successful!');
       setSuccess(true);
       toast.success(t('verification.success'));
       
       // Redirect to intended destination after 3 seconds if user is logged in
-      console.log('Setting up redirect timer...');
       setTimeout(() => {
-        console.log('=== REDIRECT EXECUTION ===');
-        console.log('User for redirect:', user);
-        console.log('Redirect destination:', user ? from : '/login');
-        
         if (user) {
-          console.log('Redirecting to:', from);
           navigate(from);
         } else {
-          console.log('No user, redirecting to login');
           navigate('/login');
         }
       }, 3000);
     } catch (error: any) {
-      console.error('=== VERIFICATION ERROR ===');
-      console.error('Error object:', error);
-      
       const errorMessage = error.message || t('verification.error');
-      console.log('Error message to display:', errorMessage);
       
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
-      console.log('Token verification completed, setting loading to false');
       setIsLoading(false);
     }
   };
@@ -137,65 +88,42 @@ const EmailVerification = () => {
   const verifyEmailWithCode = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('=== VERIFY EMAIL WITH CODE ===');
-    console.log('Verification code entered:', verificationCode);
-    console.log('Email for verification:', email);
-    
     if (!verificationCode.trim()) {
-      console.log('No verification code provided');
       setError(t('verification.code_required'));
       return;
     }
     
     try {
-      console.log('Starting code verification...');
       setIsLoading(true);
       setError('');
       
       // Use the AuthContext function to ensure proper state management
       await verifyEmailCode(email, verificationCode);
       
-      console.log('Code verification successful!');
       setHasVerified(true);
       setSuccess(true);
       toast.success(t('verification.success'));
       
       // Redirect to intended destination after 3 seconds if user is logged in
-      console.log('Setting up redirect timer (code verification)...');
       setTimeout(() => {
-        console.log('=== REDIRECT EXECUTION (CODE VERIFICATION) ===');
-        console.log('User for redirect:', user);
-        console.log('Redirect destination:', user ? from : '/login');
-        
         if (user) {
-          console.log('Redirecting to (code verification):', from);
           navigate(from);
         } else {
-          console.log('No user, redirecting to login (code verification)');
           navigate('/login');
         }
       }, 3000);
     } catch (error: any) {
-      console.error('=== CODE VERIFICATION ERROR ===');
-      console.error('Error object:', error);
-      
       const errorMessage = error.message || t('verification.invalid_code');
-      console.log('Code verification error message:', errorMessage);
       
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
-      console.log('Code verification completed, setting loading to false');
       setIsLoading(false);
     }
   };
 
   const resendVerificationEmail = async () => {
-    console.log('=== RESEND VERIFICATION EMAIL ===');
-    console.log('Email to resend to:', email);
-    
     try {
-      console.log('Starting resend verification...');
       setIsResending(true);
       setError('');
       
@@ -203,28 +131,16 @@ const EmailVerification = () => {
         email
       });
       
-      console.log('Resend verification API Response:', response);
-      console.log('Resend verification response data:', response.data);
-      
       if (response.data) {
-        console.log('Verification email resent successfully!');
         toast.success(t('verification.resent'));
         setCountdown(60); // 60 seconds cooldown
-        console.log('Countdown set to 60 seconds');
       }
     } catch (error: any) {
-      console.error('=== RESEND VERIFICATION ERROR ===');
-      console.error('Error object:', error);
-      console.error('Error response:', error.response);
-      console.error('Error data:', error.response?.data);
-      
       const errorMessage = error.response?.data?.message || t('verification.resend_error');
-      console.log('Resend error message:', errorMessage);
       
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
-      console.log('Resend verification completed, setting resending to false');
       setIsResending(false);
     }
   };
@@ -309,9 +225,6 @@ const EmailVerification = () => {
                         maxLength={6}
                         value={verificationCode}
                         onChange={(value) => {
-                          console.log('=== VERIFICATION CODE INPUT ===');
-                          console.log('Previous code:', verificationCode);
-                          console.log('New code:', value);
                           setVerificationCode(value);
                           setError('');
                         }}

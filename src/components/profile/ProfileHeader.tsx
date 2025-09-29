@@ -380,7 +380,6 @@ const ProfileHeader = ({
   };
 
   // Log all user information
-  console.log('ProfileHeader - User Info:', userInfo)
 
   // Map accountType to translation key
   const accountTypeLabel =

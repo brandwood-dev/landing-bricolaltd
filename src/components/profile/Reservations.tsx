@@ -175,7 +175,7 @@ const Reservations = () => {
       pickupTool: booking.pickupTool,
     }
   }
-  console.log('toolId', reservations[0]?.toolId)
+
   // Vérifier si l'utilisateur a déjà noté l'application
   const checkUserAppReview = async () => {
     if (!user?.id) return
@@ -184,10 +184,6 @@ const Reservations = () => {
       const result = await reviewsService.checkUserAppReview(user.id)
       setHasReviewedApp(result.hasReviewed)
     } catch (error) {
-      console.error(
-        "Erreur lors de la vérification de l'avis d'application:",
-        error
-      )
     }
   }
 
@@ -206,13 +202,7 @@ const Reservations = () => {
         page: 1,
         limit: 100,
       })
-      console.log('📊 Données bookings avec photos:', bookingsData)
-      console.log(
-        '🔍 Premier booking complet:',
-        JSON.stringify(bookingsData[0], null, 2)
-      )
-      console.log('🛠️ Outil du premier booking:', bookingsData[0]?.tool)
-      console.log('📸 Photos du premier outil:', bookingsData[0]?.tool?.photos)
+
       const transformedReservations = bookingsData.map(
         transformBookingToReservation
       )
@@ -412,7 +402,6 @@ const Reservations = () => {
       setReportReason('')
       setReportMessage('')
     } catch (error: any) {
-      console.error('Erreur lors de la création de la dispute:', error)
       toast({
         title: t('general.error'),
         description:
@@ -539,7 +528,6 @@ const Reservations = () => {
       }
 
       // Si on arrive ici, la requête a réussi (pas d'exception)
-      console.log('✅ Dispute créée avec succès:', response)
 
       // Afficher le toast de succès
       toast({
@@ -548,23 +536,17 @@ const Reservations = () => {
       })
 
       // Fermer le modal
-      console.log('🔄 Fermeture du modal...')
       setIsClaimDialogOpen(false)
 
       // Réinitialiser le formulaire
-      console.log('🧹 Réinitialisation du formulaire...')
       setReportReason('')
       setReportMessage('')
       setSelectedReservationId('')
       setUploadedFiles([])
 
       // Rafraîchir la liste des réservations
-      console.log('🔄 Rafraîchissement de la liste...')
       await loadBookings()
-      console.log('✅ Processus terminé avec succès')
     } catch (error: any) {
-      console.error('Erreur lors de la création de la dispute:', error)
-
       let errorMessage =
         "Une erreur est survenue lors de l'envoi de la réclamation."
 
@@ -730,7 +712,6 @@ const Reservations = () => {
         // Créer un avis d'outil avec tous les paramètres requis
         const selectedReservation = reservations.find(r => r.id === selectedReservationId)
         if (!selectedReservation) {
-          console.error('Selected reservation not found')
           return
         }
 
@@ -759,8 +740,6 @@ const Reservations = () => {
         handleFilteredDataChange(updatedReservations.data)
       }
     } catch (error) {
-      console.error('Error creating review:', error)
-      
       // Vérifier si c'est l'erreur spécifique "A tool review already exists for this booking"
       if (error.response?.data?.message?.includes('A tool review already exists for this booking')) {
         toast({

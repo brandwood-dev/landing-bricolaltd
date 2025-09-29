@@ -52,7 +52,6 @@ const MyAdsSearchAndFilters = ({
         const fetchedCategories = await toolsService.getCategories()
         setCategories(fetchedCategories)
       } catch (error) {
-        console.error('Error loading categories:', error)
         setCategoriesError('Failed to load categories')
       } finally {
         setCategoriesLoading(false)

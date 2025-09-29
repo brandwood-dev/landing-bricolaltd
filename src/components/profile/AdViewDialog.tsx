@@ -110,7 +110,7 @@ const AdViewDialog = ({ ad, onClose }: AdViewDialogProps) => {
         const toolReviews = await toolsService.getToolReviews(ad.id)
         setReviews(toolReviews.data || [])
       } catch (error) {
-        console.error('Erreur lors du chargement des données de l\'outil:', error)
+        // Error handled silently
       } finally {
         setLoading(false)
       }

@@ -66,8 +66,6 @@ const ReportDialog: React.FC<ReportDialogProps> = ({ requestId, onReportSubmit }
       setReportReason('')
       setReportMessage('')
     } catch (error: any) {
-      console.error('Erreur lors de la création de la dispute:', error)
-      
       // Extract meaningful error message from API response
       let errorMessage = 'Erreur lors de la création du signalement';
       if (error?.response?.data?.message) {

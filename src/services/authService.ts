@@ -44,12 +44,6 @@ export const authService = {
       const response = await api.post<ApiResponse<LoginResponse>>('/auth/login', credentials);
       return response.data.data;
     } catch (error: any) {
-      console.log('Login error details:', {
-        status: error.response?.status,
-        data: error.response?.data,
-        message: error.message
-      });
-      
       // Handle different error response formats
       let errorMessage = 'Login failed';
       
@@ -86,7 +80,6 @@ export const authService = {
       await api.post('/auth/logout');
     } catch (error) {
       // Even if logout fails on server, we should clear local storage
-      console.warn('Logout request failed, but clearing local session');
     }
   },
 
