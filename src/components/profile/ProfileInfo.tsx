@@ -273,27 +273,7 @@ const ProfileInfo = () => {
     if (!user) return
 
     try {
-      const token = localStorage.getItem('authToken')
-      const response = await fetch('http://localhost:4000/api/users/me', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          profilePicture: imageUrl,
-        }),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(
-          errorData.message || 'Échec de la mise à jour de la photo de profil'
-        )
-      }
-
-      const result = await response.json()
-      const updatedUser = result.data
+      const updatedUser = await userService.saveProfilePicture(imageUrl)
 
       // Update local user state with new profile picture
       await updateUser({

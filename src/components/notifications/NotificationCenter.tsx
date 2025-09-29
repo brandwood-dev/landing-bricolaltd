@@ -86,20 +86,13 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   onMarkAllAsRead,
   onNotificationClick,
 }) => {
-  // Debug logs pour vérifier les props
-  console.log('🎯 [NotificationCenter] Component rendered with props:', {
-    notificationsCount: notifications?.length || 0,
-    notifications: notifications,
-    hasOnMarkAsRead: !!onMarkAsRead,
-    hasOnMarkAllAsRead: !!onMarkAllAsRead,
-    hasOnNotificationClick: !!onNotificationClick
-  });
+
   
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const unreadCount = notifications.filter(n => !n.isRead).length;
   
-  console.log('📊 [NotificationCenter] Calculated unreadCount:', unreadCount);
+  
 
   const handleNotificationClick = (notification: Notification) => {
     if (!notification.isRead) {
@@ -119,10 +112,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     navigate('/notifications');
   };
 
-  // Log when no notifications
-  if (notifications.length === 0) {
-    console.log('📭 [NotificationCenter] No notifications to display');
-  }
+  
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -163,7 +153,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
           ) : (
             <div className="divide-y">
               {notifications.map((notification) => {
-                console.log('📝 [NotificationCenter] Rendering notification:', notification);
+              
                 return (
                   <div
                     key={notification.id}
