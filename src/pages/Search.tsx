@@ -593,8 +593,13 @@ const Search = () => {
                       {selectedCategory !== 'all' && (
                         <p className='text-gray-600'>
                           {t('catalog_section.category')}:{' '}
-                          {categories.find((cat) => cat.id === selectedCategory)
-                            ?.displayName || selectedCategory}
+                          {/* on veut afficher la traduction de selcted category */}
+                          {t(
+                            `categories.${categories.find(
+                              (cat) => cat.id === selectedCategory
+                            )?.name
+                            }`
+                          ) || t(`categories.${selectedCategory}`)}
                         </p>
                       )}
                       {isSearching && (
