@@ -192,7 +192,10 @@ const BlogPost = () => {
                   </div>
                   <div className='flex items-center gap-1'>
                     <Clock className='h-4 w-4' />
-                    <span>5{t('general.min')}</span>
+                    <span>
+                      {Math.ceil((post.content?.length || 0) / 180)}
+                      {t('general.min')}
+                    </span>
                   </div>
                 </div>
 
@@ -201,6 +204,7 @@ const BlogPost = () => {
                     url={currentUrl}
                     title={post.title}
                     excerpt={post.summary}
+                    imageUrl={post.imageUrl || '/placeholder-blog.svg'}
                   />
                 </div>
               </div>

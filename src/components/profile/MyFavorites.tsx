@@ -56,9 +56,12 @@ const MyFavorites = () => {
               <div key={favorite.id} className="border rounded-lg p-4">
                 <div className="flex items-start gap-4">
                   <img 
-                    src={favorite.images?.[0] || '/placeholder-tool.jpg'} 
+                    src={favorite.photos && favorite.photos.length > 0 ? (favorite.photos.find(photo => photo.isPrimary)?.url || favorite.photos[0]?.url) : '/placeholder.svg'} 
                     alt={favorite.title}
                     className="w-16 h-16 rounded-lg object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = '/placeholder.svg';
+                    }}
                   />
                   <div className="flex-1 space-y-2">
                     <div className="flex items-start justify-between">
@@ -83,13 +86,13 @@ const MyFavorites = () => {
                       </div>
                       <div className="flex items-center gap-1">
                         <MapPin className="h-4 w-4" />
-                        {favorite.location}
+                        {favorite.pickupAddress}
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between">
                       <div className="font-semibold text-primary">
-                        {favorite.pricePerDay}€/{t('general.day')}
+                        {favorite.basePrice}€/{t('general.day')}
                       </div>
                       <Link to={`/tool/${favorite.id}`}>
                         <Button size="sm">

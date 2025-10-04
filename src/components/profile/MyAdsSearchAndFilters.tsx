@@ -127,7 +127,7 @@ const MyAdsSearchAndFilters = ({
               ) : (
                 categories.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
-                    {category.name}
+                    {category.displayName}
                   </SelectItem>
                 ))
               )}

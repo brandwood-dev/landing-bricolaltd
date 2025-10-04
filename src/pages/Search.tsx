@@ -354,26 +354,7 @@ const Search = () => {
     fetchTools() // Load tools on initial mount
   }, [])
 
-  // Auto-refresh when page gains focus - DISABLED
-  // useEffect(() => {
-  //   const handleFocus = () => {
-  //     // Refresh data when user returns to the page
-  //     fetchTools();
-  //   };
-
-  //   window.addEventListener('focus', handleFocus);
-  //   document.addEventListener('visibilitychange', () => {
-  //     if (!document.hidden) {
-  //       fetchTools();
-  //     }
-  //   });
-
-  //   return () => {
-  //     window.removeEventListener('focus', handleFocus);
-  //     document.removeEventListener('visibilitychange', handleFocus);
-  //   };
-  // }, [fetchTools]);
-
+ 
   // Real-time search effect
   useEffect(() => {
     if (
@@ -495,7 +476,7 @@ const Search = () => {
                           </SelectItem>
                           {categories.map((category) => (
                             <SelectItem key={category.id} value={category.id}>
-                              {category.displayName}
+                              {t(`categories.${category.name}`) || category.displayName}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -521,14 +502,13 @@ const Search = () => {
                               {t('catalog_section.all_sub_categories')}
                             </SelectItem>
                             {(() => {
-
                               return (subcategories || []).map(
                                 (subcategory) => (
                                   <SelectItem
                                     key={subcategory.id}
                                     value={subcategory.id}
                                   >
-                                    {subcategory.displayName}
+                                    {t(`subcategories.${subcategory.name}`) || subcategory.displayName}
                                   </SelectItem>
                                 )
                               )

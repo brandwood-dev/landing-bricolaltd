@@ -156,6 +156,14 @@ export class ToolsService {
 
       const response = await api.get<ApiResponse<Tool[]>>(`/tools/user/${userId}`);
       const tools = response.data.data?.data || response.data.data;
+console.log ('**********************************************')
+console.log ('**********************************************')
+console.log ('**********************************************')
+console.log(tools)
+console.log ('**********************************************')
+console.log ('**********************************************')
+console.log ('**********************************************')
+console.log ('**********************************************')
 
 
 
@@ -282,6 +290,16 @@ export class ToolsService {
       return response.data.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to update tool availability');
+    }
+  }
+
+  // Update tool status (DRAFT ↔ PUBLISHED)
+  async updateToolStatus(toolId: string, newStatus: 'DRAFT' | 'PUBLISHED'): Promise<Tool> {
+    try {
+      const response = await api.patch<ApiResponse<Tool>>(`/tools/${toolId}/status`, { status: newStatus });
+      return response.data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to update tool status');
     }
   }
 

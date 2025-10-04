@@ -30,6 +30,7 @@ interface ShareDialogProps {
   url: string;
   title: string;
   excerpt: string;
+  imageUrl?: string;
   triggerSize?: 'sm' | 'default' | 'lg';
   triggerVariant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
 }
@@ -38,12 +39,13 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
   url,
   title,
   excerpt,
+  imageUrl,
   triggerSize = 'sm',
   triggerVariant = 'outline'
 }) => {
   const { t, language } = useLanguage();
   const [copied, setCopied] = useState(false);
-  const shareUrls = generateShareUrls(url, title, excerpt);
+  const shareUrls = generateShareUrls(url, title, excerpt, imageUrl);
 
   const handleCopyLink = async () => {
     const success = await copyToClipboard(url);

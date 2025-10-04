@@ -1,6 +1,6 @@
 
 export const generateCanonicalUrl = (path: string): string => {
-  const baseUrl = "https://www.bricolaltd.com/";
+  const baseUrl = "https://www.bricolaltd.com";
   const normalizedPath = path.startsWith('/') ? path : '/' + path;
   return baseUrl + normalizedPath;
 };
@@ -9,13 +9,19 @@ export const generateShareText = (title: string, excerpt: string): string => {
   return `${title}\n\n${excerpt}\n\nLire l'article complet :`;
 };
 
-export const generateShareUrls = (url: string, title: string, excerpt: string) => {
+export const generateShareUrls = (url: string, title: string, excerpt: string, imageUrl?: string) => {
   const shareText = generateShareText(title, excerpt);
   const twitterText = shareText + '\n' + url;
   const whatsappText = shareText + '\n' + url;
   
+  // Pour Facebook, inclure l'image si disponible
+  let facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(shareText)}`;
+  if (imageUrl) {
+    facebookUrl += `&picture=${encodeURIComponent(imageUrl)}`;
+  }
+  
   return {
-    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(shareText)}`,
+    facebook: facebookUrl,
     twitter: `https://x.com/intent/tweet?text=${encodeURIComponent(twitterText)}`,
     whatsapp: `https://wa.me/?text=${encodeURIComponent(whatsappText)}`,
     copy: url

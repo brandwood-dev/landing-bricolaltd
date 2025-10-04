@@ -14,20 +14,20 @@ const CancellationDetailsDialog: React.FC<CancellationDetailsDialogProps> = ({ r
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <Eye className="h-4 w-4 mr-1" />
-          Voir détails de l'annulation
+          {t('requests.cancellationDetails')}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Détails de l'annulation</DialogTitle>
+          <DialogTitle>{t('requests.cancellationDetails')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
           <div>
-            <strong>Raison :</strong> {request.cancellationReason}
+            <strong>{t('requests.reason')} :</strong> {request.cancellationReason}
           </div>
           {request.cancellationMessage && (
             <div>
-              <strong>Message :</strong> {request.cancellationMessage}
+              <strong>{t('requests.message')} :</strong> {request.cancellationMessage}
             </div>
           )}
         </div>

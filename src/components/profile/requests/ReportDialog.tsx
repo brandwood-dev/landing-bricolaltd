@@ -57,8 +57,10 @@ const ReportDialog: React.FC<ReportDialogProps> = ({ requestId, onReportSubmit }
       // )
 
       toast({
-        title: t('request.report.ACCEPTED.title'),
-        description: t('request.report.ACCEPTED.message'),
+        title: t('success.report.sent.title'),
+        description: t('success.report.sent.message'),
+        duration: 5000,
+        className: "bg-green-50 border-green-200 text-green-800",
       })
       // if (onReportSubmit) {
       //   onReportSubmit(requestId)

@@ -187,7 +187,7 @@ const Blog = () => {
                   }}
                   />
                   <CardContent className="p-8">
-                    <Badge className="mb-4">{featuredArticle.category || t('blog.category.general')}</Badge>
+                    <Badge className="mb-4">{t(`blog.${featuredArticle.category}`) || t('blog.category.general')}</Badge>
                     <h2 className="text-2xl font-bold mb-4">
                       <Link to={`/blog/${featuredArticle.id}`} className="hover:text-accent">
                         {featuredArticle.title}
@@ -205,7 +205,8 @@ const Blog = () => {
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
-                        <span>{featuredArticle.readTime || 5}{t('general.min')}</span>
+                        
+                        <span>{Math.ceil((featuredArticle.content?.length || 0) / 180) }{t('general.min')}</span>
                       </div>
                     </div>
                   </CardContent>
@@ -228,7 +229,7 @@ const Blog = () => {
                 }}
                 />
                 <CardContent className="p-6">
-                  <Badge className="mb-3">{article.category || t('blog.category.general')}</Badge>
+                  <Badge className="mb-3">{t(`blog.${article.category}`) || t('blog.category.general')}</Badge>
                   <h3 className="text-xl font-semibold mb-3">
                     <Link to={`/blog/${article.id}`} className="hover:text-accent">
                       {article.title}
@@ -242,7 +243,7 @@ const Blog = () => {
                     </div>
                     <div className="flex items-center gap-1">
                       <Clock className="h-4 w-4" />
-                      <span>{article.readTime || 5}{t('general.min')}</span>
+                      <span>{Math.ceil((article.content?.length || 0) / 180) }{t('general.min')}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -358,7 +359,7 @@ const Blog = () => {
                   }`}
                   onClick={() => handleCategoryFilter(category.name)}
                 >
-                  {category.displayName || category.name}
+                  {t(`blog.${category.name}`)}
                 </Badge>
               ))}
             </div>

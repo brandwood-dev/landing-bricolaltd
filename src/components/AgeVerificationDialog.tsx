@@ -18,7 +18,8 @@ const AgeVerificationDialog = () => {
 
   const handleConfirmAge = () => {
     setIsVerified(true);
-    navigate('/');
+    //stay in the same url
+    navigate(window.location.pathname);
   };
 
   const handleUnderAge = () => {

@@ -8,7 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { Search, User, Menu, Wrench, Heart, X, LogOut, Settings, UserCircle } from 'lucide-react';
+import { Search, User, Menu, Wrench, Heart, X, LogOut, Settings, UserCircle, Wallet, Calendar, Edit, MessageSquare } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import "/node_modules/flag-icons/css/flag-icons.min.css";
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
@@ -160,18 +160,30 @@ const Header = () => {
                         {t('nav.profile')}
                       </Link>
                     </DropdownMenuItem>
-                      {/* <DropdownMenuItem asChild>
-                        <Link to="/wallet" className="flex items-center">
-                          <Wrench className="mr-2 h-4 w-4" />
-                          {t('nav.wallet')}
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to="/settings" className="flex items-center">
-                          <Settings className="mr-2 h-4 w-4" />
-                          {t('nav.settings')}
-                        </Link>
-                      </DropdownMenuItem>  */}
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile?tab=wallet" className="flex items-center">
+                        <Wallet className="mr-2 h-4 w-4" />
+                        Portefeuille
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile?tab=ads" className="flex items-center">
+                        <Edit className="mr-2 h-4 w-4" />
+                        Mes annonces
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile?tab=requests" className="flex items-center">
+                        <MessageSquare className="mr-2 h-4 w-4" />
+                        Demandes
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile?tab=reservations" className="flex items-center">
+                        <Calendar className="mr-2 h-4 w-4" />
+                        Réservations
+                      </Link>
+                    </DropdownMenuItem>
                       
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout} className="text-red-600">
@@ -220,6 +232,31 @@ const Header = () => {
                       {t('nav.profile')}
                     </Link>
                   </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile?tab=wallet" className="flex items-center">
+                      <Wallet className="mr-2 h-4 w-4" />
+                      Portefeuille
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile?tab=ads" className="flex items-center">
+                      <Edit className="mr-2 h-4 w-4" />
+                      Mes annonces
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile?tab=requests" className="flex items-center">
+                      <MessageSquare className="mr-2 h-4 w-4" />
+                      Demandes
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile?tab=reservations" className="flex items-center">
+                      <Calendar className="mr-2 h-4 w-4" />
+                      Réservations
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="text-red-600">
                     <LogOut className="mr-2 h-4 w-4" />
                     {t('nav.logout')}

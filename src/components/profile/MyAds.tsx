@@ -8,6 +8,8 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { toolsService, Tool } from '@/services/toolsService'
 import { ModerationStatus } from '@/types/bridge/enums'
+import { ToolStatus } from '@/types/bridge/enums'
+
 import MyAdsSearchAndFilters from './MyAdsSearchAndFilters'
 import AdCard from './ads/AdCard'
 import AdListItem from './ads/AdListItem'
@@ -16,18 +18,39 @@ import AdsPagination from './ads/AdsPagination'
 // Transform Tool to Ad interface for compatibility
 interface Ad {
   id: string
+  image: string
   title: string
+  description: string
+  price: number
+  depositAmount: number
+  brand?: string
+  model?: string
+  year?: number
+  condition: string
+  pickupAddress: string
+  latitude?: number
+  longitude?: number
+  ownerInstructions?: string
+  toolStatus: string
+  availabilityStatus: string
+  moderationStatus: ModerationStatus
+  isAvailable: boolean // Computed field
+  ownerInstruction : string
+  // Relations
   category: string
   categoryId: string
-  price: number
-  published: boolean
+  subcategory: string
+  subcategoryId: string
+  ownerId: string
   validationStatus: 'confirmed' | 'pending' | 'rejected'
-  moderationStatus: string
-  rating: number
-  totalRentals: number
-  image: string
-  description: string
-  ownerInstruction: string
+  // Timestamps
+  publishedAt?: string
+  published: boolean
+
+  // Statistics
+  rating?: number
+  totalRentals?: number
+  reviewCount?: number
 }
 
 const MyAds = () => {
@@ -68,21 +91,29 @@ const MyAds = () => {
     return {
       id: tool.id,
       title: tool.title,
-      category:
-        tool.category?.displayName || tool.category?.name || 'Non catégorisé',
+      category: tool.category?.name || 'Non catégorisé',
+      subcategory: tool.subcategory?.name || 'Non catégorisé',
       categoryId: tool.category?.id || 'uncategorized',
       price: tool.basePrice,
       published:
-        tool.moderationStatus === ModerationStatus.CONFIRMED &&
-        tool.toolStatus === 'PUBLISHED' &&
-        tool.isAvailable,
+        tool.toolStatus === 'PUBLISHED' ? true : false,
       validationStatus: getValidationStatus(tool.moderationStatus),
       moderationStatus: tool.moderationStatus,
-      rating: 0, // Rating would need to come from reviews/bookings data
-      totalRentals: 0, // This would need to come from bookings data
+      rating: tool.rating, // Rating would need to come from reviews/bookings data
+      totalRentals: tool.reviewCount, // This would need to come from bookings data
       image: tool.photos?.[0]?.url || '/placeholder.svg',
       description: tool.description || '',
       ownerInstruction: tool.ownerInstructions || '',
+      depositAmount: tool.depositAmount,
+      brand: tool.brand || '',
+      model: tool.model || '',
+      year: tool.year || undefined,
+      condition: tool.condition || '',
+      pickupAddress: tool.pickupAddress || '',
+      latitude: tool.latitude || undefined,
+      longitude: tool.longitude || undefined,
+      toolStatus: tool.toolStatus || '',
+      availabilityStatus: tool.availabilityStatus || '',
     }
   }
 
@@ -205,7 +236,7 @@ const MyAds = () => {
 
   const handlePublishToggle = async (adId: string, published: boolean) => {
     try {
-      await toolsService.updateToolAvailability(adId, published)
+      await toolsService.updateToolStatus(adId, published ? ToolStatus.PUBLISHED : ToolStatus.DRAFT)
       setAds((prevAds) =>
         prevAds.map((ad) => (ad.id === adId ? { ...ad, published } : ad))
       )

@@ -140,31 +140,7 @@ const AddTool = () => {
     }
   }
 
-  // Address selection is now handled directly by onChange and onAddressSelected props
-
-  // Redirect to login if user is not authenticated
-  // useEffect(() => {
-  //   ///waiting 3 secondes
-  //   setTimeout(() => {
-  //     if (!user) {
-  //       navigate('/login', { state: { from: location } })
-  //     }
-  //   }, 6000)
-  // }, [user, navigate])
-
-  // Effect to handle name uniqueness check with debounce - DISABLED
-  // useEffect(() => {
-  //   const timeoutId = setTimeout(() => {
-  //     if (formData.title?.trim()) {
-  //       checkNameUniqueness(formData.title.trim())
-  //     } else {
-  //       setNameValidation({ isChecking: false, isUnique: null, message: '' })
-  //     }
-  //   }, 500)
-
-  //   return () => clearTimeout(timeoutId)
-  // }, [formData.title])
-
+ 
   // Load categories on component mount
   useEffect(() => {
     const loadCategories = async () => {
@@ -283,15 +259,7 @@ const AddTool = () => {
       return false
     }
 
-    // DISABLED - uniqueness validation removed
-    // if (nameValidation.isUnique !== true) {
-    //   toast({
-    //     title: "Nom invalide",
-    //     description: "Le nom de l'outil doit être unique",
-    //     variant: "destructive"
-    //   })
-    //   return false
-    // }
+  
 
     if (!formData.categoryId) {
       toast({
@@ -566,17 +534,6 @@ const AddTool = () => {
                         placeholder={t('add_tool.title_placeholder')}
                         className='h-12 text-base'
                       />
-                      {/* DISABLED - uniqueness validation message removed */}
-                      {/* {nameValidation.message && (
-                        <p className={`text-sm mt-1 ${
-                          nameValidation.isUnique === false ? 'text-red-500' : 
-                          nameValidation.isUnique === true ? 'text-green-500' : 
-                          'text-gray-500'
-                        }`}>
-                          {nameValidation.isChecking && <Loader2 className="inline w-4 h-4 mr-1 animate-spin" />}
-                          {nameValidation.message}
-                        </p>
-                      )} */}
                     </div>
 
                     <div className='space-y-3'>
@@ -693,7 +650,8 @@ const AddTool = () => {
                         <SelectContent>
                           {categories.map((category) => (
                             <SelectItem key={category.id} value={category.id}>
-                              {category.displayName}
+                              {t(`categories.${category.name}`) ||
+                                category.displayName}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -728,7 +686,8 @@ const AddTool = () => {
                               key={subcategory.id}
                               value={subcategory.id}
                             >
-                              {subcategory.displayName}
+                              {t(`subcategories.${subcategory.name}`) ||
+                                subcategory.displayName}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -852,8 +811,12 @@ const AddTool = () => {
                     </Label>
                     <AddressAutocomplete
                       value={formData.pickupAddress || ''}
-                      onChange={(value) => handleInputChange('pickupAddress', value)}
-                      onAddressSelected={(isSelected) => setIsAddressSelected(isSelected)}
+                      onChange={(value) =>
+                        handleInputChange('pickupAddress', value)
+                      }
+                      onAddressSelected={(isSelected) =>
+                        setIsAddressSelected(isSelected)
+                      }
                       placeholder='Paris 15ème'
                       className='h-12 text-base'
                       selectedCountry={user?.country || 'KW'}

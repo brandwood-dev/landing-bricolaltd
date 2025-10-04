@@ -47,7 +47,7 @@ const AdCard = ({
   const [toolData, setToolData] = useState<Tool | null>(null)
   const [viewToolData, setViewToolData] = useState<Tool | null>(null)
   const [isLoadingView, setIsLoadingView] = useState(false)
-
+  console.table('ad details', ad)
   const handleEditClick = async () => {
     try {
       const tool = await toolsService.getTool(ad.id)
@@ -114,7 +114,11 @@ const AdCard = ({
               >
                 {ad.title}
               </Link>
-              <p className='text-sm text-muted-foreground'>{ad.category}</p>
+              <p className='text-sm text-muted-foreground'>
+                {t(`categories.${ad.category}`) +
+                  '  :  ' +
+                  t(`subcategories.${ad.subcategory}`)}
+              </p>
             </div>
             <div className='flex flex-col sm:flex-row items-start sm:items-center gap-2'>
               <Badge className={getValidationStatusColor(ad.validationStatus)}>

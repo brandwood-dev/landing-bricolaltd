@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { authService } from '@/services/authService';
@@ -13,7 +14,19 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
 
 const Profile = () => {
-  const [activeTab, setActiveTab] = useState('profile');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  
+  // Valid tabs
+  const validTabs = ['profile', 'wallet', 'requests', 'reservations', 'ads', 'favorites'];
+  
+  // Get active tab from URL or default to 'profile'
+  const getActiveTabFromUrl = () => {
+    const tabParam = searchParams.get('tab');
+    return validTabs.includes(tabParam || '') ? tabParam : 'profile';
+  };
+  
+  const [activeTab, setActiveTabState] = useState(getActiveTabFromUrl());
   const [isAccountDeletionPending, setIsAccountDeletionPending] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,6 +39,14 @@ const Profile = () => {
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   const { toast } = useToast();
   const { user, isAuthenticated } = useAuth();
+  
+  // Function to update active tab and URL
+  const setActiveTab = (tab: string) => {
+    if (validTabs.includes(tab)) {
+      setActiveTabState(tab);
+      setSearchParams({ tab });
+    }
+  };
 
   // Fetch user profile and stats
   useEffect(() => {
@@ -74,6 +95,14 @@ const Profile = () => {
 
     fetchProfileData();
   }, [isAuthenticated, user]);
+
+  // Sync activeTab with URL changes (browser back/forward buttons)
+  useEffect(() => {
+    const newActiveTab = getActiveTabFromUrl();
+    if (newActiveTab !== activeTab) {
+      setActiveTabState(newActiveTab);
+    }
+  }, [searchParams]);
 
   // Transform user data for ProfileHeader component
   const userInfo = user ? {

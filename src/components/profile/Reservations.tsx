@@ -285,8 +285,10 @@ const Reservations = () => {
       )
 
       toast({
-        title: t('booking.CANCELLED'),
-        description: t('booking.CANCELLED_message'),
+        title: t('success.reservation.cancelled.title'),
+        description: t('success.reservation.cancelled.message'),
+        duration: 5000,
+        className: "bg-green-50 border-green-200 text-green-800",
       })
 
       setCancellationReason('')
@@ -395,8 +397,10 @@ const Reservations = () => {
       )
 
       toast({
-        title: t('request.report.ACCEPTED.title'),
-        description: t('request.report.ACCEPTED.message'),
+        title: t('success.report.sent.title'),
+        description: t('success.report.sent.message'),
+        duration: 5000,
+        className: "bg-green-50 border-green-200 text-green-800",
       })
 
       setReportReason('')
@@ -438,8 +442,10 @@ const Reservations = () => {
       )
 
       toast({
-        title: t('tool.return.confirmed'),
-        description: t('tool.return.confirmed_message'),
+        title: t('success.tool.return.confirmed.title'),
+        description: t('success.tool.return.confirmed.message'),
+        duration: 5000,
+        className: "bg-green-50 border-green-200 text-green-800",
       })
 
       setIsReturnDialogOpen(false)
@@ -531,8 +537,10 @@ const Reservations = () => {
 
       // Afficher le toast de succès
       toast({
-        title: t('claim.sent'),
-        description: t('claim.sent_message'),
+        title: t('success.report.sent.title'),
+        description: t('success.report.sent.message'),
+        duration: 5000,
+        className: "bg-green-50 border-green-200 text-green-800",
       })
 
       // Fermer le modal

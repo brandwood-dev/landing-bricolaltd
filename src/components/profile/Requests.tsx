@@ -438,8 +438,10 @@ const Requests = () => {
       )
 
       toast({
-        title: t('claim.sent'),
-        description: t('claim.sent_message'),
+        title: t('success.report.sent.title'),
+        description: t('success.report.sent.message'),
+        duration: 5000,
+        className: "bg-green-50 border-green-200 text-green-800",
       })
 
       setIsClaimDialogOpen(false)

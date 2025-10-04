@@ -225,9 +225,10 @@ const translations = {
     'profile.change_password': 'Changer le mot de passe',
     'profile.change_password_description': 'Modifiez votre mot de passe',
     'profile.current_password_placeholder': 'Entrez votre mot de passe actuel',
-    'profile.current_password_validation': 'Vérifiez d\'abord votre mot de passe actuel',
+    'profile.current_password_validation':
+      "Vérifiez d'abord votre mot de passe actuel",
     'profile.confirm_new_password': 'Confirmer le nouveau mot de passe',
-    'profile.new_password_first': 'Entrez d\'abord votre nouveau mot de passe',
+    'profile.new_password_first': "Entrez d'abord votre nouveau mot de passe",
     'profile.saving': 'Enregistrement...',
     'profile.changing_password': 'Modification...',
     'profile.passwords_no_match': 'Les mots de passe ne correspondent pas',
@@ -243,15 +244,18 @@ const translations = {
     'notifications.mark_all_read': 'Tout marquer comme lu',
     'notifications.clear_all': 'Tout effacer',
     'notifications.no_notifications': 'Aucune notification',
-    'notifications.no_notifications_desc': 'Vous n\'avez aucune notification pour le moment.',
+    'notifications.no_notifications_desc':
+      "Vous n'avez aucune notification pour le moment.",
     'notifications.mark_as_read': 'Marquer comme lu',
     'notifications.mark_as_unread': 'Marquer comme non lu',
     'notifications.delete': 'Supprimer',
     'notifications.loading': 'Chargement des notifications...',
     'notifications.error': 'Erreur lors du chargement des notifications',
-    'notifications.confirm_clear_all': 'Êtes-vous sûr de vouloir supprimer toutes les notifications ?',
-    'notifications.confirm_delete': 'Êtes-vous sûr de vouloir supprimer cette notification ?',
-    'notifications.just_now': 'À l\'instant',
+    'notifications.confirm_clear_all':
+      'Êtes-vous sûr de vouloir supprimer toutes les notifications ?',
+    'notifications.confirm_delete':
+      'Êtes-vous sûr de vouloir supprimer cette notification ?',
+    'notifications.just_now': "À l'instant",
     'notifications.minutes_ago': 'il y a {minutes} min',
     'notifications.hours_ago': 'il y a {hours}h',
     'notifications.days_ago': 'il y a {days}j',
@@ -347,7 +351,18 @@ const translations = {
 
     'resetpwd.popupsuccupdate': 'Mot de passe modifié',
     'resetpwd.txtsucc': 'Votre mot de passe a été modifié avec succès.',
-
+    'blog.Jardinage' : 'Jardinage',
+    'blog.Entretien' : 'Entretien',
+    'blog.Transport' : 'Transport',
+    'blog.Bricolage' : 'Bricolage',
+    'blog.Électricité' : 'Électricité',
+    'blog.Éclairage' : 'Éclairage',
+    'blog.Peinture' : 'Peinture',
+    'blog.Construction' : 'Construction',
+    'blog.Plantes' : 'Plantes',
+    'blog.Nettoyage' : 'Nettoyage',
+    'blog.Décoration' : 'Décoration',
+    'blog.Guide' : 'Guide',
     // Status badges
     'status.pending': 'EN ATTENTE',
     'status.accepted': 'ACCEPTÉE',
@@ -529,6 +544,12 @@ const translations = {
     'reservation.no_reservations': 'Aucune réservation',
     'reservation.no_reservations_message':
       "Vous n'avez aucune réservation pour le moment. Explorez notre catalogue pour trouver des outils à louer.",
+
+    // Calendar legend
+    'calendar.legend': 'Légende du calendrier',
+    'calendar.reserved_in_progress': 'Réservé/En cours',
+    'calendar.pending_accepted': 'En attente/Accepté',
+    'calendar.max_5_days': 'Max 5 jours consécutifs',
 
     // blog
     'blog.title': 'Blog Bricola LTD',
@@ -749,6 +770,23 @@ const translations = {
     'pagination.next': 'Suivant',
     'pagination.previous': 'Précédent',
 
+    // Messages de succès harmonisés
+    'success.reservation.confirmed.title': '✅ Réservation confirmée !',
+    'success.reservation.confirmed.message':
+      'Votre réservation a été confirmée avec succès. Vous recevrez un email de confirmation.',
+
+    'success.reservation.cancelled.title': '✅ Réservation annulée',
+    'success.reservation.cancelled.message':
+      'Votre réservation a été annulée avec succès. Vous recevrez un email de confirmation.',
+
+    'success.report.sent.title': '✅ Signalement envoyé',
+    'success.report.sent.message':
+      'Votre signalement a été transmis avec succès à notre équipe. Nous traiterons votre demande dans les plus brefs délais.',
+
+    'success.tool.return.confirmed.title': '✅ Retour confirmé',
+    'success.tool.return.confirmed.message':
+      "Vous avez confirmé le retour de l'outil avec succès. Le propriétaire sera notifié.",
+
     // requests
     'request.refuse': 'Demande refusée',
     'request.refuse.message': "Le refus a été transmis à l'administration.",
@@ -841,6 +879,9 @@ const translations = {
     'request.claim.describe': 'Décrivez le problème',
     'request.claim.describe_placeholder': 'Décrivez le problème rencontré...',
     'request.claim.submit': 'Envoyer la réclamation',
+    'requests.cancellationDetails': "Détails de l'annulation",
+    'request.message': 'Message',
+    'request.reason': 'Raison',
 
     // catalog section
     'catalog_section.title': 'Outils trouvés',
@@ -1073,10 +1114,51 @@ const translations = {
     // Categories
     'categories.title': 'Nos catégories',
     'categories.description': "Trouvez l'outil parfait selon vos besoins",
+
     'categories.gardening': 'Jardinage',
+    'subcategories.lawn-mowers': 'Tondeuses',
+    'subcategories.hedge-trimmers': 'Taille-haies',
+    'subcategories.pruning-tools': 'Outils de taille',
+    'subcategories.watering': 'Arrosage',
+    'subcategories.garden-hand-tools': 'Outils manuels',
+    'subcategories.soil-maintenance': 'Entretien du sol',
+    'subcategories.plant-care': 'Entretien des plantes',
+    'subcategories.pruning-and-cutting': 'Taille et coupe',
+    'subcategories.cleaning-and-collection': 'Nettoyage et ramassage',
+    'subcategories.watering-and-irrigation': 'Arrosage et irrigation',
+
     'categories.cleaning': 'Nettoyage',
+    'subcategories.vacuum-cleaners': 'Aspirateurs',
+    'subcategories.pressure-washers': 'Nettoyeurs haute pression',
+    'subcategories.floor-care': 'Entretien des sols',
+    'subcategories.cleaning-supplies': 'Produits de nettoyage',
+    'subcategories.indoor-cleaning': 'Nettoyage intérieur',
+    'subcategories.outdoor-cleaning': 'Nettoyage extérieur',
+    'subcategories.waste-management': 'Gestion des déchets et poussière',
+
     'categories.diy': 'Bricolage',
+    'subcategories.power-tools': 'Outils électroportatifs',
+    'subcategories.hand-tools': 'Outils manuels',
+    'subcategories.measuring-tools': 'Outils de mesure',
+    'subcategories.painting': 'Peinture',
+    'subcategories.construction': 'Construction',
+    'subcategories.electricity': 'Électricité',
+    'subcategories.screws-and-bolts': 'Vis et boulons',
+
     'categories.events': 'Événementiel',
+    'subcategories.party-equipment': 'Équipement de fête',
+    'subcategories.sound-lighting': 'Son et lumière',
+    'subcategories.event-decoration': 'Décoration',
+    'subcategories.catering-equipment': 'Matériel de restauration',
+
+    'subcategories.sound': 'Son',
+    'subcategories.lighting': 'Éclairage',
+    'subcategories.cooking': 'Cuisine',
+    'subcategories.entertainment': 'Animation et jeux',
+    'subcategories.decoration': 'Décoration',
+    'subcategories.furniture': 'Mobilier',
+    'subcategories.structure': 'Structure',
+
     'categories.transport': 'Transport',
 
     // Tools
@@ -1359,17 +1441,17 @@ const translations = {
     'category.diy.construction': 'Construction',
     'category.diy.electricity': 'Électricité',
     'category.diy.painting': 'Peinture',
-    'category.diy.screws_and_bolts': 'Vis et boulons',
+    'category.diy.screws_and_bolts': 'Vis et Boulons',
 
     'category.transport': 'Transport',
-    'category.transport.heavy_load': 'Charge lourde',
+    'category.transport.heavy_load': 'Charge Lourde',
     'category.transport.engine': 'Moteur',
     'category.transport.wheel': 'Roue',
 
     'category.event': 'Événementiel',
     'category.event.lighting': 'Éclairage',
     'category.event.kitchen': 'Cuisine',
-    'category.event.entertainment_and_games': 'Animation et jeux',
+    'category.event.entertainment_and_games': 'Animation et Jeux',
     'category.event.furniture': 'Mobilier',
     'category.event.decoration': 'Décoration',
     'category.event.structure': 'Structure',
@@ -2121,6 +2203,12 @@ const translations = {
     'reservation.refused_message_placeholder': 'Optional Message',
     'reservation.refused_confirm': 'Confirm Rejection',
 
+    // Calendar legend
+    'calendar.legend': 'Calendar Legend',
+    'calendar.reserved_in_progress': 'Reserved/In Progress',
+    'calendar.pending_accepted': 'Pending/Accepted',
+    'calendar.max_5_days': 'Max 5 consecutive days',
+
     // blog
     'blog.title': 'Bricola LTD Blog',
     'blog.description':
@@ -2336,6 +2424,23 @@ const translations = {
       'Are you sure you want to confirm the return of this tool?',
     'tool.return.report_issue': 'Report an Issue',
 
+    // Messages de succès harmonisés - Anglais
+    'success.reservation.confirmed.title': '✅ Booking Confirmed!',
+    'success.reservation.confirmed.message':
+      'Your reservation has been successfully confirmed. You will receive a confirmation email.',
+
+    'success.reservation.cancelled.title': '✅ Reservation Cancelled',
+    'success.reservation.cancelled.message':
+      'Your reservation has been successfully cancelled. You will receive a confirmation email.',
+
+    'success.report.sent.title': '✅ Report Sent',
+    'success.report.sent.message':
+      'Your report has been successfully submitted to our team. We will process your request as soon as possible.',
+
+    'success.tool.return.confirmed.title': '✅ Return Confirmed',
+    'success.tool.return.confirmed.message':
+      'You have successfully confirmed the tool return. The owner will be notified.',
+
     // requests
     'request.refuse': 'Request Denied',
     'request.refuse.message':
@@ -2429,6 +2534,9 @@ const translations = {
     'request.contact_owner_information': 'Owner Information',
     'request.call': 'Call',
     'request.mail': 'E-mail',
+    'requests.cancellationDetails': 'Cancellation Details',
+    'request.message': 'Message',
+    'request.reason': 'Reason',
 
     // pagination
     'pagination.next': 'Next',
@@ -2460,6 +2568,18 @@ const translations = {
     'blog_section.min': 'min',
     'blog_section.read_article': 'Read Article',
     'blog_section.view_all': 'View all articles',
+    'blog.Jardinage': 'Gardening',
+    'blog.Entretien': 'Maintenance',
+    'blog.Transport': 'Transport',
+    'blog.Bricolage': 'Bricolage',
+    'blog.Électricité': 'Electricity',
+    'blog.Éclairage': 'Lighting',
+    'blog.Peinture': 'Painting',
+    'blog.Construction': 'Construction',
+    'blog.Plantes': 'Plants',
+    'blog.Nettoyage': 'Cleaning',
+    'blog.Décoration': 'Decoration',
+    'blog.Guide': 'Guide',
 
     // customer reviews
     'customer_reviews.title': 'What our users say',
@@ -2654,12 +2774,65 @@ const translations = {
     // Categories
     'categories.title': 'Our Categories',
     'categories.description': 'Find the perfect tool for your needs',
-    'categories.gardening': 'Gardening',
-    'categories.cleaning': 'Cleaning',
-    'categories.diy': 'DIY',
-    'categories.events': 'Event Equipment',
-    'categories.transport': 'Transport',
 
+    'categories.gardening': 'Gardening',
+    'subcategories.lawn-mowers': 'Lawn Mowers',
+    'subcategories.hedge-trimmers': 'Hedge Trimmers',
+    'subcategories.pruning-tools': 'Pruning Tools',
+    'subcategories.watering': 'Watering',
+    'subcategories.garden-hand-tools': 'Garden Hand Tools',
+
+    'subcategories.soil-maintenance': 'Soil Maintenance',
+    'subcategories.plant-care': 'Plant Care',
+    'subcategories.pruning-and-cutting': 'Pruning and Cutting',
+    'subcategories.cleaning-and-collection': 'Cleaning and Collection',
+    'subcategories.watering-and-irrigation': 'Watering and Irrigation',
+
+    'categories.cleaning': 'Cleaning',
+
+    'subcategories.vacuum-cleaners': 'Vacuum Cleaners',
+    'subcategories.pressure-washers': 'Pressure Washers',
+    'subcategories.floor-care': 'Floor Care',
+    'subcategories.cleaning-supplies': 'Cleaning Supplies',
+    //     Nettoyage intérieur | Indoor Cleaning | التنظيف الداخلي
+    // Nettoyage extérieur | Outdoor Cleaning | التنظيف الخارجي
+    // Gestion des déchets et poussière | Waste and Dust Management | إدارة النفايات والغبار
+    'subcategories.indoor-cleaning': 'Indoor Cleaning',
+    'subcategories.outdoor-cleaning': 'Outdoor Cleaning',
+    'subcategories.waste-and-dust-management': 'Waste and Dust Management',
+
+    'categories.diy': 'DIY',
+
+    'subcategories.power-tools': 'Power Tools',
+    'subcategories.hand-tools': 'Hand Tools',
+    'subcategories.measuring-tools': 'Measuring Tools',
+    'subcategories.painting': 'Painting',
+
+    'subcategories.construction': 'Construction',
+    'subcategories.electricity': 'Electricity',
+    'subcategories.screws-and-bolts': 'Screws and Bolts',
+
+    'categories.events': 'Events',
+    'subcategories.party-equipment': 'Party Equipment',
+    'subcategories.sound-lighting': 'Sound & Lighting',
+    'subcategories.event-decoration': 'Event Decoration',
+    'subcategories.catering-equipment': 'Catering Equipment',
+    //     Son | Sound | صوت
+    // Éclairage | Lighting | إضاءة
+    // Cuisine | Cooking | طبخ
+    // Animation et jeux | Entertainment & Games | ترفيه وألعاب
+    // Décoration | Decoration | زينة
+    // Mobilier | Furniture | أثاث
+    // Structure | Structure | هيكل
+    'subcategories.sound': 'Sound',
+    'subcategories.lighting': 'Lighting',
+    'subcategories.cooking': 'Cooking',
+    'subcategories.entertainment-games': 'Entertainment & Games',
+    'subcategories.decoration': 'Decoration',
+    'subcategories.furniture': 'Furniture',
+    'subcategories.structure': 'Structure',
+
+    'categories.transport': 'Transport',
     // Tools
     'tools.featured': 'Featured tools',
     'tools.description': 'Top-rated and most requested tools by our community',
@@ -3009,17 +3182,17 @@ const translations = {
     'category.diy.construction': 'Construction',
     'category.diy.electricity': 'Electricity',
     'category.diy.painting': 'Painting',
-    'category.diy.screws_and_bolts': 'Screws and bolts',
+    'category.diy.screws_and_bolts': 'Screws and Bolts',
 
     'category.transport': 'Transport',
-    'category.transport.heavy_load': 'Heavy load',
+    'category.transport.heavy_load': 'Heavy Load',
     'category.transport.engine': 'Engine',
     'category.transport.wheel': 'Wheel',
 
     'category.event': 'Event',
     'category.event.lighting': 'Lighting',
     'category.event.kitchen': 'Kitchen',
-    'category.event.entertainment_and_games': 'Entertainment and games',
+    'category.event.entertainment_and_games': 'Entertainment and Games',
     'category.event.furniture': 'Furniture',
     'category.event.decoration': 'Decoration',
     'category.event.structure': 'Structure',
@@ -3384,7 +3557,7 @@ const translations = {
     'privacy.section10.p3':
       'Continued use of our services implies acceptance of the updated terms.',
     'register.select_prefix': 'Choose prefix',
-    
+
     // Profile translations
     'profile.photo_title': 'Profile Picture',
     'profile.photo_description': 'Manage your profile picture',
@@ -3394,7 +3567,8 @@ const translations = {
     'profile.change_password': 'Change Password',
     'profile.change_password_description': 'Change your password',
     'profile.current_password_placeholder': 'Enter your current password',
-    'profile.verify_current_password_placeholder': 'First verify your current password',
+    'profile.verify_current_password_placeholder':
+      'First verify your current password',
     'profile.confirm_new_password_label': 'Confirm new password',
     'profile.enter_new_password_placeholder': 'First enter your new password',
     'profile.save_button': 'Save',
@@ -3422,9 +3596,12 @@ const translations = {
     'notifications.no_notifications': 'No notifications',
     'notifications.no_unread': 'No unread notifications',
     'notifications.no_read': 'No read notifications',
-    'notifications.confirm_delete': 'Are you sure you want to delete this notification?',
-    'notifications.confirm_clear_all': 'Are you sure you want to clear all notifications?',
-    'notifications.confirm_mark_all_read': 'Are you sure you want to mark all notifications as read?',
+    'notifications.confirm_delete':
+      'Are you sure you want to delete this notification?',
+    'notifications.confirm_clear_all':
+      'Are you sure you want to clear all notifications?',
+    'notifications.confirm_mark_all_read':
+      'Are you sure you want to mark all notifications as read?',
     'notifications.loading': 'Loading notifications...',
     'notifications.error': 'Error loading notifications',
     'notifications.deleted_success': 'Notification deleted successfully',
@@ -3449,7 +3626,7 @@ const translations = {
 
     // AgeVerificationDialog
     'register.select_prefix': 'اختر فكس',
-    
+
     // Profile translations
     'profile.photo_title': 'صورة الملف الشخصي',
     'profile.photo_description': 'إدارة صورة ملفك الشخصي',
@@ -3459,7 +3636,8 @@ const translations = {
     'profile.change_password': 'تغيير كلمة المرور',
     'profile.change_password_description': 'تغيير كلمة المرور الخاصة بك',
     'profile.current_password_placeholder': 'أدخل كلمة المرور الحالية',
-    'profile.verify_current_password_placeholder': 'تحقق أولاً من كلمة المرور الحالية',
+    'profile.verify_current_password_placeholder':
+      'تحقق أولاً من كلمة المرور الحالية',
     'profile.confirm_new_password_label': 'تأكيد كلمة المرور الجديدة',
     'profile.enter_new_password_placeholder': 'أدخل كلمة المرور الجديدة أولاً',
     'profile.save_button': 'حفظ',
@@ -3489,7 +3667,8 @@ const translations = {
     'notifications.no_read': 'لا توجد إشعارات مقروءة',
     'notifications.confirm_delete': 'هل أنت متأكد من حذف هذا الإشعار؟',
     'notifications.confirm_clear_all': 'هل أنت متأكد من مسح جميع الإشعارات؟',
-    'notifications.confirm_mark_all_read': 'هل أنت متأكد من تحديد جميع الإشعارات كمقروءة؟',
+    'notifications.confirm_mark_all_read':
+      'هل أنت متأكد من تحديد جميع الإشعارات كمقروءة؟',
     'notifications.loading': 'جاري تحميل الإشعارات...',
     'notifications.error': 'خطأ في تحميل الإشعارات',
     'notifications.deleted_success': 'تم حذف الإشعار بنجاح',
@@ -3862,7 +4041,13 @@ const translations = {
     'reservation.refused_reason_already_booked': 'محجوز مسبقًا',
     'reservation.refused_reason_other': 'آخر',
     'reservation.refused_message_placeholder': 'رسالة اختيارية (إن وُجدت)',
-    'reservation.refused_confirm': 'تأكيد الرفض',
+    'reservation.refused_confirm': 'تأكيد الرفض',
+
+    // Calendar legend
+    'calendar.legend': 'مفتاح التقويم',
+    'calendar.reserved_in_progress': 'محجوز/قيد التنفيذ',
+    'calendar.pending_accepted': 'في الانتظار/مقبول',
+    'calendar.max_5_days': 'حد أقصى 5 أيام متتالية',
 
     // blog
     'blog.title': 'مدونة بريكولا المحدودة',
@@ -3890,7 +4075,18 @@ const translations = {
     'blog.like': 'إعجاب',
     'blog.similar_articles': 'مقالات مشابهة',
     'blog.share_article': 'مشاركة هذه المقالة',
-
+    'blog.Jardinage': 'البستنة',
+    'blog.Entretien': 'الصيانة',
+    'blog.Transport': 'النقل',
+    'blog.Bricolage': 'إصلاح سريع',
+    'blog.Électricité': 'الكهرباء',
+    'blog.Éclairage': 'الإضاءة',
+    'blog.Peinture': 'الطلاء',
+    'blog.Construction': 'البناء',
+    'blog.Plantes': 'النباتات',
+    'blog.Nettoyage': 'التنظيف',
+    'blog.Décoration': 'الديكور',
+    'blog.Guide': 'دليل',
     // favorites
     'favorites.title': 'قائمة المفضلات',
     'fav.backhome': 'العودة إلى الصفحة الرئيسية',
@@ -4071,11 +4267,28 @@ const translations = {
     'tool.return.confirm_message': 'هل أنت متأكد من تأكيد إرجاع هذه الأداة؟',
     'tool.return.report_issue': 'الإبلاغ عن مشكلة',
 
+    // Messages de succès harmonisés - Arabe
+    'success.reservation.confirmed.title': '✅ تم تأكيد الحجز!',
+    'success.reservation.confirmed.message':
+      'تم تأكيد حجزك بنجاح. ستتلقى رسالة تأكيد عبر البريد الإلكتروني.',
+
+    'success.reservation.cancelled.title': '✅ تم إلغاء الحجز',
+    'success.reservation.cancelled.message':
+      'تم إلغاء حجزك بنجاح. ستتلقى رسالة تأكيد عبر البريد الإلكتروني.',
+
+    'success.report.sent.title': '✅ تم إرسال البلاغ',
+    'success.report.sent.message':
+      'تم إرسال بلاغك بنجاح إلى فريقنا. سنقوم بمعالجة طلبك في أقرب وقت ممكن.',
+
+    'success.tool.return.confirmed.title': '✅ تم تأكيد الإرجاع',
+    'success.tool.return.confirmed.message':
+      'لقد أكدت بنجاح إرجاع الأداة. سيتم إشعار المالك.',
+
     // requests
     'request.refuse': 'تم رفض الطلب',
-    'request.refuse.message': 'تم إرسال الرفض إلى الإدارة.',
+    'request.refuse.message': 'تم إرسال الرفض إلى الإدارة.',
     'request.report.accepted.title': 'تم إرسال البلاغ',
-    'request.report.accepted.message': 'تم إرسال بلاغك إلى الإدارة.',
+    'request.report.accepted.message': 'تم إرسال بلاغك إلى الإدارة.',
 
     'request.accepted.title': 'تم قبول الطلب',
     'request.accepted.message': 'تم قبول طلب الحجز بنجاح.',
@@ -4160,6 +4373,9 @@ const translations = {
     'request.contact_owner_information': 'معلومات المالك',
     'request.call': 'اتصل',
     'request.mail': 'البريد الإلكتروني',
+    'requests.cancellationDetails': 'تفاصيل الإلغاء',
+    'request.message': 'الرسالة',
+    'request.reason': 'سبب الإلغاء',
 
     // pagination
     'pagination.next': 'التالي',
@@ -4347,11 +4563,67 @@ const translations = {
     // Categories
     'categories.title': 'الفئات المتوفرة',
     'categories.description': 'ابحث عن الأداة المناسبة حسب احتياجك',
+
+    // Categories
+
     'categories.gardening': 'البستنة',
+    'subcategories.lawn-mowers': ' التمويه',
+    'subcategories.hedge-trimmers': ' التقطي',
+    'subcategories.pruning-tools': ' التخلص',
+    'subcategories.watering': ' الري',
+    'subcategories.garden-hand-tools': ' اليد',
+    //     Entretien du sol | Soil Maintenance | صيانة التربة
+    // Entretien des plantes | Plant Care | العناية بالنباتات
+    // Taille et coupe | Pruning and Cutting | التقليم والقطع
+    // Nettoyage et ramassage | Cleaning and Collection | التنظيف والجمع
+    // Arrosage et irrigation | Watering and Irrigation | الريّ والسقي
+    'subcategories.soil-maintenance': 'صيانة التربة',
+    'subcategories.plant-care': 'عناية بالنباتات',
+    'subcategories.pruning-and-cutting': 'التقليم والقطع',
+    'subcategories.cleaning-and-collection': 'تنظيف وإجمع',
+    'subcategories.watering-and-irrigation': ' الريّ والسقي',
+
     'categories.cleaning': 'التنظيف',
-    'categories.diy': 'الأشغال  اليدوية',
+
+    'subcategories.vacuum-cleaners': ' التمويه',
+    'subcategories.pressure-washers': ' الضغط',
+    'subcategories.floor-care': ' التنظيف',
+    'subcategories.cleaning-supplies': ' التنظيف',
+
+    // Nettoyage intérieur | Indoor Cleaning | التنظيف الداخلي
+    // Nettoyage extérieur | Outdoor Cleaning | التنظيف الخارجي
+    // Gestion des déchets et poussière | Waste and Dust Management | إدارة النفايات والغبار
+    'subcategories.indoor-cleaning': 'التنظيف الداخلي',
+    'subcategories.outdoor-cleaning': 'التنظيف الخارجي',
+    'subcategories.waste-and-dust-management': 'إدارة النفايات والغبار',
+
+    'categories.diy': 'الأشغال اليدوية',
+
+    'subcategories.power-tools': 'الطاقة',
+    'subcategories.hand-tools': 'اليد',
+    'subcategories.measuring-tools': 'التقييم',
+
+    //     Construction | Construction | البناء
+    // Électricité | Electricity | الكهرباء
+    // Peinture | Painting | الطلاء
+    // Vis et boulons | Screws and Bolts | المسامير والصواميل
+    'subcategories.painting': 'الرسم',
+    'subcategories.construction': 'البناء',
+    'subcategories.electricity': 'الكهرباء',
+    'subcategories.screws-and-bolts': 'المسامير والصواميل',
+
     'categories.events': 'معدات الحفلات',
-    'categories.transport': 'النقل',
+    'subcategories.party-equipment': 'معدات الحفلات',
+    'subcategories.sound-lighting': 'الصوت والضياء',
+    'subcategories.event-decoration': 'زينة الحفلات',
+    'subcategories.catering-equipment': 'تقديم الطعام',
+    'subcategories.sound': 'صوت',
+    'subcategories.lighting': 'إضاءة',
+    'subcategories.cooking': 'طبخ',
+    'subcategories.entertainment-games': 'ترفيه وألعاب',
+    'subcategories.decoration': 'زينة',
+    'subcategories.furniture': 'أثاث',
+    'subcategories.structure': 'هيكل',
 
     // Tools
     'tools.featured': 'الأدوات المميزة',

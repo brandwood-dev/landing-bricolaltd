@@ -530,8 +530,10 @@ const Rent = () => {
       const booking = await bookingService.createBooking(bookingData)
 
       toast({
-        title: t('reservation.success'),
-        description: t('reservation.confirmation_sent'),
+        title: t('success.reservation.confirmed.title'),
+        description: t('success.reservation.confirmed.message'),
+        duration: 5000,
+        className: "bg-green-50 border-green-200 text-green-800",
       })
 
       // Redirect to profile/bookings page
@@ -874,20 +876,20 @@ const Rent = () => {
                       <div className='bg-blue-50 p-4 rounded-lg'>
                         <h4 className='font-medium text-sm mb-3 flex items-center gap-2'>
                           <Info className='h-4 w-4' />
-                          Légende du calendrier
+                          {t('calendar.legend')}
                         </h4>
                         <div className='grid grid-cols-2 gap-3 text-xs'>
                           <div className='flex items-center gap-2'>
                             <div className='w-4 h-4 bg-red-600 rounded'></div>
-                            <span>Réservé/En cours</span>
+                            <span>{t('calendar.reserved_in_progress')}</span>
                           </div>
                           <div className='flex items-center gap-2'>
                             <div className='w-4 h-4 bg-orange-500 rounded'></div>
-                            <span>En attente/Accepté</span>
+                            <span>{t('calendar.pending_accepted')}</span>
                           </div>
                           <div className='flex items-center gap-2'>
                             <AlertCircle className='h-4 w-4 text-amber-600' />
-                            <span>Max 5 jours consécutifs</span>
+                            <span>{t('calendar.max_5_days')}</span>
                           </div>
                         </div>
                       </div>
@@ -1161,25 +1163,7 @@ const Rent = () => {
                       </div>
                     </div>
 
-                    <Button
-                      type='button'
-                      className='w-full'
-                      size='lg'
-                      onClick={handleSubmit}
-                      disabled={submitting || pricingLoading}
-                    >
-                      {submitting ? (
-                        <>
-                          <Loader2 className='h-5 w-5 mr-2 animate-spin' />
-                          {t('general.processing')}
-                        </>
-                      ) : (
-                        <>
-                          <Check className='h-5 w-5 mr-2' />
-                          {t('reservation.confirm')}
-                        </>
-                      )}
-                    </Button>
+
                   </form>
                 </CardContent>
               </Card>
@@ -1306,6 +1290,26 @@ const Rent = () => {
                       )}
                     </div>
                   </div>
+
+                  <Button
+                    type='button'
+                    className='w-full'
+                    size='lg'
+                    onClick={handleSubmit}
+                    disabled={submitting || pricingLoading}
+                  >
+                    {submitting ? (
+                      <>
+                        <Loader2 className='h-5 w-5 mr-2 animate-spin' />
+                        {t('general.processing')}
+                      </>
+                    ) : (
+                      <>
+                        <Check className='h-5 w-5 mr-2' />
+                        {t('reservation.confirm')}
+                      </>
+                    )}
+                  </Button>
 
                   <div className='text-xs text-gray-500 text-center'>
                     {t('reservation.confirmation_message')}

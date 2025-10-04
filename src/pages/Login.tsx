@@ -158,7 +158,7 @@ const Login = () => {
                   {isButtonLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      {t('login.signing_in')}
+                      {t('login.signing')}
                     </>
                   ) : (
                     t('login.signin')
