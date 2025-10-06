@@ -232,7 +232,7 @@ const Register = () => {
         lastName: formData.lastName,
         countryId: formData.country,
         address: formData.address,
-        prefix: formData.phone_prefix,
+        phone_prefix: formData.phone_prefix,
         // Combine prefix and phone number
         phoneNumber: formData.phoneNumber,
       }

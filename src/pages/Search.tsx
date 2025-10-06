@@ -476,7 +476,8 @@ const Search = () => {
                           </SelectItem>
                           {categories.map((category) => (
                             <SelectItem key={category.id} value={category.id}>
-                              {t(`categories.${category.name}`) || category.displayName}
+                              {t(`categories.${category.name}`) ||
+                                category.displayName}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -508,7 +509,8 @@ const Search = () => {
                                     key={subcategory.id}
                                     value={subcategory.id}
                                   >
-                                    {t(`subcategories.${subcategory.name}`) || subcategory.displayName}
+                                    {t(`subcategories.${subcategory.name}`) ||
+                                      subcategory.displayName}
                                   </SelectItem>
                                 )
                               )
@@ -595,9 +597,10 @@ const Search = () => {
                           {t('catalog_section.category')}:{' '}
                           {/* on veut afficher la traduction de selcted category */}
                           {t(
-                            `categories.${categories.find(
-                              (cat) => cat.id === selectedCategory
-                            )?.name
+                            `categories.${
+                              categories.find(
+                                (cat) => cat.id === selectedCategory
+                              )?.name
                             }`
                           ) || t(`categories.${selectedCategory}`)}
                         </p>
