@@ -9,22 +9,19 @@ export type { Tool, ToolPhoto, Category, Subcategory, CreateToolData, UpdateTool
 export class ToolsService {
   // Get all tools with pagination and filters
   async getTools(filters?: ToolFilters): Promise<PaginatedResponse<Tool>> {
-    const params = new URLSearchParams();
+    console.log('🔍 [toolsService] getTools appelé avec filtres:', filters);
     
-    if (filters) {
-      if (filters.search) params.append('search', filters.search);
-      if (filters.toolStatus) params.append('toolStatus', filters.toolStatus);
-      if (filters.moderationStatus) params.append('moderationStatus', filters.moderationStatus);
-    }
-    
-    const response = await api.get<ApiResponse<Tool[]>>(`/tools?${params.toString()}`);
+    // Récupérer TOUS les outils de l'API sans filtres côté serveur
+    // L'API ne gère pas correctement les filtres search et location
+    const response = await api.get<ApiResponse<Tool[]>>('/tools');
     
     // Access the nested data structure: response.data.data.data
     let allTools = response.data.data?.data || response.data.data;
+    console.log('📦 [toolsService] Outils récupérés de l\'API:', allTools?.length || 0);
     
     // Ensure we have a valid array
     if (!Array.isArray(allTools)) {
-      console.warn('Tools response is not an array:', allTools);
+      console.warn('⚠️ [toolsService] La réponse n\'est pas un tableau:', allTools);
       return {
         data: [],
         total: 0,
@@ -46,28 +43,61 @@ export class ToolsService {
       tool.moderationStatus === ModerationStatus.CONFIRMED && 
       tool.toolStatus === ToolStatus.PUBLISHED
     );
+    console.log('✅ [toolsService] Outils confirmés et publiés:', allTools.length);
     
     // Apply client-side filters
     if (filters) {
+      console.log('🔧 [toolsService] Application des filtres côté client...');
+      
+      // Filtrage par recherche de titre
+      if (filters.search && filters.search.trim()) {
+        const searchTerm = filters.search.toLowerCase().trim();
+        console.log('🔍 [toolsService] Filtrage par titre avec:', searchTerm);
+        const beforeSearchCount = allTools.length;
+        
+        allTools = allTools.filter(tool => {
+          const titleMatch = tool.title?.toLowerCase().includes(searchTerm);
+          const categoryMatch = tool.category?.name?.toLowerCase().includes(searchTerm);
+          return titleMatch || categoryMatch;
+        });
+        
+        console.log(`📊 [toolsService] Après filtrage par titre: ${allTools.length} (était ${beforeSearchCount})`);
+      }
+      
+      // Filtrage par adresse/localisation
+      if (filters.location && filters.location.trim()) {
+        const locationTerm = filters.location.toLowerCase().trim();
+        console.log('📍 [toolsService] Filtrage par adresse avec:', locationTerm);
+        const beforeLocationCount = allTools.length;
+        
+        allTools = allTools.filter(tool => {
+          const addressMatch = tool.pickupAddress?.toLowerCase().includes(locationTerm);
+          return addressMatch;
+        });
+        
+        console.log(`📊 [toolsService] Après filtrage par adresse: ${allTools.length} (était ${beforeLocationCount})`);
+      }
+      
+      // Autres filtres existants
       if (filters.categoryId && filters.categoryId !== 'all') {
         allTools = allTools.filter(tool => tool.categoryId === filters.categoryId);
+        console.log(`📊 [toolsService] Après filtrage par catégorie: ${allTools.length}`);
       }
       if (filters.subcategoryId && filters.subcategoryId !== 'all') {
         allTools = allTools.filter(tool => tool.subcategoryId === filters.subcategoryId);
+        console.log(`📊 [toolsService] Après filtrage par sous-catégorie: ${allTools.length}`);
       }
       if (filters.minPrice !== undefined) {
         allTools = allTools.filter(tool => tool.basePrice >= filters.minPrice!);
+        console.log(`📊 [toolsService] Après filtrage prix min: ${allTools.length}`);
       }
       if (filters.maxPrice !== undefined) {
         allTools = allTools.filter(tool => tool.basePrice <= filters.maxPrice!);
-      }
-      if (filters.location) {
-        allTools = allTools.filter(tool => 
-          tool.pickupAddress?.toLowerCase().includes(filters.location!.toLowerCase())
-        );
+        console.log(`📊 [toolsService] Après filtrage prix max: ${allTools.length}`);
       }
       if (filters.toolStatus) {
         allTools = allTools.filter(tool => tool.toolStatus === filters.toolStatus);
+        console.log(`📊 [toolsService] Après filtrage statut: ${allTools.length}`);
       }
     }
     
@@ -105,6 +135,9 @@ export class ToolsService {
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
     const paginatedTools = allTools.slice(startIndex, endIndex);
+    
+    console.log(`📄 [toolsService] Pagination: page ${page}, limit ${limit}, total ${allTools.length}`);
+    console.log(`🎯 [toolsService] Retour de ${paginatedTools.length} outils sur ${allTools.length} trouvés`);
     
     return {
       data: paginatedTools,

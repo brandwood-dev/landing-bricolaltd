@@ -61,9 +61,13 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
     'AE': { bbox: [51.0, 22.6, 56.4, 26.1], proximity: [54.4, 24.4] }  // Émirats Arabes Unis
   };
   
-  // Bounding box par défaut pour la région du Golfe
-  const defaultGulfBoundingBox = [46.5, 22.0, 59.8, 30.1];
-  const defaultProximity = [51.5, 25.3];
+  // Liste des codes pays autorisés (zone de travail)
+  const allowedCountries = ['KW', 'SA', 'BH', 'OM', 'QA', 'AE'];
+  
+  // Bounding box globale restrictive qui englobe uniquement les 6 pays autorisés
+  // Coordonnées calculées pour couvrir précisément la zone du Golfe Persique
+  const restrictedGulfBoundingBox = [34.5, 16.0, 59.8, 32.2]; // [ouest, sud, est, nord]
+  const defaultProximity = [51.5, 25.3]; // Centre approximatif de la région
 
   useEffect(() => {
     const initializeMapbox = async () => {
@@ -100,12 +104,21 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       config.accessToken = apiKey;
 
       // Déterminer la configuration selon le pays sélectionné
-      const currentCountry = selectedCountry || '';
+      // S'assurer que selectedCountry est une chaîne valide
+      const currentCountry = typeof selectedCountry === 'string' ? selectedCountry.trim() : '';
+      
       // Corriger le code de pays si nécessaire
-      const correctedCountry = countryCodeMapping[currentCountry] || currentCountry;
-      const countrySettings = countryConfig[correctedCountry as keyof typeof countryConfig];
-      const searchCountry = correctedCountry || gulfCountries.join(',');
-      const searchBbox = countrySettings?.bbox || defaultGulfBoundingBox;
+      const correctedCountry = currentCountry && countryCodeMapping[currentCountry] 
+        ? countryCodeMapping[currentCountry] 
+        : currentCountry;
+      
+      // Validation finale pour s'assurer que correctedCountry est une chaîne valide
+      const validCountryCode = typeof correctedCountry === 'string' && correctedCountry.length >= 2 
+        ? correctedCountry.toUpperCase() 
+        : '';
+      
+      const countrySettings = validCountryCode ? countryConfig[validCountryCode as keyof typeof countryConfig] : null;
+      const searchBbox = countrySettings?.bbox || restrictedGulfBoundingBox;
       const searchProximity = countrySettings?.proximity || defaultProximity;
 
       // Configurer les options du SearchBox
@@ -116,26 +129,30 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       const sessionToken = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
       // Configuration optimisée selon la documentation Mapbox
-      const searchOptions = {
+      const searchOptions: any = {
         language: 'en', // Utiliser l'anglais pour de meilleurs résultats
         limit: 8,
         types: ['address', 'poi', 'place', 'locality', 'neighborhood', 'street'], // Types étendus
-        session_token: sessionToken // Requis pour le billing
+        session_token: sessionToken, // Requis pour le billing
+        // RESTRICTION GÉOGRAPHIQUE : Toujours appliquer la bounding box restrictive
+        bbox: restrictedGulfBoundingBox,
+        proximity: searchProximity
       };
       
-      // Ajouter les filtres géographiques seulement si un pays est sélectionné
-      if (selectedCountry) {
-        searchOptions.country = correctedCountry;
-        if (countrySettings) {
-          // Configurer bbox comme array de coordonnées
-          if (Array.isArray(searchBbox) && searchBbox.length === 4) {
-            searchOptions.bbox = searchBbox;
-          }
-          // Configurer proximity comme array [longitude, latitude]
-          if (Array.isArray(searchProximity) && searchProximity.length === 2) {
-            searchOptions.proximity = searchProximity;
-          }
+      // Ajouter les filtres par pays - Priorité au pays sélectionné, sinon tous les pays autorisés
+      if (validCountryCode && allowedCountries.includes(validCountryCode)) {
+        // Si un pays spécifique est sélectionné et autorisé, l'utiliser
+        searchOptions.country = validCountryCode;
+        // Utiliser la bbox spécifique du pays si disponible
+        if (countrySettings && countrySettings.bbox) {
+          searchOptions.bbox = countrySettings.bbox;
         }
+        if (countrySettings && countrySettings.proximity) {
+          searchOptions.proximity = countrySettings.proximity;
+        }
+      } else {
+        // Sinon, utiliser la liste de tous les pays autorisés
+        searchOptions.country = allowedCountries.join(',');
       }
       
       searchBox.options = searchOptions;
@@ -143,6 +160,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       console.log('⚙️ Configuration Mapbox SearchBox:', {
         selectedCountry: currentCountry,
         correctedCountry: correctedCountry,
+        validCountryCode: validCountryCode,
         options: searchOptions,
         countrySettings: countrySettings
       });
@@ -221,28 +239,64 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
 
 
-      // Gérer les suggestions reçues
+      // Gérer les suggestions reçues avec filtrage par pays autorisés
       const handleSuggest = (event: any) => {
         const suggestions = event.detail?.suggestions || [];
         const query = event.detail?.query || '';
         
-        console.log('💡 Suggestions reçues:', {
-          count: suggestions.length,
-          query: query,
-          suggestions: suggestions.slice(0, 3).map(s => ({
-            name: s.name,
-            place_formatted: s.place_formatted,
-            feature_type: s.feature_type
-          })),
-          raw_event: event.detail
+        // FILTRAGE DE SÉCURITÉ : S'assurer que toutes les suggestions proviennent des pays autorisés
+        const filteredSuggestions = suggestions.filter((suggestion: any) => {
+          const countryCode = suggestion.context?.country?.country_code || 
+                             suggestion.context?.country?.iso_3166_1 ||
+                             suggestion.place_formatted?.split(', ').pop();
+          
+          // Vérifier si le pays est dans la liste autorisée
+          const isAllowed = allowedCountries.some(allowed => 
+            countryCode === allowed || 
+            countryCode === allowed.toLowerCase() ||
+            suggestion.place_formatted?.includes(allowed)
+          );
+          
+          if (!isAllowed) {
+            console.warn('🚫 Suggestion filtrée (pays non autorisé):', {
+              suggestion: suggestion.name,
+              country: countryCode,
+              place_formatted: suggestion.place_formatted
+            });
+          }
+          
+          return isAllowed;
         });
         
-        // Log détaillé si aucune suggestion
-        if (suggestions.length === 0 && query.length > 2) {
-          console.warn('⚠️ Aucune suggestion pour la requête:', {
+        // Remplacer les suggestions par la version filtrée
+        if (filteredSuggestions.length !== suggestions.length) {
+          event.detail.suggestions = filteredSuggestions;
+          console.log('🔒 Filtrage appliqué:', {
+            original: suggestions.length,
+            filtered: filteredSuggestions.length,
+            removed: suggestions.length - filteredSuggestions.length
+          });
+        }
+        
+        console.log('💡 Suggestions reçues (après filtrage):', {
+          count: filteredSuggestions.length,
+          query: query,
+          suggestions: filteredSuggestions.slice(0, 3).map(s => ({
+            name: s.name,
+            place_formatted: s.place_formatted,
+            feature_type: s.feature_type,
+            country: s.context?.country?.country_code
+          })),
+          allowedCountries: allowedCountries
+        });
+        
+        // Log détaillé si aucune suggestion après filtrage
+        if (filteredSuggestions.length === 0 && query.length > 2) {
+          console.warn('⚠️ Aucune suggestion autorisée pour la requête:', {
             query,
             country: correctedCountry,
-            options: searchOptions
+            options: searchOptions,
+            originalCount: suggestions.length
           });
         }
       };
@@ -294,7 +348,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className}`}
+          className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm pl-10 h-12 border-0 bg-gray-50 focus:bg-white ${className}`}
         />
         <div className="mt-1 text-sm text-amber-600">
           ⚠️ Configuration Mapbox requise pour l'autocomplétion
@@ -312,7 +366,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm pl-10 h-12 border-0 bg-gray-50 focus:bg-white"
         />
         
         {error && (
@@ -342,7 +396,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
         ref={searchBoxRef}
         access-token={import.meta.env.VITE_MAPBOX_API_KEY}
         placeholder={placeholder}
-        className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${isLoading ? 'pr-10' : ''}`}
+        className={`pl-10 h-12 border-0 bg-gray-50 focus:bg-white ${isLoading ? 'pr-10' : ''}`}
       />
       
       {error && (
@@ -354,23 +408,70 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       <style dangerouslySetInnerHTML={{
         __html: `
           .mapbox-search-box {
-            width: 100%;
+            width: 100% !important;
           }
           
-          .mapbox-search-box input {
+          .mapbox-search-box input,
+          .mapbox-search-box input[type="text"],
+          .mapbox-search-box input[type="search"] {
+            display: flex !important;
+            height: 48px !important;
             width: 100% !important;
-            padding: 12px 16px !important;
-            border: 1px solid #d1d5db !important;
-            border-radius: 8px !important;
+            border-radius: 6px !important;
+            border: 0 !important;
+            background-color: #f9fafb !important;
+            padding: 8px 12px 8px 40px !important;
+            padding-left: 40px !important;
+            padding-right: 12px !important;
+            padding-top: 8px !important;
+            padding-bottom: 8px !important;
             font-size: 16px !important;
             line-height: 1.5 !important;
+            color: hsl(var(--foreground)) !important;
             transition: all 0.2s ease-in-out !important;
+            box-shadow: none !important;
+            outline: none !important;
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
           }
           
-          .mapbox-search-box input:focus {
+          .mapbox-search-box input::placeholder,
+          .mapbox-search-box input[type="text"]::placeholder,
+          .mapbox-search-box input[type="search"]::placeholder {
+            color: hsl(var(--muted-foreground)) !important;
+            opacity: 1 !important;
+          }
+          
+          .mapbox-search-box input:focus,
+          .mapbox-search-box input[type="text"]:focus,
+          .mapbox-search-box input[type="search"]:focus {
             outline: none !important;
-            border-color: #3b82f6 !important;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+            background-color: white !important;
+            box-shadow: 0 0 0 2px hsl(var(--ring)) !important;
+            border: 0 !important;
+            border-color: transparent !important;
+          }
+          
+          .mapbox-search-box input:hover,
+          .mapbox-search-box input[type="text"]:hover,
+          .mapbox-search-box input[type="search"]:hover {
+            background-color: white !important;
+          }
+          
+          .mapbox-search-box input:disabled,
+          .mapbox-search-box input[type="text"]:disabled,
+          .mapbox-search-box input[type="search"]:disabled {
+            cursor: not-allowed !important;
+            opacity: 0.5 !important;
+          }
+          
+          @media (min-width: 768px) {
+            .mapbox-search-box input,
+            .mapbox-search-box input[type="text"],
+            .mapbox-search-box input[type="search"] {
+              font-size: 14px !important;
+            }
           }
         `
       }} />

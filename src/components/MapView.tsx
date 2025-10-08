@@ -1,50 +1,89 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { MapPin, Star, Navigation, Loader2 } from 'lucide-react'
+import { MapPin, Star, Loader2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { toolsService } from '@/services/toolsService'
 import { Tool } from '@/types/bridge/tool.types'
+import 'mapbox-gl/dist/mapbox-gl.css'
 
-const MapView = ({ searchQuery }: { searchQuery: string }) => {
+const MapView = ({ 
+  searchQuery, 
+  selectedAddress, 
+  locationQuery 
+}: { 
+  searchQuery: string;
+  selectedAddress?: any;
+  locationQuery?: string;
+}) => {
   const mapContainer = useRef<HTMLDivElement>(null)
   const [userLocation, setUserLocation] = useState<{
     lat: number
     lng: number
   } | null>(null)
   const [selectedTool, setSelectedTool] = useState<any>(null)
-  const [mapboxToken, setMapboxToken] = useState(
+  const mapboxToken = import.meta.env.VITE_MAPBOX_API_KEY || 
     'pk.eyJ1IjoiYnJhbmR3b29kIiwiYSI6ImNtZm56dWdrbzAwcDYybHNmcXF0Mnoya2oifQ.lFWmwCmjUa_GdkOVZjROSQ'
-  )
-  const [showTokenInput, setShowTokenInput] = useState(true)
   const [tools, setTools] = useState<Tool[]>([])
   const [loading, setLoading] = useState(true)
 
   // Add coordinates to tools (in real app, these would come from the database)
-  const toolsWithCoords = tools.map((tool, index) => ({
-    ...tool,
-    coordinates: {
-      lat: 48.8566 + (Math.random() - 0.5) * 0.1, // Paris area with random offset
-      lng: 2.3522 + (Math.random() - 0.5) * 0.1,
-    },
-  }))
+  const toolsWithCoords = tools.map((tool, index) => {
+    // Use selected address area if available, otherwise use Gulf region coordinates
+    const baseCoords = selectedAddress && selectedAddress.geometry && selectedAddress.geometry.coordinates
+      ? { lat: selectedAddress.geometry.coordinates[1], lng: selectedAddress.geometry.coordinates[0] }
+      : { lat: 29.3759, lng: 47.9774 }; // Kuwait coordinates as fallback
+    
+    // Generate coordinates around the base location with better distribution
+    const angle = (index * 137.5) % 360; // Golden angle for better distribution
+    const distance = 0.01 + (Math.random() * 0.04); // 1-5km radius
+    const lat = baseCoords.lat + distance * Math.cos(angle * Math.PI / 180);
+    const lng = baseCoords.lng + distance * Math.sin(angle * Math.PI / 180);
+    
+    const toolWithCoords = {
+      ...tool,
+      coordinates: { lat, lng },
+    };
+    
+    console.log(`📍 Outil "${tool.title}" - Coordonnées générées:`, toolWithCoords.coordinates);
+    return toolWithCoords;
+  })
+  
+  console.log('🗺️ Total outils avec coordonnées:', toolsWithCoords.length);
 
-  const filteredTools = toolsWithCoords.filter(
-    (tool) =>
-      tool.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tool.category.name.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  // Supprimer le double filtrage côté client car l'API filtre déjà
+  const filteredTools = toolsWithCoords
 
-  // Load tools from API
+  // Load tools from API with location filter
   useEffect(() => {
     const fetchTools = async () => {
       try {
         setLoading(true)
-        const response = await toolsService.getTools()
+        
+        // Prepare filters with location if available
+        const filters: any = {};
+        
+        // Use selectedAddress place_name or locationQuery for location filtering
+        if (selectedAddress && selectedAddress.place_name) {
+          filters.location = selectedAddress.place_name;
+          console.log('🔍 Recherche avec adresse sélectionnée:', selectedAddress.place_name);
+        } else if (locationQuery && locationQuery.trim()) {
+          filters.location = locationQuery;
+          console.log('🔍 Recherche avec query location:', locationQuery);
+        }
+        
+        // Add search query filter
+        if (searchQuery && searchQuery.trim()) {
+          filters.search = searchQuery;
+          console.log('🔍 Recherche avec titre:', searchQuery);
+        }
+        
+        console.log('📡 Appel API avec filtres:', filters);
+        const response = await toolsService.getTools(filters)
+        console.log('📦 Outils récupérés de l\'API:', response.data?.length || 0, response.data);
         setTools(response.data || [])
       } catch (error) {
-        console.error('Error fetching tools:', error)
+        console.error('❌ Erreur lors de la récupération des outils:', error)
         setTools([])
       } finally {
         setLoading(false)
@@ -52,11 +91,14 @@ const MapView = ({ searchQuery }: { searchQuery: string }) => {
     }
 
     fetchTools()
-  }, [])
+  }, [selectedAddress, locationQuery, searchQuery])
 
   useEffect(() => {
-    // Get user's current location
-    if (navigator.geolocation) {
+    // Use selected address coordinates if available, otherwise get user's location
+    if (selectedAddress && selectedAddress.geometry && selectedAddress.geometry.coordinates) {
+      const [lng, lat] = selectedAddress.geometry.coordinates;
+      setUserLocation({ lat, lng });
+    } else if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setUserLocation({
@@ -65,14 +107,15 @@ const MapView = ({ searchQuery }: { searchQuery: string }) => {
           })
         },
         (error) => {
-          // Fallback to Paris coordinates
-          setUserLocation({ lat: 48.8566, lng: 2.3522 })
+          // Fallback to Kuwait coordinates (center of Gulf region)
+          setUserLocation({ lat: 29.3759, lng: 47.9774 })
         }
       )
     } else {
-      setUserLocation({ lat: 48.8566, lng: 2.3522 })
+      // Fallback to Kuwait coordinates
+      setUserLocation({ lat: 29.3759, lng: 47.9774 })
     }
-  }, [])
+  }, [selectedAddress])
 
   const initializeMap = async () => {
     if (!mapContainer.current || !userLocation || !mapboxToken) return
@@ -80,6 +123,10 @@ const MapView = ({ searchQuery }: { searchQuery: string }) => {
     try {
       // Dynamic import of mapbox-gl
       const mapboxgl = await import('mapbox-gl')
+
+      // Disable telemetry to avoid AdBlocker errors
+      mapboxgl.default.prewarm()
+      mapboxgl.default.clearPrewarmedResources()
 
       mapboxgl.default.accessToken = mapboxToken
 
@@ -99,7 +146,9 @@ const MapView = ({ searchQuery }: { searchQuery: string }) => {
         .addTo(map)
 
       // Add tool markers
-      filteredTools.forEach((tool) => {
+      console.log('🎯 Ajout des marqueurs pour', filteredTools.length, 'outils');
+      filteredTools.forEach((tool, index) => {
+        console.log(`📌 Ajout marqueur ${index + 1}:`, tool.title, 'à', tool.coordinates);
         const marker = new mapboxgl.default.Marker({ color: 'red' })
           .setLngLat([tool.coordinates.lng, tool.coordinates.lat])
           .setPopup(
@@ -119,6 +168,10 @@ const MapView = ({ searchQuery }: { searchQuery: string }) => {
           setSelectedTool(tool)
         })
       })
+      
+      if (filteredTools.length === 0) {
+        console.log('⚠️ Aucun outil à afficher sur la carte');
+      }
 
       // Add navigation control
       map.addControl(new mapboxgl.default.NavigationControl())
@@ -130,47 +183,12 @@ const MapView = ({ searchQuery }: { searchQuery: string }) => {
   }
 
   useEffect(() => {
-    if (mapboxToken && !showTokenInput) {
+    if (mapboxToken) {
       initializeMap()
     }
-  }, [userLocation, mapboxToken, showTokenInput, filteredTools])
+  }, [userLocation, mapboxToken, filteredTools])
 
-  if (showTokenInput) {
-    return (
-      <Card className='w-full max-w-md mx-auto mt-8'>
-        <CardContent className='p-6'>
-          <h3 className='text-lg font-semibold mb-4'>Configuration Mapbox</h3>
-          <p className='text-sm text-gray-600 mb-4'>
-            Pour afficher la carte, veuillez entrer votre token Mapbox public.
-            Vous pouvez l'obtenir sur{' '}
-            <a
-              href='https://mapbox.com'
-              target='_blank'
-              rel='noopener noreferrer'
-              className='text-blue-600 underline'
-            >
-              mapbox.com
-            </a>
-          </p>
-          <div className='space-y-4'>
-            <Input
-              type='text'
-              placeholder='pk.eyJ1IjoiZXhhbXBsZSIsImEiOiJjbGV4YW1wbGUifQ...'
-              value={mapboxToken}
-              onChange={(e) => setMapboxToken(e.target.value)}
-            />
-            <Button
-              onClick={() => setShowTokenInput(false)}
-              disabled={!mapboxToken}
-              className='w-full'
-            >
-              Afficher la carte
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    )
-  }
+
 
   if (loading) {
     return (
@@ -187,14 +205,7 @@ const MapView = ({ searchQuery }: { searchQuery: string }) => {
         <h2 className='text-xl font-semibold'>
           Carte des outils ({filteredTools.length} résultats)
         </h2>
-        <Button
-          variant='outline'
-          size='sm'
-          onClick={() => setShowTokenInput(true)}
-        >
-          <Navigation className='h-4 w-4 mr-2' />
-          Reconfigurer
-        </Button>
+
       </div>
 
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-4'>
@@ -209,52 +220,60 @@ const MapView = ({ searchQuery }: { searchQuery: string }) => {
         <div className='space-y-4'>
           <h3 className='font-semibold'>Outils trouvés</h3>
           <div className='space-y-2 max-h-96 overflow-y-auto'>
-            {filteredTools.map((tool) => (
-              <Card
-                key={tool.id}
-                className={`cursor-pointer transition-colors ${
-                  selectedTool?.id === tool.id ? 'ring-2 ring-blue-500' : ''
-                }`}
-                onClick={() => setSelectedTool(tool)}
-              >
-                <CardContent className='p-3'>
-                  <div className='flex gap-3'>
-                    <img
-                      src={tool.photos?.[0]?.url || '/placeholder.svg'}
-                      alt={tool.title}
-                      className='w-16 h-16 object-cover rounded'
-                    />
-                    <div className='flex-1 min-w-0'>
-                      <h4 className='font-medium text-sm truncate'>
-                        {tool.title}
-                      </h4>
-                      <div className='flex items-center gap-1 text-xs text-gray-500'>
-                        <Star className='h-3 w-3 fill-yellow-400 text-yellow-400' />
-                        {tool.rating || 0} ({tool.reviewCount || 0})
-                      </div>
-                      <div className='flex items-center gap-1 text-xs text-gray-500'>
-                        <MapPin className='h-3 w-3' />
-                        {tool.pickupAddress}
-                      </div>
-                      <div className='flex items-center justify-between mt-1'>
-                        <span className='font-semibold text-sm'>
-                          {tool.basePrice}€/jour
-                        </span>
-                        <Link to={`/tool/${tool.id}`}>
-                          <Button
-                            size='sm'
-                            variant='outline'
-                            className='text-xs h-6'
-                          >
-                            Voir
-                          </Button>
-                        </Link>
+            {filteredTools.length === 0 ? (
+              <div className='text-center py-8 text-gray-500'>
+                <MapPin className='h-12 w-12 mx-auto mb-2 text-gray-300' />
+                <p className='text-sm'>Aucun outil trouvé</p>
+                <p className='text-xs'>Essayez de modifier vos critères de recherche</p>
+              </div>
+            ) : (
+              filteredTools.map((tool) => (
+                <Card
+                  key={tool.id}
+                  className={`cursor-pointer transition-colors ${
+                    selectedTool?.id === tool.id ? 'ring-2 ring-blue-500' : ''
+                  }`}
+                  onClick={() => setSelectedTool(tool)}
+                >
+                  <CardContent className='p-3'>
+                    <div className='flex gap-3'>
+                      <img
+                        src={tool.photos?.[0]?.url || '/placeholder.svg'}
+                        alt={tool.title}
+                        className='w-16 h-16 object-cover rounded'
+                      />
+                      <div className='flex-1 min-w-0'>
+                        <h4 className='font-medium text-sm truncate'>
+                          {tool.title}
+                        </h4>
+                        <div className='flex items-center gap-1 text-xs text-gray-500'>
+                          <Star className='h-3 w-3 fill-yellow-400 text-yellow-400' />
+                          {tool.rating || 0} ({tool.reviewCount || 0})
+                        </div>
+                        <div className='flex items-center gap-1 text-xs text-gray-500'>
+                          <MapPin className='h-3 w-3' />
+                          {tool.pickupAddress}
+                        </div>
+                        <div className='flex items-center justify-between mt-1'>
+                          <span className='font-semibold text-sm'>
+                            {tool.basePrice}€/jour
+                          </span>
+                          <Link to={`/tool/${tool.id}`}>
+                            <Button
+                              size='sm'
+                              variant='outline'
+                              className='text-xs h-6'
+                            >
+                              Voir
+                            </Button>
+                          </Link>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
         </div>
       </div>
