@@ -2,7 +2,7 @@
 
 import { BaseEntity, Photo, Address, BaseFilters } from './common.types';
 import { ToolStatus, AvailabilityStatus, ToolCondition, ModerationStatus } from './enums';
-import { UserProfile } from './user.types';
+import { User } from './user.types';
 
 // Category interface
 export interface Category extends BaseEntity {
@@ -49,7 +49,7 @@ export interface Tool extends BaseEntity {
   // Nested objects
   category: Category;
   subcategory: Subcategory;
-  owner: UserProfile;
+  owner: User;
   photos: ToolPhoto[];
   
   // Timestamps

@@ -32,7 +32,7 @@ import {
 } from 'lucide-react'
 import { toolsService } from '@/services/toolsService'
 import { CreateToolData } from '@/types/bridge/tool.types'
-import AddressAutocomplete from '@/components/AddressAutocomplete'
+import MapboxLocationPicker from '@/components/MapboxLocationPicker'
 
 const AddTool = () => {
   const { t, language } = useLanguage()
@@ -40,6 +40,20 @@ const AddTool = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { toast } = useToast()
+
+  // Debug logs pour le pays de l'utilisateur
+  console.log('🔍 [AddTool] Debug user country data:', {
+    user: user,
+    'user?.country': user?.country,
+    'user?.countryId': user?.countryId,
+    'user?.country || user?.countryId': user?.country || user?.countryId,
+    'typeof user?.country': typeof user?.country,
+    'typeof user?.countryId': typeof user?.countryId,
+  })
+
+  // Déterminer le pays de l'utilisateur avec fallback
+  const userCountryCode = user?.countryId || user?.country?.code || user?.country || 'BH'
+  console.log('🌍 [AddTool] Final user country code:', userCountryCode)
 
   // Form state
   const [formData, setFormData] = useState<Partial<CreateToolData>>({
@@ -54,6 +68,8 @@ const AddTool = () => {
     basePrice: undefined,
     depositAmount: undefined,
     pickupAddress: '',
+    latitude: undefined,
+    longitude: undefined,
     ownerInstructions: '',
   })
 
@@ -94,9 +110,7 @@ const AddTool = () => {
     })
 
     try {
-
       const result = await toolsService.checkNameUniqueness(name.trim())
-
 
       if (result.isUnique) {
         setNameValidation({
@@ -140,7 +154,6 @@ const AddTool = () => {
     }
   }
 
- 
   // Load categories on component mount
   useEffect(() => {
     const loadCategories = async () => {
@@ -148,7 +161,7 @@ const AddTool = () => {
         setLoadingCategories(true)
         const categoriesData = await toolsService.getCategories()
         setCategories(categoriesData || [])
-        
+
         // Debug: Log user country for Mapbox configuration
       } catch (error) {
         toast({
@@ -242,7 +255,9 @@ const AddTool = () => {
       formData.condition &&
       formData.basePrice &&
       formData.basePrice > 0 &&
-      isAddressSelected
+      isAddressSelected &&
+      formData.latitude &&
+      formData.longitude
       // nameValidation.isUnique === true && // DISABLED - uniqueness check removed
       // !nameValidation.isChecking // DISABLED - uniqueness check removed
     )
@@ -258,8 +273,6 @@ const AddTool = () => {
       })
       return false
     }
-
-  
 
     if (!formData.categoryId) {
       toast({
@@ -288,10 +301,10 @@ const AddTool = () => {
       return false
     }
 
-    if (!isAddressSelected) {
+    if (!isAddressSelected || !formData.latitude || !formData.longitude) {
       toast({
         title: 'Adresse requise',
-        description: 'Veuillez sélectionner une adresse depuis les suggestions',
+        description: 'Veuillez sélectionner une adresse en cliquant sur la carte',
         variant: 'destructive',
       })
       return false
@@ -342,6 +355,8 @@ const AddTool = () => {
         basePrice: formData.basePrice!,
         depositAmount: formData.depositAmount,
         pickupAddress: formData.pickupAddress,
+        latitude: formData.latitude,
+        longitude: formData.longitude,
         ownerInstructions: formData.ownerInstructions,
         ownerId: user?.id!,
         primaryPhotoIndex:
@@ -802,25 +817,50 @@ const AddTool = () => {
                     {t('add_tool.location_title')}
                   </h3>
 
-                  <div className='space-y-3'>
-                    <Label
-                      htmlFor='location'
-                      className='text-sm font-medium text-foreground'
-                    >
-                      {t('add_tool.address')} *
-                    </Label>
-                    <AddressAutocomplete
-                      value={formData.pickupAddress || ''}
-                      onChange={(value) =>
-                        handleInputChange('pickupAddress', value)
-                      }
-                      onAddressSelected={(isSelected) =>
-                        setIsAddressSelected(isSelected)
-                      }
-                      placeholder='Paris 15ème'
-                      className='h-12 text-base'
-                      selectedCountry={user?.country || 'KW'}
-                    />
+                  <div className='space-y-6'>
+                    {/* Map for location selection */}
+                    <div className='space-y-3'>
+                      <Label className='text-sm font-medium text-foreground'>
+                        {t('add_tool.address')} * - Sélectionnez directement sur la carte
+                      </Label>
+                      <MapboxLocationPicker
+                        coordinates={
+                          formData.latitude && formData.longitude
+                            ? { lat: formData.latitude, lng: formData.longitude }
+                            : undefined
+                        }
+                        onCoordinatesChange={(coordinates) => {
+                          handleInputChange('latitude', coordinates.lat)
+                          handleInputChange('longitude', coordinates.lng)
+                          setIsAddressSelected(true) // Marquer l'adresse comme sélectionnée
+                        }}
+                        onAddressChange={(address) =>
+                          handleInputChange('pickupAddress', address)
+                        }
+                        className='h-96'
+                        userCountry={userCountryCode}
+                      />
+                    </div>
+
+                    {/* Address and coordinates display */}
+                    {(formData.latitude && formData.longitude) || formData.pickupAddress ? (
+                      <div className='bg-muted p-4 rounded-lg space-y-2'>
+                        {formData.pickupAddress && (
+                          <div className='text-sm text-foreground'>
+                            📍 <strong>Adresse:</strong> {formData.pickupAddress}
+                          </div>
+                        )}
+                        {formData.latitude && formData.longitude && (
+                          <div className='text-xs text-muted-foreground'>
+                            🌍 <strong>Coordonnées:</strong> {formData.latitude.toFixed(6)}, {formData.longitude.toFixed(6)}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className='text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg border-l-4 border-accent'>
+                        💡 Cliquez sur la carte pour sélectionner l'adresse de récupération de votre outil
+                      </div>
+                    )}
                   </div>
                 </div>
 

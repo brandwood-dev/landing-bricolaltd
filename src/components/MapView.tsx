@@ -1,20 +1,29 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { MapPin, Star, Loader2 } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { MapPin, Star, Loader2, Search } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { toolsService } from '@/services/toolsService'
 import { Tool } from '@/types/bridge/tool.types'
+import { User } from '@/types/bridge/user.types'
+import { getCountryCoordinates } from '@/utils/countryCoordinates'
 import 'mapbox-gl/dist/mapbox-gl.css'
 
 const MapView = ({ 
   searchQuery, 
   selectedAddress, 
-  locationQuery 
+  locationQuery,
+  user,
+  isAuthenticated,
+  setSearchQuery
 }: { 
   searchQuery: string;
   selectedAddress?: any;
   locationQuery?: string;
+  user?: User | null;
+  isAuthenticated?: boolean;
+  setSearchQuery?: (query: string) => void;
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null)
   const [userLocation, setUserLocation] = useState<{
@@ -26,96 +35,188 @@ const MapView = ({
     'pk.eyJ1IjoiYnJhbmR3b29kIiwiYSI6ImNtZm56dWdrbzAwcDYybHNmcXF0Mnoya2oifQ.lFWmwCmjUa_GdkOVZjROSQ'
   const [tools, setTools] = useState<Tool[]>([])
   const [loading, setLoading] = useState(true)
+  // Local search query for input (doesn't trigger API calls)
+  const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery || '')
+  // Remove localSearchQuery as we now use server-side filtering
+
+  // Handle search submission
+  const handleSearch = () => {
+    if (setSearchQuery && localSearchQuery.trim()) {
+      setSearchQuery(localSearchQuery.trim());
+    }
+  };
+
+  // Sync localSearchQuery with searchQuery when searchQuery changes externally
+  useEffect(() => {
+    setLocalSearchQuery(searchQuery || '');
+  }, [searchQuery]);
+
+  // Default countries for non-authenticated users (Gulf countries)
+  const defaultCountries = ['KW', 'BH', 'SA', 'AE', 'QA', 'OM'];
 
   // Add coordinates to tools (in real app, these would come from the database)
-  const toolsWithCoords = tools.map((tool, index) => {
-    // Use selected address area if available, otherwise use Gulf region coordinates
-    const baseCoords = selectedAddress && selectedAddress.geometry && selectedAddress.geometry.coordinates
-      ? { lat: selectedAddress.geometry.coordinates[1], lng: selectedAddress.geometry.coordinates[0] }
-      : { lat: 29.3759, lng: 47.9774 }; // Kuwait coordinates as fallback
-    
-    // Generate coordinates around the base location with better distribution
-    const angle = (index * 137.5) % 360; // Golden angle for better distribution
-    const distance = 0.01 + (Math.random() * 0.04); // 1-5km radius
-    const lat = baseCoords.lat + distance * Math.cos(angle * Math.PI / 180);
-    const lng = baseCoords.lng + distance * Math.sin(angle * Math.PI / 180);
-    
-    const toolWithCoords = {
-      ...tool,
-      coordinates: { lat, lng },
-    };
-    
-    console.log(`📍 Outil "${tool.title}" - Coordonnées générées:`, toolWithCoords.coordinates);
-    return toolWithCoords;
-  })
+  // Process tools to use real coordinates from database
+  const toolsWithCoords = tools
+    .filter(tool => {
+      // Only include tools that have valid coordinates from database
+      // Note: coordinates come as strings from API, so we need to check if they can be converted to numbers
+      const lat = parseFloat(tool.latitude as string);
+      const lng = parseFloat(tool.longitude as string);
+      return tool.latitude && tool.longitude && 
+             !isNaN(lat) && !isNaN(lng);
+    })
+    .map((tool, index) => {
+      const toolWithCoords = {
+        ...tool,
+        coordinates: { 
+          lat: Number(tool.latitude), 
+          lng: Number(tool.longitude) 
+        },
+      };
+      
+      console.log(`📍 Outil "${tool.title}" - Coordonnées DB:`, {
+        lat: tool.latitude, 
+        lng: tool.longitude,
+        owner: tool.owner?.firstName,
+        ownerCountry: tool.owner?.country || tool.owner?.countryId
+      });
+      return toolWithCoords;
+    });
   
-  console.log('🗺️ Total outils avec coordonnées:', toolsWithCoords.length);
+  console.log('🗺️ Total outils avec coordonnées valides:', toolsWithCoords.length);
+  console.log('🔐 État d\'authentification:', { isAuthenticated, userCountryId: user?.countryId });
 
-  // Supprimer le double filtrage côté client car l'API filtre déjà
-  const filteredTools = toolsWithCoords
+  // Apply country filtering based on user authentication
+  const countryFilteredTools = toolsWithCoords.filter(tool => {
+    const toolCountry = tool.owner?.countryId;
+    
+    // Debug: Log tool details
+    console.log(`🔍 Filtrage outil "${tool.title}" - Pays: ${toolCountry}, Owner: ${tool.owner?.email}`);
+    
+    // If user is authenticated, show ONLY tools from user's specific country
+    if (isAuthenticated && user?.countryId) {
+      const isFromUserCountry = toolCountry === user.countryId;
+      console.log(`👤 Utilisateur connecté - User country: ${user.countryId}, Tool country: ${toolCountry}, Match: ${isFromUserCountry}`);
+      return isFromUserCountry;
+    }
+    
+    // If user is not authenticated, show tools from all Gulf countries
+    if (!isAuthenticated) {
+      const isFromGulfCountry = defaultCountries.includes(toolCountry || '');
+      console.log(`🏖️ Utilisateur non connecté - Tool country: ${toolCountry}, Is Gulf: ${isFromGulfCountry}, DefaultCountries: [${defaultCountries.join(', ')}]`);
+      return isFromGulfCountry;
+    }
+    
+    // Fallback: show no tools
+    return false;
+  });
 
-  // Load tools from API with location filter
+  console.log(`🌍 Filtrage par pays - Utilisateur connecté: ${isAuthenticated}, Pays: ${user?.countryId}`);
+  console.log(`📊 Outils après filtrage par pays: ${countryFilteredTools.length} (était ${toolsWithCoords.length})`);
+
+  // No client-side search filtering - handled by server
+  const filteredTools = countryFilteredTools;
+
+  // Load tools from API with filters
   useEffect(() => {
     const fetchTools = async () => {
       try {
         setLoading(true)
         
-        // Prepare filters with location if available
+        // Prepare filters
         const filters: any = {};
         
-        // Use selectedAddress place_name or locationQuery for location filtering
-        if (selectedAddress && selectedAddress.place_name) {
-          filters.location = selectedAddress.place_name;
-          console.log('🔍 Recherche avec adresse sélectionnée:', selectedAddress.place_name);
-        } else if (locationQuery && locationQuery.trim()) {
-          filters.location = locationQuery;
-          console.log('🔍 Recherche avec query location:', locationQuery);
-        }
-        
-        // Add search query filter
+        // Use server-side search filtering for better performance
         if (searchQuery && searchQuery.trim()) {
-          filters.search = searchQuery;
-          console.log('🔍 Recherche avec titre:', searchQuery);
+          filters.search = searchQuery.trim();
         }
         
-        console.log('📡 Appel API avec filtres:', filters);
-        const response = await toolsService.getTools(filters)
-        console.log('📦 Outils récupérés de l\'API:', response.data?.length || 0, response.data);
-        setTools(response.data || [])
+        // Location filtering is handled client-side after fetching
+        
+        console.log('🔍 Fetching tools with filters:', filters);
+        const response = await toolsService.getTools(filters);
+        console.log('📦 Raw API response:', response);
+        console.log('📊 Tools received from API:', response.data?.length || 0);
+        
+        // Log first few tools to understand structure
+        if (response.data && response.data.length > 0) {
+          console.log('🔍 First tool structure:', JSON.stringify(response.data[0], null, 2));
+          console.log('🔍 Owner structure of first tool:', response.data[0].owner);
+          console.log('🔍 Country info in first tool:', {
+            'owner.country': response.data[0].owner?.country,
+            'owner.countryId': response.data[0].owner?.countryId,
+            'owner.country.code': response.data[0].owner?.country?.code,
+            'owner.country.id': response.data[0].owner?.country?.id,
+            'owner.country.name': response.data[0].owner?.country?.name
+          });
+          
+          // Log a few more tools to see the pattern
+          console.log('🔍 Sample of tools with country info:');
+          response.data.slice(0, 5).forEach((tool, index) => {
+            console.log(`Tool ${index + 1}: ${tool.title}`, {
+              'owner.country': tool.owner?.country,
+              'owner.countryId': tool.owner?.countryId,
+              'owner.country.code': tool.owner?.country?.code,
+              'owner.country.id': tool.owner?.country?.id,
+              'owner.country.name': tool.owner?.country?.name
+            });
+          });
+        }
+        
+        setTools(response.data || []);
       } catch (error) {
-        console.error('❌ Erreur lors de la récupération des outils:', error)
-        setTools([])
+        console.error('❌ Error fetching tools:', error);
+        setTools([]);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
     fetchTools()
-  }, [selectedAddress, locationQuery, searchQuery])
+  }, [selectedAddress, locationQuery, searchQuery, user?.countryId, isAuthenticated])
 
   useEffect(() => {
     // Use selected address coordinates if available, otherwise get user's location
     if (selectedAddress && selectedAddress.geometry && selectedAddress.geometry.coordinates) {
       const [lng, lat] = selectedAddress.geometry.coordinates;
+      console.log('📍 Using selected address coordinates:', { lat, lng });
       setUserLocation({ lat, lng });
     } else if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          console.log('📍 Using geolocation coordinates:', { 
+            lat: position.coords.latitude, 
+            lng: position.coords.longitude 
+          });
           setUserLocation({
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           })
         },
         (error) => {
-          // Fallback to Kuwait coordinates (center of Gulf region)
-          setUserLocation({ lat: 29.3759, lng: 47.9774 })
+          console.log('❌ Geolocation failed, using user country fallback');
+          // Use user's country coordinates if authenticated, otherwise Kuwait
+          const userCountryCode = isAuthenticated && user?.countryId ? user.countryId : 'KW';
+          const countryCoords = getCountryCoordinates(userCountryCode);
+          console.log('🌍 Using country coordinates for geolocation fallback:', { 
+            country: userCountryCode, 
+            coords: countryCoords 
+          });
+          setUserLocation({ lat: countryCoords.lat, lng: countryCoords.lng });
         }
       )
     } else {
-      // Fallback to Kuwait coordinates
-      setUserLocation({ lat: 29.3759, lng: 47.9774 })
+      console.log('❌ Geolocation not available, using user country fallback');
+      // Use user's country coordinates if authenticated, otherwise Kuwait
+      const userCountryCode = isAuthenticated && user?.countryId ? user.countryId : 'KW';
+      const countryCoords = getCountryCoordinates(userCountryCode);
+      console.log('🌍 Using country coordinates for no geolocation:', { 
+        country: userCountryCode, 
+        coords: countryCoords 
+      });
+      setUserLocation({ lat: countryCoords.lat, lng: countryCoords.lng });
     }
-  }, [selectedAddress])
+  }, [selectedAddress, isAuthenticated, user?.countryId])
 
   const initializeMap = async () => {
     if (!mapContainer.current || !userLocation || !mapboxToken) return
@@ -130,20 +231,44 @@ const MapView = ({
 
       mapboxgl.default.accessToken = mapboxToken
 
+      // Determine zoom level and center based on authentication status
+      let mapCenter = [userLocation.lng, userLocation.lat];
+      let zoomLevel = 12; // Default for authenticated users
+
+      if (!isAuthenticated) {
+        // For non-authenticated users, use a central point in the Gulf region
+        // Center around Saudi Arabia to show all Gulf countries
+        mapCenter = [45.0792, 23.8859]; // Central Saudi Arabia coordinates
+        zoomLevel = 3; // Wide zoom to show all Gulf countries
+        console.log('🌍 Utilisateur non connecté - Vue élargie des pays du Golfe, zoom:', zoomLevel);
+      } else {
+        // For authenticated users, center on their specific country with closer zoom
+        if (user?.countryId) {
+          const userCountryCoords = getCountryCoordinates(user.countryId);
+          if (userCountryCoords) {
+            mapCenter = [userCountryCoords.lng, userCountryCoords.lat];
+            zoomLevel = 10; // Closer zoom for user's specific country
+          }
+        }
+        console.log('👤 Utilisateur connecté - Vue centrée sur le pays de l\'utilisateur:', user?.countryId, 'zoom:', zoomLevel);
+      }
+
       const map = new mapboxgl.default.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/streets-v12',
-        center: [userLocation.lng, userLocation.lat],
-        zoom: 12,
+        center: mapCenter,
+        zoom: zoomLevel,
       })
 
-      // Add user location marker
-      const userMarker = new mapboxgl.default.Marker({ color: 'blue' })
-        .setLngLat([userLocation.lng, userLocation.lat])
-        .setPopup(
-          new mapboxgl.default.Popup().setHTML('<div>Votre position</div>')
-        )
-        .addTo(map)
+      // Add user location marker only for authenticated users or when geolocation is available
+      if (isAuthenticated || (userLocation.lat !== 45.0792 && userLocation.lng !== 23.8859)) {
+        const userMarker = new mapboxgl.default.Marker({ color: 'blue' })
+          .setLngLat([userLocation.lng, userLocation.lat])
+          .setPopup(
+            new mapboxgl.default.Popup().setHTML('<div>Votre position</div>')
+          )
+          .addTo(map)
+      }
 
       // Add tool markers
       console.log('🎯 Ajout des marqueurs pour', filteredTools.length, 'outils');
@@ -201,6 +326,28 @@ const MapView = ({
 
   return (
     <div className='space-y-4'>
+      {/* Search Input */}
+      <div className='flex gap-2'>
+        <div className='relative flex-1'>
+          <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4' />
+          <Input
+            type='text'
+            placeholder='Rechercher des outils sur la carte...'
+            value={localSearchQuery}
+            onChange={(e) => setLocalSearchQuery(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+            className='pl-10 pr-4 py-2'
+          />
+        </div>
+        <Button 
+          onClick={handleSearch}
+          className='px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white'
+          disabled={!localSearchQuery.trim()}
+        >
+          <Search className='h-4 w-4' />
+        </Button>
+      </div>
+
       <div className='flex items-center justify-between'>
         <h2 className='text-xl font-semibold'>
           Carte des outils ({filteredTools.length} résultats)

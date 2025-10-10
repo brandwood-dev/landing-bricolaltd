@@ -56,9 +56,15 @@ export class ToolsService {
         const beforeSearchCount = allTools.length;
         
         allTools = allTools.filter(tool => {
+          // Make search more flexible - search in title, description, brand, model
           const titleMatch = tool.title?.toLowerCase().includes(searchTerm);
+          const descriptionMatch = tool.description?.toLowerCase().includes(searchTerm);
+          const brandMatch = tool.brand?.toLowerCase().includes(searchTerm);
+          const modelMatch = tool.model?.toLowerCase().includes(searchTerm);
           const categoryMatch = tool.category?.name?.toLowerCase().includes(searchTerm);
-          return titleMatch || categoryMatch;
+          const subcategoryMatch = tool.subcategory?.name?.toLowerCase().includes(searchTerm);
+          
+          return titleMatch || descriptionMatch || brandMatch || modelMatch || categoryMatch || subcategoryMatch;
         });
         
         console.log(`📊 [toolsService] Après filtrage par titre: ${allTools.length} (était ${beforeSearchCount})`);

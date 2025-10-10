@@ -3,36 +3,27 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Search, MapPin, AlertCircle } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Search, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import MapView from './MapView';
-import AddressAutocomplete from './AddressAutocomplete';
 
 const HeroSection = () => {
   const { t } = useLanguage();
+  const { user, isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
-  const [locationQuery, setLocationQuery] = useState('');
-  const [selectedAddress, setSelectedAddress] = useState(null);
   const [showMap, setShowMap] = useState(false);
-  const [errors, setErrors] = useState({ search: false, location: false });
+  const [searchError, setSearchError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const validateFields = () => {
-    const newErrors = {
-      search: !searchQuery.trim(),
-      location: !locationQuery.trim() && !selectedAddress
-    };
-    setErrors(newErrors);
-    return !newErrors.search && !newErrors.location;
-  };
-
-  // Helper function to check if both fields are valid
-  const isFormValid = () => {
-    return searchQuery.trim() && (locationQuery.trim() || selectedAddress);
+  const validateSearch = () => {
+    const isValid = searchQuery.trim().length > 0;
+    setSearchError(!isValid);
+    return isValid;
   };
 
   const handleSearch = async () => {
-    if (!validateFields()) {
+    if (!validateSearch()) {
       return;
     }
 
@@ -46,34 +37,23 @@ const HeroSection = () => {
     }
   };
 
-  const handleAddressSelect = (address) => {
-    setSelectedAddress(address);
-    setLocationQuery(address?.place_name || '');
-    setErrors(prev => ({ ...prev, location: false }));
-  };
-
   if (showMap) {
     return (
       <section className="py-20 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="mb-6 text-center">
             <h2 className="text-2xl font-bold mb-4">Résultats de recherche pour "{searchQuery}"</h2>
-            {selectedAddress && (
-              <p className="text-gray-600 mb-2">Localisation: {selectedAddress.place_name}</p>
-            )}
-            <Button 
-              variant="outline" 
-              onClick={() => setShowMap(false)}
-              className="mb-4"
-            >
-              ← Retour à la recherche
-            </Button>
           </div>
-          <MapView 
-            searchQuery={searchQuery} 
-            selectedAddress={selectedAddress}
-            locationQuery={locationQuery}
-          />
+          {showMap && (
+            <div className="mt-8">
+              <MapView 
+                searchQuery={searchQuery}
+                user={user}
+                isAuthenticated={isAuthenticated}
+                setSearchQuery={setSearchQuery}
+              />
+            </div>
+          )}
         </div>
       </section>
     );
@@ -95,72 +75,52 @@ const HeroSection = () => {
           {t('hero.subtitle')}
         </p>
 
-        {/* Search bar */}
-        <div className="bg-white rounded-2xl p-4 shadow-xl max-w-3xl mx-auto">
+        {/* Search bar - Title only */}
+        <div className="bg-white rounded-2xl p-4 shadow-xl max-w-2xl mx-auto">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
               <Input
                 placeholder={`${t('hero.search.placeholder')} *`}
                 className={`pl-10 h-12 border-0 bg-gray-50 focus:bg-white ${
-                  errors.search ? 'ring-2 ring-red-500' : ''
+                  searchError ? 'ring-2 ring-red-500' : ''
                 }`}
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
                   if (e.target.value.trim()) {
-                    setErrors(prev => ({ ...prev, search: false }));
+                    setSearchError(false);
                   }
                 }}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
               />
-              {errors.search && (
+              {searchError && (
                 <div className="flex items-center gap-1 text-red-500 text-sm mt-1">
                   <AlertCircle className="h-4 w-4" />
                   <span>Ce champ est obligatoire</span>
                 </div>
               )}
             </div>
-            <div className="flex-1 relative">
-              <MapPin className="absolute left-3 top-3 h-5 w-5 text-gray-400 z-10" />
-              <AddressAutocomplete
-                value={locationQuery}
-                onChange={(value) => {
-                  setLocationQuery(value);
-                  if (value.trim()) {
-                    setErrors(prev => ({ ...prev, location: false }));
-                  }
-                }}
-                onAddressSelected={(isSelected) => {
-                  if (isSelected) {
-                    setErrors(prev => ({ ...prev, location: false }));
-                  }
-                }}
-                selectedCountry="KW"
-                placeholder={`${t('hero.search.location')} *`}
-                className={`pl-10 h-12 border-0 bg-gray-50 focus:bg-white ${
-                  errors.location ? 'ring-2 ring-red-500' : ''
-                }`}
-              />
-              {errors.location && (
-                <div className="flex items-center gap-1 text-red-500 text-sm mt-1">
-                  <AlertCircle className="h-4 w-4" />
-                  <span>Veuillez sélectionner une adresse</span>
-                </div>
-              )}
-            </div>
             <Button 
               size="lg" 
               className={`h-12 px-8 bg-accent hover:bg-accent/90 text-white ${
-                !isFormValid() 
+                !searchQuery.trim() 
                   ? 'opacity-50 cursor-not-allowed' 
                   : ''
               }`}
               onClick={handleSearch}
-              disabled={isLoading || !isFormValid()}
+              disabled={isLoading || !searchQuery.trim()}
             >
               {isLoading ? 'Recherche...' : t('hero.search.button')}
             </Button>
+          </div>
+          
+          {/* Info text about automatic location filtering */}
+          <div className="mt-3 text-sm text-gray-600 text-center">
+            {isAuthenticated 
+              ? `Recherche dans votre pays (${user?.country?.name || 'votre région'})`
+              : 'Recherche dans les pays du Golfe (Koweït, Bahreïn, Arabie Saoudite, EAU, Qatar, Oman)'
+            }
           </div>
         </div>
 
