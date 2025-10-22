@@ -1,0 +1,23 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" rx="8" fill="#f3f4f6"/>
+  <g transform="translate(16, 16)">
+    <!-- Hammer icon -->
+    <path d="M8 4L12 8L20 0L24 4L16 12L12 8L8 4Z" fill="#9ca3af" stroke="#6b7280" stroke-width="1"/>
+    <rect x="6" y="8" width="4" height="16" rx="2" fill="#9ca3af" stroke="#6b7280" stroke-width="1"/>
+    
+    <!-- Wrench icon -->
+    <path d="M20 16L24 20L28 16L24 12L20 16Z" fill="#9ca3af" stroke="#6b7280" stroke-width="1"/>
+    <rect x="18" y="20" width="12" height="3" rx="1.5" fill="#9ca3af" stroke="#6b7280" stroke-width="1"/>
+    
+    <!-- Screwdriver icon -->
+    <circle cx="8" cy="24" r="2" fill="#9ca3af" stroke="#6b7280" stroke-width="1"/>
+    <rect x="7" y="26" width="2" height="8" fill="#9ca3af" stroke="#6b7280" stroke-width="1"/>
+  </g>
+  
+  <!-- Background pattern -->
+  <defs>
+    <pattern id="dots" patternUnits="userSpaceOnUse" width="8" height="8">
+      <circle cx="4" cy="4" r="0.5" fill="#e5e7eb"/>
+    </pattern>
+  </defs>
+  <rect width="64" height="64" rx="8" fill="url(#
