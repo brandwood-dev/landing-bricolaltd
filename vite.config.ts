@@ -16,22 +16,37 @@ export default defineConfig(({ mode }) => {
     },
     optimizeDeps: {
       // Pre-bundle Stripe packages to avoid resolution issues during development
-      include: ['@stripe/stripe-js', '@stripe/react-stripe-js']
+      include: ['@stripe/stripe-js', '@stripe/react-stripe-js'],
+      // Force optimization of these packages
+      force: true
     },
     build: {
       // Ensure proper handling of CommonJS modules
       commonjsOptions: {
-        include: [/stripe/, /node_modules/]
+        include: [/stripe/, /node_modules/],
+        transformMixedEsModules: true
       },
       rollupOptions: {
-        // Explicitly handle Stripe packages resolution
+        // Explicitly handle Stripe packages resolution - DO NOT externalize
         external: [],
         output: {
-          manualChunks: {
-            stripe: ['@stripe/stripe-js', '@stripe/react-stripe-js']
+          // Create separate chunks for better loading
+          manualChunks: (id) => {
+            // Bundle Stripe packages together
+            if (id.includes('@stripe/')) {
+              return 'stripe';
+            }
+            // Bundle node_modules separately
+            if (id.includes('node_modules')) {
+              return 'vendor';
+            }
           }
         }
-      }
+      },
+      // Increase chunk size warning limit for large bundles
+      chunkSizeWarningLimit: 1000,
+      // Ensure all dependencies are bundled
+      ssr: false
     }
   }
 
