@@ -1,7 +1,6 @@
 // vite.config.ts
 
 import { defineConfig, loadEnv } from 'vite'
-import mkcert from 'vite-plugin-mkcert'
 import path from 'path'
 
 // Environment variable validation
@@ -71,8 +70,24 @@ function createAnchorLCLConfig(env: Record<string, string>, baseConfig: any, htt
 }
 
 // Fallback mkcert configuration
-function createMkcertConfig(baseConfig: any, httpsPort: number) {
+async function createMkcertConfig(baseConfig: any, httpsPort: number) {
   console.log(`✅ Using mkcert for HTTPS certificates`)
+  
+  // Dynamically import mkcert only when needed
+  let mkcert: any = null
+  try {
+    mkcert = (await import('vite-plugin-mkcert')).default
+  } catch (error) {
+    console.warn('⚠️  vite-plugin-mkcert not available, falling back to HTTP')
+    return {
+      ...baseConfig,
+      server: {
+        port: httpsPort,
+        host: '0.0.0.0',
+        https: false,
+      },
+    }
+  }
   
   return {
     ...baseConfig,
@@ -85,7 +100,7 @@ function createMkcertConfig(baseConfig: any, httpsPort: number) {
   }
 }
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(async ({ mode }) => {
   // Load env file based on `mode` in the current working directory.
   const env = loadEnv(mode, process.cwd(), '')
   
@@ -141,5 +156,5 @@ export default defineConfig(({ mode }) => {
   }
   
   // Fallback to mkcert
-  return createMkcertConfig(baseConfig, httpsPort)
+  return await createMkcertConfig(baseConfig, httpsPort)
 })
