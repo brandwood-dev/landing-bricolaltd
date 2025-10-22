@@ -1,10 +1,10 @@
 
+/* Import flag-icons CSS */
+@import 'flag-icons/css/flag-icons.min.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import flag-icons CSS */
-@import 'flag-icons/css/flag-icons.min.css';
 
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
 
