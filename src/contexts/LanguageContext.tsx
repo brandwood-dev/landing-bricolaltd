@@ -16,6 +16,7 @@ interface LanguageContextType {
 
 const translations = {
   fr: {
+    'login.signing': 'Connexion en cours...',
     'blog.category.general': 'Général',
     // AgeVerificationDialog
     'ageVerification.title': "Vérification de l'âge",
@@ -351,18 +352,18 @@ const translations = {
 
     'resetpwd.popupsuccupdate': 'Mot de passe modifié',
     'resetpwd.txtsucc': 'Votre mot de passe a été modifié avec succès.',
-    'blog.Jardinage' : 'Jardinage',
-    'blog.Entretien' : 'Entretien',
-    'blog.Transport' : 'Transport',
-    'blog.Bricolage' : 'Bricolage',
-    'blog.Électricité' : 'Électricité',
-    'blog.Éclairage' : 'Éclairage',
-    'blog.Peinture' : 'Peinture',
-    'blog.Construction' : 'Construction',
-    'blog.Plantes' : 'Plantes',
-    'blog.Nettoyage' : 'Nettoyage',
-    'blog.Décoration' : 'Décoration',
-    'blog.Guide' : 'Guide',
+    'blog.Jardinage': 'Jardinage',
+    'blog.Entretien': 'Entretien',
+    'blog.Transport': 'Transport',
+    'blog.Bricolage': 'Bricolage',
+    'blog.Électricité': 'Électricité',
+    'blog.Éclairage': 'Éclairage',
+    'blog.Peinture': 'Peinture',
+    'blog.Construction': 'Construction',
+    'blog.Plantes': 'Plantes',
+    'blog.Nettoyage': 'Nettoyage',
+    'blog.Décoration': 'Décoration',
+    'blog.Guide': 'Guide',
     // Status badges
     'status.pending': 'EN ATTENTE',
     'status.accepted': 'ACCEPTÉE',
@@ -395,6 +396,22 @@ const translations = {
     'validation.condition_required': "L'état de l'outil est obligatoire",
     'validation.price_invalid': 'Le prix par jour doit être supérieur à 0',
     'validation.limit_reached': 'Vous ne pouvez ajouter que 10 photos maximum',
+    'validation.description_max_chars': 'Vous avez dépassé le nombre maximum de caractères autorisés (500).',
+    'validation.instructions_max_chars': 'Vous avez dépassé le nombre maximum de caractères autorisés (300).',
+    'validation.price_max_amount': 'Le prix maximum par jour est de 500 €.',
+    'validation.deposit_max_amount': 'La caution maximale est de 500 €.',
+    'validation.character_counter': 'Attention: {current}/{max} caractères utilisés.',
+    'validation.char_count': '{current}/{max} caractères',
+
+    // Currency names
+    'currency.GBP': 'Livre Sterling Britannique',
+    'currency.KWD': 'Dinar Koweïtien',
+    'currency.SAR': 'Riyal Saoudien',
+    'currency.BHD': 'Dinar Bahreïni',
+    'currency.OMR': 'Rial Omanais',
+    'currency.QAR': 'Riyal Qatarien',
+    'currency.AED': 'Dirham des Émirats Arabes Unis',
+    'currency.label': 'Devise',
     'validation.first_name_required': 'Le prénom est obligatoire',
     'validation.last_name_required': 'Le nom de famille est obligatoire',
     'validation.email_required': "L'adresse email est obligatoire",
@@ -1831,8 +1848,9 @@ const translations = {
       'L’usage continu de la plateforme après modification vaut acceptation tacite de la nouvelle version.',
   },
   en: {
+    'login.signing': 'Signing in...',
     'blog.category.general': 'General',
-
+    'general.loading': 'loading...',
     // AgeVerificationDialog
     'ageVerification.title': 'Age Verification',
     'ageVerification.description':
@@ -2876,6 +2894,22 @@ const translations = {
     'validation.condition_required': 'Tool condition is required',
     'validation.price_invalid': 'Price per day must be greater than 0',
     'validation.limit_reached': 'You can add a maximum of 10 photos',
+    'validation.description_max_chars': 'You have exceeded the maximum number of allowed characters (500).',
+    'validation.instructions_max_chars': 'You have exceeded the maximum number of allowed characters (300).',
+    'validation.price_max_amount': 'The maximum price per day is €500.',
+    'validation.deposit_max_amount': 'The maximum deposit is €500.',
+    'validation.character_counter': 'Warning: {current}/{max} characters used.',
+    'validation.char_count': '{current}/{max} characters',
+
+    // Currency names
+    'currency.GBP': 'British Pound Sterling',
+    'currency.KWD': 'Kuwaiti Dinar',
+    'currency.SAR': 'Saudi Riyal',
+    'currency.BHD': 'Bahraini Dinar',
+    'currency.OMR': 'Omani Rial',
+    'currency.QAR': 'Qatari Riyal',
+    'currency.AED': 'UAE Dirham',
+    'currency.label': 'Currency',
     'validation.first_name_required': 'First name is required',
     'validation.last_name_required': 'Last name is required',
     'validation.email_required': 'Email address is required',
@@ -3622,8 +3656,9 @@ const translations = {
     'notifications.booking_accepted': 'Booking Accepted',
   },
   ar: {
+    'login.signing': 'تسجيل الدخول...',
     'blog.category.general': 'عام',
-
+    'general.loading': 'جاري التحميل...',
     // AgeVerificationDialog
     'register.select_prefix': 'اختر فكس',
 
@@ -5250,6 +5285,22 @@ const translations = {
     'validation.passwords_dont_match': 'كلمات المرور غير متطابقة',
     'validation.invalid_price': 'السعر غير صحيح',
     'validation.invalid_deposit': 'مبلغ التأمين غير صحيح',
+    'validation.description_max_chars': 'لقد تجاوزت العدد الأقصى المسموح به من الأحرف (500).',
+    'validation.instructions_max_chars': 'لقد تجاوزت العدد الأقصى المسموح به من الأحرف (300).',
+    'validation.price_max_amount': 'الحد الأقصى للسعر اليومي هو 500 يورو.',
+    'validation.deposit_max_amount': 'الحد الأقصى للتأمين هو 500 يورو.',
+    'validation.character_counter': 'تحذير: {current}/{max} حرف مستخدم.',
+    'validation.char_count': '{current}/{max} حرف',
+
+    // Currency names
+    'currency.GBP': 'الجنيه الإسترليني البريطاني',
+    'currency.KWD': 'الدينار الكويتي',
+    'currency.SAR': 'الريال السعودي',
+    'currency.BHD': 'الدينار البحريني',
+    'currency.OMR': 'الريال العماني',
+    'currency.QAR': 'الريال القطري',
+    'currency.AED': 'درهم الإمارات العربية المتحدة',
+    'currency.label': 'العملة',
   },
 }
 

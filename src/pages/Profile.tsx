@@ -10,10 +10,14 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import ProfileTabs from '@/components/profile/ProfileTabs';
+import DeleteAccountButton from '@/components/profile/DeleteAccountButton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const Profile = () => {
+  const { t } = useLanguage();
+
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   
@@ -60,21 +64,30 @@ const Profile = () => {
         setIsLoading(true);
         setError(null);
         
-        // Fetch user statistics from backend
-        const [userStatsData, walletBalance] = await Promise.all([
-          userService.getUserStats(user.id),
-          walletService.getUserBalance(user.id).catch(() => ({ balance: 0 })) // Fallback if wallet doesn't exist
-        ]);
+        console.log('Profile - Fetching user stats for current user');
         
-        setUserStats(userStatsData);
+        // Fetch user statistics from backend
+        const userStatsData = await userService.getUserStats();
+        
+        console.log('Profile - User stats received:', userStatsData);
+        
+        setUserStats(userStatsData.data);
         
         // Transform backend data to match ProfileHeader expectations
         const transformedStats = {
-          totalEarnings: walletBalance.balance || 0,
-          activeAds: userStatsData.activeTools,
-          totalRentals: userStatsData.completedBookings,
-          rating: userStatsData.averageRating
+          totalEarnings: userStatsData?.totalEarnings || 0,
+          activeAds: userStatsData?.activeAds || 0,
+          completedRentals: userStatsData?.completedRentals || 0,
+          averageRating: userStatsData?.averageRating || 0
         };
+        
+        console.log('Profile - Transformed stats:', transformedStats);
+        console.log('Profile - UserStatsData details:', {
+          totalEarnings: userStatsData.totalEarnings,
+          activeAds: userStatsData.activeAds,
+          completedRentals: userStatsData.completedRentals,
+          averageRating: userStatsData.averageRating
+        });
         
         setStats(transformedStats);
       } catch (err: any) {
@@ -111,8 +124,9 @@ const Profile = () => {
     lastName: user.lastName,
     email: user.email,
     verified: user.verifiedEmail,
-    memberSince: userStats?.memberSince || user.createdAt,
-    accountType: user.userType === 'individual' ? 'Particulier' : 'Entreprise',
+    memberSince: user.createdAt,
+    phoneNumber: user.phoneNumber,
+    phone_prefix: user.phone_prefix,
     profilePicture: user.profilePicture
     
   } : null;
@@ -135,7 +149,7 @@ const Profile = () => {
           <div className="max-w-6xl mx-auto px-4">
             <div className="flex items-center justify-center py-20">
               <Loader2 className="h-8 w-8 animate-spin" />
-              <span className="ml-2">Chargement du profil...</span>
+              <span className="ml-2">{t('general.loading')}</span>
             </div>
           </div>
         </main>
@@ -186,10 +200,19 @@ const Profile = () => {
           <ProfileHeader 
             userInfo={userInfo}
             stats={stats}
-            isAccountDeletionPending={isAccountDeletionPending}
-            onAccountDeletion={handleAccountDeletion}
           />
           <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+          
+          {/* Delete Account Button - affiché seulement si ?tab=profile */}
+          <div className="mt-8 pt-8 border-t border-border">
+            {activeTab === 'profile' && (
+              <DeleteAccountButton
+                userId={user?.id || ''}
+                isAccountDeletionPending={isAccountDeletionPending}
+                onAccountDeletion={handleAccountDeletion}
+              />
+            )}
+          </div>
         </div>
       </main>
       <Footer />

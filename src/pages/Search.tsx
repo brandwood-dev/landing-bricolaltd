@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Slider } from '@/components/ui/slider'
+import CustomRangeSlider from '@/components/ui/CustomRangeSlider'
 import { Badge } from '@/components/ui/badge'
 import {
   Pagination,
@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/pagination'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { PriceDisplay } from '@/components/PriceDisplay'
 import {
   Search as SearchIcon,
   MapPin,
@@ -83,6 +84,10 @@ const Search = () => {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const location = useLocation()
+
+  // Debug log pour vérifier la valeur de isAuthenticated
+  console.log('🔍 Search.tsx - isAuthenticated:', isAuthenticated)
+
   const [priceRange, setPriceRange] = useState([0, 500])
   const [selectedCategory, setSelectedCategory] = useState(
     searchParams.get('categoryId') || 'all'
@@ -269,7 +274,7 @@ const Search = () => {
     setLocationQuery('')
     setSelectedCategory('all')
     setSelectedSubCategory('all')
-    setPriceRange([0, 100])
+    setPriceRange([0, 500])
     setSortBy('createdAt')
     setSortOrder('desc')
     setCurrentPage(1)
@@ -525,22 +530,14 @@ const Search = () => {
                         {t('catalog_section.daily_price')}
                       </Label>
                       <div className='px-2'>
-                        <Slider
+                        <CustomRangeSlider
                           value={priceRange}
                           onValueChange={setPriceRange}
-                          max={100}
+                          min={0}
+                          max={500}
                           step={5}
                           className='mt-2'
                         />
-                        <div className='flex justify-between items-center mt-2 text-sm text-gray-600'>
-                          <span className='px-2 py-1 bg-gray-100 rounded text-xs font-medium'>
-                            {priceRange[0]}€
-                          </span>
-                          <span className='text-gray-400'>-</span>
-                          <span className='px-2 py-1 bg-gray-100 rounded text-xs font-medium'>
-                            {priceRange[1]}€
-                          </span>
-                        </div>
                       </div>
                     </div>
 
@@ -800,7 +797,11 @@ const Search = () => {
 
                           <div className='flex items-center justify-between mb-4'>
                             <div className='text-lg font-bold text-primary'>
-                              {calculateDisplayPrice(tool.basePrice)}€
+                              <PriceDisplay 
+                                price={calculateDisplayPrice(tool.basePrice)} 
+                                baseCurrency={tool.baseCurrencyCode || 'GBP'} 
+                                size="md"
+                              />
                               <span className='text-sm font-normal text-gray-500'>
                                 /{t('tools.day')}
                               </span>
@@ -821,6 +822,8 @@ const Search = () => {
                             >
                               {t('tools.rent')}
                             </Button>
+                            {/* Debug log pour vérifier la condition d'affichage */}
+                            {console.log('🔍 Bouton favoris - isAuthenticated:', isAuthenticated, 'pour outil:', tool.id)}
                             {isAuthenticated && (
                               <Button
                                 variant='outline'

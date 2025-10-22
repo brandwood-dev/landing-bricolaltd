@@ -207,9 +207,21 @@ export class BookingService {
   }
 
   // Process payment for booking
-  async processPayment(bookingId: string, paymentData: any): Promise<{ success: boolean; paymentIntentId?: string }> {
+  async processPayment(bookingId: string, paymentMethodId: string): Promise<{ 
+    success: boolean; 
+    paymentIntentId?: string; 
+    clientSecret?: string;
+    error?: string;
+  }> {
     try {
-      const response = await api.post<ApiResponse<{ success: boolean; paymentIntentId?: string }>>(`/bookings/${bookingId}/payment`, paymentData);
+      const response = await api.post<ApiResponse<{ 
+        success: boolean; 
+        paymentIntentId?: string; 
+        clientSecret?: string;
+        error?: string;
+      }>>(`/bookings/${bookingId}/with-payment`, {
+        paymentMethodId
+      });
       return response.data.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Payment processing failed');

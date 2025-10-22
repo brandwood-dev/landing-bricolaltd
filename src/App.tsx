@@ -28,6 +28,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Favorites from "./pages/Favorites";
 import Profile from "./pages/Profile";
+import Wallet from "./pages/Wallet";
 import GuideLoueur from "./pages/GuideLoueur";
 import GuideLocataire from "./pages/GuideLocataire";
 import FAQ from "./pages/FAQ";
@@ -42,6 +43,7 @@ import PolitiqueAnnulation from "./pages/PolitiqueAnnulation";
 import PolitiqueRemboursement from "./pages/PolitiqueRemboursement";
 import NotificationsPage from "./pages/NotificationsPage";
 import CategorySelectorExample from "./pages/CategorySelectorExample";
+import Checkout from "./pages/Checkout";
 
 const queryClient = new QueryClient();
 
@@ -92,6 +94,14 @@ const App = () => (
                 <Route path="/search" element={<Search />} />
                 <Route path="/tool/:id" element={<ToolDetails />} />
                 <Route path="/rent/:id" element={<Rent />} />
+                <Route 
+                  path="/checkout/:bookingId" 
+                  element={
+                    <ProtectedRoute>
+                      <Checkout />
+                    </ProtectedRoute>
+                  } 
+                />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:id" element={<BlogPost />} />
                 <Route path="/about" element={<About />} />
@@ -102,6 +112,14 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <Profile />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/wallet" 
+                  element={
+                    <ProtectedRoute>
+                      <Wallet />
                     </ProtectedRoute>
                   } 
                 />

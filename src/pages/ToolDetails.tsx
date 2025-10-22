@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/pagination'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { PriceDisplay } from '@/components/PriceDisplay'
 import { toolsService } from '@/services/toolsService'
 import { reviewsService, ReviewTool } from '@/services/reviewsService'
 import { Tool, Review } from '@/types/bridge/tool.types'
@@ -249,6 +250,39 @@ const ToolDetails = () => {
   const primaryPhotoUrl = getPrimaryPhotoUrl(tool)
   const allPhotoUrls = getAllPhotoUrls(tool)
   const feeAmount = (tool.basePrice || 0) * 0.06
+
+  // Debug logs for price values
+  console.log(`🔍 [ToolDetails] Tool price debugging:`, {
+    toolId: tool.id,
+    toolTitle: tool.title,
+    basePrice: tool.basePrice,
+    basePriceType: typeof tool.basePrice,
+    depositAmount: tool.depositAmount,
+    depositAmountType: typeof tool.depositAmount,
+    baseCurrencyCode: tool.baseCurrencyCode,
+    displayPrice,
+    feeAmount,
+    fullTool: tool
+  });
+
+  // Fix for null/undefined prices - use fallback values and ensure they are numbers
+  const safeBasePrice = typeof tool.basePrice === 'string' ? parseFloat(tool.basePrice) : (tool.basePrice || 0);
+  const safeDepositAmount = typeof tool.depositAmount === 'string' ? parseFloat(tool.depositAmount) : (tool.depositAmount || 0);
+  
+  console.log(`🔧 [ToolDetails] Safe price values:`, {
+    originalBasePrice: tool.basePrice,
+    basePriceType: typeof tool.basePrice,
+    safeBasePrice,
+    safBasePriceType: typeof safeBasePrice,
+    originalDepositAmount: tool.depositAmount,
+    depositAmountType: typeof tool.depositAmount,
+    safeDepositAmount,
+    safeDepositAmountType: typeof safeDepositAmount
+  });
+
+  // Only show price components if the original values are not null/undefined
+  const shouldShowBasePrice = tool.basePrice !== null && tool.basePrice !== undefined;
+  const shouldShowDepositAmount = tool.depositAmount !== null && tool.depositAmount !== undefined;
 
   return (
     <div className='min-h-screen bg-background'>
@@ -494,20 +528,40 @@ const ToolDetails = () => {
 
               <div className='bg-accent/5 rounded-lg p-6 mb-6'>
                 <div className='text-3xl font-bold text-accent mb-2'>
-                  {displayPrice.toFixed(2)} €
+                  <PriceDisplay 
+                    price={displayPrice} 
+                    baseCurrency={tool.baseCurrencyCode || 'GBP'} 
+                    size="lg"
+                  />
                   <span className='text-lg font-normal text-gray-600'>
                     /{t('tools.day')}
                   </span>
                 </div>
                 <div className='text-sm text-gray-600 mb-4'>
-                  {t('tools.fees_and_taxes')} : {(feeAmount || 0).toFixed(1)} €
-                  (6% {t('tools.of')} {tool.basePrice || 0} €{' '}
-                  {t('tools.charged')})
+                  {t('tools.fees_and_taxes')} : <PriceDisplay 
+                    price={feeAmount || 0} 
+                    baseCurrency={tool.baseCurrencyCode || 'GBP'} 
+                    size="sm"
+                  />
+                  {shouldShowBasePrice && (
+                    <>
+                      (6% {t('tools.of')} <PriceDisplay 
+                        price={safeBasePrice} 
+                        baseCurrency={tool.baseCurrencyCode || 'GBP'} 
+                        size="sm"
+                      /> {t('tools.charged')})
+                    </>
+                  )}
                 </div>
-                <div className='text-sm text-gray-600 mb-4'>
-                  {t('tools.deposit')}: {tool.depositAmount || 0}€{' '}
-                  {t('tools.refunded')}
-                </div>
+                {shouldShowDepositAmount && (
+                  <div className='text-sm text-gray-600 mb-4'>
+                    {t('tools.deposit')}: <PriceDisplay 
+                      price={safeDepositAmount} 
+                      baseCurrency={tool.baseCurrencyCode || 'GBP'} 
+                      size="sm"
+                    /> {t('tools.refunded')}
+                  </div>
+                )}
                 <div className='space-y-2'>
                   {!isAuthenticated ? (
                     <Button 
@@ -532,20 +586,22 @@ const ToolDetails = () => {
                       </Button>
                     </Link>
                   )}
-                  <Button
-                    variant='outline'
-                    className='w-full'
-                    onClick={handleFavoriteToggle}
-                  >
-                    <Heart
-                      className={`h-4 w-4 mr-2 ${
-                        isFavorite(tool.id) ? 'fill-red-500 text-red-500' : ''
-                      }`}
-                    />
-                    {isFavorite(tool.id)
-                      ? `${t('tools.remove_from_favorites')}`
-                      : `${t('tools.add_to_favorites')}`}
-                  </Button>
+                  {isAuthenticated && (
+                    <Button
+                      variant='outline'
+                      className='w-full'
+                      onClick={handleFavoriteToggle}
+                    >
+                      <Heart
+                        className={`h-4 w-4 mr-2 ${
+                          isFavorite(tool.id) ? 'fill-red-500 text-red-500' : ''
+                        }`}
+                      />
+                      {isFavorite(tool.id)
+                        ? `${t('tools.remove_from_favorites')}`
+                        : `${t('tools.add_to_favorites')}`}
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>

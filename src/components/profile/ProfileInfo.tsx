@@ -167,12 +167,12 @@ const ProfileInfo = () => {
 
   // Static countries list (same as Register.tsx)
   const countries = [
-    { value: 'KW', label: 'kuwait', flag: '<span class="fi fi-kw"></span>' },
-    { value: 'SA', label: 'ksa', flag: '<span class="fi fi-sa"></span>' },
-    { value: 'BH', label: 'bahrain', flag: '<span class="fi fi-bh"></span>' },
-    { value: 'OM', label: 'oman', flag: '<span class="fi fi-om"></span>' },
-    { value: 'QA', label: 'qatar', flag: '<span class="fi fi-qa"></span>' },
-    { value: 'AE', label: 'uae', flag: '<span class="fi fi-ae"></span>' },
+    { value: 'KW', label: 'kuwait', flag: '<span className="fi fi-kw"></span>' },
+    { value: 'SA', label: 'ksa', flag: '<span className="fi fi-sa"></span>' },
+    { value: 'BH', label: 'bahrain', flag: '<span className="fi fi-bh"></span>' },
+    { value: 'OM', label: 'oman', flag: '<span className="fi fi-om"></span>' },
+    { value: 'QA', label: 'qatar', flag: '<span className="fi fi-qa"></span>' },
+    { value: 'AE', label: 'uae', flag: '<span className="fi fi-ae"></span>' },
   ]
 
   // // Generate countries options from static data (same as Register.tsx)

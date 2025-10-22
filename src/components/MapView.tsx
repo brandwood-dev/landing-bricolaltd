@@ -278,12 +278,14 @@ const MapView = ({
           .setLngLat([tool.coordinates.lng, tool.coordinates.lat])
           .setPopup(
             new mapboxgl.default.Popup().setHTML(`
-              <div class="p-2">
-                <h3 class="font-semibold">${tool.title}</h3>
-                <p class="text-sm text-gray-600">${
-                  tool.basePrice || tool.price
-                }€/jour</p>
-                <p class="text-sm">${tool.pickupAddress}</p>
+              <div className="p-2">
+                <h3 className="font-semibold">${tool.title}</h3>
+                <p className="text-sm text-gray-600">${
+                  tool.description.length > 100 
+                    ? tool.description.substring(0, 100) + '...' 
+                    : tool.description
+                }</p>
+                <p className="text-sm">${tool.pickupAddress}</p>
               </div>
             `)
           )

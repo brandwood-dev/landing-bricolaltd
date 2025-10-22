@@ -3,6 +3,7 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useToast } from '@/hooks/use-toast'
+import { useValidation } from '@/hooks/useValidation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -40,6 +41,7 @@ const AddTool = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { toast } = useToast()
+  const { validateDescription, validateInstructions, validatePrice, validateDeposit } = useValidation()
 
   // Debug logs pour le pays de l'utilisateur
   console.log('🔍 [AddTool] Debug user country data:', {
@@ -96,6 +98,29 @@ const AddTool = () => {
     message: string
   }>({ isChecking: false, isUnique: null, message: '' })
 
+  // Validation states for real-time feedback
+  const [descriptionValidation, setDescriptionValidation] = useState<{
+    isValid: boolean
+    message: string
+    charCount: number
+  }>({ isValid: true, message: '', charCount: 0 })
+
+  const [instructionsValidation, setInstructionsValidation] = useState<{
+    isValid: boolean
+    message: string
+    charCount: number
+  }>({ isValid: true, message: '', charCount: 0 })
+
+  const [priceValidation, setPriceValidation] = useState<{
+    isValid: boolean
+    message: string
+  }>({ isValid: true, message: '' })
+
+  const [depositValidation, setDepositValidation] = useState<{
+    isValid: boolean
+    message: string
+  }>({ isValid: true, message: '' })
+
   // Check name uniqueness
   const checkNameUniqueness = async (name: string) => {
     if (!name.trim()) {
@@ -143,9 +168,44 @@ const AddTool = () => {
     }
   }
 
-  // Input change handler
+  // Input change handler with validation
   const handleInputChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
+
+    // Real-time validation for specific fields
+    if (field === 'description') {
+      const validation = validateDescription(value || '')
+      setDescriptionValidation({
+        isValid: validation.isValid,
+        message: validation.message,
+        charCount: (value || '').length
+      })
+    }
+
+    if (field === 'ownerInstructions') {
+      const validation = validateInstructions(value || '')
+      setInstructionsValidation({
+        isValid: validation.isValid,
+        message: validation.message,
+        charCount: (value || '').length
+      })
+    }
+
+    if (field === 'basePrice') {
+      const validation = validatePrice(value)
+      setPriceValidation({
+        isValid: validation.isValid,
+        message: validation.message
+      })
+    }
+
+    if (field === 'depositAmount') {
+      const validation = validateDeposit(value)
+      setDepositValidation({
+        isValid: validation.isValid,
+        message: validation.message
+      })
+    }
 
     // Handle category change to load subcategories
     if (field === 'categoryId' && value) {
@@ -623,15 +683,33 @@ const AddTool = () => {
                     >
                       {t('add_tool.description')}
                     </Label>
-                    <Textarea
-                      id='description'
-                      value={formData.description || ''}
-                      onChange={(e) =>
-                        handleInputChange('description', e.target.value)
-                      }
-                      placeholder={t('add_tool.description_placeholder')}
-                      className='min-h-[120px] resize-none text-base'
-                    />
+                    <div className='relative'>
+                      <Textarea
+                        id='description'
+                        value={formData.description || ''}
+                        onChange={(e) =>
+                          handleInputChange('description', e.target.value)
+                        }
+                        placeholder={t('add_tool.description_placeholder')}
+                        className={`min-h-[120px] resize-none text-base pr-16 ${
+                          !descriptionValidation.isValid ? 'border-destructive focus:border-destructive' : ''
+                        }`}
+                        maxLength={500}
+                      />
+                      <div className='absolute bottom-3 right-3 text-xs text-muted-foreground'>
+                        {descriptionValidation.charCount}/500
+                      </div>
+                    </div>
+                    {!descriptionValidation.isValid && (
+                      <p className='text-sm text-destructive mt-1'>
+                        {descriptionValidation.message}
+                      </p>
+                    )}
+                    {descriptionValidation.charCount > 450 && descriptionValidation.isValid && (
+                      <p className='text-sm text-amber-600 mt-1'>
+                        {t('validation.character_counter', { current: descriptionValidation.charCount, max: 500 })}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -758,21 +836,30 @@ const AddTool = () => {
                           id='price'
                           type='number'
                           min='0.01'
+                          max='500'
                           step='0.01'
                           value={formData.basePrice || ''}
-                          onChange={(e) =>
-                            handleInputChange(
-                              'basePrice',
-                              e.target.value
-                                ? parseFloat(e.target.value)
-                                : undefined
-                            )
-                          }
+                          onChange={(e) => {
+                            const value = e.target.value
+                            const numValue = value ? parseFloat(value) : undefined
+                            // Block input if value exceeds 500
+                            if (numValue && numValue > 500) {
+                              return
+                            }
+                            handleInputChange('basePrice', numValue)
+                          }}
                           placeholder='25'
-                          className='h-12 text-base pl-8'
+                          className={`h-12 text-base pl-8 ${
+                            !priceValidation.isValid ? 'border-destructive focus:border-destructive' : ''
+                          }`}
                         />
                         <Euro className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
                       </div>
+                      {!priceValidation.isValid && (
+                        <p className='text-sm text-destructive mt-1'>
+                          {priceValidation.message}
+                        </p>
+                      )}
                     </div>
 
                     <div className='space-y-3'>
@@ -787,21 +874,30 @@ const AddTool = () => {
                           id='deposit'
                           type='number'
                           min='0'
+                          max='500'
                           step='0.01'
                           value={formData.depositAmount || ''}
-                          onChange={(e) =>
-                            handleInputChange(
-                              'depositAmount',
-                              e.target.value
-                                ? parseFloat(e.target.value)
-                                : undefined
-                            )
-                          }
+                          onChange={(e) => {
+                            const value = e.target.value
+                            const numValue = value ? parseFloat(value) : undefined
+                            // Block input if value exceeds 500
+                            if (numValue && numValue > 500) {
+                              return
+                            }
+                            handleInputChange('depositAmount', numValue)
+                          }}
                           placeholder='100'
-                          className='h-12 text-base pl-8'
+                          className={`h-12 text-base pl-8 ${
+                            !depositValidation.isValid ? 'border-destructive focus:border-destructive' : ''
+                          }`}
                         />
                         <Shield className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
                       </div>
+                      {!depositValidation.isValid && (
+                        <p className='text-sm text-destructive mt-1'>
+                          {depositValidation.message}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -988,15 +1084,33 @@ const AddTool = () => {
                     >
                       {t('add_tool.owner_instructions')}
                     </Label>
-                    <Textarea
-                      id='instructions'
-                      value={formData.ownerInstructions || ''}
-                      onChange={(e) =>
-                        handleInputChange('ownerInstructions', e.target.value)
-                      }
-                      placeholder='Ex: Prévoir une rallonge électrique, nettoyer après usage, manipulation délicate...'
-                      className='min-h-[100px] resize-none text-base'
-                    />
+                    <div className='relative'>
+                      <Textarea
+                        id='instructions'
+                        value={formData.ownerInstructions || ''}
+                        onChange={(e) =>
+                          handleInputChange('ownerInstructions', e.target.value)
+                        }
+                        placeholder='Ex: Prévoir une rallonge électrique, nettoyer après usage, manipulation délicate...'
+                        className={`min-h-[100px] resize-none text-base pr-16 ${
+                          !instructionsValidation.isValid ? 'border-destructive focus:border-destructive' : ''
+                        }`}
+                        maxLength={300}
+                      />
+                      <div className='absolute bottom-3 right-3 text-xs text-muted-foreground'>
+                        {instructionsValidation.charCount}/300
+                      </div>
+                    </div>
+                    {!instructionsValidation.isValid && (
+                      <p className='text-sm text-destructive mt-1'>
+                        {instructionsValidation.message}
+                      </p>
+                    )}
+                    {instructionsValidation.charCount > 250 && instructionsValidation.isValid && (
+                      <p className='text-sm text-amber-600 mt-1'>
+                        {t('validation.character_counter', { current: instructionsValidation.charCount, max: 300 })}
+                      </p>
+                    )}
                   </div>
                 </div>
 

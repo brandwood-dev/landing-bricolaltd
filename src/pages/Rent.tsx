@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
+import { StripeProvider } from '@/contexts/StripeContext'
 
 import { useLanguage } from '@/contexts/LanguageContext'
 import { Button } from '@/components/ui/button'
@@ -24,12 +25,13 @@ import { Calendar } from '@/components/ui/calendar'
 import { useToast } from '@/hooks/use-toast'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import PaymentForm from '@/components/payment/PaymentForm'
 import { toolsService } from '@/services/toolsService'
 import { bookingService } from '@/services/bookingService'
 import { getActiveCountries } from '@/services/countriesService'
 
 import { Tool } from '@/types/bridge/tool.types'
-import { CreateBookingData, BookingPricing } from '@/types/bridge/booking.types'
+import { CreateBookingData, BookingPricing, Booking } from '@/types/bridge/booking.types'
 import { Country } from '@/types/bridge/common.types'
 import {
   ArrowLeft,
@@ -46,45 +48,200 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react'
+import { PriceDisplay } from '@/components/PriceDisplay'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { cn } from '@/lib/utils'
 import { PaymentMethod } from '@/types/bridge'
 
-const Rent = () => {
-  const { user } = useAuth()
-  const { id } = useParams()
-  const { t, language } = useLanguage()
-  const { toast } = useToast()
+// Interface pour les données persistées
+interface PersistedFormData {
+  startDate: Date | null
+  endDate: Date | null
+  pickupHour: string
+  message: string
+  paymentMethod: 'card'
+  renterInfo?: {
+    firstName: string
+    lastName: string
+    phone: string
+    phone_prefix: string
+  }
+  timestamp: number
+}
+
+const Rent: React.FC = () => {
+  const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const location = useLocation()
+  const { user } = useAuth()
+  const { t, language } = useLanguage()
+  const { toast } = useToast()
 
-  // State variables
+  // États existants
   const [tool, setTool] = useState<Tool | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [unavailableDates, setUnavailableDates] = useState<Date[]>([])
-  const [existingBookings, setExistingBookings] = useState<any[]>([])
+  const [confirmedDates, setConfirmedDates] = useState<Date[]>([])
+  const [pendingDates, setPendingDates] = useState<Date[]>([])
+  const [inProgressDates, setInProgressDates] = useState<Date[]>([])
+  const [existingBookings, setExistingBookings] = useState<Booking[]>([])
+  const [pricing, setPricing] = useState<BookingPricing | null>(null)
+  const [countries, setCountries] = useState<Country[]>([])
+
+  // États du formulaire
+  const [startDate, setStartDate] = useState<Date | null>(null)
+  const [endDate, setEndDate] = useState<Date | null>(null)
+  const [pickupHour, setPickupHour] = useState<string>('09:00')
+  const [formData, setFormData] = useState({
+    message: '',
+    paymentMethod: 'card' as 'card',
+  })
+
+  // États pour le nouveau flux de paiement
+  const [pendingBookingData, setPendingBookingData] = useState<CreateBookingData | null>(null)
+
+  // Fonction pour générer la clé de stockage unique
+  const getStorageKey = (toolId: string, userId?: string): string => {
+    return `rent_form_${toolId}_${userId || 'anonymous'}`
+  }
+
+  // Fonction pour sauvegarder les données dans localStorage
+  const saveFormData = () => {
+    if (!id) return
+
+    const dataToSave: PersistedFormData = {
+      startDate,
+      endDate,
+      pickupHour,
+      message: formData.message,
+      paymentMethod: formData.paymentMethod,
+      timestamp: Date.now(),
+    }
+
+    try {
+      const storageKey = getStorageKey(id, user?.id)
+      localStorage.setItem(storageKey, JSON.stringify(dataToSave))
+    } catch (error) {
+      console.warn('Failed to save form data to localStorage:', error)
+    }
+  }
+
+  // Fonction pour restaurer les données depuis localStorage
+  const restoreFormData = () => {
+    if (!id) return
+
+    try {
+      const storageKey = getStorageKey(id, user?.id)
+      const savedData = localStorage.getItem(storageKey)
+      
+      if (savedData) {
+        const parsedData: PersistedFormData = JSON.parse(savedData)
+        
+        // Vérifier que les données ne sont pas trop anciennes (24h max)
+        const maxAge = 24 * 60 * 60 * 1000 // 24 heures en millisecondes
+        if (Date.now() - parsedData.timestamp > maxAge) {
+          localStorage.removeItem(storageKey)
+          return
+        }
+
+        // Restaurer les données
+        if (parsedData.startDate) {
+          setStartDate(new Date(parsedData.startDate))
+        }
+        if (parsedData.endDate) {
+          setEndDate(new Date(parsedData.endDate))
+        }
+        setPickupHour(parsedData.pickupHour || '09:00')
+        setFormData(prev => ({
+          ...prev,
+          message: parsedData.message || '',
+          paymentMethod: parsedData.paymentMethod || 'card',
+        }))
+
+        console.log('Form data restored from localStorage')
+      }
+    } catch (error) {
+      console.warn('Failed to restore form data from localStorage:', error)
+    }
+  }
+
+  // Fonction pour nettoyer les données sauvegardées
+  const clearSavedFormData = () => {
+    if (!id) return
+
+    try {
+      const storageKey = getStorageKey(id, user?.id)
+      localStorage.removeItem(storageKey)
+    } catch (error) {
+      console.warn('Failed to clear saved form data:', error)
+    }
+  }
+
+  // Fonction pour nettoyer les données d'autres outils
+  const clearOtherToolsData = (currentToolId: string, userId?: string) => {
+    try {
+      const prefix = `rent_form_`
+      const currentKey = getStorageKey(currentToolId, userId)
+      
+      // Parcourir toutes les clés localStorage
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const key = localStorage.key(i)
+        if (key && key.startsWith(prefix) && key !== currentKey) {
+          localStorage.removeItem(key)
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to clear other tools data:', error)
+    }
+  }
+
+  // useEffect pour restaurer les données au chargement
+  useEffect(() => {
+    if (id && !loading) {
+      restoreFormData()
+      clearOtherToolsData(id, user?.id)
+    }
+  }, [id, user?.id, loading])
+
+  // useEffect pour sauvegarder automatiquement les données
+  useEffect(() => {
+    if (!loading && id) {
+      saveFormData()
+    }
+  }, [startDate, endDate, pickupHour, formData.message, formData.paymentMethod, id, user?.id, loading])
+
+  // useEffect pour nettoyer lors de la navigation vers d'autres pages (sauf Checkout)
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      // Ne pas nettoyer si on va vers la page de checkout
+      const isGoingToCheckout = location.pathname.includes('/checkout')
+      if (!isGoingToCheckout) {
+        clearSavedFormData()
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+      // Ne pas nettoyer automatiquement au démontage du composant
+      // car cela pourrait interférer avec la navigation vers checkout
+    }
+  }, [location.pathname, id, user?.id])
+
+  // États supplémentaires pour la gestion des réservations
   const [bookingDates, setBookingDates] = useState<{
     confirmed: Date[],
     pending: Date[],
     inProgress: Date[]
   }>({ confirmed: [], pending: [], inProgress: [] })
-  const [pricing, setPricing] = useState<BookingPricing | null>(null)
   const [pricingLoading, setPricingLoading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
-
-  const [formData, setFormData] = useState({
-    startDate: '',
-    endDate: '',
-    pickupHour: '09:00',
-    message: '',
-    paymentMethod: 'card',
-  })
-  const [countries, setCountries] = useState<Country[]>([])
+  const [showPayment, setShowPayment] = useState(false)
+  const [currentBooking, setCurrentBooking] = useState<Booking | null>(null)
   const [loadingCountries, setLoadingCountries] = useState(true)
-  const [startDate, setStartDate] = useState<Date>()
-  const [endDate, setEndDate] = useState<Date>()
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
   useEffect(() => {
@@ -511,35 +668,33 @@ const Rent = () => {
         return
       }
 
-      // Create booking data
+      // Préparer les données de réservation (sans créer la réservation encore)
       const bookingData: CreateBookingData = {
         toolId: tool.id,
         startDate: startDate.toISOString().split('T')[0],
         endDate: endDate.toISOString().split('T')[0],
         pickupHour: formData.pickupHour,
-        paymentMethod: formData.paymentMethod as
-          | PaymentMethod.CARD
-          | PaymentMethod.PAYPAL,
+        paymentMethod: PaymentMethod.CARD,
         message: formData.message || undefined,
         renterId: user?.id!,
         ownerId: tool.ownerId,
         totalPrice: totalToPay,
       }
 
-      // Create the booking
-      const booking = await bookingService.createBooking(bookingData)
+      // Stocker les données pour les utiliser après le paiement
+      setPendingBookingData(bookingData)
+      console.log('🔍 Booking data prepared:', bookingData)
 
       toast({
-        title: t('success.reservation.confirmed.title'),
-        description: t('success.reservation.confirmed.message'),
-        duration: 5000,
-        className: "bg-green-50 border-green-200 text-green-800",
+        title: 'Données validées!',
+        description: 'Veuillez procéder au paiement pour confirmer votre réservation.',
+        duration: 3000,
+        className: "bg-blue-50 border-blue-200 text-blue-800",
       })
 
-      // Redirect to profile/bookings page
-      setTimeout(() => {
-        navigate('/profile?tab=bookings')
-      }, 2000)
+      // Afficher le formulaire de paiement
+      setShowPayment(true)
+      console.log('🔍 ShowPayment set to true')
     } catch (err: any) {
       // Function to get user-friendly error message
       const getErrorMessage = (error: any) => {
@@ -653,19 +808,20 @@ const Rent = () => {
   }
 
   return (
-    <div className='min-h-screen bg-background'>
-      <Header />
-      <main className='py-20'>
-        <div className='max-w-6xl mx-auto px-4'>
-          <div className='mb-6'>
-            <Link
-              to={`/tool/${id}`}
-              className='inline-flex items-center gap-2 text-accent hover:underline'
-            >
-              <ArrowLeft className='h-4 w-4' />
-              {t('reservation.back_to_details')}
-            </Link>
-          </div>
+    <StripeProvider>
+      <div className='min-h-screen bg-background'>
+        <Header />
+        <main className='py-20'>
+          <div className='max-w-6xl mx-auto px-4'>
+            <div className='mb-6'>
+              <Link
+                to={`/tool/${id}`}
+                className='inline-flex items-center gap-2 text-accent hover:underline'
+              >
+                <ArrowLeft className='h-4 w-4' />
+                {t('reservation.back_to_details')}
+              </Link>
+            </div>
 
           {/* Section détaillée de l'outil */}
           {/* {tool && (
@@ -1125,48 +1281,142 @@ const Rent = () => {
                       <h3 className='font-semibold text-lg'>
                         {t('reservation.payment_method')}
                       </h3>
+                      
+                      {/* SECTION SUPPRIMÉE - PaymentForm déplacé en dehors du formulaire principal */}
                       <div className='space-y-3'>
-                        <label className='flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50'>
-                          <input
-                            type='radio'
-                            name='payment'
-                            value='card'
-                            checked={formData.paymentMethod === 'card'}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                paymentMethod: e.target.value,
-                              })
-                            }
-                          />
-                          <CreditCard className='h-5 w-5' />
-                          <span>{t('reservation.card')}</span>
-                        </label>
-                        <label className='flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50'>
-                          <input
-                            type='radio'
-                            name='payment'
-                            value='paypal'
-                            checked={formData.paymentMethod === 'paypal'}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                paymentMethod: e.target.value,
-                              })
-                            }
-                          />
-                          <span className='w-5 h-5 bg-blue-600 rounded text-white text-xs flex items-center justify-center font-bold'>
-                            P
-                          </span>
-                          <span>PayPal</span>
-                        </label>
+                        <div className='flex items-center gap-3 p-3 border rounded-lg bg-blue-50 border-blue-200'>
+                          <CreditCard className='h-5 w-5 text-blue-600' />
+                          <span className='font-medium text-blue-800'>{t('reservation.card')}</span>
+                          <span className='ml-auto text-sm text-blue-600'>Sélectionné</span>
+                        </div>
+                        <p className='text-sm text-gray-600'>
+                          Le formulaire de paiement apparaîtra après validation de vos informations.
+                        </p>
                       </div>
+
+                      {/* LOGIQUE ORIGINALE COMMENTÉE - À RESTAURER PLUS TARD */}
+                      {/*
+                      {(() => {
+                        console.log('🔍 Render check - showPayment:', showPayment, 'currentBooking:', currentBooking)
+                        return !showPayment ? (
+                          <div className='space-y-3'>
+                            <div className='flex items-center gap-3 p-3 border rounded-lg bg-blue-50 border-blue-200'>
+                              <CreditCard className='h-5 w-5 text-blue-600' />
+                              <span className='font-medium text-blue-800'>{t('reservation.card')}</span>
+                              <span className='ml-auto text-sm text-blue-600'>Sélectionné</span>
+                            </div>
+                          </div>
+                        ) : (
+                         <div className='space-y-4'>
+                           <div className='bg-green-50 border border-green-200 rounded-lg p-4'>
+                             <div className='flex items-center gap-2'>
+                               <Check className='h-5 w-5 text-green-600' />
+                               <span className='text-green-800 font-medium'>
+                                 Réservation créée avec succès
+                               </span>
+                             </div>
+                             <p className='text-green-700 text-sm mt-1'>
+                               Veuillez procéder au paiement pour confirmer votre réservation
+                             </p>
+                           </div>
+                           
+                           {(() => {
+                             console.log('🔍 PaymentForm render check - currentBooking exists:', !!currentBooking, 'totalToPay:', totalToPay)
+                             return currentBooking && (
+                               <PaymentForm
+                                 amount={totalToPay}
+                                 bookingId={currentBooking.id}
+                                 paymentMethod="card"
+                                 onPaymentSuccess={() => {
+                                   // Nettoyer les données sauvegardées après un paiement réussi
+                                   clearSavedFormData()
+                                   toast({
+                                     title: 'Paiement effectué avec succès!',
+                                     description: 'Votre réservation a été confirmée.',
+                                     className: "bg-green-50 border-green-200 text-green-800",
+                                   })
+                                   navigate('/profile?tab=reservations')
+                                 }}
+                                 onPaymentError={(error) => {
+                                   setError(error)
+                                   toast({
+                                     title: 'Erreur lors du paiement',
+                                     description: error,
+                                     variant: 'destructive',
+                                   })
+                                 }}
+                               />
+                             )
+                           })()}
+                         </div>
+                       )
+                     })()}
+                     */}
                     </div>
 
 
                   </form>
                 </CardContent>
               </Card>
+
+              {/* PaymentForm affiché après validation du formulaire */}
+              {showPayment && pendingBookingData && (
+                <div className='mt-6'>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className='flex items-center gap-2'>
+                        <CreditCard className='h-5 w-5' />
+                        Paiement de la réservation
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+
+
+                      <PaymentForm
+                        amount={totalToPay}
+                        bookingId="pending" // Temporaire, sera remplacé après création
+                        paymentMethod="card"
+                        onPaymentSuccess={async () => {
+                          try {
+                            // Créer la réservation après paiement réussi
+                            const booking = await bookingService.createBooking(pendingBookingData)
+                            console.log('🔍 Booking created after payment:', booking)
+                            
+                            // Nettoyer les données
+                            setPendingBookingData(null)
+                            setShowPayment(false)
+                            clearSavedFormData()
+                            
+                            toast({
+                              title: 'Paiement effectué avec succès!',
+                              description: 'Votre réservation a été confirmée.',
+                              className: "bg-green-50 border-green-200 text-green-800",
+                            })
+                            
+                            navigate('/profile?tab=reservations')
+                          } catch (error: any) {
+                            toast({
+                              title: 'Erreur lors de la création de la réservation',
+                              description: 'Le paiement a été effectué mais la réservation n\'a pas pu être créée. Contactez le support.',
+                              variant: 'destructive',
+                            })
+                          }
+                        }}
+                        onPaymentError={(error) => {
+                          toast({
+                            title: 'Erreur lors du paiement',
+                            description: error,
+                            variant: 'destructive',
+                          })
+                          // Optionnel: revenir au formulaire
+                          // setShowPayment(false)
+                        }}
+                      />
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+
             </div>
 
             {/* Récapitulatif */}
@@ -1204,7 +1454,7 @@ const Rent = () => {
                         }
                       >
                         <span>{t('reservation.price_per_day')}</span>
-                        <span>{displayPrice.toFixed(1)}€</span>
+                        <span><PriceDisplay price={displayPrice} baseCurrency={tool?.baseCurrencyCode || 'GBP'} size="sm" /></span>
                       </div>
                       <div
                         className={
@@ -1222,7 +1472,7 @@ const Rent = () => {
                         }
                       >
                         <span>{t('reservation.subtotal')}</span>
-                        <span>{totalPrice.toFixed(1)}€</span>
+                        <span><PriceDisplay price={totalPrice} baseCurrency={tool?.baseCurrencyCode || 'GBP'} size="sm" /></span>
                       </div>
                       <div
                         className={
@@ -1231,7 +1481,7 @@ const Rent = () => {
                         }
                       >
                         <span>{t('reservation.payment_fee')}</span>
-                        <span>{totalFees.toFixed(1)}€</span>
+                        <span><PriceDisplay price={totalFees} baseCurrency={tool?.baseCurrencyCode || 'GBP'} size="sm" /></span>
                       </div>
                       <div
                         className={
@@ -1240,7 +1490,7 @@ const Rent = () => {
                         }
                       >
                         <span>{t('reservation.deposit')}</span>
-                        <span>{deposit}€</span>
+                        <span><PriceDisplay price={deposit} baseCurrency={tool?.baseCurrencyCode || 'GBP'} size="sm" /></span>
                       </div>
                       <div
                         className={
@@ -1250,7 +1500,7 @@ const Rent = () => {
                       >
                         <div className='flex justify-between font-semibold text-lg'>
                           <span>{t('reservation.total_amount')}</span>
-                          <span>{totalToPay.toFixed(1)}€</span>
+                          <span><PriceDisplay price={totalToPay} baseCurrency={tool?.baseCurrencyCode || 'GBP'} size="lg" /></span>
                         </div>
                       </div>
                     </div>
@@ -1296,14 +1546,19 @@ const Rent = () => {
                     className='w-full'
                     size='lg'
                     onClick={handleSubmit}
-                    disabled={submitting || pricingLoading}
+                    disabled={submitting || pricingLoading || showPayment}
                   >
                     {submitting ? (
                       <>
                         <Loader2 className='h-5 w-5 mr-2 animate-spin' />
                         {t('general.processing')}
                       </>
-                    ) : (
+                    ) : showPayment ? (
+                       <>
+                         <Check className='h-5 w-5 mr-2' />
+                         Données validées - Procédez au paiement
+                       </>
+                     ) : (
                       <>
                         <Check className='h-5 w-5 mr-2' />
                         {t('reservation.confirm')}
@@ -1318,10 +1573,11 @@ const Rent = () => {
               </Card>
             </div>
           </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    </StripeProvider>
   )
 }
 

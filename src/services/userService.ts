@@ -93,48 +93,41 @@ class UserService {
     }
   }
 
-  // Calculate user statistics from related data
-  async getUserStats(userId: string): Promise<UserStats> {
-    // eslint-disable-next-line no-useless-catch
+  // Get user statistics from API endpoint
+  async getUserStats(): Promise<UserStats> {
     try {
-      // Get user profile with relations
-      const userProfile = await this.getUserProfile(userId)
-
-      // Calculate stats from the user's related data
-      const totalTools = userProfile.tools?.length || 0
-      const totalBookings = userProfile.bookingsAsRenter?.length || 0
-      const totalReviews = userProfile.reviewsReceived?.length || 0
-
-      // Calculate average rating
-      const averageRating =
-        totalReviews > 0
-          ? userProfile.reviewsReceived.reduce(
-              (sum: number, review: any) => sum + review.rating,
-              0
-            ) / totalReviews
-          : 0
-
-      // Count active tools
-      const activeTools =
-        userProfile.tools?.filter((tool: any) => tool.isActive)?.length || 0
-
-      // Count completed bookings
-      const completedBookings =
-        userProfile.bookingsAsRenter?.filter(
-          (booking: any) => booking.status === 'completed'
-        )?.length || 0
-
-      return {
-        totalTools,
-        totalBookings,
-        totalReviews,
-        averageRating: Math.round(averageRating * 10) / 10, // Round to 1 decimal
-        totalEarnings: 0, // Will be calculated from wallet/transactions
-        completedBookings,
-        activeTools,
-        memberSince: userProfile.createdAt,
+      console.log('UserService - Fetching stats for current user');
+      
+      // Call the dedicated stats endpoint
+      const response = await api.get<ApiResponse<{
+        totalEarnings: number;
+        activeAds: number;
+        completedRentals: number;
+        averageRating: number;
+      }>>('/users/me/stats')
+      
+      console.log('UserService - Raw API response:', response);
+      console.log('UserService - Response data:', response.data);
+      
+      const stats = response.data.data.data
+      
+      console.log('UserService - Extracted stats:', stats);
+      
+      // Get user profile for memberSince date
+      const userProfile = await this.getUserProfile('')
+      
+      const transformedStats = {
+        activeAds: stats.activeAds,
+        averageRating: stats.averageRating,
+        completedRentals: stats.completedRentals,
+        totalEarnings: stats.totalEarnings,
       }
+      
+      console.log('UserService - Transformed stats:', transformedStats);
+      
+      return transformedStats;
     } catch (error) {
+      console.error('UserService - Error fetching user stats:', error)
       throw error
     }
   }

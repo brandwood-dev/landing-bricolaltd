@@ -6,9 +6,7 @@ interface ContractData {
   toolDescription: string
   toolBrand: string
   toolModel: string
-  serialNumber?: string
   condition: string
-  accessories: string
   ownerName: string
   ownerAddress: string
   ownerEmail: string
@@ -19,7 +17,7 @@ interface ContractData {
   renterPhone: string
   startDate: string
   endDate: string
-  pickupHour : string
+  pickupHour: string
   handoverLocation: string
   returnLocation: string
   totalPrice: number
@@ -111,23 +109,31 @@ export const generateRentalContract = (data: ContractData): void => {
     yPosition
   )
   yPosition += 10
-  doc.text(`Designation: ${data.toolName}`, margin, yPosition)
+  doc.text(`Designation : ${data.toolName}`, margin, yPosition)
   yPosition += 6
+  doc.text(`Brand : ${data.toolBrand}`, margin, yPosition)
+  yPosition += 6
+  doc.text(`Model : ${data.toolModel}`, margin, yPosition)
+  yPosition += 6
+  doc.text(`Condition : ${data.condition}`, margin, yPosition)
+  yPosition += 6
+
   doc.text(
-    `Brand/Model: ${data.toolBrand} ${data.toolModel}`,
+    `-----------------------------------------------------------------------------`,
     margin,
     yPosition
   )
-  yPosition += 6
-  if (data.serialNumber) {
-    doc.text(`Serial Number: ${data.serialNumber}`, margin, yPosition)
-    yPosition += 6
-  }
-  doc.text(`Condition: ${data.condition}`, margin, yPosition)
-  yPosition += 6
-  doc.text(`Included Accessories: ${data.accessories}`, margin, yPosition)
   yPosition += 15
-
+  // Add page number in footer
+  const totalPages = 3
+  
+    doc.setPage(1)
+    doc.setFontSize(10)
+    doc.setFont(undefined, 'normal')
+    doc.text(`Page 1 of ${totalPages}`, pageWidth / 2, pageHeight - 10, {
+      align: 'center',
+    })
+ 
   // Check if we need a new page
   if (yPosition > pageHeight - 60) {
     startNewPage()
@@ -166,7 +172,7 @@ export const generateRentalContract = (data: ContractData): void => {
   doc.text('Payment Method: Via the Bricola platform', margin, yPosition)
   yPosition += 15
 
-   // Article 4 - Renter's Obligations
+  // Article 4 - Renter's Obligations
   doc.setFont(undefined, 'bold')
   doc.text("Article 4 - Renter's Obligations", margin, yPosition)
   yPosition += 8
@@ -230,12 +236,17 @@ export const generateRentalContract = (data: ContractData): void => {
   doc.text(liabilityText, margin, yPosition)
   yPosition += liabilityText.length * 6 + 10
 
+  // Add page number in footer
+  doc.setPage(2)
+  doc.setFontSize(10)
+  doc.setFont(undefined, 'normal')
+  doc.text(`Page 2 of ${totalPages}`, pageWidth / 2, pageHeight - 10, {
+    align: 'center',
+  })
   // Check if we need a new page
   if (yPosition > pageHeight - 80) {
     startNewPage()
   }
-
-
 
   // Article 7 - Dispute Resolution
   doc.setFont(undefined, 'bold')
@@ -249,8 +260,6 @@ export const generateRentalContract = (data: ContractData): void => {
   doc.text(disputeText, margin, yPosition)
   yPosition += disputeText.length * 6 + 20
 
-
-
   // Signatures
   doc.setFont(undefined, 'bold')
   doc.text("Owner's Signature", margin, yPosition)
@@ -261,7 +270,6 @@ export const generateRentalContract = (data: ContractData): void => {
   doc.text('[Signature and date]', pageWidth - margin - 80, yPosition)
   yPosition += 20
 
- 
   // Usage Instructions
   doc.setFont(undefined, 'bold')
   doc.text('Usage Instructions', margin, yPosition)
@@ -281,8 +289,12 @@ export const generateRentalContract = (data: ContractData): void => {
     doc.text(splitInstruction, margin, yPosition)
     yPosition += splitInstruction.length * 6 + 2
   })
-
- 
+  doc.setPage(3)
+  doc.setFontSize(10)
+  doc.setFont(undefined, 'normal')
+  doc.text(`Page 3 of ${totalPages}`, pageWidth / 2, pageHeight - 10, {
+    align: 'center',
+  })
   // Download the PDF
   doc.save(`rental-contract-${data.referenceId}.pdf`)
 }

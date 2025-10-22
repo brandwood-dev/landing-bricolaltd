@@ -14,6 +14,7 @@ import {
   ChevronRight,
   Loader2
 } from 'lucide-react';
+import { PriceDisplay } from '@/components/PriceDisplay';
 import { DateRange } from 'react-day-picker';
 import { isWithinInterval, parseISO } from 'date-fns';
 import TransactionFilters from './TransactionFilters';
@@ -156,7 +157,7 @@ const Wallet = () => {
                 </Badge>
               </div>
               <div className="text-sm text-blue-700 font-medium mb-1">{t('wallet.cumulative_balance')}</div>
-              <div className="text-3xl font-bold text-blue-900">{stats?.cumulativeBalance || '0.00'}€</div>
+              <div className="text-3xl font-bold text-blue-900"><PriceDisplay price={stats?.cumulativeBalance || 0} baseCurrency="GBP" size="lg" /></div>
             </div>
             
             <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl border border-green-200">
@@ -169,7 +170,7 @@ const Wallet = () => {
                 </Badge>
               </div>
               <div className="text-sm text-green-700 font-medium mb-1">{t('wallet.available_balance')}</div>
-              <div className="text-3xl font-bold text-green-900">{stats?.availableBalance?.toFixed(2) || '0.00'}€</div>
+              <div className="text-3xl font-bold text-green-900"><PriceDisplay price={stats?.availableBalance || 0} baseCurrency="GBP" size="lg" /></div>
             </div>
             
             <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl border border-purple-200">

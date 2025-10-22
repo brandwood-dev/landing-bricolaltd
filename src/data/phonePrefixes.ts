@@ -2,7 +2,7 @@ import countries from "world-countries";
 
 type PhonePrefix = {
   value: string; // e.g. "+216"
-  flag: string;  // e.g. '<span class="fi fi-tn"></span>'
+  flag: string;  // e.g. '<span className="fi fi-tn"></span>'
 };
 
 export const phonePrefixes: PhonePrefix[] = countries.flatMap(({ cca2, idd }) => {
@@ -16,7 +16,7 @@ export const phonePrefixes: PhonePrefix[] = countries.flatMap(({ cca2, idd }) =>
   if (suffixes && suffixes.length) {
     return suffixes.map((s) => ({
       value: `${root}${s}`,
-      flag: `<span class="fi fi-${iso}"></span>`,
+      flag: `<span className="fi fi-${iso}"></span>`,
     }));
   }
 
@@ -24,7 +24,7 @@ export const phonePrefixes: PhonePrefix[] = countries.flatMap(({ cca2, idd }) =>
   return [
     {
       value: root,
-      flag: `<span class="fi fi-${iso}"></span>`,
+      flag: `<span className="fi fi-${iso}"></span>`,
     },
   ];
 });

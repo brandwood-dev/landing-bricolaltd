@@ -5,6 +5,7 @@ import { UserRole } from './enums'
 
 // Base User interface (aligned with backend User entity)
 export interface User extends BaseEntity {
+  verifiedEmail: any
   firstName: string
   lastName: string
   email: string
@@ -52,11 +53,14 @@ export interface UserProfile {
   id: string
   firstName: string
   lastName: string
+  email: string
   profilePicture?: string
   phoneNumber?: string
+  phone_prefix?: string
   rating?: number
   completedRentals?: number
   isIdentityVerified?: boolean
+  isEmailVerified?: boolean
   memberSince: string
 }
 
@@ -81,14 +85,10 @@ export interface UserPreferences {
 
 // User statistics
 export interface UserStats {
-  totalBookings: number
-  completedBookings: number
-  cancelledBookings: number
-  totalEarnings: number
+  activeAds: number
   averageRating: number
-  totalReviews: number
-  toolsListed: number
-  activeTools: number
+  completedRentals: number
+  totalEarnings: number
 }
 
 // User wallet information

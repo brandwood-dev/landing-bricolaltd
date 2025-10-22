@@ -8,6 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { CurrencySelector } from '@/components/CurrencySelector';
 import { Search, User, Menu, Wrench, Heart, X, LogOut, Settings, UserCircle, Wallet, Calendar, Edit, MessageSquare } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import "/node_modules/flag-icons/css/flag-icons.min.css";
@@ -71,22 +72,11 @@ const Header = () => {
           {/* Desktop Right side */}
           <div className="hidden md:flex items-center space-x-6">
             {/* Currency selector */}
-            <Select value={currency.code} onValueChange={(value) => {
-              const selectedCurrency = currencies.find(c => c.code === value);
-              if (selectedCurrency) setCurrency(selectedCurrency);
-            }}>
-              <SelectTrigger className="w-20 border-none bg-transparent">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {currencies.map((curr) => (
-                  <SelectItem key={curr.code} value={curr.code}>
-                    <span className='mx-2' dangerouslySetInnerHTML={{ __html: curr.flag }} />
-                    {curr.code} 
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <CurrencySelector 
+              showLabel={false} 
+              size="sm" 
+              className="w-40"
+            />
 
             {/* Language selector */}
             <Select value={language} onValueChange={(value: 'fr' | 'en' | 'ar') => setLanguage(value)}>
@@ -94,9 +84,9 @@ const Header = () => {
                 <SelectValue placeholder="Langue" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="fr"><span class="fi fi-fr"></span> Français</SelectItem>
-                <SelectItem value="en"><span class="fi fi-gb-eng"></span>  English</SelectItem>
-                <SelectItem value="ar"><span class="fi fi-sa"></span> العربية</SelectItem>
+                <SelectItem value="fr"><span className="fi fi-fr"></span> Français</SelectItem>
+                <SelectItem value="en"><span className="fi fi-gb-eng"></span>  English</SelectItem>
+                <SelectItem value="ar"><span className="fi fi-sa"></span> العربية</SelectItem>
               </SelectContent>
             </Select>
 
@@ -311,7 +301,7 @@ const Header = () => {
                               {t('nav.profile')}
                             </Button>
                           </Link>
-                          <Link to="/wallet" onClick={() => setIsMenuOpen(false)}>
+                          <Link to="/profile?tab=wallet" onClick={() => setIsMenuOpen(false)}>
                             <Button variant="outline" className="w-full h-12 text-sm">
                               <Wrench className="mr-2 h-4 w-4" />
                               {t('nav.wallet')}
@@ -405,9 +395,9 @@ const Header = () => {
                           <SelectValue placeholder="Langue" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="fr"><span class="fi fi-fr"></span> Français</SelectItem>
-                          <SelectItem value="en"><span class="fi fi-gb-eng"></span>  English</SelectItem>
-                          <SelectItem value="ar"><span class="fi fi-sa"></span> العربية</SelectItem>
+                          <SelectItem value="fr"><span className="fi fi-fr"></span> Français</SelectItem>
+                <SelectItem value="en"><span className="fi fi-gb-eng"></span>  English</SelectItem>
+                <SelectItem value="ar"><span className="fi fi-sa"></span> العربية</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -427,7 +417,7 @@ const Header = () => {
                         <SelectContent>
                           {currencies.map((curr) => (
                             <SelectItem key={curr.code} value={curr.code}>
-                              <span className='mx-2' dangerouslySetInnerHTML={{ __html: curr.flag }} /> {curr.code} - {curr.name}
+                              <span className={`${curr.flagClass} mx-2`}></span> {curr.code}
                             </SelectItem>
                           ))}
                         </SelectContent>

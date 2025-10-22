@@ -22,6 +22,8 @@ export enum PaymentStatus {
 export enum PaymentMethod {
   CARD = 'card',
   PAYPAL = 'paypal',
+  GOOGLE_PAY = 'google_pay',
+  APPLE_PAY = 'apple_pay',
   STRIPE = 'STRIPE',
   BANK_TRANSFER = 'BANK_TRANSFER',
 }

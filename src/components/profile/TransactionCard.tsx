@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Transaction } from '@/types/bridge/wallet.types';
+import { PriceDisplay } from '@/components/PriceDisplay';
 
 interface TransactionCardProps {
   transaction: Transaction & {
@@ -60,7 +61,7 @@ const TransactionCard = ({ transaction }: TransactionCardProps) => {
           </div>
           <div className="text-right">
             <div className="font-bold text-lg mb-1 text-green-600">
-              +{transaction.amount}€
+              +<PriceDisplay price={transaction.amount} baseCurrency="GBP" size="md" />
             </div>
             <Badge className={getStatusColor(transaction.status)}>
               {getStatusLabel(transaction.status)}
@@ -87,7 +88,7 @@ const TransactionCard = ({ transaction }: TransactionCardProps) => {
         </div>
         <div className="text-right">
           <div className="font-bold text-lg mb-1 text-blue-600">
-            -{transaction.amount}€
+            -<PriceDisplay price={transaction.amount} baseCurrency="GBP" size="md" />
           </div>
           <Badge className={getStatusColor(transaction.status)}>
             {getStatusLabel(transaction.status)}

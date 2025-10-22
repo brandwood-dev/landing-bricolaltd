@@ -315,11 +315,11 @@ const Reservations = () => {
       toolId: reservation.toolId,
       toolName: reservation.toolName,
       toolDescription: reservation.toolDescription,
-      toolBrand: reservation.toolBrand || 'Brand',
-      toolModel: reservation.toolModel || 'Model',
-      serialNumber: reservation.toolBrand + reservation.toolModel + '2025',
+      toolBrand: reservation.toolBrand || '*******',
+      toolModel: reservation.toolModel || '*******',
+     
       condition: reservation.toolCondition || 'New',
-      accessories: '',
+      
       ownerId: reservation.ownerId,
       ownerName: reservation.owner,
       ownerAddress: reservation.ownerAddress,
