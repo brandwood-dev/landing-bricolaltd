@@ -130,14 +130,8 @@ export default defineConfig(async ({ mode }) => {
     },
     build: {
       rollupOptions: {
-        // Externalize Stripe packages as suggested by Rollup error
-        external: ['@stripe/stripe-js', '@stripe/react-stripe-js'],
-        output: {
-          globals: {
-            '@stripe/stripe-js': 'Stripe',
-            '@stripe/react-stripe-js': 'StripeReact'
-          }
-        }
+        // Remove external configuration - let Vite bundle Stripe packages normally
+        // This fixes the runtime error: "Failed to resolve module specifier @stripe/react-stripe-js"
       }
     },
     optimizeDeps: {
