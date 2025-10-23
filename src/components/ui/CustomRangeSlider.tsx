@@ -1,69 +1,89 @@
-import React, { useState, useRef, useCallback } from 'react'
+import React, { useState, useRef, useCallback } from 'react';
 
 interface CustomRangeSliderProps {
-  value: [number, number]
-  onValueChange: (value: [number, number]) => void
-  min?: number
-  max?: number
-  step?: number
-  className?: string
+  min: number;
+  max: number;
+  step?: number;
+  value: [number, number];
+  onValueChange: (value: [number, number]) => void;
+  className?: string;
+  // Nouvelles props pour la conversion de devise
+  currencySymbol?: string;
+  convertValue?: (value: number) => number; // Fonction pour convertir GBP vers devise utilisateur
+  formatValue?: (value: number) => string; // Fonction pour formater l'affichage
 }
 
 const CustomRangeSlider: React.FC<CustomRangeSliderProps> = ({
+  min,
+  max,
+  step = 1,
   value,
   onValueChange,
-  min = 0,
-  max = 100,
-  step = 1,
-  className = ''
+  className = '',
+  currencySymbol = '£',
+  convertValue,
+  formatValue
 }) => {
-  const [isDragging, setIsDragging] = useState<'min' | 'max' | null>(null)
-  const sliderRef = useRef<HTMLDivElement>(null)
+  const [isDragging, setIsDragging] = useState<'min' | 'max' | null>(null);
+  const sliderRef = useRef<HTMLDivElement>(null);
 
-  const getPercentage = (val: number) => ((val - min) / (max - min)) * 100
+  // Fonction pour formater la valeur affichée
+  const getDisplayValue = useCallback((val: number): string => {
+    if (formatValue) {
+      return formatValue(val);
+    }
+    
+    const displayVal = convertValue ? convertValue(val) : val;
+    return `${currencySymbol}${Math.round(displayVal)}`;
+  }, [currencySymbol, convertValue, formatValue]);
 
-  const handleMouseDown = (type: 'min' | 'max') => (e: React.MouseEvent) => {
-    e.preventDefault()
-    setIsDragging(type)
-  }
+  const getPercentage = useCallback((val: number) => {
+    return ((val - min) / (max - min)) * 100;
+  }, [min, max]);
 
-  const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
-      if (!isDragging || !sliderRef.current) return
+  const getValueFromPercentage = useCallback((percentage: number) => {
+    const rawValue = min + (percentage / 100) * (max - min);
+    return Math.round(rawValue / step) * step;
+  }, [min, max, step]);
 
-      const rect = sliderRef.current.getBoundingClientRect()
-      const percentage = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100))
-      const newValue = Math.round((percentage / 100) * (max - min) + min)
-      const steppedValue = Math.round(newValue / step) * step
+  const handleMouseDown = useCallback((type: 'min' | 'max') => (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(type);
+  }, []);
 
-      if (isDragging === 'min') {
-        const newMin = Math.min(steppedValue, value[1] - step)
-        onValueChange([Math.max(min, newMin), value[1]])
-      } else {
-        const newMax = Math.max(steppedValue, value[0] + step)
-        onValueChange([value[0], Math.min(max, newMax)])
-      }
-    },
-    [isDragging, value, min, max, step, onValueChange]
-  )
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!isDragging || !sliderRef.current) return;
+
+    const rect = sliderRef.current.getBoundingClientRect();
+    const percentage = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+    const newValue = getValueFromPercentage(percentage);
+
+    if (isDragging === 'min') {
+      const newMin = Math.min(newValue, value[1] - step);
+      onValueChange([Math.max(min, newMin), value[1]]);
+    } else {
+      const newMax = Math.max(newValue, value[0] + step);
+      onValueChange([value[0], Math.min(max, newMax)]);
+    }
+  }, [isDragging, value, onValueChange, getValueFromPercentage, min, max, step]);
 
   const handleMouseUp = useCallback(() => {
-    setIsDragging(null)
-  }, [])
+    setIsDragging(null);
+  }, []);
 
   React.useEffect(() => {
     if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove)
-      document.addEventListener('mouseup', handleMouseUp)
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
       return () => {
-        document.removeEventListener('mousemove', handleMouseMove)
-        document.removeEventListener('mouseup', handleMouseUp)
-      }
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
     }
-  }, [isDragging, handleMouseMove, handleMouseUp])
+  }, [isDragging, handleMouseMove, handleMouseUp]);
 
-  const minPercentage = getPercentage(value[0])
-  const maxPercentage = getPercentage(value[1])
+  const minPercentage = getPercentage(value[0]);
+  const maxPercentage = getPercentage(value[1]);
 
   return (
     <div className={`relative w-full ${className}`}>
@@ -74,50 +94,35 @@ const CustomRangeSlider: React.FC<CustomRangeSliderProps> = ({
       >
         {/* Active range */}
         <div
-          className="absolute h-full bg-primary rounded-full"
+          className="absolute h-2 bg-blue-500 rounded-full"
           style={{
             left: `${minPercentage}%`,
-            width: `${maxPercentage - minPercentage}%`
+            width: `${maxPercentage - minPercentage}%`,
           }}
         />
         
-        {/* Min thumb */}
+        {/* Min handle */}
         <div
-          className="absolute w-5 h-5 bg-white border-2 border-primary rounded-full cursor-grab active:cursor-grabbing transform -translate-y-1/2 -translate-x-1/2 shadow-md hover:scale-110 transition-transform"
-          style={{ left: `${minPercentage}%`, top: '50%' }}
+          className="absolute w-4 h-4 bg-white border-2 border-blue-500 rounded-full cursor-grab active:cursor-grabbing transform -translate-y-1 -translate-x-2 hover:scale-110 transition-transform"
+          style={{ left: `${minPercentage}%` }}
           onMouseDown={handleMouseDown('min')}
         />
         
-        {/* Max thumb */}
+        {/* Max handle */}
         <div
-          className="absolute w-5 h-5 bg-white border-2 border-primary rounded-full cursor-grab active:cursor-grabbing transform -translate-y-1/2 -translate-x-1/2 shadow-md hover:scale-110 transition-transform"
-          style={{ left: `${maxPercentage}%`, top: '50%' }}
+          className="absolute w-4 h-4 bg-white border-2 border-blue-500 rounded-full cursor-grab active:cursor-grabbing transform -translate-y-1 -translate-x-2 hover:scale-110 transition-transform"
+          style={{ left: `${maxPercentage}%` }}
           onMouseDown={handleMouseDown('max')}
         />
       </div>
-
-      {/* Value displays */}
-      <div className="flex justify-between items-center mt-4">
-        <div className="flex flex-col items-center">
-          <div className="w-3 h-3 bg-primary rounded-full mb-2 shadow-sm"></div>
-          <span className="px-3 py-1.5 bg-primary/10 border border-primary/20 rounded-lg text-xs font-semibold text-primary">
-            {value[0]}€
-          </span>
-          <span className="text-xs text-gray-500 mt-1">Min</span>
-        </div>
-        
-        <div className="flex-1 mx-4 border-t border-dashed border-gray-300"></div>
-        
-        <div className="flex flex-col items-center">
-          <div className="w-3 h-3 bg-primary rounded-full mb-2 shadow-sm"></div>
-          <span className="px-3 py-1.5 bg-primary/10 border border-primary/20 rounded-lg text-xs font-semibold text-primary">
-            {value[1]}€
-          </span>
-          <span className="text-xs text-gray-500 mt-1">Max</span>
-        </div>
+      
+      {/* Value labels */}
+      <div className="flex justify-between mt-2 text-sm text-gray-600">
+        <span>{getDisplayValue(value[0])}</span>
+        <span>{getDisplayValue(value[1])}</span>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CustomRangeSlider
+export default CustomRangeSlider;

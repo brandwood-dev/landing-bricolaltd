@@ -19,6 +19,9 @@ import {
   User
 } from 'lucide-react'
 import { PriceDisplay } from '@/components/PriceDisplay'
+import { OptimizedPriceDisplay, CriticalPriceDisplay } from '@/components/OptimizedPriceDisplay'
+import { usePaymentRates } from '@/hooks/usePaymentRates'
+import { RateFetchTrigger } from '@/types/currency'
 import { bookingService } from '@/services/bookingService'
 import PaymentForm from '@/components/payment/PaymentForm'
 import { StripeProvider } from '@/contexts/StripeContext'
@@ -32,6 +35,7 @@ const Checkout: React.FC = () => {
   const { user } = useAuth()
   const { t, language } = useLanguage()
   const { toast } = useToast()
+  const { getFreshRate, calculatePaymentAmount, isRateFresh } = usePaymentRates()
 
   const [booking, setBooking] = useState<Booking | null>(null)
   const [loading, setLoading] = useState(true)
@@ -323,27 +327,27 @@ const Checkout: React.FC = () => {
                 <CardContent className='space-y-4'>
                   <div className='space-y-3'>
                     <div className='flex justify-between text-sm'>
-                      <span>Prix par jour (<PriceDisplay price={basePrice} baseCurrency={booking.tool?.baseCurrencyCode || 'GBP'} size="sm" />)</span>
-                      <span><PriceDisplay price={basePrice} baseCurrency={booking.tool?.baseCurrencyCode || 'GBP'} size="sm" /> × {days} jour{days > 1 ? 's' : ''}</span>
+                      <span>Prix par jour (<OptimizedPriceDisplay price={basePrice} baseCurrency={booking.tool?.baseCurrencyCode || 'GBP'} size="sm" />)</span>
+                      <span><OptimizedPriceDisplay price={basePrice} baseCurrency={booking.tool?.baseCurrencyCode || 'GBP'} size="sm" /> × {days} jour{days > 1 ? 's' : ''}</span>
                     </div>
                     <div className='flex justify-between text-sm'>
                       <span>Sous-total</span>
-                      <span><PriceDisplay price={subtotal} baseCurrency={booking.tool?.baseCurrencyCode || 'GBP'} size="sm" /></span>
+                      <span><OptimizedPriceDisplay price={subtotal} baseCurrency={booking.tool?.baseCurrencyCode || 'GBP'} size="sm" /></span>
                     </div>
                     <div className='flex justify-between text-sm'>
                       <span>Frais de service (6%)</span>
-                      <span><PriceDisplay price={totalFees} baseCurrency={booking.tool?.baseCurrencyCode || 'GBP'} size="sm" /></span>
+                      <span><OptimizedPriceDisplay price={totalFees} baseCurrency={booking.tool?.baseCurrencyCode || 'GBP'} size="sm" /></span>
                     </div>
                     <div className='flex justify-between text-sm'>
                       <span>Caution</span>
-                      <span><PriceDisplay price={deposit} baseCurrency={booking.tool?.baseCurrencyCode || 'GBP'} size="sm" /></span>
+                      <span><OptimizedPriceDisplay price={deposit} baseCurrency={booking.tool?.baseCurrencyCode || 'GBP'} size="sm" /></span>
                     </div>
                     
                     <Separator />
                     
                     <div className='flex justify-between font-semibold text-lg'>
                       <span>Total à payer</span>
-                      <span><PriceDisplay price={totalAmount} baseCurrency={booking.tool?.baseCurrencyCode || 'GBP'} size="lg" /></span>
+                      <span><CriticalPriceDisplay price={totalAmount} baseCurrency={booking.tool?.baseCurrencyCode || 'GBP'} size="lg" /></span>
                     </div>
                   </div>
 

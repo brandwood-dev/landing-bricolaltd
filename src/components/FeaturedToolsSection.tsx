@@ -15,7 +15,7 @@ import { Star, MapPin, Calendar, Heart, Loader2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { toolsService, Tool } from '@/services/toolsService'
 import { useToast } from '@/hooks/use-toast'
-import { PriceDisplay } from '@/components/PriceDisplay'
+import { OptimizedPriceDisplay } from '@/components/OptimizedPriceDisplay'
 
 const FeaturedToolsSection = () => {
   const { t } = useLanguage()
@@ -223,14 +223,12 @@ const FeaturedToolsSection = () => {
 
                         <div className='flex items-center justify-between mb-4'>
                           <div className='text-lg font-bold text-primary'>
-                            <PriceDisplay 
-                              price={displayPrice} 
-                              baseCurrency={tool.baseCurrencyCode || 'GBP'} 
-                              size="md"
+                            <OptimizedPriceDisplay
+                              price={displayPrice}
+                              baseCurrency={tool.baseCurrencyCode || 'GBP'}
+                              size='md'
+                              cible='basePrice'
                             />
-                            <span className='text-sm font-normal text-gray-500'>
-                              /{t('tools.day')}
-                            </span>
                           </div>
                           <div className='text-sm text-gray-500'>
                             {t('tools.by')} {tool.owner.firstName}{' '}

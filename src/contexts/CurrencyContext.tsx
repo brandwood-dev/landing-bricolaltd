@@ -1,12 +1,14 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-
-interface Currency {
-  code: string;
-  symbol: string;
-  nameKey: string; // Changed from 'name' to 'nameKey' for translation
-  flagClass: string; // Changed from 'flag' to 'flagClass' for CSS class
-}
+import { 
+  Currency, 
+  ConvertedPrice, 
+  RateFetchTrigger, 
+  UseCurrencyOptimizedReturn,
+  PriceItem,
+  BulkConvertedPrice
+} from '../types/currency';
+import { optimizedCalculator } from '../utils/OptimizedCurrencyCalculator';
 
 const currencies: Currency[] = [
   { code: 'GBP', symbol: '£', nameKey: 'currency.GBP', flagClass: 'fi fi-gb' },
@@ -18,31 +20,26 @@ const currencies: Currency[] = [
   { code: 'AED', symbol: 'د.إ', nameKey: 'currency.AED', flagClass: 'fi fi-ae' },
 ];
 
-interface ConvertedPrice {
-  originalAmount: number;
-  convertedAmount: number;
-  rate: number;
-  fromCurrency: string;
-  toCurrency: string;
-}
-
-interface CurrencyContextType {
-  currency: Currency;
-  setCurrency: (currency: Currency) => void;
+// Interface étendue pour le contexte optimisé
+interface OptimizedCurrencyContextType extends UseCurrencyOptimizedReturn {
   currencies: Currency[];
-  formatPrice: (price: number, fromCurrency?: string) => Promise<string>;
+  formatPrice: (price: number, fromCurrency?: string) => string;
   convertPrice: (amount: number, fromCurrency: string, toCurrency?: string) => Promise<ConvertedPrice>;
-  isLoading: boolean;
+  // Méthodes de compatibilité avec l'ancien système
+  legacyFormatPrice: (price: number, fromCurrency?: string) => Promise<string>;
+  legacyConvertPrice: (amount: number, fromCurrency: string, toCurrency?: string) => Promise<ConvertedPrice>;
 }
 
-const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
+const CurrencyContext = createContext<OptimizedCurrencyContextType | undefined>(undefined);
 
 export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currency, setCurrency] = useState<Currency>(currencies[0]); // Default to GBP
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  
+  // Cache optimisé - durée étendue à 30 minutes
   const [exchangeRatesCache, setExchangeRatesCache] = useState<Record<string, number>>({});
   const [cacheTimestamp, setCacheTimestamp] = useState<number>(0);
-  const CACHE_DURATION = 15 * 60 * 1000; // Increased to 15 minutes for better performance
+  const CACHE_DURATION = 30 * 60 * 1000; // Étendu à 30 minutes pour l'optimisation
 
   // Load saved currency from localStorage on mount
   useEffect(() => {
@@ -148,6 +145,9 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const handleSetCurrency = (newCurrency: Currency) => {
     console.log(`🔄 [CurrencyContext] Currency change: ${currency.code} → ${newCurrency.code}`);
     setCurrency(newCurrency);
+    
+    // Déclencher la récupération optimisée des taux lors du changement de devise
+    refreshRates(RateFetchTrigger.USER_CURRENCY_CHANGE);
   };
 
   const convertPrice = async (
@@ -232,11 +232,25 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
-  const formatPrice = async (price: number, fromCurrency?: string): Promise<string> => {
+  // Nouvelle méthode optimisée pour le formatage instantané
+  const formatPrice = (price: number, fromCurrency?: string): string => {
+    const validPrice = typeof price === 'number' && !isNaN(price) ? price : 0;
+    
+    if (!fromCurrency || fromCurrency === currency.code) {
+      return `${currency.symbol}${validPrice.toFixed(2)}`;
+    }
+
+    // Utiliser le calculateur optimisé pour un calcul instantané
+    const convertedAmount = optimizedCalculator.calculatePrice(validPrice, fromCurrency, currency.code);
+    return `${currency.symbol}${convertedAmount.toFixed(2)}`;
+  };
+
+  // Méthode de compatibilité avec l'ancien système (async)
+  const legacyFormatPrice = async (price: number, fromCurrency?: string): Promise<string> => {
     // Validate price input
     const validPrice = typeof price === 'number' && !isNaN(price) ? price : 0;
     
-    console.log(`💰 [CurrencyContext] Formatting price: ${price} (valid: ${validPrice}) from ${fromCurrency || 'current'} to ${currency.code}`);
+    console.log(`💰 [CurrencyContext] Legacy formatting price: ${price} (valid: ${validPrice}) from ${fromCurrency || 'current'} to ${currency.code}`);
     
     if (!fromCurrency || fromCurrency === currency.code) {
       const formatted = `${currency.symbol}${validPrice.toFixed(2)}`;
@@ -246,7 +260,7 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     try {
       console.log(`🔄 [CurrencyContext] Converting price for formatting`);
-      const converted = await convertPrice(validPrice, fromCurrency);
+      const converted = await legacyConvertPrice(validPrice, fromCurrency);
       const convertedAmount = typeof converted.convertedAmount === 'number' && !isNaN(converted.convertedAmount) 
         ? converted.convertedAmount 
         : 0;
@@ -262,15 +276,72 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
+  // Nouvelles méthodes optimisées
+  const calculatePrice = (amount: number, from: string, to?: string): number => {
+    return optimizedCalculator.calculatePrice(amount, from, to || currency.code);
+  };
+
+  const calculateBulkPrices = (prices: PriceItem[]): BulkConvertedPrice[] => {
+    return optimizedCalculator.calculateBulkPrices(prices, currency.code);
+  };
+
+  const refreshRates = async (trigger: RateFetchTrigger): Promise<void> => {
+    // Vérifier si une récupération est nécessaire
+    if (!optimizedCalculator.shouldFetchRates(trigger)) {
+      console.log(`⏭️ [CurrencyContext] Skipping rate fetch for trigger: ${trigger}`);
+      return;
+    }
+
+    console.log(`🔄 [CurrencyContext] Refreshing rates for trigger: ${trigger}`);
+    setIsLoading(true);
+    
+    try {
+      const { currencyService } = await import('../services/currencyService');
+      const bulkRates = await currencyService.getBulkExchangeRates(currency.code);
+      
+      const rates = bulkRates && bulkRates.data && bulkRates.data.rates;
+      
+      if (rates && typeof rates === 'object' && Object.keys(rates).length > 0) {
+        // Mettre à jour le cache optimisé
+        optimizedCalculator.updateCache(currency.code, rates, trigger);
+        
+        // Maintenir la compatibilité avec l'ancien cache
+        setExchangeRatesCache(rates);
+        setCacheTimestamp(Date.now());
+        
+        console.log(`✅ [CurrencyContext] Rates refreshed successfully (${Object.keys(rates).length} rates)`);
+      } else {
+        console.warn('⚠️ [CurrencyContext] Invalid rates response');
+      }
+    } catch (error) {
+      console.error('❌ [CurrencyContext] Failed to refresh rates:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const cacheAge = optimizedCalculator.getCacheAge();
+  const isRatesFresh = optimizedCalculator.isRatesFresh();
+
+  // Renommer convertPrice en legacyConvertPrice pour la compatibilité
+  const legacyConvertPrice = convertPrice;
+
   return (
     <CurrencyContext.Provider 
       value={{ 
         currency, 
         setCurrency: handleSetCurrency, 
         currencies, 
-        formatPrice, 
-        convertPrice,
-        isLoading 
+        formatPrice,
+        convertPrice: legacyConvertPrice,
+        legacyFormatPrice,
+        legacyConvertPrice,
+        calculatePrice,
+        calculateBulkPrices,
+        refreshRates,
+        isLoading,
+        cacheAge,
+        isRatesFresh
       }}
     >
       {children}

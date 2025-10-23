@@ -25,7 +25,7 @@ import {
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import authService from '@/services/authService'
-
+import { OptimizedPriceDisplay } from '../OptimizedPriceDisplay'
 interface ProfileHeaderProps {
   userInfo: {
     id: string
@@ -199,7 +199,12 @@ const ProfileHeader = ({ userInfo, stats }: ProfileHeaderProps) => {
           <div className='grid grid-cols-2 lg:grid-cols-4 gap-4'>
             <div className='text-center p-3 bg-gray-50 rounded-lg'>
               <div className='text-lg sm:text-xl font-bold text-primary'>
-                {stats?.totalEarnings ?? 0}€
+                <OptimizedPriceDisplay
+                  price={stats?.totalEarnings}
+                  baseCurrency='GBP'
+                  size='md'
+                  cible='totalPrice'
+                />
               </div>
               <div className='text-xs sm:text-sm text-muted-foreground'>
                 {t('profile.total_earnings')}

@@ -532,34 +532,36 @@ const ToolDetails = () => {
                     price={displayPrice} 
                     baseCurrency={tool.baseCurrencyCode || 'GBP'} 
                     size="lg"
+                    cible='basePrice'
                   />
-                  <span className='text-lg font-normal text-gray-600'>
-                    /{t('tools.day')}
-                  </span>
+                 
                 </div>
                 <div className='text-sm text-gray-600 mb-4'>
-                  {t('tools.fees_and_taxes')} : <PriceDisplay 
+                  <PriceDisplay 
                     price={feeAmount || 0} 
                     baseCurrency={tool.baseCurrencyCode || 'GBP'} 
                     size="sm"
+                    cible='fees'
                   />
                   {shouldShowBasePrice && (
                     <>
-                      (6% {t('tools.of')} <PriceDisplay 
+                       <PriceDisplay 
                         price={safeBasePrice} 
                         baseCurrency={tool.baseCurrencyCode || 'GBP'} 
                         size="sm"
-                      /> {t('tools.charged')})
+                        cible='feesInc'
+                      />
                     </>
                   )}
                 </div>
                 {shouldShowDepositAmount && (
                   <div className='text-sm text-gray-600 mb-4'>
-                    {t('tools.deposit')}: <PriceDisplay 
+                    <PriceDisplay 
                       price={safeDepositAmount} 
                       baseCurrency={tool.baseCurrencyCode || 'GBP'} 
                       size="sm"
-                    /> {t('tools.refunded')}
+                      cible='deposit'
+                    /> 
                   </div>
                 )}
                 <div className='space-y-2'>

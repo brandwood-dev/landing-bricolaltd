@@ -12,9 +12,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { ModerationStatus } from '@/types/bridge/enums';
 import { toolsService, Tool } from '@/services/toolsService';
 import { useToast } from '@/hooks/use-toast';
+import { OptimizedPriceDisplay } from '@/components/OptimizedPriceDisplay';
 
 interface AdListItemProps {
-  ad: any;
+  ad: Tool;
   onPublishToggle: (adId: string, published: boolean) => void;
   onDeleteAd: (adId: string) => void;
   onRefresh: () => void;
@@ -78,7 +79,12 @@ const AdListItem = ({ ad, onPublishToggle, onDeleteAd, onRefresh, getValidationS
         </div>
       )}
       <div className="font-semibold text-sm text-primary">
-        {ad.price}€/{t('general.day')}
+        <OptimizedPriceDisplay
+          price={ad.price}
+          baseCurrency='GBP'
+          size='lg'
+          cible='basePrice'
+        />
       </div>
       <div className="flex gap-1">
         <Button variant="outline" size="sm" onClick={handleEditClick}>

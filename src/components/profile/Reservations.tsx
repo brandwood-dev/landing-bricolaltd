@@ -67,6 +67,7 @@ import { disputeService } from '@/services/disputeService'
 import { reviewsService } from '@/services/reviewsService'
 import { api } from '@/services/api'
 import { Booking, BookingStatus, Reservation } from '@/types/bridge'
+import { OptimizedPriceDisplay } from '../OptimizedPriceDisplay'
 
 
 
@@ -898,10 +899,22 @@ const Reservations = () => {
 
                       <div className='text-left lg:text-right mt-4 lg:mt-0'>
                         <div className='text-2xl font-bold text-blue-600 mb-2'>
-                          {reservation.price}€
+                          {/* optimizedPriceDisplay */}
+
+                          <OptimizedPriceDisplay
+                            price={reservation.price}
+                            baseCurrency='GBP'
+                            size='md'
+                            cible='totalPrice'
+                          />
                         </div>
                         <div className='text-sm text-gray-500'>
-                          {reservation.dailyPrice}€/{t('general.day')}
+                          <OptimizedPriceDisplay
+                            price={reservation.dailyPrice}
+                            baseCurrency='GBP'
+                            size='md'
+                            cible='basePrice'
+                          />
                         </div>
                       </div>
                     </div>

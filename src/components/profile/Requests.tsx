@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,7 +24,7 @@ import {
   Loader2,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
-
+import { OptimizedPriceDisplay } from '../OptimizedPriceDisplay'
 import { useToast } from '@/hooks/use-toast'
 import { useAuth } from '@/contexts/AuthContext'
 import RequestsAndReservationsFilters from './RequestsAndReservationsFilters'
@@ -626,13 +627,17 @@ const Requests = () => {
                   {t('request.pickup_time')} : {req.pickupHour}
                 </div>
                 <div className='font-semibold text-primary'>
-                  {Math.round(
-                    (req.basePrice + req.basePrice * 0.06) *
-                      Number(
-                        calculateRentalDuration(req.startDate, req.endDate)
-                      )
-                  )}
-                  €
+                  <OptimizedPriceDisplay
+                    price={Math.round(
+                      (req.basePrice + req.basePrice * 0.06) *
+                        Number(
+                          calculateRentalDuration(req.startDate, req.endDate)
+                        )
+                    )}
+                    baseCurrency='GBP'
+                    size='md'
+                    cible='totalPrice'
+                  />
                 </div>
               </div>
 

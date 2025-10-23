@@ -496,24 +496,9 @@ const ProfileInfo = () => {
       const previewUrl = URL.createObjectURL(file)
       setImagePreview(previewUrl)
 
-      // Create FormData for file upload
-      // const formData = new FormData()
-      // formData.append('photo', file)
+     
       const response = await userService.uploadProfilePicture(user.id, file)
-      // Upload to backend API
-      // const token = localStorage.getItem('authToken')
-
-      // const response = await fetch(
-      //   'http://localhost:4000/api/users/profile/upload-photo',
-      //   {
-      //     method: 'POST',
-      //     headers: {
-      //       Authorization: `Bearer ${token}`,
-      //     },
-      //     body: formData,
-      //   }
-      // )
-      // Handle the API response structure: {data: {data: {url: ...}}, message: ...}
+  
       const imageUrl = response.data?.data?.data?.url
 
       if (imageUrl) {
@@ -705,20 +690,8 @@ const ProfileInfo = () => {
                     {t('profile.verified')}
                   </Badge>
                 )}
-                <Badge variant='secondary' className='text-xs'>
-                  {t('profile.account_type_individual')}
-                </Badge>
               </div>
-              <p className='text-sm text-muted-foreground mt-1'>
-                {t('profile.member_since').replace(
-                  '{date}',
-                  language === 'fr'
-                    ? 'janvier 2024'
-                    : language === 'ar'
-                    ? 'يناير 2024'
-                    : 'January 2024'
-                )}
-              </p>
+            
             </div>
           </div>
         </CardContent>

@@ -23,8 +23,10 @@ import { ModerationStatus } from '@/types/bridge/enums'
 import { toolsService, Tool } from '@/services/toolsService'
 import { useToast } from '@/hooks/use-toast'
 import { Link } from 'react-router-dom'
+import { OptimizedPriceDisplay } from '@/components/OptimizedPriceDisplay'
+
 interface AdCardProps {
-  ad: any
+  ad: Tool
   onPublishToggle: (adId: string, published: boolean) => void
   onDeleteAd: (adId: string) => void
   onRefresh: () => void
@@ -156,7 +158,12 @@ const AdCard = ({
 
           <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3'>
             <div className='font-semibold text-primary'>
-              {ad.price}€/{t('general.day')}
+              <OptimizedPriceDisplay
+                price={ad.price}
+                baseCurrency='GBP'
+                size='lg'
+                cible='basePrice'
+              />
             </div>
             <div className='flex flex-wrap gap-2'>
               <Button variant='outline' size='sm' onClick={handleEditClick}>

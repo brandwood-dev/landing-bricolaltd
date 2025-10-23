@@ -9,6 +9,7 @@ import Footer from '@/components/Footer';
 import { Heart, Star, MapPin, ArrowLeft, Trash2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
+import { OptimizedPriceDisplay } from '@/components/OptimizedPriceDisplay';
 
 const Favorites = () => {
   const { favorites, removeFromFavorites, isLoading } = useFavorites();
@@ -167,7 +168,12 @@ const Favorites = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="text-lg font-bold text-primary">
-                      {tool.basePrice}€/{t('general.day')}
+                      <OptimizedPriceDisplay
+                          price={tool.basePrice}
+                          baseCurrency='GBP'
+                          size='md'
+                          cible='basePrice'
+                        />
                     </div>
                     <Link to={`/tool/${tool.id}`}>
                       <Button size="sm">{t('general.view_details')}</Button>

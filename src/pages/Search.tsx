@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { useCurrency } from '@/contexts/CurrencyContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -24,6 +25,9 @@ import {
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { PriceDisplay } from '@/components/PriceDisplay'
+import { OptimizedPriceDisplay } from '@/components/OptimizedPriceDisplay'
+import { useCurrencyOptimized } from '@/hooks/useCurrencyOptimized'
+import { RateFetchTrigger } from '@/types/currency'
 import {
   Search as SearchIcon,
   MapPin,
@@ -84,6 +88,8 @@ const Search = () => {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const location = useLocation()
+  const { calculateBulkPrices, refreshRates } = useCurrencyOptimized()
+  const { selectedCurrency, calculatePrice, formatPrice } = useCurrency()
 
   // Debug log pour vérifier la valeur de isAuthenticated
   console.log('🔍 Search.tsx - isAuthenticated:', isAuthenticated)
@@ -116,6 +122,51 @@ const Search = () => {
   // Debounced search term for real-time search
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
   const debouncedLocationQuery = useDebounce(locationQuery, 300)
+
+  // Currency conversion functions for price slider
+  const convertGBPToUserCurrency = useCallback((gbpPrice: number) => {
+    if (selectedCurrency === 'GBP') return gbpPrice
+    return calculatePrice(gbpPrice, 'GBP') || gbpPrice
+  }, [selectedCurrency, calculatePrice])
+
+  const convertUserCurrencyToGBP = useCallback((userPrice: number) => {
+    if (selectedCurrency === 'GBP') return userPrice
+    // Convert back to GBP by dividing by the rate
+    const rate = calculatePrice(1, 'GBP') || 1
+    return userPrice / rate
+  }, [selectedCurrency, calculatePrice])
+
+  // Convert slider range for display
+  const displayPriceRange = useMemo(() => [
+    Math.round(convertGBPToUserCurrency(priceRange[0])),
+    Math.round(convertGBPToUserCurrency(priceRange[1]))
+  ], [priceRange, convertGBPToUserCurrency])
+
+  // Convert display range back to GBP for filtering
+  const gbpPriceRange = useMemo(() => [
+    Math.round(convertUserCurrencyToGBP(displayPriceRange[0])),
+    Math.round(convertUserCurrencyToGBP(displayPriceRange[1]))
+  ], [displayPriceRange, convertUserCurrencyToGBP])
+
+  // Handle price range change from slider
+  const handlePriceRangeChange = useCallback((newDisplayRange: number[]) => {
+    // Convert the display range back to GBP for internal state
+    const newGBPRange = [
+      Math.round(convertUserCurrencyToGBP(newDisplayRange[0])),
+      Math.round(convertUserCurrencyToGBP(newDisplayRange[1]))
+    ]
+    setPriceRange(newGBPRange)
+  }, [convertUserCurrencyToGBP])
+
+  // Filter tools on frontend based on GBP price
+  const filteredTools = useMemo(() => {
+    if (!tools.length) return tools
+    
+    return tools.filter(tool => {
+      const toolPrice = tool.basePrice || 0
+      return toolPrice >= priceRange[0] && toolPrice <= priceRange[1]
+    })
+  }, [tools, priceRange])
 
   // Fetch tools with current filters
   const fetchTools = useCallback(
@@ -215,12 +266,10 @@ const Search = () => {
 
   // Fetch subcategories when category changes
   const fetchSubcategories = async (categoryId: string) => {
-
     try {
       if (categoryId && categoryId !== 'all') {
         const fetchedSubcategories =
           await toolsService.getSubcategoriesByCategory(categoryId)
-
 
         setSubcategories(
           fetchedSubcategories.data?.data || fetchedSubcategories || []
@@ -235,13 +284,14 @@ const Search = () => {
 
   // Calculate display price based on rental period
   // - handles null/undefined values and ensures valid number output
-  const calculateDisplayPrice = (
-    basePrice: number | null | undefined
-  ): number => {
-    if (!basePrice || typeof basePrice !== 'number' || isNaN(basePrice)) {
-      return 0
-    }
-    return Number(basePrice)
+  const calculateDisplayPrice = (originalPrice: number | string) => {
+    const price =
+      typeof originalPrice === 'number'
+        ? originalPrice
+        : parseFloat(originalPrice) || 0
+    const feeRate = 0.06
+    const feeAmount = price * feeRate
+    return price + feeAmount
   }
 
   // Get primary photo URL
@@ -357,9 +407,9 @@ const Search = () => {
   useEffect(() => {
     fetchCategories()
     fetchTools() // Load tools on initial mount
+    refreshRates(RateFetchTrigger.SEARCH_PAGE_ENTRY) // Refresh rates on search page entry
   }, [])
 
- 
   // Real-time search effect
   useEffect(() => {
     if (
@@ -443,7 +493,7 @@ const Search = () => {
                           placeholder={t('catalog_section.tool_name')}
                           value={searchQuery}
                           onChange={(e) => handleSearchChange(e.target.value)}
-                          onKeyPress={(e) =>
+                          onKeyDown={(e) =>
                             e.key === 'Enter' && handleApplyFilters()
                           }
                           className='pl-10'
@@ -525,21 +575,24 @@ const Search = () => {
                       </div>
                     )}
 
-                    <div className='space-y-3'>
-                      <Label className='text-sm font-medium'>
-                        {t('catalog_section.daily_price')}
-                      </Label>
-                      <div className='px-2'>
-                        <CustomRangeSlider
-                          value={priceRange}
-                          onValueChange={setPriceRange}
-                          min={0}
-                          max={500}
-                          step={5}
-                          className='mt-2'
-                        />
-                      </div>
-                    </div>
+                     <div className='space-y-3'>
+                       <Label className='text-sm font-medium'>
+                         {t('catalog_section.daily_price')}
+                       </Label>
+                       <div className='px-2'>
+                         <CustomRangeSlider
+                           value={displayPriceRange}
+                           onValueChange={handlePriceRangeChange}
+                           min={Math.round(convertGBPToUserCurrency(0))}
+                           max={Math.round(convertGBPToUserCurrency(500))}
+                           step={1}
+                           className='mt-2'
+                           currencySymbol={selectedCurrency}
+                           convertValue={(value) => value}
+                           formatValue={(value) => formatPrice(value, selectedCurrency)}
+                         />
+                       </div>
+                     </div>
 
                     <div className='flex gap-2'>
                       <Button
@@ -797,14 +850,13 @@ const Search = () => {
 
                           <div className='flex items-center justify-between mb-4'>
                             <div className='text-lg font-bold text-primary'>
-                              <PriceDisplay 
-                                price={calculateDisplayPrice(tool.basePrice)} 
-                                baseCurrency={tool.baseCurrencyCode || 'GBP'} 
-                                size="md"
+                              <OptimizedPriceDisplay
+                                price={calculateDisplayPrice(tool.basePrice)}
+                                baseCurrency={tool.baseCurrencyCode || 'GBP'}
+                                size='md'
+                                cible='basePrice'
                               />
-                              <span className='text-sm font-normal text-gray-500'>
-                                /{t('tools.day')}
-                              </span>
+                              
                             </div>
                             <div className='text-sm text-gray-500'>
                               {t('catalog_section.by')}{' '}
@@ -823,7 +875,12 @@ const Search = () => {
                               {t('tools.rent')}
                             </Button>
                             {/* Debug log pour vérifier la condition d'affichage */}
-                            {console.log('🔍 Bouton favoris - isAuthenticated:', isAuthenticated, 'pour outil:', tool.id)}
+                            {console.log(
+                              '🔍 Bouton favoris - isAuthenticated:',
+                              isAuthenticated,
+                              'pour outil:',
+                              tool.id
+                            )}
                             {isAuthenticated && (
                               <Button
                                 variant='outline'
