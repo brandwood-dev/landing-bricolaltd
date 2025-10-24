@@ -129,7 +129,7 @@ const Wallet = () => {
 
   // Pagination
   const totalPages = Math.ceil(totalTransactions / itemsPerPage)
-
+  const price = 50
   // Calculate KPIs
   const availableBalance = balance
   const successfulTransactions = Array.isArray(transactions)
@@ -286,7 +286,7 @@ const Wallet = () => {
                 <div className='space-y-2'>
                   <p className='text-sm text-amber-800 font-medium'>
                     <OptimizedPriceDisplay
-                      price={50}
+                      price={price || 0}
                       baseCurrency='GBP'
                       size='lg'
                       cible='minPrice'
