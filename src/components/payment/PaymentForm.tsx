@@ -5,7 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, CreditCard, AlertCircle, CheckCircle } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
-
+const API_BASE_URL = import.meta.env.VITE_BASE_URL
+  ? `${import.meta.env.VITE_BASE_URL}`
+  : 'http://localhost:4000/api'
 interface PaymentFormProps {
   amount: number
   bookingId?: string
@@ -63,7 +65,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
 
         try {
           // Create Payment Intent
-          const response = await fetch('http://localhost:4000/api/payments/intent', {
+          const response = await fetch('/payments/intent', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -178,7 +180,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
 
     try {
       // Create Payment Intent
-      const response = await fetch('http://localhost:4000/api/payments/intent', {
+      const response = await fetch(`${API_BASE_URL}/payments/intent`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

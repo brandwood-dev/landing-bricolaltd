@@ -9,6 +9,8 @@ import {
   BulkConvertedPrice
 } from '../types/currency';
 import { optimizedCalculator } from '../utils/OptimizedCurrencyCalculator';
+import { useAuth } from './AuthContext';
+import { getCurrencyFromCountry } from '../utils/countryToCurrency';
 
 const currencies: Currency[] = [
   { code: 'GBP', symbol: '£', nameKey: 'currency.GBP', flagClass: 'fi fi-gb' },
@@ -28,36 +30,88 @@ interface OptimizedCurrencyContextType extends UseCurrencyOptimizedReturn {
   // Méthodes de compatibilité avec l'ancien système
   legacyFormatPrice: (price: number, fromCurrency?: string) => Promise<string>;
   legacyConvertPrice: (amount: number, fromCurrency: string, toCurrency?: string) => Promise<ConvertedPrice>;
+  // Cache properties for direct access
+  exchangeRatesCache: Record<string, number>;
+  cacheTimestamp: number;
+  // Nouvelles méthodes pour conversion instantanée
+  getInstantRate: (fromCurrency: string, toCurrency: string) => number | null;
+  convertInstantly: (amount: number, fromCurrency: string, toCurrency: string) => number | null;
+  formatInstantPrice: (amount: number, fromCurrency: string, toCurrency?: string) => string;
 }
 
 const CurrencyContext = createContext<OptimizedCurrencyContextType | undefined>(undefined);
 
 export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, isAuthenticated } = useAuth();
   const [currency, setCurrency] = useState<Currency>(currencies[0]); // Default to GBP
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [hasAutoSelected, setHasAutoSelected] = useState<boolean>(false);
   
   // Cache optimisé - durée étendue à 30 minutes
   const [exchangeRatesCache, setExchangeRatesCache] = useState<Record<string, number>>({});
   const [cacheTimestamp, setCacheTimestamp] = useState<number>(0);
   const CACHE_DURATION = 30 * 60 * 1000; // Étendu à 30 minutes pour l'optimisation
 
-  // Load saved currency from localStorage on mount
+  // Auto-select currency based on user's country when logged in
   useEffect(() => {
-    console.log('🏦 [CurrencyContext] Loading saved currency from localStorage');
-    const savedCurrencyCode = localStorage.getItem('selectedCurrency');
-    if (savedCurrencyCode) {
-      console.log(`🔍 [CurrencyContext] Found saved currency: ${savedCurrencyCode}`);
-      const savedCurrency = currencies.find(c => c.code === savedCurrencyCode);
-      if (savedCurrency) {
-        console.log(`✅ [CurrencyContext] Setting currency to: ${savedCurrency.code} (${savedCurrency.symbol})`);
-        setCurrency(savedCurrency);
-      } else {
-        console.warn(`⚠️ [CurrencyContext] Saved currency ${savedCurrencyCode} not found in available currencies`);
+    if (isAuthenticated && user && !hasAutoSelected) {
+      console.log('🌍 [CurrencyContext] User logged in, checking for auto-currency selection');
+      console.log('👤 [CurrencyContext] User country:', user.country);
+      
+      // Check if user has manually selected a currency before
+      const savedCurrencyCode = localStorage.getItem('selectedCurrency');
+      const hasManualSelection = localStorage.getItem('hasManualCurrencySelection') === 'true';
+      
+      if (!hasManualSelection && user.country) {
+        // Auto-select currency based on user's country
+        const userCountry = user.country || user.countryId;
+        console.log(`🌍 [CurrencyContext] User country:`, userCountry, 'Type:', typeof userCountry);
+        
+        if (userCountry) {
+          const suggestedCurrencyCode = getCurrencyFromCountry(userCountry);
+          console.log(`💰 [CurrencyContext] Suggested currency for country ${JSON.stringify(userCountry)}: ${suggestedCurrencyCode}`);
+          
+          const suggestedCurrency = currencies.find(c => c.code === suggestedCurrencyCode);
+          if (suggestedCurrency && suggestedCurrency.code !== currency.code) {
+            console.log(`✅ [CurrencyContext] Auto-selecting currency: ${suggestedCurrency.code} (${suggestedCurrency.symbol})`);
+            setCurrency(suggestedCurrency);
+            localStorage.setItem('selectedCurrency', suggestedCurrencyCode);
+          } else if (!suggestedCurrency) {
+            console.warn(`⚠️ [CurrencyContext] Suggested currency ${suggestedCurrencyCode} not found in available currencies`);
+          }
+        }
+      } else if (savedCurrencyCode) {
+        // Use saved manual selection
+        console.log(`🔍 [CurrencyContext] Using saved manual currency selection: ${savedCurrencyCode}`);
+        const savedCurrency = currencies.find(c => c.code === savedCurrencyCode);
+        if (savedCurrency) {
+          setCurrency(savedCurrency);
+        }
       }
-    } else {
-      console.log('📝 [CurrencyContext] No saved currency found, using default GBP');
+      
+      setHasAutoSelected(true);
     }
-  }, []);
+  }, [isAuthenticated, user, hasAutoSelected, currency.code]);
+
+  // Load saved currency from localStorage on mount (for non-authenticated users)
+  useEffect(() => {
+    if (!isAuthenticated) {
+      console.log('🏦 [CurrencyContext] Loading saved currency from localStorage (non-authenticated)');
+      const savedCurrencyCode = localStorage.getItem('selectedCurrency');
+      if (savedCurrencyCode) {
+        console.log(`🔍 [CurrencyContext] Found saved currency: ${savedCurrencyCode}`);
+        const savedCurrency = currencies.find(c => c.code === savedCurrencyCode);
+        if (savedCurrency) {
+          console.log(`✅ [CurrencyContext] Setting currency to: ${savedCurrency.code} (${savedCurrency.symbol})`);
+          setCurrency(savedCurrency);
+        } else {
+          console.warn(`⚠️ [CurrencyContext] Saved currency ${savedCurrencyCode} not found in available currencies`);
+        }
+      } else {
+        console.log('📝 [CurrencyContext] No saved currency found, using default GBP');
+      }
+    }
+  }, [isAuthenticated]);
 
   // Save currency to localStorage when it changes
   useEffect(() => {
@@ -143,11 +197,100 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, [currency.code]);
 
   const handleSetCurrency = (newCurrency: Currency) => {
-    console.log(`🔄 [CurrencyContext] Currency change: ${currency.code} → ${newCurrency.code}`);
+    console.log(`🔄 [CurrencyContext] Manual currency change: ${currency.code} → ${newCurrency.code}`);
     setCurrency(newCurrency);
     
-    // Déclencher la récupération optimisée des taux lors du changement de devise
-    refreshRates(RateFetchTrigger.USER_CURRENCY_CHANGE);
+    // Mark as manual selection to prevent auto-selection on future logins
+    localStorage.setItem('hasManualCurrencySelection', 'true');
+  };
+
+  // Nouvelles méthodes pour conversion instantanée
+  const getInstantRate = (fromCurrency: string, toCurrency: string): number | null => {
+    // Si même devise, retourner 1
+    if (fromCurrency === toCurrency) {
+      return 1;
+    }
+
+    // Vérifier si le cache est valide
+    const now = Date.now();
+    const cacheAge = now - cacheTimestamp;
+    
+    if (cacheAge >= CACHE_DURATION || !exchangeRatesCache || Object.keys(exchangeRatesCache).length === 0) {
+      console.log(`⚠️ [CurrencyContext] Cache expired or empty for instant conversion ${fromCurrency} → ${toCurrency}`);
+      return null;
+    }
+
+    // Chercher le taux direct
+    const directKey = `${fromCurrency}_${toCurrency}`;
+    if (exchangeRatesCache[directKey]) {
+      return exchangeRatesCache[directKey];
+    }
+
+    // Chercher le taux inverse
+    const inverseKey = `${toCurrency}_${fromCurrency}`;
+    if (exchangeRatesCache[inverseKey]) {
+      return 1 / exchangeRatesCache[inverseKey];
+    }
+
+    // Si les taux sont basés sur une devise de base (ex: GBP), calculer via la devise de base
+    const baseCurrency = 'GBP'; // Devise de base utilisée par l'API
+    
+    if (fromCurrency === baseCurrency) {
+      // De la devise de base vers la devise cible
+      return exchangeRatesCache[toCurrency] || null;
+    }
+    
+    if (toCurrency === baseCurrency) {
+      // De la devise source vers la devise de base
+      const rate = exchangeRatesCache[fromCurrency];
+      return rate ? 1 / rate : null;
+    }
+    
+    // Conversion entre deux devises non-base via la devise de base
+    const fromToBase = exchangeRatesCache[fromCurrency];
+    const toToBase = exchangeRatesCache[toCurrency];
+    
+    if (fromToBase && toToBase) {
+      // Convertir via la devise de base: (1/fromToBase) * toToBase
+      return toToBase / fromToBase;
+    }
+
+    console.log(`⚠️ [CurrencyContext] No rate found for instant conversion ${fromCurrency} → ${toCurrency}`);
+    return null;
+  };
+
+  const convertInstantly = (amount: number, fromCurrency: string, toCurrency: string): number | null => {
+    if (!amount || amount <= 0) {
+      return null;
+    }
+
+    const rate = getInstantRate(fromCurrency, toCurrency);
+    if (rate === null) {
+      return null;
+    }
+
+    return amount * rate;
+  };
+
+  const formatInstantPrice = (amount: number, fromCurrency: string, toCurrency?: string): string => {
+    const targetCurrency = toCurrency || currency.code;
+    const targetCurrencyObj = currencies.find(c => c.code === targetCurrency);
+    
+    if (!targetCurrencyObj) {
+      return `${amount.toFixed(2)} ${targetCurrency}`;
+    }
+
+    if (fromCurrency === targetCurrency) {
+      return `${targetCurrencyObj.symbol}${amount.toFixed(2)}`;
+    }
+
+    const convertedAmount = convertInstantly(amount, fromCurrency, targetCurrency);
+    
+    if (convertedAmount === null) {
+      return 'Conversion unavailable';
+    }
+
+    return `${targetCurrencyObj.symbol}${convertedAmount.toFixed(2)}`;
   };
 
   const convertPrice = async (
@@ -324,8 +467,6 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const isRatesFresh = optimizedCalculator.isRatesFresh();
 
   // Renommer convertPrice en legacyConvertPrice pour la compatibilité
-  const legacyConvertPrice = convertPrice;
-
   return (
     <CurrencyContext.Provider 
       value={{ 
@@ -333,15 +474,23 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setCurrency: handleSetCurrency, 
         currencies, 
         formatPrice,
-        convertPrice: legacyConvertPrice,
-        legacyFormatPrice,
-        legacyConvertPrice,
+        convertPrice: convertPrice,
+        legacyFormatPrice: async (price: number, fromCurrency?: string) => {
+          return formatPrice(price, fromCurrency);
+        },
+        legacyConvertPrice: convertPrice,
         calculatePrice,
         calculateBulkPrices,
         refreshRates,
         isLoading,
         cacheAge,
-        isRatesFresh
+        isRatesFresh,
+        exchangeRatesCache,
+        cacheTimestamp,
+        // Nouvelles méthodes instantanées
+        getInstantRate,
+        convertInstantly,
+        formatInstantPrice,
       }}
     >
       {children}

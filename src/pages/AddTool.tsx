@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuth } from '@/contexts/AuthContext'
+import { useCurrency } from '@/contexts/CurrencyContext'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useToast } from '@/hooks/use-toast'
 import { useValidation } from '@/hooks/useValidation'
@@ -38,6 +39,8 @@ import MapboxLocationPicker from '@/components/MapboxLocationPicker'
 const AddTool = () => {
   const { t, language } = useLanguage()
   const { user } = useAuth()
+  const currencyContext = useCurrency()
+  const { currency, formatPrice, convertPrice } = currencyContext
   const navigate = useNavigate()
   const location = useLocation()
   const { toast } = useToast()
@@ -74,6 +77,76 @@ const AddTool = () => {
     longitude: undefined,
     ownerInstructions: '',
   })
+
+  // Currency conversion state
+  const [priceInGBP, setPriceInGBP] = useState<number | null>(null)
+  const [depositInGBP, setDepositInGBP] = useState<number | null>(null)
+
+  // Real-time currency conversion for price using instant conversion
+  useEffect(() => {
+    if (!formData.basePrice) {
+      setPriceInGBP(null)
+      // Re-validate when price is cleared
+      if (formData.basePrice !== undefined) {
+        const validation = validatePrice(formData.basePrice, null)
+        setPriceValidation({
+          isValid: validation.isValid,
+          message: validation.message
+        })
+      }
+      return
+    }
+
+    let convertedAmount: number
+    if (currency.code === 'GBP') {
+      convertedAmount = formData.basePrice
+      setPriceInGBP(formData.basePrice)
+    } else {
+      // Use instant conversion from CurrencyContext
+      convertedAmount = currencyContext.convertInstantly(formData.basePrice, currency.code, 'GBP')
+      setPriceInGBP(convertedAmount)
+    }
+
+    // Trigger validation with the converted GBP amount
+    const validation = validatePrice(formData.basePrice, convertedAmount)
+    setPriceValidation({
+      isValid: validation.isValid,
+      message: validation.message
+    })
+  }, [formData.basePrice, currency.code, currencyContext, validatePrice])
+
+  // Real-time currency conversion for deposit using instant conversion
+  useEffect(() => {
+    if (!formData.depositAmount) {
+      setDepositInGBP(null)
+      // Re-validate when deposit is cleared
+      if (formData.depositAmount !== undefined) {
+        const validation = validateDeposit(formData.depositAmount, null)
+        setDepositValidation({
+          isValid: validation.isValid,
+          message: validation.message
+        })
+      }
+      return
+    }
+
+    let convertedAmount: number
+    if (currency.code === 'GBP') {
+      convertedAmount = formData.depositAmount
+      setDepositInGBP(formData.depositAmount)
+    } else {
+      // Use instant conversion from CurrencyContext
+      convertedAmount = currencyContext.convertInstantly(formData.depositAmount, currency.code, 'GBP')
+      setDepositInGBP(convertedAmount)
+    }
+
+    // Trigger validation with the converted GBP amount
+    const validation = validateDeposit(formData.depositAmount, convertedAmount)
+    setDepositValidation({
+      isValid: validation.isValid,
+      message: validation.message
+    })
+  }, [formData.depositAmount, currency.code, currencyContext, validateDeposit])
 
   // File upload state
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
@@ -192,7 +265,7 @@ const AddTool = () => {
     }
 
     if (field === 'basePrice') {
-      const validation = validatePrice(value)
+      const validation = validatePrice(value, priceInGBP)
       setPriceValidation({
         isValid: validation.isValid,
         message: validation.message
@@ -200,7 +273,7 @@ const AddTool = () => {
     }
 
     if (field === 'depositAmount') {
-      const validation = validateDeposit(value)
+      const validation = validateDeposit(value, depositInGBP)
       setDepositValidation({
         isValid: validation.isValid,
         message: validation.message
@@ -403,6 +476,18 @@ const AddTool = () => {
     try {
       setSubmitting(true)
 
+      // Convert prices to GBP if user is using a different currency
+      let finalBasePrice = formData.basePrice!
+      let finalDepositAmount = formData.depositAmount
+
+      if (currency.code !== 'GBP') {
+        // Use the already calculated GBP values from real-time conversion
+        finalBasePrice = priceInGBP || formData.basePrice!
+        if (formData.depositAmount) {
+          finalDepositAmount = depositInGBP || formData.depositAmount
+        }
+      }
+
       const toolData: CreateToolData = {
         title: formData.title!,
         brand: formData.brand,
@@ -412,8 +497,8 @@ const AddTool = () => {
         categoryId: formData.categoryId!,
         subcategoryId: formData.subcategoryId,
         condition: formData.condition!,
-        basePrice: formData.basePrice!,
-        depositAmount: formData.depositAmount,
+        basePrice: finalBasePrice,
+        depositAmount: finalDepositAmount,
         pickupAddress: formData.pickupAddress,
         latitude: formData.latitude,
         longitude: formData.longitude,
@@ -692,7 +777,9 @@ const AddTool = () => {
                         }
                         placeholder={t('add_tool.description_placeholder')}
                         className={`min-h-[120px] resize-none text-base pr-16 ${
-                          !descriptionValidation.isValid ? 'border-destructive focus:border-destructive' : ''
+                          !descriptionValidation.isValid
+                            ? 'border-destructive focus:border-destructive'
+                            : ''
                         }`}
                         maxLength={500}
                       />
@@ -705,11 +792,15 @@ const AddTool = () => {
                         {descriptionValidation.message}
                       </p>
                     )}
-                    {descriptionValidation.charCount > 450 && descriptionValidation.isValid && (
-                      <p className='text-sm text-amber-600 mt-1'>
-                        {t('validation.character_counter', { current: descriptionValidation.charCount, max: 500 })}
-                      </p>
-                    )}
+                    {descriptionValidation.charCount > 450 &&
+                      descriptionValidation.isValid && (
+                        <p className='text-sm text-amber-600 mt-1'>
+                          {t('validation.character_counter', {
+                            current: descriptionValidation.charCount,
+                            max: 500,
+                          })}
+                        </p>
+                      )}
                   </div>
                 </div>
 
@@ -829,36 +920,63 @@ const AddTool = () => {
                         htmlFor='price'
                         className='text-sm font-medium text-foreground'
                       >
-                        {t('add_tool.price_per_day')} *
+                        {t('add_tool.price_per_day')} * ({currency.code})
                       </Label>
                       <div className='relative'>
                         <Input
                           id='price'
                           type='number'
                           min='0.01'
-                          max='500'
                           step='0.01'
                           value={formData.basePrice || ''}
                           onChange={(e) => {
                             const value = e.target.value
-                            const numValue = value ? parseFloat(value) : undefined
+                            const numValue = value
+                              ? parseFloat(value)
+                              : undefined
                             // Block input if value exceeds 500
-                            if (numValue && numValue > 500) {
+                            // Block input if GBP-converted value exceeds 500
+                            const gbpValue =
+                              currency.code === 'GBP'
+                                ? numValue
+                                : currencyContext.convertInstantly(
+                                    numValue,
+                                    currency.code,
+                                    'GBP'
+                                  )
+                            if (numValue && gbpValue > 500) {
                               return
                             }
                             handleInputChange('basePrice', numValue)
                           }}
-                          placeholder='25'
-                          className={`h-12 text-base pl-8 ${
-                            !priceValidation.isValid ? 'border-destructive focus:border-destructive' : ''
+                          className={`h-12 text-base  ${
+                            !priceValidation.isValid
+                              ? 'border-destructive focus:border-destructive'
+                              : ''
                           }`}
                         />
-                        <Euro className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+
+                        <div className='absolute right-10 top-1/2 transform -translate-y-1/2 text-xs text-muted-foreground'>
+                          {currency.code}
+                        </div>
                       </div>
                       {!priceValidation.isValid && (
                         <p className='text-sm text-destructive mt-1'>
                           {priceValidation.message}
                         </p>
+                      )}
+                      {/* GBP Conversion Display */}
+                      {formData.basePrice && currency.code !== 'GBP' && (
+                        <div className='text-xs text-muted-foreground mt-1'>
+                          {priceInGBP !== null &&
+                          typeof priceInGBP === 'number' ? (
+                            <span>≈ £{priceInGBP.toFixed(2)} GBP</span>
+                          ) : (
+                            <span className='text-amber-600'>
+                              Conversion unavailable
+                            </span>
+                          )}
+                        </div>
                       )}
                     </div>
 
@@ -867,36 +985,63 @@ const AddTool = () => {
                         htmlFor='deposit'
                         className='text-sm font-medium text-foreground'
                       >
-                        {t('add_tool.deposit')}
+                        {t('add_tool.deposit')} ({currency.code})
                       </Label>
                       <div className='relative'>
                         <Input
                           id='deposit'
                           type='number'
                           min='0'
-                          max='500'
                           step='0.01'
                           value={formData.depositAmount || ''}
                           onChange={(e) => {
                             const value = e.target.value
-                            const numValue = value ? parseFloat(value) : undefined
+                            const numValue = value
+                              ? parseFloat(value)
+                              : undefined
                             // Block input if value exceeds 500
-                            if (numValue && numValue > 500) {
+                            // Block input if GBP-converted value exceeds 500
+                            const gbpValue =
+                              currency.code === 'GBP'
+                                ? numValue
+                                : currencyContext.convertInstantly(
+                                    numValue,
+                                    currency.code,
+                                    'GBP'
+                                  )
+                            if (numValue && gbpValue > 500) {
                               return
                             }
                             handleInputChange('depositAmount', numValue)
                           }}
-                          placeholder='100'
-                          className={`h-12 text-base pl-8 ${
-                            !depositValidation.isValid ? 'border-destructive focus:border-destructive' : ''
+                          className={`h-12 text-base  ${
+                            !depositValidation.isValid
+                              ? 'border-destructive focus:border-destructive'
+                              : ''
                           }`}
                         />
-                        <Shield className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+
+                        <div className='absolute right-10 top-1/2 transform -translate-y-1/2 text-xs text-muted-foreground'>
+                          {currency.code}
+                        </div>
                       </div>
                       {!depositValidation.isValid && (
                         <p className='text-sm text-destructive mt-1'>
                           {depositValidation.message}
                         </p>
+                      )}
+                      {/* GBP Conversion Display */}
+                      {formData.depositAmount && currency.code !== 'GBP' && (
+                        <div className='text-xs text-muted-foreground mt-1'>
+                          {depositInGBP !== null &&
+                          typeof depositInGBP === 'number' ? (
+                            <span>≈ £{depositInGBP.toFixed(2)} GBP</span>
+                          ) : (
+                            <span className='text-amber-600'>
+                              Conversion unavailable
+                            </span>
+                          )}
+                        </div>
                       )}
                     </div>
                   </div>
@@ -917,12 +1062,16 @@ const AddTool = () => {
                     {/* Map for location selection */}
                     <div className='space-y-3'>
                       <Label className='text-sm font-medium text-foreground'>
-                        {t('add_tool.address')} * - Sélectionnez directement sur la carte
+                        {t('add_tool.address')} * - Sélectionnez directement sur
+                        la carte
                       </Label>
                       <MapboxLocationPicker
                         coordinates={
                           formData.latitude && formData.longitude
-                            ? { lat: formData.latitude, lng: formData.longitude }
+                            ? {
+                                lat: formData.latitude,
+                                lng: formData.longitude,
+                              }
                             : undefined
                         }
                         onCoordinatesChange={(coordinates) => {
@@ -939,22 +1088,32 @@ const AddTool = () => {
                     </div>
 
                     {/* Address and coordinates display */}
-                    {(formData.latitude && formData.longitude) || formData.pickupAddress ? (
+                    {(formData.latitude && formData.longitude) ||
+                    formData.pickupAddress ? (
                       <div className='bg-muted p-4 rounded-lg space-y-2'>
                         {formData.pickupAddress && (
                           <div className='text-sm text-foreground'>
-                            📍 <strong>Adresse:</strong> {formData.pickupAddress}
+                            📍 <strong>Adresse:</strong>{' '}
+                            {formData.pickupAddress}
                           </div>
                         )}
                         {formData.latitude && formData.longitude && (
                           <div className='text-xs text-muted-foreground'>
-                            🌍 <strong>Coordonnées:</strong> {formData.latitude.toFixed(6)}, {formData.longitude.toFixed(6)}
+                            🌍 <strong>Coordonnées:</strong>{' '}
+                            {typeof formData.latitude === 'number'
+                              ? formData.latitude.toFixed(6)
+                              : formData.latitude}
+                            ,{' '}
+                            {typeof formData.longitude === 'number'
+                              ? formData.longitude.toFixed(6)
+                              : formData.longitude}
                           </div>
                         )}
                       </div>
                     ) : (
                       <div className='text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg border-l-4 border-accent'>
-                        💡 Cliquez sur la carte pour sélectionner l'adresse de récupération de votre outil
+                        💡 Cliquez sur la carte pour sélectionner l'adresse de
+                        récupération de votre outil
                       </div>
                     )}
                   </div>
@@ -1093,7 +1252,9 @@ const AddTool = () => {
                         }
                         placeholder='Ex: Prévoir une rallonge électrique, nettoyer après usage, manipulation délicate...'
                         className={`min-h-[100px] resize-none text-base pr-16 ${
-                          !instructionsValidation.isValid ? 'border-destructive focus:border-destructive' : ''
+                          !instructionsValidation.isValid
+                            ? 'border-destructive focus:border-destructive'
+                            : ''
                         }`}
                         maxLength={300}
                       />
@@ -1106,11 +1267,15 @@ const AddTool = () => {
                         {instructionsValidation.message}
                       </p>
                     )}
-                    {instructionsValidation.charCount > 250 && instructionsValidation.isValid && (
-                      <p className='text-sm text-amber-600 mt-1'>
-                        {t('validation.character_counter', { current: instructionsValidation.charCount, max: 300 })}
-                      </p>
-                    )}
+                    {instructionsValidation.charCount > 250 &&
+                      instructionsValidation.isValid && (
+                        <p className='text-sm text-amber-600 mt-1'>
+                          {t('validation.character_counter', {
+                            current: instructionsValidation.charCount,
+                            max: 300,
+                          })}
+                        </p>
+                      )}
                   </div>
                 </div>
 

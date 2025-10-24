@@ -60,7 +60,9 @@ import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { cn } from '@/lib/utils'
 import { PaymentMethod } from '@/types/bridge'
-
+const API_BASE_URL = import.meta.env.VITE_BASE_URL
+  ? `${import.meta.env.VITE_BASE_URL}`
+  : 'http://localhost:4000/api'
 // Interface pour les données persistées
 interface PersistedFormData {
   startDate: Date | null
@@ -312,7 +314,7 @@ const Rent: React.FC = () => {
 
       // Récupérer les réservations existantes depuis l'API avec authentification
       const response = await fetch(
-        `http://localhost:4000/api/bookings/tool/${toolId}`,
+        `${API_BASE_URL}/bookings/tool/${toolId}`,
         {
           method: 'GET',
           headers: {
