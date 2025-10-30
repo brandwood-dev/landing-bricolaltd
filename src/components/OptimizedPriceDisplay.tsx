@@ -22,23 +22,29 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
   className = '',
   showOriginal = false,
   size = 'md',
-  cible = 'basePrice',
+  cible = 'totalPrice',
   useCache = true,
 }) => {
-  const { currency, currencies, calculatePrice, legacyConvertPrice, isLoading } = useCurrency()
+  const {
+    currency,
+    currencies,
+    calculatePrice,
+    legacyConvertPrice,
+    isLoading,
+  } = useCurrency()
   const { t, language } = useLanguage()
 
   // Fonction pour obtenir le symbole de devise selon la langue
   const getCurrencySymbol = (currencyCode: string) => {
     const currencyObj = currencies.find((c) => c.code === currencyCode)
-    
+
     if (!currencyObj) return currencyCode
-    
+
     // Si la langue est arabe, utiliser les symboles arabes
     if (language === 'ar') {
       return currencyObj.symbol
     }
-    
+
     // Pour français et anglais, utiliser les codes de devise latins
     return currencyCode
   }
@@ -48,10 +54,15 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
     try {
       // Validation du prix d'entrée
       const numericPrice = typeof price === 'string' ? parseFloat(price) : price
-      const isValidPrice = typeof numericPrice === 'number' && !isNaN(numericPrice) && numericPrice > 0
+      const isValidPrice =
+        typeof numericPrice === 'number' &&
+        !isNaN(numericPrice) &&
+        numericPrice > 0
       const validPrice = isValidPrice ? numericPrice : 0
 
-      console.log(`💰 [OptimizedPriceDisplay] Processing price: ${price} (valid: ${validPrice}) from ${baseCurrency} to ${currency.code}`)
+      console.log(
+        `💰 [OptimizedPriceDisplay] Processing price: ${price} (valid: ${validPrice}) from ${baseCurrency} to ${currency.code}`
+      )
 
       // Obtenir le symbole de devise de base selon la langue
       const baseSymbol = getCurrencySymbol(baseCurrency)
@@ -63,11 +74,13 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
       if (!isValidPrice) {
         const targetSymbol = getCurrencySymbol(currency.code)
         const zeroPrice = `0.00 ${targetSymbol}`
-        console.log(`⚠️ [OptimizedPriceDisplay] Invalid price, displaying zero: ${zeroPrice}`)
+        console.log(
+          `⚠️ [OptimizedPriceDisplay] Invalid price, displaying zero: ${zeroPrice}`
+        )
         return {
           convertedPrice: zeroPrice,
           originalPrice: originalFormatted,
-          error: false
+          error: false,
         }
       }
 
@@ -75,31 +88,43 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
       if (baseCurrency === currency.code) {
         const targetSymbol = getCurrencySymbol(currency.code)
         const samePrice = `${validPrice.toFixed(2)} ${targetSymbol}`
-        console.log(`✅ [OptimizedPriceDisplay] Same currency, no conversion: ${samePrice}`)
+        console.log(
+          `✅ [OptimizedPriceDisplay] Same currency, no conversion: ${samePrice}`
+        )
         return {
           convertedPrice: samePrice,
           originalPrice: originalFormatted,
-          error: false
+          error: false,
         }
       }
 
       // Utiliser le calcul optimisé instantané si le cache est activé
       if (useCache) {
-        const convertedAmount = calculatePrice(validPrice, baseCurrency, currency.code)
+        const convertedAmount = calculatePrice(
+          validPrice,
+          baseCurrency,
+          currency.code
+        )
         const targetSymbol = getCurrencySymbol(currency.code)
         const formattedPrice = `${convertedAmount.toFixed(2)} ${targetSymbol}`
-        
-        console.log(`⚡ [OptimizedPriceDisplay] Instant calculation: ${validPrice} ${baseCurrency} → ${convertedAmount.toFixed(2)} ${currency.code}`)
-        
+
+        console.log(
+          `⚡ [OptimizedPriceDisplay] Instant calculation: ${validPrice} ${baseCurrency} → ${convertedAmount.toFixed(
+            2
+          )} ${currency.code}`
+        )
+
         return {
           convertedPrice: formattedPrice,
           originalPrice: originalFormatted,
-          error: false
+          error: false,
         }
       } else {
         // Pour les paiements critiques, utiliser l'ancienne méthode avec API
         // Cette partie sera gérée de manière asynchrone
-        console.log(`🔄 [OptimizedPriceDisplay] Using legacy conversion for critical payment`)
+        console.log(
+          `🔄 [OptimizedPriceDisplay] Using legacy conversion for critical payment`
+        )
         const targetSymbol = getCurrencySymbol(currency.code)
         return {
           convertedPrice: `${validPrice.toFixed(2)} ${targetSymbol}`, // Fallback temporaire
@@ -107,22 +132,33 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
           error: false,
         }
       }
-
     } catch (err) {
       console.error('❌ [OptimizedPriceDisplay] Calculation error:', err)
-      
+
       // Fallback en cas d'erreur
       const numericPrice = typeof price === 'string' ? parseFloat(price) : price
-      const validPrice = typeof numericPrice === 'number' && !isNaN(numericPrice) ? numericPrice : 0
+      const validPrice =
+        typeof numericPrice === 'number' && !isNaN(numericPrice)
+          ? numericPrice
+          : 0
       const baseSymbol = getCurrencySymbol(baseCurrency)
-      
+
       return {
         convertedPrice: `${validPrice.toFixed(2)} ${baseSymbol}`,
         originalPrice: `${validPrice.toFixed(2)} ${baseSymbol}`,
-        error: true
+        error: true,
       }
     }
-  }, [price, baseCurrency, currency.code, currency.symbol, currencies, calculatePrice, useCache, language])
+  }, [
+    price,
+    baseCurrency,
+    currency.code,
+    currency.symbol,
+    currencies,
+    calculatePrice,
+    useCache,
+    language,
+  ])
 
   const getSizeClasses = () => {
     switch (size) {
@@ -148,7 +184,9 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
       case 'feesInc':
         return `6% ${t('tools.of')} ${formattedPrice} ${t('tools.charged')}`
       case 'deposit':
-        return `${t('tools.deposit')} : ${formattedPrice} ${t('tools.refunded')}`
+        return `${t('tools.deposit')} : ${formattedPrice} ${t(
+          'tools.refunded'
+        )}`
       case 'totalPrice':
         return formattedPrice
       case 'minPrice':

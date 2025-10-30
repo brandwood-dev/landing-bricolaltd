@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { StripeProvider } from '@/contexts/StripeContext'
-
+import { useDepositModal } from '@/contexts/DepositModalContext'
+import { useDepositNotification } from '@/components/DepositNotification'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -87,6 +88,8 @@ const Rent: React.FC = () => {
   const { t, language } = useLanguage()
   const { toast } = useToast()
   const { refreshRates } = useCurrencyOptimized()
+  const { openModal } = useDepositModal()
+  const { showDepositToast } = useDepositNotification()
 
   // États existants
   const [tool, setTool] = useState<Tool | null>(null)
@@ -112,6 +115,8 @@ const Rent: React.FC = () => {
   // États pour le nouveau flux de paiement
   const [pendingBookingData, setPendingBookingData] =
     useState<CreateBookingData | null>(null)
+
+
 
   // Fonction pour générer la clé de stockage unique
   const getStorageKey = (toolId: string, userId?: string): string => {
@@ -232,24 +237,7 @@ const Rent: React.FC = () => {
     loading,
   ])
 
-  // useEffect pour nettoyer lors de la navigation vers d'autres pages (sauf Checkout)
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      // Ne pas nettoyer si on va vers la page de checkout
-      const isGoingToCheckout = location.pathname.includes('/checkout')
-      if (!isGoingToCheckout) {
-        clearSavedFormData()
-      }
-    }
-
-    window.addEventListener('beforeunload', handleBeforeUnload)
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-      // Ne pas nettoyer automatiquement au démontage du composant
-      // car cela pourrait interférer avec la navigation vers checkout
-    }
-  }, [location.pathname, id, user?.id])
+ 
 
   // États supplémentaires pour la gestion des réservations
   const [bookingDates, setBookingDates] = useState<{
@@ -415,11 +403,7 @@ const Rent: React.FC = () => {
     refreshRates(RateFetchTrigger.RENT_PAGE_ENTRY)
   }, [id, refreshRates])
 
-  // useEffect(() => {
-  //   if (!user) {
-  //     navigate('/login', { state: { from: location } })
-  //   }
-  // }, [user, navigate])
+
 
   const isDateUnavailable = (date: Date) => {
     return unavailableDates.some(
@@ -449,7 +433,7 @@ const Rent: React.FC = () => {
   // Fonction pour vérifier si la sélection dépasse 5 jours
   const isDateExceeding5Days = (date: Date, referenceDate: Date) => {
     const diffTime = Math.abs(date.getTime() - referenceDate.getTime())
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
     return diffDays > 5
   }
 
@@ -465,6 +449,35 @@ const Rent: React.FC = () => {
     return false
   }
 
+  // Fonction utilitaire pour formater une date en YYYY-MM-DD sans conversion UTC
+  const formatDateLocal = (date: Date): string => {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
+  // Calculer la date minimum (maintenant + 48h)
+  const getMinimumStartDate = () => {
+    const now = new Date()
+    const minimumDate = new Date(now.getTime() + 48 * 60 * 60 * 1000)
+    return minimumDate
+  }
+
+  // Vérifier si une heure de pickup est désactivée pour une date donnée
+  const isPickupTimeDisabled = (selectedDate: Date, pickupTime: string) => {
+    if (!selectedDate) return false
+    
+    const [hours, minutes] = pickupTime.split(':').map(Number)
+    const pickupDateTime = new Date(selectedDate)
+    pickupDateTime.setHours(hours, minutes, 0, 0)
+    
+    const now = new Date()
+    const minimumDateTime = new Date(now.getTime() + 48 * 60 * 60 * 1000)
+    
+    return pickupDateTime < minimumDateTime
+  }
+
   // Fonction personnalisée pour setStartDate avec validation
   const handleStartDateChange = (date: Date | undefined) => {
     setStartDate(date)
@@ -472,11 +485,49 @@ const Rent: React.FC = () => {
     if (date && endDate && date > endDate) {
       setEndDate(undefined)
     }
+    // Si la nouvelle date de début est identique à la date de fin, réinitialiser la date de fin
+    if (date && endDate && date.toDateString() === endDate.toDateString()) {
+      setEndDate(undefined)
+      toast({
+        title: 'Dates identiques non autorisées',
+        description: 'La date de fin doit être différente de la date de début.',
+        variant: 'destructive',
+      })
+    }
+    // Vérifier si l'heure de pickup actuelle est encore valide avec la nouvelle date
+    if (date && formData.pickupHour && isPickupTimeDisabled(date, formData.pickupHour)) {
+      setFormData({ ...formData, pickupHour: '' })
+      toast({
+        title: 'Heure de récupération réinitialisée',
+        description: 'L\'heure sélectionnée n\'est plus disponible pour cette date. Veuillez en choisir une autre.',
+        variant: 'default',
+      })
+    }
   }
 
   // Fonction personnalisée pour setEndDate avec validation de période
   const handleEndDateChange = (date: Date | undefined) => {
     if (date && startDate) {
+      // Vérifier si les dates sont identiques
+      if (date.toDateString() === startDate.toDateString()) {
+        toast({
+          title: 'Dates identiques non autorisées',
+          description: 'La date de fin doit être différente de la date de début.',
+          variant: 'destructive',
+        })
+        return
+      }
+      
+      // Vérifier la limite de 5 jours
+      if (isDateExceeding5Days(date, startDate)) {
+        toast({
+          title: 'Période trop longue',
+          description: 'La durée de location ne peut pas dépasser 5 jours consécutifs.',
+          variant: 'destructive',
+        })
+        return
+      }
+      
       // Vérifier si la période contient des dates indisponibles
       if (isPeriodUnavailable(startDate, date)) {
         toast({
@@ -494,7 +545,7 @@ const Rent: React.FC = () => {
   const calculateDays = () => {
     if (!startDate || !endDate) return 0
     const diffTime = Math.abs(endDate.getTime() - startDate.getTime())
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
     return diffDays
   }
 
@@ -527,7 +578,7 @@ const Rent: React.FC = () => {
         subtotal,
         taxes: fees,
         deposit,
-        totalAmount: Number(subtotal) + Number(fees) + Number(deposit),
+        totalAmount: Number(subtotal) + Number(fees), // Exclure la caution du montant à payer
         startDate: startDate.toISOString().split('T')[0],
         endDate: endDate.toISOString().split('T')[0],
         serviceFee: fees,
@@ -552,45 +603,25 @@ const Rent: React.FC = () => {
     fetchPricing()
   }, [tool, startDate, endDate])
 
-  // Get all photo URLs with primary photo first
-  const getAllPhotoUrls = (tool: Tool) => {
-    if (tool.photos && tool.photos.length > 0) {
-      // Sort photos to put primary photo first
-      const sortedPhotos = [...tool.photos].sort((a, b) => {
-        if (a.isPrimary) return -1
-        if (b.isPrimary) return 1
-        return 0
-      })
-      return sortedPhotos.map((photo) => photo.url)
-    }
-    return ['https://picsum.photos/800/600?random=990&tool']
-  }
+ 
 
-  // Carousel navigation functions
-  const nextImage = () => {
-    if (!tool) return
-    const allPhotos = getAllPhotoUrls(tool)
-    setCurrentImageIndex((prev) => (prev + 1) % allPhotos.length)
-  }
-
-  const prevImage = () => {
-    if (!tool) return
-    const allPhotos = getAllPhotoUrls(tool)
-    setCurrentImageIndex(
-      (prev) => (prev - 1 + allPhotos.length) % allPhotos.length
-    )
-  }
-
-  const goToImage = (index: number) => {
-    setCurrentImageIndex(index)
-  }
+ 
 
   // Pricing values with fallbacks and validation
   const basePrice = Math.max(
     Number(pricing?.basePrice || tool?.basePrice) || 25,
     0
   )
-  const days = Math.max(Number(pricing?.totalDays || calculateDays()) || 1, 1)
+  
+  // 🔍 LOGS DE DÉBOGAGE POUR LE CALCUL DES JOURS
+  console.log('🔍 [DEBUG] Calcul des jours:')
+  console.log('  - calculateDays():', calculateDays())
+  console.log('  - pricing?.totalDays:', pricing?.totalDays)
+  console.log('  - startDate:', startDate)
+  console.log('  - endDate:', endDate)
+  
+  // FORCER l'utilisation de calculateDays() au lieu de pricing?.totalDays
+  const days = Math.max(calculateDays() || 1, 1)
   const totalPrice = Math.max(Number(pricing?.subtotal) || basePrice * days, 0)
   const totalFees = Math.max(Number(pricing?.taxes) || totalPrice * 0.06, 0)
   const deposit = Math.max(
@@ -599,9 +630,19 @@ const Rent: React.FC = () => {
   )
   const displayPrice = basePrice
   const totalToPay = Math.max(
-    Number(pricing?.totalAmount) || totalPrice + totalFees + deposit,
+    Number(pricing?.totalAmount) || totalPrice + totalFees, // Exclure la caution du montant à payer
     0
   )
+
+  // 🔍 LOGS DE DÉBOGAGE POUR TRACER LE CALCUL DU MONTANT TOTAL
+  console.log('🔍 [Rent.tsx] Calcul du montant total:')
+  console.log('  - basePrice:', basePrice)
+  console.log('  - days:', days)
+  console.log('  - totalPrice:', totalPrice)
+  console.log('  - totalFees:', totalFees)
+  console.log('  - deposit:', deposit)
+  console.log('  - totalToPay (final):', totalToPay)
+  console.log('  - pricing object:', pricing)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -622,6 +663,17 @@ const Rent: React.FC = () => {
         title: t('errors.validation_error'),
         description:
           'La date de début ne peut pas être postérieure à la date de fin',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    // Vérifier que les dates ne sont pas identiques
+    if (startDate.toDateString() === endDate.toDateString()) {
+      toast({
+        title: t('errors.validation_error'),
+        description:
+          'La date de fin doit être différente de la date de début',
         variant: 'destructive',
       })
       return
@@ -717,8 +769,8 @@ const Rent: React.FC = () => {
       // Préparer les données de réservation (sans créer la réservation encore)
       const bookingData: CreateBookingData = {
         toolId: tool.id,
-        startDate: startDate.toISOString().split('T')[0],
-        endDate: endDate.toISOString().split('T')[0],
+        startDate: formatDateLocal(startDate),
+        endDate: formatDateLocal(endDate),
         pickupHour: formData.pickupHour,
         paymentMethod: formData.paymentMethod === 'card' ? PaymentMethod.CARD : 
                       formData.paymentMethod === 'google_pay' ? PaymentMethod.GOOGLE_PAY : 
@@ -947,8 +999,9 @@ const Rent: React.FC = () => {
                                   selected={startDate}
                                   onSelect={handleStartDateChange}
                                   disabled={(date) => {
+                                    const minimumStartDate = getMinimumStartDate()
                                     return (
-                                      date < new Date() ||
+                                      date < minimumStartDate ||
                                       isDateUnavailable(date) ||
                                       isDateConfirmed(date) ||
                                       isDatePending(date) ||
@@ -1022,8 +1075,9 @@ const Rent: React.FC = () => {
                                       return true
                                     }
 
+                                    // Empêcher la sélection de dates ≤ date de début (même date ou antérieure)
                                     if (
-                                      date < startDate ||
+                                      date <= startDate ||
                                       isDateUnavailable(date) ||
                                       isDateConfirmed(date) ||
                                       isDatePending(date) ||
@@ -1036,10 +1090,7 @@ const Rent: React.FC = () => {
                                     const diffTime = Math.abs(
                                       date.getTime() - startDate.getTime()
                                     )
-                                    const diffDays =
-                                      Math.floor(
-                                        diffTime / (1000 * 60 * 60 * 24)
-                                      ) + 1
+                                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
                                     if (diffDays > 5) {
                                       return true
                                     }
@@ -1110,14 +1161,19 @@ const Rent: React.FC = () => {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value='08:00'>08:00</SelectItem>
-                              <SelectItem value='09:00'>09:00</SelectItem>
-                              <SelectItem value='10:00'>10:00</SelectItem>
-                              <SelectItem value='11:00'>11:00</SelectItem>
-                              <SelectItem value='14:00'>14:00</SelectItem>
-                              <SelectItem value='15:00'>15:00</SelectItem>
-                              <SelectItem value='16:00'>16:00</SelectItem>
-                              <SelectItem value='17:00'>17:00</SelectItem>
+                              {['08:00', '09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'].map((time) => {
+                                const isDisabled = startDate ? isPickupTimeDisabled(startDate, time) : false
+                                return (
+                                  <SelectItem 
+                                    key={time} 
+                                    value={time} 
+                                    disabled={isDisabled}
+                                    className={isDisabled ? 'opacity-50 cursor-not-allowed text-gray-400' : ''}
+                                  >
+                                    {time} {isDisabled && '(Non disponible)'}
+                                  </SelectItem>
+                                )
+                              })}
                             </SelectContent>
                           </Select>
                         </div>
@@ -1322,38 +1378,81 @@ const Rent: React.FC = () => {
                           amount={totalToPay}
                           bookingId='pending' // Temporaire, sera remplacé après création
                           paymentMethod={formData.paymentMethod}
-                          onPaymentSuccess={async () => {
+                          onPaymentSuccess={async (paymentIntentId: string) => {
+                            // 🔍 LOG AVANT CRÉATION DE LA RÉSERVATION
+                            console.log('🔍 [Rent.tsx] Paiement réussi, création de la réservation avec totalToPay:', totalToPay)
+                            console.log('🔍 [Rent.tsx] PaymentIntentId reçu:', paymentIntentId)
+                            console.log('🔍 [Rent.tsx] PendingBookingData:', pendingBookingData)
+                            
+                            // 🔍 LOGS ULTRA-DÉTAILLÉS POUR LES DATES
+                            if (pendingBookingData) {
+                              console.log('🔍 [Rent.tsx] === ANALYSE DÉTAILLÉE DES DATES ===')
+                              console.log('🔍 [Rent.tsx] startDate (string):', pendingBookingData.startDate)
+                              console.log('🔍 [Rent.tsx] endDate (string):', pendingBookingData.endDate)
+                              console.log('🔍 [Rent.tsx] Type de startDate:', typeof pendingBookingData.startDate)
+                              console.log('🔍 [Rent.tsx] Type de endDate:', typeof pendingBookingData.endDate)
+                              
+                              // Conversion en Date pour vérification
+                              const startDateObj = new Date(pendingBookingData.startDate)
+                              const endDateObj = new Date(pendingBookingData.endDate)
+                              console.log('🔍 [Rent.tsx] startDate converti en Date:', startDateObj)
+                              console.log('🔍 [Rent.tsx] endDate converti en Date:', endDateObj)
+                              console.log('🔍 [Rent.tsx] startDate.getTime():', startDateObj.getTime())
+                              console.log('🔍 [Rent.tsx] endDate.getTime():', endDateObj.getTime())
+                              console.log('🔍 [Rent.tsx] Comparaison startDate < endDate:', startDateObj < endDateObj)
+                              console.log('🔍 [Rent.tsx] Différence en millisecondes:', endDateObj.getTime() - startDateObj.getTime())
+                              console.log('🔍 [Rent.tsx] Différence en jours:', (endDateObj.getTime() - startDateObj.getTime()) / (1000 * 60 * 60 * 24))
+                              console.log('🔍 [Rent.tsx] === FIN ANALYSE DES DATES ===')
+                            }
+                            
                             try {
                               // Créer la réservation après paiement réussi
-                              const booking =
-                                await bookingService.createBooking(
-                                  pendingBookingData
-                                )
-                              console.log(
-                                '🔍 Booking created after payment:',
-                                booking
-                              )
+                              console.log('🔍 [Rent.tsx] Appel de bookingService.createBooking...')
+                              const booking = await bookingService.createBooking(pendingBookingData)
+                              console.log('🔍 [Rent.tsx] Booking created after payment:', booking)
+
+                              // Programmer le déclenchement de la modal d'acompte (1 minute pour les tests)
+                              console.log('🔍 [Rent.tsx] Programmation de la modal d\'acompte...')
+                              setTimeout(() => {
+                                if (booking && tool) {
+                                  // Utiliser le contexte global pour ouvrir la modal
+                                  const depositInfo = {
+                                    bookingId: booking.id,
+                                    amount: deposit,
+                                    currency: tool.baseCurrencyCode || 'GBP',
+                                    dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+                                    propertyTitle: tool.title
+                                  }
+                                  
+                                  openModal(depositInfo)
+                                  
+                                  // Afficher une notification avec bouton pour ouvrir la modal
+                                  showDepositToast(depositInfo)
+                                }
+                              }, 60000) // 1 minute pour les tests (au lieu de 24h)
 
                               // Nettoyer les données
+                              console.log('🔍 [Rent.tsx] Nettoyage des données...')
                               setPendingBookingData(null)
                               setShowPayment(false)
                               clearSavedFormData()
 
+                              console.log('🔍 [Rent.tsx] Affichage du toast de succès...')
                               toast({
                                 title: 'Paiement effectué avec succès!',
-                                description:
-                                  'Votre réservation a été confirmée.',
-                                className:
-                                  'bg-green-50 border-green-200 text-green-800',
+                                description: 'Votre réservation a été confirmée.',
+                                className: 'bg-green-50 border-green-200 text-green-800',
                               })
 
+                              console.log('🔍 [Rent.tsx] Navigation vers /profile?tab=reservations...')
                               navigate('/profile?tab=reservations')
                             } catch (error: any) {
+                              console.error('❌ [Rent.tsx] Erreur lors de la création de la réservation:', error)
+                              console.error('❌ [Rent.tsx] Stack trace:', error.stack)
+                              console.error('❌ [Rent.tsx] Response data:', error.response?.data)
                               toast({
-                                title:
-                                  'Erreur lors de la création de la réservation',
-                                description:
-                                  "Le paiement a été effectué mais la réservation n'a pas pu être créée. Contactez le support.",
+                                title: 'Erreur lors de la création de la réservation',
+                                description: "Le paiement a été effectué mais la réservation n'a pas pu être créée. Contactez le support.",
                                 variant: 'destructive',
                               })
                             }
@@ -1562,6 +1661,8 @@ const Rent: React.FC = () => {
           </div>
         </main>
         <Footer />
+
+
       </div>
     </StripeProvider>
   )

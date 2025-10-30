@@ -16,9 +16,14 @@ export class BookingService {
   // Create a new booking
   async createBooking(bookingData: CreateBookingData): Promise<Booking> {
     try {
+      console.log('🔍 [BookingService] createBooking called with:', bookingData);
       const response = await api.post<ApiResponse<Booking>>('/bookings', bookingData);
+      console.log('🔍 [BookingService] createBooking response:', response.data);
       return response.data.data;
     } catch (error: any) {
+      console.error('❌ [BookingService] createBooking error:', error);
+      console.error('❌ [BookingService] Error response:', error.response?.data);
+      console.error('❌ [BookingService] Error status:', error.response?.status);
       throw new Error(error.response?.data?.message || 'Failed to create booking');
     }
   }

@@ -1,4 +1,5 @@
 
+import React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,7 +10,12 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import { CurrencyProvider } from '@/contexts/CurrencyContext';
 import { AgeVerificationProvider } from '@/contexts/AgeVerificationContext';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { DepositModalProvider, useDepositModal } from '@/contexts/DepositModalContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import DepositPaymentModal from '@/components/payment/DepositPaymentModal';
+import { StripeProvider } from '@/contexts/StripeContext';
+import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
@@ -43,9 +49,71 @@ import PolitiqueAnnulation from "./pages/PolitiqueAnnulation";
 import PolitiqueRemboursement from "./pages/PolitiqueRemboursement";
 import NotificationsPage from "./pages/NotificationsPage";
 import CategorySelectorExample from "./pages/CategorySelectorExample";
-import Checkout from "./pages/Checkout";
 
 const queryClient = new QueryClient();
+
+// Composant pour gérer la modal d'acompte globale
+const GlobalDepositModal = () => {
+  const { isOpen, depositInfo, closeModal, hasDepositPending } = useDepositModal();
+  const { toast } = useToast();
+  const { t } = useLanguage();
+
+  // Vérifier automatiquement s'il y a un acompte en attente au chargement
+  React.useEffect(() => {
+    if (hasDepositPending && depositInfo && !isOpen) {
+      // Afficher une notification discrète qu'il y a un acompte en attente
+      toast({
+        title: 'Acompte en attente',
+        description: `Vous avez un acompte de ${depositInfo.amount} ${depositInfo.currency} en attente pour ${depositInfo.propertyTitle}. Cliquez ici pour payer.`,
+        className: 'bg-orange-50 border-orange-200 text-orange-800 cursor-pointer',
+        duration: 8000,
+        onClick: () => {
+          // Ouvrir la modal quand on clique sur le toast
+          // Note: Cette fonctionnalité dépend de l'implémentation du toast
+        }
+      });
+    }
+  }, [hasDepositPending, depositInfo, isOpen, toast]);
+
+  if (!depositInfo) return null;
+
+  return (
+    <StripeProvider>
+      <DepositPaymentModal
+        isOpen={isOpen}
+        onClose={closeModal}
+        booking={{
+          id: depositInfo.bookingId,
+          tool_name: depositInfo.propertyTitle,
+          start_date: depositInfo.dueDate,
+          end_date: depositInfo.dueDate,
+        }}
+        depositAmount={depositInfo.amount}
+        onPaymentSuccess={(paymentIntentId: string) => {
+          closeModal();
+          // Nettoyer les données d'acompte du localStorage
+          localStorage.removeItem('pendingDeposit');
+          toast({
+            title: t('deposit.modal.success'),
+            description: 'Votre acompte a été payé avec succès.',
+            className: 'bg-green-50 border-green-200 text-green-800',
+          });
+        }}
+        onCancelReservation={() => {
+          closeModal();
+          // Nettoyer les données d'acompte du localStorage
+          localStorage.removeItem('pendingDeposit');
+          toast({
+            title: 'Réservation annulée',
+            description: 'Votre réservation a été annulée avec succès.',
+            className: 'bg-red-50 border-red-200 text-red-800',
+          });
+        }}
+        testMode={true}
+      />
+    </StripeProvider>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -56,94 +124,98 @@ const App = () => (
         <AuthProvider>
           <CurrencyProvider>
             <AgeVerificationProvider>
-              <BrowserRouter>
-              <ScrollToTop />
-              <AgeVerificationDialog />
-              <FloatingActionButton />
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route 
-                  path="/login" 
-                  element={
-                    <ProtectedRoute requireAuth={false}>
-                      <Login />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/register" 
-                  element={
-                    <ProtectedRoute requireAuth={false}>
-                      <Register />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/verify-email" 
-                  element={
-                    <ProtectedRoute requireAuth={false}>
-                      <EmailVerification />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/verify-code" element={<VerifyCode />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/add-tool" element={<AddTool />} />
-                <Route path="/search" element={<Search />} />
-                <Route path="/tool/:id" element={<ToolDetails />} />
-                <Route path="/rent/:id" element={<Rent />} />
-                <Route 
-                  path="/checkout/:bookingId" 
-                  element={
+              <DepositModalProvider>
+                <BrowserRouter>
+                <ScrollToTop />
+                <AgeVerificationDialog />
+                <FloatingActionButton />
+                <GlobalDepositModal />
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route 
+                    path="/login" 
+                    element={
+                      <ProtectedRoute requireAuth={false}>
+                        <Login />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/register" 
+                    element={
+                      <ProtectedRoute requireAuth={false}>
+                        <Register />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/verify-email" 
+                    element={
+                      <ProtectedRoute requireAuth={false}>
+                        <EmailVerification />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/verify-code" element={<VerifyCode />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/add-tool" element={ 
                     <ProtectedRoute>
-                      <Checkout />
+                      <AddTool />
                     </ProtectedRoute>
-                  } 
-                />
-                <Route path="/blog" element={<Blog />} />
-                <Route path="/blog/:id" element={<BlogPost />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/favorites" element={<Favorites />} />
-                <Route 
-                  path="/profile" 
-                  element={
+                  } />
+                  <Route path="/search" element={<Search />} />
+                  <Route path="/tool/:id" element={<ToolDetails />} />
+                  <Route path="/rent/:id" element={ 
                     <ProtectedRoute>
-                      <Profile />
+                      <Rent />
                     </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/wallet" 
-                  element={
-                    <ProtectedRoute>
-                      <Wallet />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/notifications" 
-                  element={
-                    <ProtectedRoute>
-                      <NotificationsPage />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route path="/guide-loueur" element={<GuideLoueur />} /> 
-                <Route path="/guide-locataire" element={<GuideLocataire />} /> 
-                <Route path="/faq" element={<FAQ />} />
-                <Route path="/cgu" element={<CGU />} />
-                <Route path="/contrat-location" element={<ContratLocation />} />
-                <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
-                <Route path="/politique-annulation" element={<PolitiqueAnnulation />} />
-                <Route path="/politique-remboursement" element={<PolitiqueRemboursement />} />
-                <Route path="/under-age" element={<UnderAge />} />
-                <Route path="/category-selector-example" element={<CategorySelectorExample />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              </BrowserRouter>
+                  } />
+                  
+                  <Route path="/blog" element={<Blog />} />
+                  <Route path="/blog/:id" element={<BlogPost />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/favorites" element={<Favorites />} />
+                  <Route 
+                    path="/profile" 
+                    element={
+                      <ProtectedRoute>
+                        <Profile />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/wallet" 
+                    element={
+                      <ProtectedRoute>
+                        <Wallet />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/notifications" 
+                    element={
+                      <ProtectedRoute>
+                        <NotificationsPage />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route path="/guide-loueur" element={<GuideLoueur />} /> 
+                  <Route path="/guide-locataire" element={<GuideLocataire />} /> 
+                  <Route path="/faq" element={<FAQ />} />
+                  <Route path="/cgu" element={<CGU />} />
+                  <Route path="/contrat-location" element={<ContratLocation />} />
+                  <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
+                  <Route path="/politique-annulation" element={<PolitiqueAnnulation />} />
+                  <Route path="/politique-remboursement" element={<PolitiqueRemboursement />} />
+                  <Route path="/under-age" element={<UnderAge />} />
+                  <Route path="/category-selector-example" element={<CategorySelectorExample />} />
+
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+                </BrowserRouter>
+              </DepositModalProvider>
             </AgeVerificationProvider>
           </CurrencyProvider>
         </AuthProvider>
