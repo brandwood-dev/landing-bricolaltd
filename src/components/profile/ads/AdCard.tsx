@@ -17,12 +17,11 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Edit, Eye, Trash2, Star } from 'lucide-react'
 import AdEditDialog from '../AdEditDialog'
-import AdViewDialog from '../AdViewDialog'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { ModerationStatus } from '@/types/bridge/enums'
 import { toolsService, Tool } from '@/services/toolsService'
 import { useToast } from '@/hooks/use-toast'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { OptimizedPriceDisplay } from '@/components/OptimizedPriceDisplay'
 
 interface AdCardProps {
@@ -44,11 +43,9 @@ const AdCard = ({
 }: AdCardProps) => {
   const { t, language } = useLanguage()
   const { toast } = useToast()
+  const navigate = useNavigate()
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
   const [toolData, setToolData] = useState<Tool | null>(null)
-  const [viewToolData, setViewToolData] = useState<Tool | null>(null)
-  const [isLoadingView, setIsLoadingView] = useState(false)
   console.table('ad details', ad)
   const handleEditClick = async () => {
     try {
@@ -74,26 +71,8 @@ const AdCard = ({
     setToolData(null)
   }
 
-  const handleViewClick = async () => {
-    try {
-      setIsLoadingView(true)
-      const tool = await toolsService.getTool(ad.id)
-      setViewToolData(tool)
-      setIsViewDialogOpen(true)
-    } catch (error) {
-      toast({
-        title: 'Erreur',
-        description: "Impossible de charger les détails de l'outil",
-        variant: 'destructive',
-      })
-    } finally {
-      setIsLoadingView(false)
-    }
-  }
-
-  const handleViewClose = () => {
-    setIsViewDialogOpen(false)
-    setViewToolData(null)
+  const handleViewClick = () => {
+    navigate(`/tool/${ad.id}`)
   }
   return (
     <div className='border rounded-lg p-4'>
@@ -103,7 +82,6 @@ const AdCard = ({
             src={ad.image}
             alt={ad.title}
             className='w-full sm:w-20 h-48 sm:h-20 rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity'
-            onClick={handleViewClick}
           />
         </Link>
         <div className='flex-1 space-y-3 w-full sm:w-auto'>
@@ -112,7 +90,6 @@ const AdCard = ({
               <Link
                 to={`/tool/${ad.id}`}
                 className='font-semibold cursor-pointer hover:text-primary transition-colors'
-                onClick={handleViewClick}
               >
                 {ad.title}
               </Link>
@@ -188,20 +165,10 @@ const AdCard = ({
                 variant='outline'
                 size='sm'
                 onClick={handleViewClick}
-                disabled={isLoadingView}
               >
                 <Eye className='h-4 w-4 mr-1' />
-                {isLoadingView ? t('general.loading') : t('general.see')}
+                {t('general.see')}
               </Button>
-
-              {viewToolData && (
-                <Dialog
-                  open={isViewDialogOpen}
-                  onOpenChange={setIsViewDialogOpen}
-                >
-                  <AdViewDialog ad={viewToolData} onClose={handleViewClose} />
-                </Dialog>
-              )}
 
               <AlertDialog>
                 <AlertDialogTrigger asChild>

@@ -331,7 +331,8 @@ const MapboxLocationPicker: React.FC<MapboxLocationPickerProps> = ({
         {currentCoordinates && (
           <div className="absolute bottom-4 left-4 bg-white bg-opacity-90 rounded-lg p-2 shadow-lg">
             <p className="text-xs text-gray-600">
-              Lat: {currentCoordinates.lat.toFixed(6)}, Lng: {currentCoordinates.lng.toFixed(6)}
+              Lat: {typeof currentCoordinates.lat === 'number' ? currentCoordinates.lat.toFixed(6) : parseFloat(currentCoordinates.lat || 0).toFixed(6)}, 
+              Lng: {typeof currentCoordinates.lng === 'number' ? currentCoordinates.lng.toFixed(6) : parseFloat(currentCoordinates.lng || 0).toFixed(6)}
             </p>
           </div>
         )}

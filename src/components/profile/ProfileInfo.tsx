@@ -52,7 +52,9 @@ import {
 } from '@/components/ui/alert-dialog'
 import AddressAutocomplete from '@/components/AddressAutocomplete'
 import phonePrefixes from '@/data/phonePrefixes'
-
+const API_BASE_URL = import.meta.env.VITE_BASE_URL
+  ? `${import.meta.env.VITE_BASE_URL}`
+  : 'http://localhost:4000/api'
 const ProfileInfo = () => {
   const { t, language } = useLanguage()
   const { user, updateUser } = useAuth()
@@ -325,7 +327,7 @@ const ProfileInfo = () => {
 
       // Call the profile update endpoint
       const token = localStorage.getItem('authToken')
-      const response = await fetch('http://localhost:4000/api/users/me', {
+      const response = await fetch(`${API_BASE_URL}/users/me`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
