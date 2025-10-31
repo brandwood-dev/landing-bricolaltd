@@ -3,12 +3,14 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Eye } from 'lucide-react';
 import { Request } from './types';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface CancellationDetailsDialogProps {
   request: Request;
 }
 
 const CancellationDetailsDialog: React.FC<CancellationDetailsDialogProps> = ({ request }) => {
+  const { t } = useLanguage();
   return (
     <Dialog>
       <DialogTrigger asChild>

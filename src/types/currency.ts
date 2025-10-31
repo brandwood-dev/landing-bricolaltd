@@ -55,7 +55,7 @@ export interface RateFetchConfig {
 
 export const RATE_FETCH_CONFIG: Record<RateFetchTrigger, RateFetchConfig> = {
   [RateFetchTrigger.USER_CURRENCY_CHANGE]: {
-    immediate: true,
+    immediate: false, // Changé pour utiliser le cache si disponible
     cacheDuration: 30 * 60 * 1000 // 30 minutes
   },
   [RateFetchTrigger.RENT_PAGE_ENTRY]: {

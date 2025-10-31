@@ -1,8 +1,8 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart, Star, MapPin, Trash2 } from 'lucide-react';
+import { Heart, Star, MapPin, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useFavorites } from '@/hooks/useFavorites';
@@ -11,6 +11,8 @@ import { OptimizedPriceDisplay } from '../OptimizedPriceDisplay'
 const MyFavorites = () => {
   const { favorites, removeFromFavorites, isLoading } = useFavorites();
   const { toast } = useToast();
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
   
   const handleRemoveFavorite = async (id: string) => {
     try {
@@ -27,7 +29,18 @@ const MyFavorites = () => {
       });
     }
   };
+  
   const { t } = useLanguage();
+  
+  // Pagination logic
+  const totalPages = Math.ceil(favorites.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentFavorites = favorites.slice(startIndex, endIndex);
+  
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
   return (
     <Card>
       <CardHeader>
@@ -52,7 +65,7 @@ const MyFavorites = () => {
           </div>
         ) : (
           <div className='space-y-4'>
-            {favorites.map((favorite) => (
+            {currentFavorites.map((favorite) => (
               <div key={favorite.id} className='border rounded-lg p-4'>
                 <div className='flex items-start gap-4'>
                   <img
@@ -115,6 +128,41 @@ const MyFavorites = () => {
                 </div>
               </div>
             ))}
+            
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-6">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <Button
+                    key={page}
+                    variant={currentPage === page ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handlePageChange(page)}
+                    className="min-w-[40px]"
+                  >
+                    {page}
+                  </Button>
+                ))}
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </CardContent>

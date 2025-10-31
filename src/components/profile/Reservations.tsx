@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -109,6 +109,11 @@ const Reservations = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [reservations, setReservations] = useState<Reservation[]>([])
+  
+  // Références pour suivre les changements de filtres et éviter la réinitialisation de la pagination
+  const previousFilteredDataRef = useRef<Reservation[]>([])
+  const isInitialLoadRef = useRef(true)
+  
   const transformBookingToReservation = (booking: Booking): Reservation => {
     // Get primary photo or fallback to first photo
     const primaryPhoto = booking.tool?.photos?.find((photo) => photo.isPrimary)
@@ -689,8 +694,26 @@ const Reservations = () => {
 
   // Reset de la page quand les filtres changent
   const handleFilteredDataChange = (data: Reservation[]) => {
+    // Vérifier si c'est le chargement initial
+    if (isInitialLoadRef.current) {
+      setFilteredReservations(data)
+      previousFilteredDataRef.current = data
+      isInitialLoadRef.current = false
+      return
+    }
+
+    // Comparer avec les données précédentes pour détecter un vrai changement
+    const previousData = previousFilteredDataRef.current
+    const hasDataChanged = 
+      data.length !== previousData.length ||
+      data.some((item, index) => item.id !== previousData[index]?.id)
+
+    if (hasDataChanged) {
+      setCurrentPage(1)
+    }
+
     setFilteredReservations(data)
-    setCurrentPage(1) // Retour à la première page lors d'un changement de filtre
+    previousFilteredDataRef.current = data
   }
 
   const handleOpenReview = (reservationId: string) => {

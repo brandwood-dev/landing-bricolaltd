@@ -1,12 +1,12 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useFavorites } from '@/hooks/useFavorites';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Heart, Star, MapPin, ArrowLeft, Trash2 } from 'lucide-react';
+import { Heart, Star, MapPin, ArrowLeft, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
 import { OptimizedPriceDisplay } from '@/components/OptimizedPriceDisplay';
@@ -15,6 +15,8 @@ const Favorites = () => {
   const { favorites, removeFromFavorites, isLoading } = useFavorites();
   const { t,language } = useLanguage();
   const { toast } = useToast();
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
   const handleRemoveFavorite = async (toolId: string) => {
     try {
@@ -31,6 +33,17 @@ const Favorites = () => {
       });
     }
   };
+  
+  // Pagination logic
+  const totalPages = Math.ceil(favorites.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentFavorites = favorites.slice(startIndex, endIndex);
+  
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+  
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -116,7 +129,7 @@ const Favorites = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {favorites.map((tool) => (
+            {currentFavorites.map((tool) => (
               <Card key={tool.id} className="overflow-hidden hover:shadow-lg transition-shadow">
                 <div className="relative">
                   <img 
@@ -183,6 +196,41 @@ const Favorites = () => {
               </Card>
             ))}
           </div>
+          
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-8">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <Button
+                  key={page}
+                  variant={currentPage === page ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handlePageChange(page)}
+                  className="min-w-[40px]"
+                >
+                  {page}
+                </Button>
+              ))}
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </div>
       </main>
       <Footer />

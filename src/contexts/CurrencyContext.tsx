@@ -119,81 +119,13 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     localStorage.setItem('selectedCurrency', currency.code);
   }, [currency]);
 
-  // Fetch bulk exchange rates on mount and when currency changes
+  // Fetch bulk exchange rates on mount and when currency changes (optimized)
   useEffect(() => {
-    const fetchBulkRates = async () => {
-      const now = Date.now();
-      const cacheAge = now - cacheTimestamp;
-      
-      console.log(`🔄 [CurrencyContext] Checking bulk rates cache for ${currency.code}`);
-      console.log(`📊 [CurrencyContext] Cache age: ${cacheAge}ms, Duration: ${CACHE_DURATION}ms`);
-      console.log(`📊 [CurrencyContext] Cache keys: ${Object.keys(exchangeRatesCache).length}`);
-      
-      if (cacheAge < CACHE_DURATION && exchangeRatesCache && Object.keys(exchangeRatesCache).length > 0) {
-        console.log(`✅ [CurrencyContext] Using cached rates (${Object.keys(exchangeRatesCache).length} rates)`);
-        return; // Use cached rates
-      }
-
-      console.log(`🌐 [CurrencyContext] Fetching fresh bulk rates for ${currency.code}`);
-      setIsLoading(true);
-      
-      try {
-        const { currencyService } = await import('../services/currencyService');
-        console.log(`📡 [CurrencyContext] Calling currencyService.getBulkExchangeRates(${currency.code})`);
-        
-        const bulkRates = await currencyService.getBulkExchangeRates(currency.code);
-        console.log(`📊 [CurrencyContext] Bulk rates response:`, bulkRates);
-        console.log(`📊 [CurrencyContext] Response structure check:`, {
-          hasBulkRates: !!bulkRates,
-          hasData: !!(bulkRates && bulkRates.data),
-          hasRates: !!(bulkRates && bulkRates.data && bulkRates.data.rates),
-          ratesType: bulkRates && bulkRates.data && bulkRates.data.rates ? typeof bulkRates.data.rates : 'undefined',
-          ratesKeys: bulkRates && bulkRates.data && bulkRates.data.rates ? Object.keys(bulkRates.data.rates) : []
-        });
-        
-        // Correct structure: response.data.data.rates (API returns {data: {...}, message: "..."})
-        const rates = bulkRates && bulkRates.data && bulkRates.data.rates;
-        
-        if (rates && typeof rates === 'object' && Object.keys(rates).length > 0) {
-          console.log(`✅ [CurrencyContext] Valid rates found - Setting cache with ${Object.keys(rates).length} rates`);
-          console.log(`📊 [CurrencyContext] Rates:`, rates);
-          // Only update cache if rates are different to prevent unnecessary re-renders
-          const currentRatesKeys = Object.keys(exchangeRatesCache).sort().join(',');
-          const newRatesKeys = Object.keys(rates).sort().join(',');
-          
-          if (currentRatesKeys !== newRatesKeys || JSON.stringify(exchangeRatesCache) !== JSON.stringify(rates)) {
-            setExchangeRatesCache(rates);
-            setCacheTimestamp(now);
-          } else {
-            console.log(`📊 [CurrencyContext] Rates unchanged, skipping cache update`);
-            // Still update timestamp to prevent immediate refetch
-            setCacheTimestamp(now);
-          }
-        } else {
-          console.warn('⚠️ [CurrencyContext] Invalid bulk rates response structure:');
-          console.warn('📊 [CurrencyContext] Expected: response.data.data.rates, Got:', {
-            bulkRates,
-            dataExists: !!(bulkRates && bulkRates.data),
-            ratesExists: !!(bulkRates && bulkRates.data && bulkRates.data.rates),
-            actualStructure: bulkRates ? Object.keys(bulkRates) : 'null/undefined'
-          });
-          // Set empty cache to prevent further API calls for a while
-          setExchangeRatesCache({});
-          setCacheTimestamp(now);
-        }
-      } catch (error) {
-        console.error('❌ [CurrencyContext] Failed to fetch bulk exchange rates:', error);
-        console.error('📊 [CurrencyContext] Error details:', error.message);
-        console.error('📊 [CurrencyContext] Error stack:', error.stack);
-        // Set empty cache and timestamp to prevent continuous retries
-        setExchangeRatesCache({});
-        setCacheTimestamp(now);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchBulkRates();
+    const trigger = RateFetchTrigger.USER_CURRENCY_CHANGE;
+    console.log(`🔄 [CurrencyContext] Currency changed to ${currency.code}, checking if refresh needed`);
+    
+    // Utiliser le système optimisé pour décider si un fetch est nécessaire
+    refreshRates(trigger);
   }, [currency.code]);
 
   const handleSetCurrency = (newCurrency: Currency) => {

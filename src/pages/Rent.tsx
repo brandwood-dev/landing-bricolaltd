@@ -1406,9 +1406,14 @@ const Rent: React.FC = () => {
                             }
                             
                             try {
-                              // Créer la réservation après paiement réussi
+                              // Créer la réservation après paiement réussi avec statut de paiement "authorized"
                               console.log('🔍 [Rent.tsx] Appel de bookingService.createBooking...')
-                              const booking = await bookingService.createBooking(pendingBookingData)
+                              const bookingDataWithPaymentStatus = {
+                                ...pendingBookingData,
+                                paymentStatus: 'authorized' // Définir le statut de paiement comme autorisé après paiement réussi
+                              }
+                              console.log('🔍 [Rent.tsx] Booking data with payment status:', bookingDataWithPaymentStatus)
+                              const booking = await bookingService.createBooking(bookingDataWithPaymentStatus)
                               console.log('🔍 [Rent.tsx] Booking created after payment:', booking)
 
                               // Programmer le déclenchement de la modal d'acompte (1 minute pour les tests)

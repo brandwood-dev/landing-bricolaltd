@@ -253,6 +253,14 @@ export class OptimizedCurrencyCalculator {
       return shouldFetch;
     }
 
+    // Optimisation pour USER_CURRENCY_CHANGE : utiliser le cache si récent
+    if (trigger === RateFetchTrigger.USER_CURRENCY_CHANGE) {
+      const cacheAge = this.getCacheAge();
+      const shouldFetch = cacheAge > 10 * 60 * 1000; // > 10 minutes
+      console.log(`💱 [OptimizedCalculator] Currency change: cache age ${Math.round(cacheAge / 1000)}s, should fetch: ${shouldFetch}`);
+      return shouldFetch;
+    }
+
     return !this.isCacheValid(trigger);
   }
 

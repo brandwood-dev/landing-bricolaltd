@@ -119,22 +119,8 @@ const Profile = () => {
     }
   }, [searchParams]);
 
-  // Force refresh of exchange rates when currency changes
-  useEffect(() => {
-    const refreshCurrencyRates = async () => {
-      if (currency && isAuthenticated) {
-        console.log(`🔄 [Profile] Currency changed to ${currency.code}, refreshing exchange rates`);
-        try {
-          await refreshRates('currency_change');
-          console.log(`✅ [Profile] Exchange rates refreshed for ${currency.code}`);
-        } catch (error) {
-          console.error('❌ [Profile] Failed to refresh exchange rates:', error);
-        }
-      }
-    };
-
-    refreshCurrencyRates();
-  }, [currency.code, refreshRates, isAuthenticated]);
+  // Note: Exchange rates are automatically managed by CurrencyContext
+  // No need for manual refresh here as it causes duplicate API calls
 
   // Transform user data for ProfileHeader component
   const userInfo = user ? {

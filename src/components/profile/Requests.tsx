@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -22,20 +22,15 @@ import {
   Clock,
   Download,
   Loader2,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { OptimizedPriceDisplay } from '../OptimizedPriceDisplay'
 import { useToast } from '@/hooks/use-toast'
 import { useAuth } from '@/contexts/AuthContext'
 import RequestsAndReservationsFilters from './RequestsAndReservationsFilters'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination'
+
 
 // Import refactored components and utilities
 import { Request, StatusOption } from '@/types/bridge'
@@ -72,6 +67,8 @@ const Requests = () => {
   const [filteredRequests, setFilteredRequests] = useState<Request[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(3)
+  const previousFilteredDataRef = useRef<Request[]>([])
+  const isInitialLoadRef = useRef(true)
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
   const [viewToolData, setViewToolData] = useState<Tool | null>(null)
   const [isLoadingView, setIsLoadingView] = useState(false)
@@ -91,11 +88,30 @@ const Requests = () => {
 
     return {
       id: booking.id,
+      createdAt: booking.createdAt,
+      updatedAt: booking.updatedAt,
       referenceId: `RES-${booking.id}`,
+      toolId: booking.toolId,
+      renterId: booking.renterId,
+      ownerId: booking.ownerId,
       toolName: booking.tool?.title || t('general.tool_not_specified'),
       toolDescription: booking.tool?.description || '',
       pickupAddress: booking.tool?.pickupAddress || '',
       toolImage,
+      toolBrand: booking.tool?.brand || '',
+      toolModel: booking.tool?.model || '',
+      toolCondition:
+        booking.tool?.condition === 1
+          ? 'NEW'
+          : booking.tool?.condition === 2
+          ? 'LIKE_NEW'
+          : booking.tool?.condition === 3
+          ? 'GOOD'
+          : booking.tool?.condition === 4
+          ? 'FAIR'
+          : booking.tool?.condition === 5
+          ? 'POOR'
+          : '',
       ownerName:
         `${booking.owner?.firstName || ''} ${
           booking.owner?.lastName || ''
@@ -110,15 +126,21 @@ const Requests = () => {
       renterEmail: booking.renter?.email || '',
       renterPhone: booking.renter?.phoneNumber || '',
       renterAddress: booking.renter?.address || '',
-      pickupHour: booking.pickupHour,
       startDate: booking.startDate,
       endDate: booking.endDate,
-      message: booking.message,
-      status: booking.status,
-      totalPrice: booking.totalPrice || 0,
-      basePrice: booking.tool?.basePrice || 0,
+      pickupHour: booking.pickupHour,
       location:
         booking.tool?.pickupAddress || t('general.location_not_specified'),
+      totalDays: booking.totalDays || 1,
+      basePrice: booking.tool?.basePrice || 0,
+      totalPrice: booking.totalPrice || 0,
+      fees: booking.fees || 0,
+      deposit: booking.deposit || 0,
+      totalAmount: booking.totalAmount || booking.totalPrice || 0,
+      status: booking.status,
+      paymentMethod: booking.paymentMethod,
+      paymentStatus: booking.paymentStatus,
+      message: booking.message,
       validationCode: booking.validationCode,
       hasActiveClaim: booking.hasActiveClaim,
       cancellationReason: booking.cancellationReason,
@@ -128,20 +150,15 @@ const Requests = () => {
       renterHasReturned: booking.renterHasReturned,
       hasUsedReturnButton: booking.hasUsedReturnButton,
       pickupTool: booking.pickupTool,
-      toolBrand: booking.tool.brand,
-      toolModel: booking.tool.model,
-      toolCondition:
-        booking.tool?.condition === 1
-          ? 'NEW'
-          : booking.tool?.condition === 2
-          ? 'LIKE_NEW'
-          : booking.tool?.condition === 3
-          ? 'GOOD'
-          : booking.tool?.condition === 4
-          ? 'FAIR'
-          : booking.tool?.condition === 5
-          ? 'POOR'
-          : '',
+      renterInfo: booking.renterInfo || {
+        firstName: booking.renter?.firstName || '',
+        lastName: booking.renter?.lastName || '',
+        phone: booking.renter?.phoneNumber || '',
+        phone_prefix: booking.renter?.phone_prefix || '',
+      },
+      tool: booking.tool,
+      renter: booking.renter,
+      owner: booking.owner,
     }
   }
   const { t, language } = useLanguage()
@@ -156,15 +173,36 @@ const Requests = () => {
     try {
       setLoading(true)
       setError(null)
+      
+      // Debug log: Afficher l'ID utilisateur utilisé pour la requête
+      console.log('🔍 [DEBUG] Fetching bookings for user ID:', user.id)
+      
       const ownerBookings = await bookingService.getOwnerBookings(user.id, {
         page: 1,
         limit: 100,
       })
 
+      // Debug log: Afficher la réponse complète de l'API
+      console.log('🔍 [DEBUG] API Response:', ownerBookings)
+      
+      // Debug log: Afficher le nombre de réservations récupérées
+      console.log('🔍 [DEBUG] Number of bookings received:', ownerBookings.data?.length || 0)
+      
+      // Debug log: Afficher un échantillon de la première réservation si elle existe
+      if (ownerBookings.data && ownerBookings.data.length > 0) {
+        console.log('🔍 [DEBUG] Sample booking (first one):', ownerBookings.data[0])
+      }
+
       const transformedReq = ownerBookings.data.map(transformBookingToRequest)
+      
+      // Debug log: Afficher les données transformées
+      console.log('🔍 [DEBUG] Transformed requests:', transformedReq)
+      console.log('🔍 [DEBUG] Number of transformed requests:', transformedReq.length)
+      
       setBookings(ownerBookings.data)
       setRequests(transformedReq)
     } catch (err: any) {
+      console.error('Error fetching bookings:', err)
       setError(err.message || t('request.load_error'))
       setRequests([])
     } finally {
@@ -468,22 +506,62 @@ const Requests = () => {
   // Données à paginer
   const dataToDisplay =
     filteredRequests.length > 0 ? filteredRequests : requests
-
+  
+  // 🔍 Debug: Log final data for display
+  console.log('🔍 [Requests] Final data to display:', dataToDisplay)
+  console.log('🔍 [Requests] Using filtered requests:', filteredRequests.length > 0)
+  console.log('🔍 [Requests] Total requests:', requests.length)
+  console.log('🔍 [Requests] Filtered requests:', filteredRequests.length)
+  console.log('🔍 [Requests] Data to display length:', dataToDisplay.length)
   // Calcul de la pagination
   const totalPages = Math.ceil(dataToDisplay.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
   const paginatedRequests = dataToDisplay.slice(startIndex, endIndex)
 
+  // Debug logs pour la pagination
+  console.log('🔍 DEBUG PAGINATION:', {
+    currentPage,
+    totalPages,
+    dataToDisplayLength: dataToDisplay.length,
+    itemsPerPage,
+    startIndex,
+    endIndex,
+    paginatedRequestsLength: paginatedRequests.length
+  })
+
   // Gestion du changement de page
   const handlePageChange = (page: number) => {
+    console.log('📄 handlePageChange appelée avec page:', page, 'currentPage actuel:', currentPage)
     setCurrentPage(page)
   }
 
   // Reset de la page quand les filtres changent
   const handleFilteredDataChange = (data: Request[]) => {
+    console.log('🔄 handleFilteredDataChange appelée avec', data.length, 'éléments')
+    
+    // Vérifier si les données ont réellement changé
+    const previousData = previousFilteredDataRef.current
+    const hasDataChanged = 
+      isInitialLoadRef.current || 
+      data.length !== previousData.length ||
+      data.some((item, index) => item.id !== previousData[index]?.id)
+    
+    console.log('📊 Données changées:', hasDataChanged, 'Initial load:', isInitialLoadRef.current)
+    
     setFilteredRequests(data)
-    setCurrentPage(1) // Retour à la première page lors d'un changement de filtre
+    
+    // Ne réinitialiser currentPage que si les données ont réellement changé
+    if (hasDataChanged) {
+      console.log('🔄 Réinitialisation de currentPage à 1')
+      setCurrentPage(1)
+      isInitialLoadRef.current = false
+    } else {
+      console.log('⏭️ Pas de réinitialisation de currentPage, données identiques')
+    }
+    
+    // Mettre à jour la référence des données précédentes
+    previousFilteredDataRef.current = [...data]
   }
 
   const calculateRentalDuration = (startDate: string, endDate: string) => {
@@ -628,12 +706,7 @@ const Requests = () => {
                 </div>
                 <div className='font-semibold text-primary'>
                   <OptimizedPriceDisplay
-                    price={Math.round(
-                      (req.basePrice + req.basePrice * 0.06) *
-                        Number(
-                          calculateRentalDuration(req.startDate, req.endDate)
-                        )
-                    )}
+                    price={req.totalPrice}
                     baseCurrency='GBP'
                     size='md'
                     cible='totalPrice'
@@ -791,60 +864,54 @@ const Requests = () => {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className='mt-6'>
-            <Pagination>
-              <PaginationContent
-                className={language === 'ar' ? '[direction:ltr]' : ''}
+            {console.log('🎯 PAGINATION RENDUE - totalPages:', totalPages, 'currentPage:', currentPage)}
+            <div className={`flex flex-row items-center gap-1 ${language === 'ar' ? '[direction:ltr]' : ''}`}>
+              {/* Bouton Précédent */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  if (currentPage > 1) handlePageChange(currentPage - 1)
+                }}
+                disabled={currentPage <= 1}
+                className="gap-1 pl-2.5"
               >
-                <PaginationItem>
-                  <PaginationPrevious
-                    href='#'
-                    onClick={(e) => {
-                      e.preventDefault()
-                      if (currentPage > 1) handlePageChange(currentPage - 1)
-                    }}
-                    className={
-                      currentPage <= 1 ? 'pointer-events-none opacity-50' : ''
-                    }
-                  />
-                </PaginationItem>
+                <ChevronLeft className="h-4 w-4" />
+                <span>Précédent</span>
+              </Button>
 
-                {Array.from({ length: totalPages }, (_, index) => {
-                  const pageNumber = index + 1
-                  const isCurrentPage = pageNumber === currentPage
+              {/* Boutons numérotés */}
+              {Array.from({ length: totalPages }, (_, index) => {
+                const pageNumber = index + 1
+                const isCurrentPage = pageNumber === currentPage
 
-                  return (
-                    <PaginationItem key={pageNumber}>
-                      <PaginationLink
-                        href='#'
-                        onClick={(e) => {
-                          e.preventDefault()
-                          handlePageChange(pageNumber)
-                        }}
-                        isActive={isCurrentPage}
-                      >
-                        {pageNumber}
-                      </PaginationLink>
-                    </PaginationItem>
-                  )
-                })}
+                return (
+                  <Button
+                    key={pageNumber}
+                    variant={isCurrentPage ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handlePageChange(pageNumber)}
+                    className="w-10 h-10"
+                  >
+                    {pageNumber}
+                  </Button>
+                )
+              })}
 
-                <PaginationItem>
-                  <PaginationNext
-                    href='#'
-                    onClick={(e) => {
-                      e.preventDefault()
-                      if (currentPage < totalPages)
-                        handlePageChange(currentPage + 1)
-                    }}
-                    className={
-                      currentPage >= totalPages
-                        ? 'pointer-events-none opacity-50'
-                        : ''
-                    }
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+              {/* Bouton Suivant */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  if (currentPage < totalPages) handlePageChange(currentPage + 1)
+                }}
+                disabled={currentPage >= totalPages}
+                className="gap-1 pr-2.5"
+              >
+                <span>Suivant</span>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         )}
 
