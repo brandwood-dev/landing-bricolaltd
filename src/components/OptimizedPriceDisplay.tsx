@@ -40,13 +40,9 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
 
     if (!currencyObj) return currencyCode
 
-    // Si la langue est arabe, utiliser les symboles arabes
-    if (language === 'ar') {
-      return currencyObj.symbol
-    }
-
-    // Pour français et anglais, utiliser les codes de devise latins
-    return currencyCode
+    // Pour toutes les langues, utiliser le symbole de devise réel
+    // Cela assure une cohérence d'affichage et une meilleure UX
+    return currencyObj.symbol
   }
 
   // Calcul optimisé avec mémoisation

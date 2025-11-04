@@ -6,6 +6,7 @@ import { Transaction, WithdrawalRequest, UserBalance } from '@/types/bridge/wall
 export interface UserStats {
   cumulativeBalance: number;
   availableBalance: number;
+  pendingBalance: number;
   successfulTransactionsCount: number;
 }
 

@@ -56,5 +56,6 @@ export interface UserBalance {
 export interface WalletStats {
   cumulativeBalance: number;
   availableBalance: number;
+  pendingBalance: number;
   successfulTransactionsCount: number;
 }

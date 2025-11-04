@@ -18,6 +18,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  Clock,
 } from 'lucide-react'
 import { PriceDisplay } from '@/components/PriceDisplay'
 import { DateRange } from 'react-day-picker'
@@ -169,7 +170,7 @@ const Wallet = () => {
           </CardHeader>
           <CardContent className='space-y-6'>
             {/* KPI Cards */}
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
               <div className='bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl border border-blue-200'>
                 <div className='flex items-center justify-between mb-3'>
                   <div className='p-2 bg-blue-500 rounded-lg'>
@@ -213,6 +214,31 @@ const Wallet = () => {
                 <div className='text-3xl font-bold text-green-900'>
                   <OptimizedPriceDisplay
                     price={stats?.availableBalance || 0}
+                    baseCurrency='GBP'
+                    size='lg'
+                    cible='totalPrice'
+                  />
+                </div>
+              </div>
+
+              <div className='bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-xl border border-orange-200'>
+                <div className='flex items-center justify-between mb-3'>
+                  <div className='p-2 bg-orange-500 rounded-lg'>
+                    <Clock className='h-5 w-5 text-white' />
+                  </div>
+                  <Badge
+                    variant='secondary'
+                    className='bg-orange-200 text-orange-800'
+                  >
+                    {t('wallet.pending')}
+                  </Badge>
+                </div>
+                <div className='text-sm text-orange-700 font-medium mb-1'>
+                  Balance en attente
+                </div>
+                <div className='text-3xl font-bold text-orange-900'>
+                  <OptimizedPriceDisplay
+                    price={stats?.pendingBalance || 0}
                     baseCurrency='GBP'
                     size='lg'
                     cible='totalPrice'

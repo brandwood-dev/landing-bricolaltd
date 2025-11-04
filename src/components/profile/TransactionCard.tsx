@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Transaction } from '@/types/bridge/wallet.types';
-import { PriceDisplay } from '@/components/PriceDisplay';
+import { OptimizedPriceDisplay } from '@/components/OptimizedPriceDisplay';
 
 interface TransactionCardProps {
   transaction: Transaction & {
@@ -56,12 +56,22 @@ const TransactionCard = ({ transaction }: TransactionCardProps) => {
               <div className="font-semibold text-gray-900 mb-1">{transaction.toolName}</div>
               <div className="text-sm text-gray-600 mb-1">{transaction.userName}</div>
               <div className="text-xs text-gray-500">{transaction.reference}</div>
-              <div className="text-sm text-gray-500">{transaction.date}</div>
+              <div className="text-sm text-gray-500">
+                {new Date(transaction.date).toLocaleString(undefined, {
+                  year: '2-digit',
+                  month: '2-digit',
+                  day: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit',
+                  hour12: false
+                }).replace(/\//g, '/')}
+              </div>
             </div>
           </div>
           <div className="text-right">
             <div className="font-bold text-lg mb-1 text-green-600">
-              +<PriceDisplay price={transaction.amount} baseCurrency="GBP" size="md" />
+              +<OptimizedPriceDisplay price={transaction.amount} baseCurrency="GBP" size="md" cible='totalPrice' />
             </div>
             <Badge className={getStatusColor(transaction.status)}>
               {getStatusLabel(transaction.status)}
@@ -83,12 +93,22 @@ const TransactionCard = ({ transaction }: TransactionCardProps) => {
           <div>
             <div className="font-semibold text-gray-900 mb-1">{t('wallet.withdrawal')}</div>
             <div className="text-sm text-gray-600 mb-1">{transaction.withdrawalId}</div>
-            <div className="text-sm text-gray-500">{transaction.date}</div>
+            <div className="text-sm text-gray-500">
+              {new Date(transaction.date).toLocaleString(undefined, {
+                year: '2-digit',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+              }).replace(/\//g, '/')}
+            </div>
           </div>
         </div>
         <div className="text-right">
           <div className="font-bold text-lg mb-1 text-blue-600">
-            -<PriceDisplay price={transaction.amount} baseCurrency="GBP" size="md" />
+            -<OptimizedPriceDisplay price={transaction.amount} baseCurrency="GBP" size="md" cible='totalPrice' />
           </div>
           <Badge className={getStatusColor(transaction.status)}>
             {getStatusLabel(transaction.status)}
