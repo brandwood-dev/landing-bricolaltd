@@ -16,6 +16,7 @@ interface LanguageContextType {
 
 const translations = {
   fr: {
+    'reservation.deposit.desc' : 'La caution sera gelé 24h avant le début de la location et remboursée après celle-ci si aucun dommage n`est constaté.',
     'login.signing': 'Connexion en cours...',
     'blog.category.general': 'Général',
     // AgeVerificationDialog
@@ -1886,6 +1887,7 @@ const translations = {
       'L’usage continu de la plateforme après modification vaut acceptation tacite de la nouvelle version.',
   },
   en: {
+    'reservation.deposit.desc' : 'The security deposit will be charged 24 hours before the rental starts and refunded after the rental if no damage is found.',
     'login.signing': 'Signing in...',
     'blog.category.general': 'General',
     'general.loading': 'loading...',
@@ -3732,6 +3734,7 @@ const translations = {
     'notifications.booking_accepted': 'Booking Accepted',
   },
   ar: {
+    'reservation.deposit.desc' : ' سيتم تجميد مبلغ التأمين قبل 24 ساعة من بداية الإيجار، ويُعاد بعد انتهاء الإيجار في حال عدم وجود أي تلف بالأداة المستأجرة.',
     'login.signing': 'تسجيل الدخول...',
     'blog.category.general': 'عام',
     'general.loading': 'جاري التحميل...',

@@ -999,7 +999,8 @@ const Rent: React.FC = () => {
                                   selected={startDate}
                                   onSelect={handleStartDateChange}
                                   disabled={(date) => {
-                                    const minimumStartDate = getMinimumStartDate()
+                                    const minimumStartDate =
+                                      getMinimumStartDate()
                                     return (
                                       date < minimumStartDate ||
                                       isDateUnavailable(date) ||
@@ -1090,7 +1091,9 @@ const Rent: React.FC = () => {
                                     const diffTime = Math.abs(
                                       date.getTime() - startDate.getTime()
                                     )
-                                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+                                    const diffDays = Math.floor(
+                                      diffTime / (1000 * 60 * 60 * 24)
+                                    )
                                     if (diffDays > 5) {
                                       return true
                                     }
@@ -1161,14 +1164,29 @@ const Rent: React.FC = () => {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              {['08:00', '09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'].map((time) => {
-                                const isDisabled = startDate ? isPickupTimeDisabled(startDate, time) : false
+                              {[
+                                '08:00',
+                                '09:00',
+                                '10:00',
+                                '11:00',
+                                '14:00',
+                                '15:00',
+                                '16:00',
+                                '17:00',
+                              ].map((time) => {
+                                const isDisabled = startDate
+                                  ? isPickupTimeDisabled(startDate, time)
+                                  : false
                                 return (
-                                  <SelectItem 
-                                    key={time} 
-                                    value={time} 
+                                  <SelectItem
+                                    key={time}
+                                    value={time}
                                     disabled={isDisabled}
-                                    className={isDisabled ? 'opacity-50 cursor-not-allowed text-gray-400' : ''}
+                                    className={
+                                      isDisabled
+                                        ? 'opacity-50 cursor-not-allowed text-gray-400'
+                                        : ''
+                                    }
                                   >
                                     {time} {isDisabled && '(Non disponible)'}
                                   </SelectItem>
@@ -1229,22 +1247,32 @@ const Rent: React.FC = () => {
                         </h3>
                         <div className='space-y-3'>
                           {/* Carte bancaire */}
-                          <div 
+                          <div
                             className={cn(
                               'flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors',
-                              formData.paymentMethod === 'card' 
-                                ? 'bg-blue-50 border-blue-200' 
+                              formData.paymentMethod === 'card'
+                                ? 'bg-blue-50 border-blue-200'
                                 : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
                             )}
-                            onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'card' }))}
+                            onClick={() =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                paymentMethod: 'card',
+                              }))
+                            }
                           >
                             <input
-                              type="radio"
-                              name="paymentMethod"
-                              value="card"
+                              type='radio'
+                              name='paymentMethod'
+                              value='card'
                               checked={formData.paymentMethod === 'card'}
-                              onChange={() => setFormData(prev => ({ ...prev, paymentMethod: 'card' }))}
-                              className="h-4 w-4 text-blue-600"
+                              onChange={() =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  paymentMethod: 'card',
+                                }))
+                              }
+                              className='h-4 w-4 text-blue-600'
                             />
                             <CreditCard className='h-5 w-5 text-blue-600' />
                             <span className='font-medium text-blue-800'>
@@ -1258,39 +1286,51 @@ const Rent: React.FC = () => {
                           </div>
 
                           {/* Google Pay */}
-                          <div 
+                          <div
                             className={cn(
                               'flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors',
-                              formData.paymentMethod === 'google_pay' 
-                                ? 'bg-green-50 border-green-200' 
+                              formData.paymentMethod === 'google_pay'
+                                ? 'bg-green-50 border-green-200'
                                 : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
                             )}
                             onClick={() => {
-                              setFormData(prev => ({ ...prev, paymentMethod: 'google_pay' }))
+                              setFormData((prev) => ({
+                                ...prev,
+                                paymentMethod: 'google_pay',
+                              }))
                               toast({
-                                title: "Non disponible",
-                                description: "Google Pay n'est pas encore disponible.",
-                                variant: "destructive"
+                                title: 'Non disponible',
+                                description:
+                                  "Google Pay n'est pas encore disponible.",
+                                variant: 'destructive',
                               })
                             }}
                           >
                             <input
-                              type="radio"
-                              name="paymentMethod"
-                              value="google_pay"
+                              type='radio'
+                              name='paymentMethod'
+                              value='google_pay'
                               checked={formData.paymentMethod === 'google_pay'}
                               onChange={() => {
-                                setFormData(prev => ({ ...prev, paymentMethod: 'google_pay' }))
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  paymentMethod: 'google_pay',
+                                }))
                                 toast({
-                                  title: "Non disponible",
-                                  description: "Google Pay n'est pas encore disponible.",
-                                  variant: "destructive"
+                                  title: 'Non disponible',
+                                  description:
+                                    "Google Pay n'est pas encore disponible.",
+                                  variant: 'destructive',
                                 })
                               }}
-                              className="h-4 w-4 text-green-600"
+                              className='h-4 w-4 text-green-600'
                             />
-                            <svg className="h-5 w-5 text-green-600" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M12.426 21.996c-.897 0-1.626-.729-1.626-1.626s.729-1.626 1.626-1.626 1.626.729 1.626 1.626-.729 1.626-1.626 1.626zm-6.426-3.252c-.897 0-1.626-.729-1.626-1.626s.729-1.626 1.626-1.626 1.626.729 1.626 1.626-.729 1.626-1.626 1.626zm12.852 0c-.897 0-1.626-.729-1.626-1.626s.729-1.626 1.626-1.626 1.626.729 1.626 1.626-.729 1.626-1.626 1.626z"/>
+                            <svg
+                              className='h-5 w-5 text-green-600'
+                              viewBox='0 0 24 24'
+                              fill='currentColor'
+                            >
+                              <path d='M12.426 21.996c-.897 0-1.626-.729-1.626-1.626s.729-1.626 1.626-1.626 1.626.729 1.626 1.626-.729 1.626-1.626 1.626zm-6.426-3.252c-.897 0-1.626-.729-1.626-1.626s.729-1.626 1.626-1.626 1.626.729 1.626 1.626-.729 1.626-1.626 1.626zm12.852 0c-.897 0-1.626-.729-1.626-1.626s.729-1.626 1.626-1.626 1.626.729 1.626 1.626-.729 1.626-1.626 1.626z' />
                             </svg>
                             <span className='font-medium text-green-800'>
                               Google Pay
@@ -1303,44 +1343,60 @@ const Rent: React.FC = () => {
                           </div>
 
                           {/* Apple Pay */}
-                          <div 
+                          <div
                             className={cn(
                               'flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors',
-                              formData.paymentMethod === 'apple_pay' 
-                                ? 'bg-gray-900 border-gray-700 text-white' 
+                              formData.paymentMethod === 'apple_pay'
+                                ? 'bg-gray-900 border-gray-700 text-white'
                                 : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
                             )}
                             onClick={() => {
-                              setFormData(prev => ({ ...prev, paymentMethod: 'apple_pay' }))
+                              setFormData((prev) => ({
+                                ...prev,
+                                paymentMethod: 'apple_pay',
+                              }))
                               toast({
-                                title: "Non disponible",
-                                description: "Apple Pay n'est pas encore disponible.",
-                                variant: "destructive"
+                                title: 'Non disponible',
+                                description:
+                                  "Apple Pay n'est pas encore disponible.",
+                                variant: 'destructive',
                               })
                             }}
                           >
                             <input
-                              type="radio"
-                              name="paymentMethod"
-                              value="apple_pay"
+                              type='radio'
+                              name='paymentMethod'
+                              value='apple_pay'
                               checked={formData.paymentMethod === 'apple_pay'}
                               onChange={() => {
-                                setFormData(prev => ({ ...prev, paymentMethod: 'apple_pay' }))
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  paymentMethod: 'apple_pay',
+                                }))
                                 toast({
-                                  title: "Non disponible",
-                                  description: "Apple Pay n'est pas encore disponible.",
-                                  variant: "destructive"
+                                  title: 'Non disponible',
+                                  description:
+                                    "Apple Pay n'est pas encore disponible.",
+                                  variant: 'destructive',
                                 })
                               }}
-                              className="h-4 w-4 text-gray-600"
+                              className='h-4 w-4 text-gray-600'
                             />
-                            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.84 2.82c.73-.87 1.22-2.07 1.08-3.27-1.05.04-2.32.7-3.08 1.58-.68.78-1.27 2.04-1.11 3.24 1.17.09 2.37-.6 3.11-1.55"/>
+                            <svg
+                              className='h-5 w-5'
+                              viewBox='0 0 24 24'
+                              fill='currentColor'
+                            >
+                              <path d='M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.84 2.82c.73-.87 1.22-2.07 1.08-3.27-1.05.04-2.32.7-3.08 1.58-.68.78-1.27 2.04-1.11 3.24 1.17.09 2.37-.6 3.11-1.55' />
                             </svg>
-                            <span className={cn(
-                              'font-medium',
-                              formData.paymentMethod === 'apple_pay' ? 'text-white' : 'text-gray-800'
-                            )}>
+                            <span
+                              className={cn(
+                                'font-medium',
+                                formData.paymentMethod === 'apple_pay'
+                                  ? 'text-white'
+                                  : 'text-gray-800'
+                              )}
+                            >
                               Apple Pay
                             </span>
                             {formData.paymentMethod === 'apple_pay' && (
@@ -1358,7 +1414,6 @@ const Rent: React.FC = () => {
                           )}
                         </div>
                       </div>
-                     
                     </form>
                   </CardContent>
                 </Card>
@@ -1380,44 +1435,109 @@ const Rent: React.FC = () => {
                           paymentMethod={formData.paymentMethod}
                           onPaymentSuccess={async (paymentIntentId: string) => {
                             // 🔍 LOG AVANT CRÉATION DE LA RÉSERVATION
-                            console.log('🔍 [Rent.tsx] Paiement réussi, création de la réservation avec totalToPay:', totalToPay)
-                            console.log('🔍 [Rent.tsx] PaymentIntentId reçu:', paymentIntentId)
-                            console.log('🔍 [Rent.tsx] PendingBookingData:', pendingBookingData)
-                            
+                            console.log(
+                              '🔍 [Rent.tsx] Paiement réussi, création de la réservation avec totalToPay:',
+                              totalToPay
+                            )
+                            console.log(
+                              '🔍 [Rent.tsx] PaymentIntentId reçu:',
+                              paymentIntentId
+                            )
+                            console.log(
+                              '🔍 [Rent.tsx] PendingBookingData:',
+                              pendingBookingData
+                            )
+
                             // 🔍 LOGS ULTRA-DÉTAILLÉS POUR LES DATES
                             if (pendingBookingData) {
-                              console.log('🔍 [Rent.tsx] === ANALYSE DÉTAILLÉE DES DATES ===')
-                              console.log('🔍 [Rent.tsx] startDate (string):', pendingBookingData.startDate)
-                              console.log('🔍 [Rent.tsx] endDate (string):', pendingBookingData.endDate)
-                              console.log('🔍 [Rent.tsx] Type de startDate:', typeof pendingBookingData.startDate)
-                              console.log('🔍 [Rent.tsx] Type de endDate:', typeof pendingBookingData.endDate)
-                              
+                              console.log(
+                                '🔍 [Rent.tsx] === ANALYSE DÉTAILLÉE DES DATES ==='
+                              )
+                              console.log(
+                                '🔍 [Rent.tsx] startDate (string):',
+                                pendingBookingData.startDate
+                              )
+                              console.log(
+                                '🔍 [Rent.tsx] endDate (string):',
+                                pendingBookingData.endDate
+                              )
+                              console.log(
+                                '🔍 [Rent.tsx] Type de startDate:',
+                                typeof pendingBookingData.startDate
+                              )
+                              console.log(
+                                '🔍 [Rent.tsx] Type de endDate:',
+                                typeof pendingBookingData.endDate
+                              )
+
                               // Conversion en Date pour vérification
-                              const startDateObj = new Date(pendingBookingData.startDate)
-                              const endDateObj = new Date(pendingBookingData.endDate)
-                              console.log('🔍 [Rent.tsx] startDate converti en Date:', startDateObj)
-                              console.log('🔍 [Rent.tsx] endDate converti en Date:', endDateObj)
-                              console.log('🔍 [Rent.tsx] startDate.getTime():', startDateObj.getTime())
-                              console.log('🔍 [Rent.tsx] endDate.getTime():', endDateObj.getTime())
-                              console.log('🔍 [Rent.tsx] Comparaison startDate < endDate:', startDateObj < endDateObj)
-                              console.log('🔍 [Rent.tsx] Différence en millisecondes:', endDateObj.getTime() - startDateObj.getTime())
-                              console.log('🔍 [Rent.tsx] Différence en jours:', (endDateObj.getTime() - startDateObj.getTime()) / (1000 * 60 * 60 * 24))
-                              console.log('🔍 [Rent.tsx] === FIN ANALYSE DES DATES ===')
+                              const startDateObj = new Date(
+                                pendingBookingData.startDate
+                              )
+                              const endDateObj = new Date(
+                                pendingBookingData.endDate
+                              )
+                              console.log(
+                                '🔍 [Rent.tsx] startDate converti en Date:',
+                                startDateObj
+                              )
+                              console.log(
+                                '🔍 [Rent.tsx] endDate converti en Date:',
+                                endDateObj
+                              )
+                              console.log(
+                                '🔍 [Rent.tsx] startDate.getTime():',
+                                startDateObj.getTime()
+                              )
+                              console.log(
+                                '🔍 [Rent.tsx] endDate.getTime():',
+                                endDateObj.getTime()
+                              )
+                              console.log(
+                                '🔍 [Rent.tsx] Comparaison startDate < endDate:',
+                                startDateObj < endDateObj
+                              )
+                              console.log(
+                                '🔍 [Rent.tsx] Différence en millisecondes:',
+                                endDateObj.getTime() - startDateObj.getTime()
+                              )
+                              console.log(
+                                '🔍 [Rent.tsx] Différence en jours:',
+                                (endDateObj.getTime() -
+                                  startDateObj.getTime()) /
+                                  (1000 * 60 * 60 * 24)
+                              )
+                              console.log(
+                                '🔍 [Rent.tsx] === FIN ANALYSE DES DATES ==='
+                              )
                             }
-                            
+
                             try {
                               // Créer la réservation après paiement réussi avec statut de paiement "authorized"
-                              console.log('🔍 [Rent.tsx] Appel de bookingService.createBooking...')
+                              console.log(
+                                '🔍 [Rent.tsx] Appel de bookingService.createBooking...'
+                              )
                               const bookingDataWithPaymentStatus = {
                                 ...pendingBookingData,
-                                paymentStatus: 'authorized' // Définir le statut de paiement comme autorisé après paiement réussi
+                                paymentStatus: 'authorized', // Définir le statut de paiement comme autorisé après paiement réussi
                               }
-                              console.log('🔍 [Rent.tsx] Booking data with payment status:', bookingDataWithPaymentStatus)
-                              const booking = await bookingService.createBooking(bookingDataWithPaymentStatus)
-                              console.log('🔍 [Rent.tsx] Booking created after payment:', booking)
+                              console.log(
+                                '🔍 [Rent.tsx] Booking data with payment status:',
+                                bookingDataWithPaymentStatus
+                              )
+                              const booking =
+                                await bookingService.createBooking(
+                                  bookingDataWithPaymentStatus
+                                )
+                              console.log(
+                                '🔍 [Rent.tsx] Booking created after payment:',
+                                booking
+                              )
 
                               // Programmer le déclenchement de la modal d'acompte (1 minute pour les tests)
-                              console.log('🔍 [Rent.tsx] Programmation de la modal d\'acompte...')
+                              console.log(
+                                "🔍 [Rent.tsx] Programmation de la modal d'acompte..."
+                              )
                               setTimeout(() => {
                                 if (booking && tool) {
                                   // Utiliser le contexte global pour ouvrir la modal
@@ -1425,39 +1545,60 @@ const Rent: React.FC = () => {
                                     bookingId: booking.id,
                                     amount: deposit,
                                     currency: tool.baseCurrencyCode || 'GBP',
-                                    dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-                                    propertyTitle: tool.title
+                                    dueDate: new Date(
+                                      Date.now() + 24 * 60 * 60 * 1000
+                                    ).toISOString(),
+                                    propertyTitle: tool.title,
                                   }
-                                  
+
                                   openModal(depositInfo)
-                                  
+
                                   // Afficher une notification avec bouton pour ouvrir la modal
                                   showDepositToast(depositInfo)
                                 }
                               }, 60000) // 1 minute pour les tests (au lieu de 24h)
 
                               // Nettoyer les données
-                              console.log('🔍 [Rent.tsx] Nettoyage des données...')
+                              console.log(
+                                '🔍 [Rent.tsx] Nettoyage des données...'
+                              )
                               setPendingBookingData(null)
                               setShowPayment(false)
                               clearSavedFormData()
 
-                              console.log('🔍 [Rent.tsx] Affichage du toast de succès...')
+                              console.log(
+                                '🔍 [Rent.tsx] Affichage du toast de succès...'
+                              )
                               toast({
                                 title: 'Paiement effectué avec succès!',
-                                description: 'Votre réservation a été confirmée.',
-                                className: 'bg-green-50 border-green-200 text-green-800',
+                                description:
+                                  'Votre réservation a été confirmée.',
+                                className:
+                                  'bg-green-50 border-green-200 text-green-800',
                               })
 
-                              console.log('🔍 [Rent.tsx] Navigation vers /profile?tab=reservations...')
+                              console.log(
+                                '🔍 [Rent.tsx] Navigation vers /profile?tab=reservations...'
+                              )
                               navigate('/profile?tab=reservations')
                             } catch (error: any) {
-                              console.error('❌ [Rent.tsx] Erreur lors de la création de la réservation:', error)
-                              console.error('❌ [Rent.tsx] Stack trace:', error.stack)
-                              console.error('❌ [Rent.tsx] Response data:', error.response?.data)
+                              console.error(
+                                '❌ [Rent.tsx] Erreur lors de la création de la réservation:',
+                                error
+                              )
+                              console.error(
+                                '❌ [Rent.tsx] Stack trace:',
+                                error.stack
+                              )
+                              console.error(
+                                '❌ [Rent.tsx] Response data:',
+                                error.response?.data
+                              )
                               toast({
-                                title: 'Erreur lors de la création de la réservation',
-                                description: "Le paiement a été effectué mais la réservation n'a pas pu être créée. Contactez le support.",
+                                title:
+                                  'Erreur lors de la création de la réservation',
+                                description:
+                                  "Le paiement a été effectué mais la réservation n'a pas pu être créée. Contactez le support.",
                                 variant: 'destructive',
                               })
                             }
@@ -1560,21 +1701,7 @@ const Rent: React.FC = () => {
                             />
                           </span>
                         </div>
-                        <div
-                          className={
-                            'flex justify-between text-sm ' +
-                            (language === 'ar' ? '[direction:ltr]' : '')
-                          }
-                        >
-                          <span>{t('reservation.deposit')}</span>
-                          <span>
-                            <OptimizedPriceDisplay
-                              price={deposit}
-                              baseCurrency={tool?.baseCurrencyCode || 'GBP'}
-                              size='sm'
-                            />
-                          </span>
-                        </div>
+
                         <div
                           className={
                             'border-t pt-3 ' +
@@ -1607,10 +1734,26 @@ const Rent: React.FC = () => {
                           <>
                             <div className='text-sm'>
                               <p className='font-medium text-blue-900 mb-1'>
-                                {t('reservation.included_protection')}
+                                <div
+                                  className={
+                                    'flex justify-between text-sm ' +
+                                    (language === 'ar' ? '[direction:ltr]' : '')
+                                  }
+                                >
+                                  <span>{t('reservation.deposit')}</span>
+                                  <span>
+                                    <OptimizedPriceDisplay
+                                      price={deposit}
+                                      baseCurrency={
+                                        tool?.baseCurrencyCode || 'GBP'
+                                      }
+                                      size='sm'
+                                    />
+                                  </span>
+                                </div>
                               </p>
                               <p className='text-blue-700'>
-                                {t('reservation.insurance_description')}
+                                {t('reservation.deposit.desc')}
                               </p>
                             </div>
                             <Shield className='h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0' />
@@ -1620,10 +1763,26 @@ const Rent: React.FC = () => {
                             <Shield className='h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0' />
                             <div className='text-sm'>
                               <p className='font-medium text-blue-900 mb-1'>
-                                {t('reservation.included_protection')}
+                                <div
+                                  className={
+                                    'flex justify-between text-sm ' +
+                                    (language === 'ar' ? '[direction:ltr]' : '')
+                                  }
+                                >
+                                  <span>{t('reservation.deposit')}</span>
+                                  <span>
+                                    <OptimizedPriceDisplay
+                                      price={deposit}
+                                      baseCurrency={
+                                        tool?.baseCurrencyCode || 'GBP'
+                                      }
+                                      size='sm'
+                                    />
+                                  </span>
+                                </div>
                               </p>
                               <p className='text-blue-700'>
-                                {t('reservation.insurance_description')}
+                                {t('reservation.deposit.desc')}
                               </p>
                             </div>
                           </>
@@ -1666,8 +1825,6 @@ const Rent: React.FC = () => {
           </div>
         </main>
         <Footer />
-
-
       </div>
     </StripeProvider>
   )
