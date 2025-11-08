@@ -13,6 +13,7 @@ interface ReviewDialogProps {
   toolId?: string;
   revieweeId?: string;
   reviewerId?: string;
+  titleKey?: string; // optional custom title translation key
 }
 
 const ReviewDialog: React.FC<ReviewDialogProps> = ({
@@ -22,7 +23,8 @@ const ReviewDialog: React.FC<ReviewDialogProps> = ({
   bookingId,
   toolId,
   revieweeId,
-  reviewerId
+  reviewerId,
+  titleKey
 }) => {
   const [rating, setRating] = useState(0);
   const [reviewComment, setReviewComment] = useState('');
@@ -37,7 +39,7 @@ const ReviewDialog: React.FC<ReviewDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader className={language === 'ar' ? '[direction:ltr]' : ''}>
-          <DialogTitle>{t('review.modaltitle')}</DialogTitle>
+          <DialogTitle>{t(titleKey || 'review.modaltitle')}</DialogTitle>
         </DialogHeader>
         <div className={"space-y-4"}>
           <div>

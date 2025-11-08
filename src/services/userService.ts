@@ -113,6 +113,20 @@ class UserService {
       
       console.log('UserService - Extracted stats:', stats);
       
+      // Fetch global average rating of all tools (admin endpoint)
+      // If this fails, we will gracefully fall back to user's averageRating
+      let globalAverageRating: number | undefined = undefined
+      try {
+        const globalResp = await api.get<ApiResponse<{ total: number; averageRating: number }>>(
+          '/reviews/tools/stats'
+        )
+        const container = globalResp.data?.data
+        globalAverageRating = (container?.averageRating ?? undefined) as number | undefined
+        console.log('UserService - Global tools average rating (public):', globalAverageRating)
+      } catch (err) {
+        console.warn('UserService - Failed to fetch global average rating (public), fallback to user average', err)
+      }
+
       // Get user profile for memberSince date
       const userProfile = await this.getUserProfile('')
       
@@ -121,6 +135,7 @@ class UserService {
         averageRating: stats.averageRating,
         completedRentals: stats.completedRentals,
         totalEarnings: stats.totalEarnings,
+        globalAverageRating: globalAverageRating ?? stats.averageRating,
       }
       
       console.log('UserService - Transformed stats:', transformedStats);

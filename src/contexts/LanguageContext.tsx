@@ -319,6 +319,15 @@ const translations = {
     'review.popuptitle': 'Évaluation soumise',
     'review.modalmsg':
       'Merci pour votre évaluation. Le statut passe à "Terminé".',
+    'review.app_title': "Évaluer l'application",
+    'review.success': 'Évaluation enregistrée',
+    'review.success_message': 'Merci pour votre avis !',
+    'review.error': 'Erreur lors de l’évaluation',
+    'review.error_message': "Une erreur s’est produite lors de l’envoi de votre avis.",
+
+    // Review buttons
+    'booking.rate_tool': "Évaluer l'outil",
+    'booking.rate_app': "Évaluer l'application",
 
     // reset password
     'resetpwd.emailtitle': 'Mot de passe oublié ?',
@@ -2128,6 +2137,15 @@ const translations = {
     'review.popuptitle': 'Review Submitted',
     'review.modalmsg':
       'Thank you for your review. The status has been updated to "Completed".',
+    'review.app_title': 'Review the App',
+    'review.success': 'Review saved',
+    'review.success_message': 'Thank you for your review!',
+    'review.error': 'Review error',
+    'review.error_message': 'An error occurred while submitting your review.',
+
+    // Review buttons
+    'booking.rate_tool': 'Rate Tool',
+    'booking.rate_app': 'Rate App',
 
     // reset password
     'resetpwd.emailtitle': 'Forgot Password?',
@@ -4029,6 +4047,15 @@ const translations = {
     'review.submitbtn': 'إرسال التقييم',
     'review.popuptitle': 'تم إرسال التقييم',
     'review.modalmsg': 'شكرًا على تقييمك',
+    'review.app_title': 'تقييم التطبيق',
+    'review.success': 'تم حفظ التقييم',
+    'review.success_message': 'شكراً على تقييمك!',
+    'review.error': 'خطأ في التقييم',
+    'review.error_message': 'حدث خطأ أثناء إرسال تقييمك.',
+
+    // Review buttons
+    'booking.rate_tool': 'تقييم الأداة',
+    'booking.rate_app': 'تقييم التطبيق',
 
     // reset password
     'resetpwd.emailtitle': 'هل نسيت كلمة المرور؟',

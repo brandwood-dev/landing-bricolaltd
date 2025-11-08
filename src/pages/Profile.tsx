@@ -76,11 +76,12 @@ const Profile = () => {
         setUserStats(userStatsData.data);
         
         // Transform backend data to match ProfileHeader expectations
+        // Use globalAverageRating when available, fallback to user's averageRating
         const transformedStats = {
           totalEarnings: userStatsData?.totalEarnings || 0,
           activeAds: userStatsData?.activeAds || 0,
           completedRentals: userStatsData?.completedRentals || 0,
-          averageRating: userStatsData?.averageRating || 0
+          averageRating: (userStatsData as any)?.globalAverageRating ?? userStatsData?.averageRating ?? 0
         };
         
         console.log('Profile - Transformed stats:', transformedStats);

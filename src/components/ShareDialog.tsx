@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Share2, Copy, Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { generateShareUrls, copyToClipboard, openInNewTab } from '@/utils/shareUtils';
+import { generateShareUrls, copyToClipboard, openInNewTab, shareViaWebAPI, webShareSupported } from '@/utils/shareUtils';
 
 // Icônes des réseaux sociaux
 const FacebookIcon = () => (
@@ -47,6 +47,18 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
   const [copied, setCopied] = useState(false);
   const shareUrls = generateShareUrls(url, title, excerpt, imageUrl);
 
+  const handleNativeShare = async () => {
+    const didShare = await shareViaWebAPI({
+      title,
+      text: `${title}\n\n${excerpt}`,
+      url
+    })
+    if (!didShare) {
+      // Fallback: open WhatsApp (common on mobile) or copy
+      openInNewTab(shareUrls.whatsapp)
+    }
+  }
+
   const handleCopyLink = async () => {
     const success = await copyToClipboard(url);
     if (success) {
@@ -56,6 +68,12 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
   };
 
   const shareOptions = [
+    webShareSupported() ? {
+      id: 'native',
+      name: t('blog.share'),
+      icon: Share2,
+      action: handleNativeShare
+    } : null,
     {
       id: 'copy',
       name: t('general.copy_link'),
@@ -79,6 +97,12 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
       name: 'WhatsApp',
       icon: WhatsAppIcon,
       action: () => openInNewTab(shareUrls.whatsapp)
+    },
+    {
+      id: 'linkedin',
+      name: 'LinkedIn',
+      icon: FacebookIcon, // reuse simple icon; ideally add LinkedIn SVG
+      action: () => openInNewTab(shareUrls.linkedin)
     }
   ];
 
@@ -95,7 +119,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
           <DialogTitle>{t('blog.share_article')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
-          {shareOptions.map((option) => (
+          {shareOptions.filter(Boolean).map((option) => (
             <Button
               key={option.id}
               variant="outline"

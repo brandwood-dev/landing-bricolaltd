@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import { generateCanonicalUrl } from '@/utils/shareUtils'
+import { generateCanonicalUrl, ensureAbsoluteUrl } from '@/utils/shareUtils'
 import { newsService } from '@/services/newsService'
 import { News } from '@/types/bridge/news.types'
 import { useToast } from '@/hooks/use-toast'
@@ -130,6 +130,7 @@ const BlogPost = () => {
   const post = article
 
   const currentUrl = generateCanonicalUrl(`/blog/${post.id}`)
+  const absoluteImage = ensureAbsoluteUrl(post.imageUrl)
   const categoryMap: Record<string, string> = {
     Jardinage: 'gardening',
     Entretien: 'maintenance',
@@ -152,7 +153,7 @@ const BlogPost = () => {
       <SEOHead
         title={post.title}
         description={post.summary || post.title}
-        image={post.imageUrl}
+        image={absoluteImage}
         url={currentUrl}
         type='article'
         author={getAuthorName(post)}
@@ -204,13 +205,13 @@ const BlogPost = () => {
                     url={currentUrl}
                     title={post.title}
                     excerpt={post.summary}
-                    imageUrl={post.imageUrl || '/placeholder-blog.svg'}
+                    imageUrl={absoluteImage || '/placeholder-blog.svg'}
                   />
                 </div>
               </div>
 
               <img
-                src={post.imageUrl || '/placeholder-blog.svg'}
+                src={absoluteImage || '/placeholder-blog.svg'}
                 alt={post.title}
                 className='w-full h-96 object-cover rounded-lg'
                 onError={(e) => {

@@ -97,6 +97,7 @@ const Reservations = () => {
   const [selectedReservationId, setSelectedReservationId] = useState('')
   const [reviewType, setReviewType] = useState<'tool' | 'app'>('tool')
   const [hasReviewedApp, setHasReviewedApp] = useState(false)
+  const [hasReviewedToolMap, setHasReviewedToolMap] = useState<{ [bookingId: string]: boolean }>({})
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [filteredReservations, setFilteredReservations] = useState<
@@ -193,6 +194,26 @@ const Reservations = () => {
     }
   }
 
+  // Vérifier si l'utilisateur a déjà noté des outils (par réservation)
+  const checkUserToolReviews = async () => {
+    if (!user?.id) return
+
+    try {
+      const userToolReviews = await reviewsService.getToolReviewsByUserId(user.id)
+      const reviewedBookingIds = new Set(userToolReviews.map((r) => r.bookingId))
+
+      setHasReviewedToolMap((prev) => {
+        const updated: { [bookingId: string]: boolean } = { ...prev }
+        reservations.forEach((res) => {
+          updated[res.id] = reviewedBookingIds.has(res.id)
+        })
+        return updated
+      })
+    } catch (error) {
+      // silencieux: ne pas bloquer l'UI si la vérification échoue
+    }
+  }
+
   // API data loading
   const loadBookings = async () => {
     if (!user?.id) {
@@ -229,6 +250,13 @@ const Reservations = () => {
       checkUserAppReview()
     }
   }, [user?.id])
+
+  // Lorsqu'on a des réservations, vérifier les avis outils de l'utilisateur
+  useEffect(() => {
+    if (user?.id && reservations.length > 0) {
+      checkUserToolReviews()
+    }
+  }, [user?.id, reservations])
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -718,24 +746,68 @@ const Reservations = () => {
 
   const handleOpenReview = (reservationId: string) => {
     setSelectedReservationId(reservationId)
+    console.log('[Reservations] Opening review dialog', {
+      reservationId,
+      reviewType,
+    })
     setIsReviewDialogOpen(true)
   }
-  const handleSubmitReview = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!selectedReservationId || !user?.id) return
-
+  const handleSubmitReview = async (e?: React.SyntheticEvent) => {
     try {
+      if (e) {
+        e.preventDefault()
+      }
+      console.log('[Reservations] handleSubmitReview called', {
+        selectedReservationId,
+        reviewType,
+        rating,
+        reviewCommentLen: reviewComment.trim().length,
+        userId: user?.id,
+      })
+      if (!selectedReservationId || !user?.id) {
+        console.warn('[Reservations] Missing selectedReservationId or user.id, aborting submit')
+        toast({
+          title: t('review.error'),
+          description: t('review.error_message'),
+          variant: 'destructive',
+        })
+        return
+      }
+
+      // Validations common to both review types
+      if (rating < 1 || rating > 5) {
+        console.warn('[Reservations] Invalid rating, must be between 1 and 5', { rating })
+        toast({
+          title: t('review.error'),
+          description: t('review.error_message'),
+          variant: 'destructive',
+        })
+        return
+      }
+      if (reviewComment.trim().length < 3) {
+        console.warn('[Reservations] Invalid comment length', { len: reviewComment.trim().length })
+        toast({
+          title: t('review.error'),
+          description: t('review.error_message'),
+          variant: 'destructive',
+        })
+        return
+      }
+
       if (reviewType === 'app') {
         // Créer un avis d'application
-        await reviewsService.createAppReview({
+        console.log('[Reservations] Creating app review payload')
+        const appPayload = {
           rating: rating,
           comment: reviewComment,
           reviewerId: user.id,
-        })
+        }
+        console.log('[Reservations] POST /reviews/app', appPayload)
+        await reviewsService.createAppReview(appPayload)
 
         toast({
           title: t('review.success'),
-          description: "Merci pour votre avis sur l'application !",
+          description: t('review.success_message'),
         })
 
         // Mettre à jour l'état pour cacher le bouton
@@ -744,22 +816,44 @@ const Reservations = () => {
         // Créer un avis d'outil avec tous les paramètres requis
         const selectedReservation = reservations.find(r => r.id === selectedReservationId)
         if (!selectedReservation) {
+          console.error('[Reservations] Selected reservation not found', { selectedReservationId })
+          toast({
+            title: t('review.error'),
+            description: t('review.error_message'),
+            variant: 'destructive',
+          })
           return
         }
 
-        await reviewsService.createToolReview({
+        // Ensure booking is completed before allowing tool review
+        if (selectedReservation.status !== BookingStatus.COMPLETED) {
+          console.warn('[Reservations] Reservation not COMPLETED', { status: selectedReservation.status })
+          toast({
+            title: t('review.error'),
+            description: t('review.error_message'),
+            variant: 'destructive',
+          })
+          return
+        }
+
+        const toolPayload = {
           bookingId: selectedReservation.id,
           toolId: selectedReservation.toolId,
           reviewerId: user.id,
           revieweeId: selectedReservation.ownerId,
           rating: rating,
           comment: reviewComment,
-        })
+        }
+        console.log('[Reservations] POST /reviews/tools', toolPayload)
+        await reviewsService.createToolReview(toolPayload)
 
         toast({
           title: t('review.success'),
           description: t('review.success_message'),
         })
+
+        // Marquer cette réservation comme déjà notée pour masquer le bouton
+        setHasReviewedToolMap((prev) => ({ ...prev, [selectedReservationId]: true }))
       }
 
       setReviewComment('')
@@ -768,11 +862,31 @@ const Reservations = () => {
 
       // Actualiser la liste des réservations si nécessaire
       if (reviewType === 'tool') {
-        const updatedReservations = await api.get('/reservations')
-        handleFilteredDataChange(updatedReservations.data)
+        console.log('[Reservations] Refreshing bookings after tool review')
+        try {
+          const bookingsData = await bookingService.getUserBookings(user.id, {
+            page: 1,
+            limit: 100,
+          })
+          const transformedReservations = bookingsData.map(
+            transformBookingToReservation
+          )
+          console.log('[Reservations] bookings refresh received', {
+            count: transformedReservations.length,
+          })
+          handleFilteredDataChange(transformedReservations)
+        } catch (err) {
+          console.error('[Reservations] Failed to refresh bookings after review', err)
+          toast({
+            title: t('review.error'),
+            description: t('review.error_message'),
+            variant: 'destructive',
+          })
+        }
       }
     } catch (error) {
       // Vérifier si c'est l'erreur spécifique "A tool review already exists for this booking"
+      console.error('[Reservations] Review submission error', error)
       if (error.response?.data?.message?.includes('A tool review already exists for this booking')) {
         toast({
           title: 'Avis déjà existant',
@@ -1619,18 +1733,20 @@ const Reservations = () => {
                     {/* review if status completed  */}
                     {reservation.status === 'COMPLETED' && (
                       <div className='flex gap-2'>
-                        <Button
-                          variant='outline'
-                          size='sm'
-                          onClick={() => {
-                            setReviewType('tool')
-                            handleOpenReview(reservation.id)
-                          }}
-                          className='flex items-center gap-2'
-                        >
-                          <Star className='h-4 w-4 mr-1' />
-                          {t('booking.rate_tool')}
-                        </Button>
+                        {!hasReviewedToolMap[reservation.id] && (
+                          <Button
+                            variant='outline'
+                            size='sm'
+                            onClick={() => {
+                              setReviewType('tool')
+                              handleOpenReview(reservation.id)
+                            }}
+                            className='flex items-center gap-2'
+                          >
+                            <Star className='h-4 w-4 mr-1' />
+                            {t('booking.rate_tool')}
+                          </Button>
+                        )}
                         {!hasReviewedApp && (
                           <Button
                             variant='outline'
@@ -1921,7 +2037,7 @@ const Reservations = () => {
             </div>
           </DialogContent>
         </Dialog>
-
+{/* review app dialog */}
         <Dialog open={isReviewDialogOpen} onOpenChange={setIsReviewDialogOpen}>
           <DialogContent>
             <DialogHeader
@@ -1966,7 +2082,17 @@ const Reservations = () => {
                   onChange={(e) => setReviewComment(e.target.value)}
                 />
               </div>
-              <Button onClick={handleSubmitReview} className='w-full'>
+              <Button
+                type='button'
+                onClick={(e) => {
+                  console.log('[Reservations] Review submit button clicked', {
+                    selectedReservationId,
+                    reviewType,
+                  })
+                  handleSubmitReview(e)
+                }}
+                className='w-full'
+              >
                 {t('review.submitbtn')}
               </Button>
             </div>

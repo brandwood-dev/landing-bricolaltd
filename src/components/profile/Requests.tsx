@@ -62,6 +62,8 @@ const Requests = () => {
   const [validationCode, setValidationCode] = useState('')
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false)
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false)
+  const [isAppReviewDialogOpen, setIsAppReviewDialogOpen] = useState(false)
+  const [hasReviewedApp, setHasReviewedApp] = useState(false)
   const [isClaimDialogOpen, setIsClaimDialogOpen] = useState(false)
   const [selectedRequestId, setSelectedRequestId] = useState('')
   const [filteredRequests, setFilteredRequests] = useState<Request[]>([])
@@ -213,8 +215,22 @@ const Requests = () => {
   useEffect(() => {
     if (user?.id) {
       fetchBookings()
+      // Check if owner already reviewed the app
+      checkUserAppReview()
     }
   }, [user?.id])
+
+  const checkUserAppReview = async (): Promise<boolean> => {
+    if (!user?.id) return false
+    try {
+      const result = await reviewsService.checkUserAppReview(user.id)
+      setHasReviewedApp(!!result.hasReviewed)
+      return !!result.hasReviewed
+    } catch (error) {
+      console.error('Failed to check app review status', error)
+      return false
+    }
+  }
 
   const handleAcceptRequest = async (requestId: string) => {
     try {
@@ -365,7 +381,11 @@ const Requests = () => {
       })
 
       setIsConfirmDialogOpen(false)
-      setIsReviewDialogOpen(true)
+      // After marking booking as COMPLETED, open App review if not already done
+      const reviewed = await checkUserAppReview()
+      if (!reviewed) {
+        setIsAppReviewDialogOpen(true)
+      }
     } catch (error: any) {
       toast({
         title: t('general.error'),
@@ -426,6 +446,43 @@ const Requests = () => {
       toast({
         title: t('general.error'),
         description: error.message || 'Failed to submit review',
+        variant: 'destructive',
+      })
+    }
+  }
+
+  // Submit app review (owner reviews app usage)
+  const handleSubmitAppReview = async (
+    rating: number,
+    comment: string,
+  ) => {
+    if (!user?.id) {
+      toast({
+        title: t('general.error'),
+        description: 'Missing user information for app review',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    try {
+      await reviewsService.createAppReview({
+        rating,
+        comment,
+        reviewerId: user.id,
+      })
+
+      toast({
+        title: t('review.popuptitle'),
+        description: t('review.modalmsg'),
+      })
+
+      setHasReviewedApp(true)
+      setIsAppReviewDialogOpen(false)
+    } catch (error: any) {
+      toast({
+        title: t('general.error'),
+        description: error.message || 'Failed to submit app review',
         variant: 'destructive',
       })
     }
@@ -856,6 +913,17 @@ const Requests = () => {
                 {req.status === 'CANCELLED' && (
                   <CancellationDetailsDialog request={req} />
                 )}
+
+                {/* App Review button visible only after completion and hidden once reviewed */}
+                {req.status === 'COMPLETED' && !hasReviewedApp && (
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={() => setIsAppReviewDialogOpen(true)}
+                  >
+                    {t('review.app_title')}
+                  </Button>
+                )}
               </div>
             </div>
           ))}
@@ -935,6 +1003,15 @@ const Requests = () => {
             bookings.find((booking) => booking.id === selectedRequestId)
               ?.renterId
           }
+          reviewerId={user?.id}
+        />
+
+        {/* App Review Dialog */}
+        <ReviewDialog
+          isOpen={isAppReviewDialogOpen}
+          onOpenChange={setIsAppReviewDialogOpen}
+          onSubmit={handleSubmitAppReview}
+          titleKey={'review.app_title'}
           reviewerId={user?.id}
         />
 

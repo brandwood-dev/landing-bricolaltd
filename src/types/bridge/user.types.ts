@@ -89,6 +89,8 @@ export interface UserStats {
   averageRating: number
   completedRentals: number
   totalEarnings: number
+  // Global average rating of all tools across the platform
+  globalAverageRating?: number
 }
 
 // User wallet information
