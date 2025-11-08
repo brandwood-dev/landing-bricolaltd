@@ -31,15 +31,10 @@ export const generateShareUrls = (
   imageUrl?: string
 ) => {
   const canonicalUrl = ensureAbsoluteUrl(url) || url
-  // Normalize trailing slashes to avoid `//share` which can break route matching
-  const canonicalNoTrailing = canonicalUrl.replace(/\/+$/, '')
-  // If this is a blog canonical, create API share URL that serves OG/Twitter HTML
-  const shareHtmlUrl = canonicalNoTrailing.includes('/blog/')
-    ? (canonicalNoTrailing.replace('/blog/', '/api/news/') + '/share')
-    : canonicalNoTrailing
+  // Use direct blog URL for all platforms - no API endpoint needed
   const shareText = generateShareText(title, excerpt)
 
-  // Platform-specific formats
+  // Platform-specific formats using direct blog URLs
   const twitterUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(
     title
   )}&url=${encodeURIComponent(canonicalUrl)}`
@@ -47,13 +42,14 @@ export const generateShareUrls = (
   const whatsappText = `${title}\n\n${excerpt}\n\n${canonicalUrl}`
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappText)}`
 
-  // Facebook ignores explicit image param; rely on OG tags
+  // Facebook - use direct URL, it will scrape the page for OG tags
   const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-    shareHtmlUrl
+    canonicalUrl
   )}`
 
+  // LinkedIn - use direct URL
   const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-    shareHtmlUrl
+    canonicalUrl
   )}`
 
   return {
@@ -61,7 +57,7 @@ export const generateShareUrls = (
     twitter: twitterUrl,
     whatsapp: whatsappUrl,
     linkedin: linkedinUrl,
-    copy: canonicalNoTrailing,
+    copy: canonicalUrl,
   }
 }
 
