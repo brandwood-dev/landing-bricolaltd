@@ -31,33 +31,36 @@ export const generateShareUrls = (
   imageUrl?: string
 ) => {
   const canonicalUrl = ensureAbsoluteUrl(url) || url
-  // Use direct blog URL for all platforms - no API endpoint needed
+  const canonicalNoTrailing = canonicalUrl.replace(/\/+$/, '')
+
+  // If this is a blog canonical, build API share URL on the API host
+  // API base comes from env: e.g. https://api.bricolaltd.com/api
+  const API_BASE_URL = (import.meta as any).env?.VITE_BASE_URL || 'http://localhost:4000/api'
+  const blogMatch = canonicalNoTrailing.match(/\/blog\/([^\/]+)$/)
+  const shareHtmlUrl = blogMatch
+    ? `${API_BASE_URL}/blog/share/${blogMatch[1]}`
+    : canonicalNoTrailing
+
   const shareText = generateShareText(title, excerpt)
 
-  // Platform-specific formats using direct blog URLs
+  // Platform-specific formats
   const twitterUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(
     title
-  )}&url=${encodeURIComponent(canonicalUrl)}`
+  )}&url=${encodeURIComponent(canonicalNoTrailing)}`
 
-  const whatsappText = `${title}\n\n${excerpt}\n\n${canonicalUrl}`
+  const whatsappText = `${title}\n\n${excerpt}\n\n${canonicalNoTrailing}`
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappText)}`
 
-  // Facebook - use direct URL, it will scrape the page for OG tags
+  // Facebook should use the share HTML endpoint for proper OG tags
   const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-    canonicalUrl
-  )}`
-
-  // LinkedIn - use direct URL
-  const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-    canonicalUrl
+    shareHtmlUrl
   )}`
 
   return {
     facebook: facebookUrl,
     twitter: twitterUrl,
     whatsapp: whatsappUrl,
-    linkedin: linkedinUrl,
-    copy: canonicalUrl,
+    copy: canonicalNoTrailing,
   }
 }
 
