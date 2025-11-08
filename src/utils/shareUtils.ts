@@ -44,8 +44,9 @@ export const generateShareUrls = (
   const shareText = generateShareText(title, excerpt)
 
   // Platform-specific formats
-  const twitterUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(
-    title
+  const twitterText = `${title}\n\n${excerpt}`
+  const twitterUrl = `https://x.com/intent/post?text=${encodeURIComponent(
+    twitterText
   )}&url=${encodeURIComponent(canonicalNoTrailing)}`
 
   const whatsappText = `${title}\n\n${excerpt}\n\n${canonicalNoTrailing}`
