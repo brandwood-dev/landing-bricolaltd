@@ -174,6 +174,8 @@ const App = () => (
                   
                   <Route path="/blog" element={<Blog />} />
                   <Route path="/blog/:id" element={<BlogPost />} />
+                  {/* Trailing slash tolerant route to avoid 404s when shared with a final '/' */}
+                  <Route path="/blog/:id/" element={<BlogPost />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/favorites" element={<Favorites />} />

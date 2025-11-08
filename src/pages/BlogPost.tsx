@@ -131,6 +131,8 @@ const BlogPost = () => {
 
   const currentUrl = generateCanonicalUrl(`/blog/${post.id}`)
   const absoluteImage = ensureAbsoluteUrl(post.imageUrl)
+  // Optional: shareHtml URL for crawlers (used internally by shareUtils for FB/LinkedIn)
+  const shareHtmlUrl = `${generateCanonicalUrl(`/api/news/${post.id}/share`)}`
   const categoryMap: Record<string, string> = {
     Jardinage: 'gardening',
     Entretien: 'maintenance',

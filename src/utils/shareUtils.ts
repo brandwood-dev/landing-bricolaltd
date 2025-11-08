@@ -31,6 +31,12 @@ export const generateShareUrls = (
   imageUrl?: string
 ) => {
   const canonicalUrl = ensureAbsoluteUrl(url) || url
+  // Normalize trailing slashes to avoid `//share` which can break route matching
+  const canonicalNoTrailing = canonicalUrl.replace(/\/+$/, '')
+  // If this is a blog canonical, create API share URL that serves OG/Twitter HTML
+  const shareHtmlUrl = canonicalNoTrailing.includes('/blog/')
+    ? (canonicalNoTrailing.replace('/blog/', '/api/news/') + '/share')
+    : canonicalNoTrailing
   const shareText = generateShareText(title, excerpt)
 
   // Platform-specific formats
@@ -43,11 +49,11 @@ export const generateShareUrls = (
 
   // Facebook ignores explicit image param; rely on OG tags
   const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-    canonicalUrl
+    shareHtmlUrl
   )}`
 
   const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-    canonicalUrl
+    shareHtmlUrl
   )}`
 
   return {
@@ -55,7 +61,7 @@ export const generateShareUrls = (
     twitter: twitterUrl,
     whatsapp: whatsappUrl,
     linkedin: linkedinUrl,
-    copy: canonicalUrl,
+    copy: canonicalNoTrailing,
   }
 }
 
