@@ -53,9 +53,10 @@ export const generateShareUrls = (
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappText)}`
 
   // Facebook should use the share HTML endpoint for proper OG tags
+  const facebookQuote = `${title}\n\n${excerpt}`.trim()
   const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
     shareHtmlUrl
-  )}`
+  )}&quote=${encodeURIComponent(facebookQuote)}`
 
   return {
     facebook: facebookUrl,
