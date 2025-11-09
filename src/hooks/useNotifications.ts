@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { toast } from 'sonner';
 import { Notification } from '@/components/notifications/NotificationCenter';
 import { apiClient } from '@/services/api';
@@ -21,6 +21,7 @@ export const useNotifications = (): UseNotificationsReturn => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const socketRef = useRef<any>(null);
 
   const fetchNotifications = useCallback(async () => {
     if (!isAuthenticated) return;
@@ -97,7 +98,7 @@ export const useNotifications = (): UseNotificationsReturn => {
 
   const clearAllNotifications = useCallback(async () => {
     try {
-      await apiClient.delete('/notifications/user');
+      await apiClient.delete('/notifications/my');
       
       setNotifications([]);
       toast.success('Toutes les notifications ont été supprimées');
@@ -129,6 +130,76 @@ export const useNotifications = (): UseNotificationsReturn => {
 
     return () => clearInterval(interval);
   }, [fetchNotifications, isAuthenticated]);
+
+  // WebSocket: connect to user notifications namespace for real-time updates
+  useEffect(() => {
+    // Only connect when authenticated and window.io is available
+    if (!isAuthenticated || typeof window === 'undefined') {
+      return;
+    }
+
+    const ioAvailable = (window as any).io;
+    const token = localStorage.getItem('authToken');
+    if (!ioAvailable || !token) {
+      return;
+    }
+
+    try {
+      // Connect to `/notifications` namespace
+      socketRef.current = (window as any).io(
+        (import.meta.env.VITE_WS_BASE || 'http://localhost:4000') + '/notifications',
+        {
+          transports: ['websocket'],
+          auth: { token },
+          withCredentials: true,
+        }
+      );
+
+      const socket = socketRef.current;
+
+      socket.on('connect', () => {
+        // Optionally request current notifications on connect
+        socket.emit('get_notifications');
+      });
+
+      socket.on('unread_count', (payload: { count: number }) => {
+        // No direct state; count will be derived from notifications state
+        // Optionally refetch to sync if server indicates change
+        fetchNotifications();
+      });
+
+      socket.on('new_notification', (notification: Notification) => {
+        // Prepend new notification to the list
+        setNotifications(prev => [notification, ...prev]);
+      });
+
+      socket.on('notifications', (payload: { notifications: Notification[]; unreadCount: number }) => {
+        const list = Array.isArray((payload as any)?.notifications)
+          ? (payload as any).notifications
+          : Array.isArray((payload as any)?.notifications?.data)
+            ? (payload as any).notifications.data
+            : [];
+        setNotifications(list);
+      });
+
+      socket.on('disconnect', () => {
+        // Cleanup handled below
+      });
+
+      socket.on('connect_error', () => {
+        // Silently ignore WS errors; rely on polling
+      });
+    } catch (e) {
+      // If WS fails, fallback to polling only
+    }
+
+    return () => {
+      try {
+        socketRef.current?.disconnect();
+      } catch {}
+      socketRef.current = null;
+    };
+  }, [isAuthenticated, fetchNotifications]);
 
   const unreadCount = (notifications || []).filter(n => !n.isRead).length;
 
