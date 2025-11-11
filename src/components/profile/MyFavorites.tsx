@@ -13,6 +13,14 @@ const MyFavorites = () => {
   const { toast } = useToast();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+
+  // Calculer le prix affiché avec 6% de majoration
+  const calculateDisplayPrice = (basePrice: number | string): number => {
+    const basePriceNumber =
+      typeof basePrice === 'string' ? parseFloat(basePrice) : basePrice
+    const feeAmount = (basePriceNumber || 0) * 0.06
+    return (basePriceNumber || 0) + feeAmount
+  }
   
   const handleRemoveFavorite = async (id: string) => {
     try {
@@ -114,8 +122,8 @@ const MyFavorites = () => {
                     <div className='flex items-center justify-between'>
                       <div className='font-semibold text-primary'>
                         <OptimizedPriceDisplay
-                          price={favorite.basePrice}
-                          baseCurrency='GBP'
+                          price={calculateDisplayPrice(favorite.basePrice)}
+                          baseCurrency={favorite.baseCurrencyCode || 'GBP'}
                           size='md'
                           cible='basePrice'
                         />

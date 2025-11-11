@@ -591,8 +591,8 @@ const ProfileInfo = () => {
         requestPayload
       )
 
-      // Access data via response.data.data.data.valid according to API structure
-      if (response.data.data?.data?.valid) {
+      // Access data via response.data.data.valid according to API structure
+      if (response.data.data?.valid) {
         setCurrentPasswordValid(true)
         setCurrentPasswordChecked(true)
       } else {

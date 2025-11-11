@@ -47,15 +47,35 @@ const DeleteAccountButton = ({
     setDeletionStep('validation');
     
     try {
+      const tsStart = new Date().toISOString();
+      console.debug('🧩 DeleteAccountButton.click', { ts: tsStart, userId, msg: 'start validation' });
       const validation = await accountDeletionService.validateAccountDeletion(userId);
+      // Debug validation result
+      const tsRes = new Date().toISOString();
+      console.debug('✅ Deletion validation result:', { ts: tsRes, userId, validation });
+      console.debug('🧭 Deletion flow decision:', {
+        ts: tsRes,
+        userId,
+        canDelete: validation?.canDelete,
+        pendingBookings: validation?.blockingIssues?.pendingBookings,
+        confirmedReservations: validation?.blockingIssues?.confirmedReservations,
+        ongoingDisputes: validation?.blockingIssues?.ongoingDisputes,
+        unreturnedTools: validation?.blockingIssues?.unreturnedTools,
+        stepChosen: validation?.canDelete ? 'password' : 'validation',
+      });
       setValidationResult(validation);
       
       if (validation.canDelete) {
-        setDeletionStep('confirmation');
+        // If the user can delete immediately, skip confirmation and go straight to password
+        setDeletionStep('password');
       } else {
+        const tsShow = new Date().toISOString();
+        console.debug('🪧 Showing validation blockers to the user', { ts: tsShow, userId });
         setDeletionStep('validation');
       }
     } catch (error: any) {
+      const tsErr = new Date().toISOString();
+      console.warn('❌ Deletion validation failed', { ts: tsErr, userId, err: error?.message || error });
       toast.error(
         language === 'fr' ? 'Erreur lors de la validation' :
         language === 'ar' ? 'خطأ في التحقق' :
@@ -63,6 +83,8 @@ const DeleteAccountButton = ({
       );
       setIsDialogOpen(false);
     } finally {
+      const tsEnd = new Date().toISOString();
+      console.debug('🏁 DeleteAccountButton.click end', { ts: tsEnd, userId });
       setIsLoading(false);
     }
   };
@@ -151,10 +173,83 @@ const DeleteAccountButton = ({
 
   // Transform blocking issues into displayable issues
   const getDisplayableIssues = () => {
-    if (!validationResult || !validationResult.blockingIssues) return [];
+    if (!validationResult) return [];
 
-    const issues = [];
+    const issues: Array<{
+      title: string
+      description: string
+      action?: string
+      actionUrl?: string
+      onClick?: () => void
+    }> = [];
     const { blockingIssues } = validationResult;
+    // Debug blocking issues transformation
+    console.debug('🧩 Blocking issues received:', blockingIssues);
+    console.debug('🧾 Full validationResult for display:', validationResult);
+
+    // If backend conservatively set canDelete=false due to an internal error,
+    // the blockingIssues counts may all be zero. Provide a helpful fallback.
+    if (
+      blockingIssues &&
+      !validationResult.canDelete &&
+      Object.values(blockingIssues).every((count) => count === 0)
+    ) {
+      issues.push({
+        title:
+          language === 'fr'
+            ? 'Vérification non concluante'
+            : language === 'ar'
+            ? 'التحقق غير حاسم'
+            : 'Validation Inconclusive',
+        description:
+          language === 'fr'
+            ? "Nous n'avons pas identifié de blocage explicite, mais la suppression n'est pas autorisée pour le moment. Veuillez réessayer ou contacter le support."
+            : language === 'ar'
+            ? 'لم نحدد أي عوائق واضحة، ولكن الحذف غير مسموح حالياً. يرجى إعادة المحاولة أو الاتصال بالدعم.'
+            : 'No explicit blockers were found, but deletion is not allowed right now. Please retry or contact support.',
+        action:
+          language === 'fr'
+            ? 'Réessayer la vérification'
+            : language === 'ar'
+            ? 'إعادة المحاولة'
+            : 'Retry Validation',
+        onClick: () => {
+          handleDeleteAccountClick();
+        },
+      });
+      console.debug('🧱 Displaying fallback inconclusive issue');
+      return issues;
+    }
+
+    // If validation failed but no blocking issues object, show a fallback error
+    if (!blockingIssues && !validationResult.canDelete) {
+      issues.push({
+        title:
+          language === 'fr'
+            ? 'Erreur de validation'
+            : language === 'ar'
+            ? 'خطأ في التحقق'
+            : 'Validation Error',
+        description:
+          language === 'fr'
+            ? "Une erreur est survenue lors de la vérification des conditions de suppression. Veuillez réessayer ou contacter le support."
+            : language === 'ar'
+            ? 'حدث خطأ أثناء التحقق من شروط الحذف. يرجى المحاولة مرة أخرى أو الاتصال بالدعم.'
+            : 'An error occurred while checking deletion conditions. Please retry or contact support.',
+        action:
+          language === 'fr'
+            ? 'Réessayer la vérification'
+            : language === 'ar'
+            ? 'إعادة المحاولة'
+            : 'Retry Validation',
+        onClick: () => {
+          // Retry validation
+          handleDeleteAccountClick();
+        },
+      });
+      console.debug('🧱 Displaying fallback validation error issue');
+      return issues;
+    }
 
     // Pending bookings
     if (blockingIssues.pendingBookings > 0) {
@@ -261,6 +356,8 @@ const DeleteAccountButton = ({
     }
 
     const displayableIssues = getDisplayableIssues();
+    const tsIssues = new Date().toISOString();
+    console.debug('📋 Displayable issues:', { ts: tsIssues, userId, count: displayableIssues.length, issues: displayableIssues });
 
     return (
       <>
@@ -293,7 +390,9 @@ const DeleteAccountButton = ({
                       className="text-orange-700 border-orange-300 hover:bg-orange-100"
                       onClick={() => {
                         // Handle action click - could navigate to relevant page
-                        if (issue.actionUrl) {
+                        if (issue.onClick) {
+                          issue.onClick();
+                        } else if (issue.actionUrl) {
                           navigate(issue.actionUrl);
                         }
                       }}
@@ -448,10 +547,19 @@ const DeleteAccountButton = ({
             {t('profile.delete_account')}
           </Button>
         </AlertDialogTrigger>
-        <AlertDialogContent className='max-w-md'>
+        <AlertDialogContent className='max-w-md' aria-describedby='delete-account-desc'>
+          {/* Keep an accessible title for screen readers */}
           <AlertDialogTitle className="sr-only">
             {t('profile.delete_account')}
           </AlertDialogTitle>
+          {/* Provide a persistent, visually hidden description to satisfy Radix accessibility */}
+          <AlertDialogDescription id='delete-account-desc' className='sr-only'>
+            {language === 'fr'
+              ? "Cette fenêtre confirme et explique les étapes pour supprimer votre compte."
+              : language === 'ar'
+              ? "هذه النافذة تؤكد وتشرح خطوات حذف حسابك."
+              : "This dialog confirms and explains the steps to delete your account."}
+          </AlertDialogDescription>
           {renderDeletionContent()}
         </AlertDialogContent>
       </AlertDialog>

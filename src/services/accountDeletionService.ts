@@ -36,16 +36,72 @@ class AccountDeletionService {
         `/users/${userId}/deletion-validation`
       )
 
-      // Handle nested response structure: response.data.data.data
-      const validationData = response.data.data?.data || response.data.data
+      // API returns { data: {...}, message }, use response.data.data
+      const envelope = response.data
+      const ts = new Date().toISOString()
+      const validationData = envelope?.data || {}
+      // Debug raw response envelope and payload
+      console.debug('📦 Raw deletion-validation response envelope:', {
+        ts,
+        userId,
+        hasSuccess: typeof envelope?.success !== 'undefined',
+        hasMessage: typeof envelope?.message !== 'undefined',
+        keys: Object.keys(envelope || {}),
+      })
+      console.debug('🧯 Raw deletion-validation payload (data):', { ts, userId, payloadKeys: Object.keys(validationData || {}) })
+
+      // Normalize blocking issues to ensure numbers are present
+      const rawBlocking = validationData.blockingIssues || {}
+      const blockingIssues = {
+        pendingBookings: Number(rawBlocking.pendingBookings) || 0,
+        confirmedReservations: Number(rawBlocking.confirmedReservations) || 0,
+        ongoingDisputes: Number(rawBlocking.ongoingDisputes) || 0,
+        unreturnedTools: Number(rawBlocking.unreturnedTools) || 0,
+      }
+
+      // Decide canDelete: prefer backend flag if boolean, otherwise infer
+      const canDeleteFlag = typeof validationData.canDelete === 'boolean'
+        ? validationData.canDelete
+        : Object.values(blockingIssues).every((c) => c === 0)
+
+      const details = validationData.details || {}
+
+      // Debug logging to trace validation result
+      console.debug('🔎 AccountDeletionService.validateAccountDeletion:', {
+        ts,
+        userId,
+        canDelete: canDeleteFlag,
+        blockingIssues,
+        detailsKeys: Object.keys(details)
+      })
+      console.debug('✅ Computed decision:', {
+        ts,
+        userId,
+        proceedToPassword: canDeleteFlag,
+        reason:
+          typeof validationData.canDelete === 'boolean'
+            ? 'Backend flag used'
+            : 'Inferred from blockingIssues counts',
+      })
 
       return {
-        canDelete: validationData.canDelete,
-        blockingIssues: validationData.blockingIssues,
-        details: validationData.details,
+        canDelete: canDeleteFlag,
+        blockingIssues,
+        details: {
+          pendingBookings: details.pendingBookings || [],
+          confirmedReservations: details.confirmedReservations || [],
+          ongoingDisputes: details.ongoingDisputes || [],
+          unreturnedTools: details.unreturnedTools || [],
+        },
       }
     } catch (error: any) {
       // If endpoint doesn't exist, perform manual validation
+      const tsErr = new Date().toISOString()
+      console.warn('⚠️ deletion-validation endpoint failed, falling back to manual validation:', {
+        ts: tsErr,
+        userId,
+        message: error?.response?.data?.message || error?.message,
+      })
       return await this.performManualValidation(userId)
     }
   }
@@ -62,23 +118,27 @@ class AccountDeletionService {
       ])
 
       // Check for pending/confirmed bookings
-      const pendingBookings = userBookings.filter((booking: any) =>
-        ['pending', 'confirmed', 'in_progress'].includes(booking.status)
-      )
+      const pendingBookings = userBookings.filter((booking: any) => {
+        const s = String(booking.status || '').toUpperCase()
+        return ['PENDING', 'CONFIRMED', 'ACCEPTED', 'ONGOING', 'IN_PROGRESS'].includes(s)
+      })
 
-      const confirmedReservations = ownerBookings.filter((booking: any) =>
-        ['confirmed', 'in_progress'].includes(booking.status)
-      )
+      const confirmedReservations = ownerBookings.filter((booking: any) => {
+        const s = String(booking.status || '').toUpperCase()
+        return ['CONFIRMED', 'ACCEPTED', 'ONGOING', 'IN_PROGRESS'].includes(s)
+      })
 
       // Check for ongoing disputes
-      const ongoingDisputes = userDisputes.filter((dispute: any) =>
-        ['open', 'in_progress', 'pending'].includes(dispute.status)
-      )
+      const ongoingDisputes = userDisputes.filter((dispute: any) => {
+        const s = String(dispute.status || '').toUpperCase()
+        return ['OPEN', 'IN_PROGRESS', 'PENDING'].includes(s)
+      })
 
       // Check for unreturned tools (bookings where user is renter and status is not completed/returned)
-      const unreturnedTools = userBookings.filter((booking: any) =>
-        ['confirmed', 'in_progress'].includes(booking.status)
-      )
+      const unreturnedTools = userBookings.filter((booking: any) => {
+        const s = String(booking.status || '').toUpperCase()
+        return ['CONFIRMED', 'ACCEPTED', 'ONGOING', 'IN_PROGRESS'].includes(s)
+      })
 
       const blockingIssues = {
         pendingBookings: pendingBookings.length,
@@ -152,10 +212,8 @@ class AccountDeletionService {
         { password }
       )
 
-      // Debug logs to see what we receive
-
-      // Handle the nested response structure
-      const isValid = response.data?.data.data?.valid
+      // Handle the standard API response structure: { data: { valid: boolean }, message }
+      const isValid = response.data?.data?.valid
 
       if (typeof isValid !== 'boolean') {
 

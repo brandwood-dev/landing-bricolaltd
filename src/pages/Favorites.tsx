@@ -18,6 +18,14 @@ const Favorites = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
+  // Calculer le prix affiché avec 6% de majoration
+  const calculateDisplayPrice = (basePrice: number | string): number => {
+    const basePriceNumber =
+      typeof basePrice === 'string' ? parseFloat(basePrice) : basePrice
+    const feeAmount = (basePriceNumber || 0) * 0.06
+    return (basePriceNumber || 0) + feeAmount
+  }
+
   const handleRemoveFavorite = async (toolId: string) => {
     try {
       await removeFromFavorites(toolId);
@@ -182,8 +190,8 @@ const Favorites = () => {
                   <div className="flex items-center justify-between">
                     <div className="text-lg font-bold text-primary">
                       <OptimizedPriceDisplay
-                          price={tool.basePrice}
-                          baseCurrency='GBP'
+                          price={calculateDisplayPrice(tool.basePrice)}
+                          baseCurrency={tool.baseCurrencyCode || 'GBP'}
                           size='md'
                           cible='basePrice'
                         />
