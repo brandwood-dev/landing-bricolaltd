@@ -64,23 +64,7 @@ const getNotificationColor = (type: string) => {
   }
 };
 
-const formatTimeAgo = (dateString: string) => {
- const date = new Date(dateString);
- const now = new Date();
- const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
- 
-  if (diffInMinutes < 1) return t('notifications.just_now');
-  if (diffInMinutes < 60) return t('notifications.minutes_ago').replace('{minutes}', diffInMinutes.toString());
- 
- const diffInHours = Math.floor(diffInMinutes / 60);
-  if (diffInHours < 24) return t('notifications.hours_ago').replace('{hours}', diffInHours.toString());
- 
- const diffInDays = Math.floor(diffInHours / 24);
-  if (diffInDays < 7) return t('notifications.days_ago').replace('{days}', diffInDays.toString());
- 
-  const locale = language === 'fr' ? 'fr-FR' : language === 'en' ? 'en-US' : 'ar-SA';
-  return date.toLocaleDateString(locale);
-};
+// Remove the standalone formatTimeAgo function - it will be defined inside the component
 
 export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   notifications,
@@ -94,6 +78,25 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
  const navigate = useNavigate();
   const { language, t } = useLanguage();
  const unreadCount = notifications.filter(n => !n.isRead).length;
+
+  // Format time ago function - now inside component to access language and t
+  const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    
+    if (diffInMinutes < 1) return t('notifications.just_now');
+    if (diffInMinutes < 60) return t('notifications.minutes_ago').replace('{minutes}', diffInMinutes.toString());
+    
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return t('notifications.hours_ago').replace('{hours}', diffInHours.toString());
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) return t('notifications.days_ago').replace('{days}', diffInDays.toString());
+    
+    const locale = language === 'fr' ? 'fr-FR' : language === 'en' ? 'en-US' : 'ar-SA';
+    return date.toLocaleDateString(locale);
+  };
   
   
 
