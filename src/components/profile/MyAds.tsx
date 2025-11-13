@@ -89,14 +89,14 @@ const MyAds = () => {
     }
 
     return {
-      id: tool.id,
-      title: tool.title,
-      category: tool.category?.name || 'Non catégorisé',
-      subcategory: tool.subcategory?.name || 'Non catégorisé',
-      categoryId: tool.category?.id || 'uncategorized',
-      price: tool.basePrice,
-      published:
-        tool.toolStatus === 'PUBLISHED' ? true : false,
+     id: tool.id,
+     title: tool.title,
+      category: tool.category?.name || t('category.unknown'),
+      subcategory: tool.subcategory?.name || t('category.unknown'),
+     categoryId: tool.category?.id || 'uncategorized',
+     price: tool.basePrice,
+     published:
+       tool.toolStatus === 'PUBLISHED' ? true : false,
       validationStatus: getValidationStatus(tool.moderationStatus),
       moderationStatus: tool.moderationStatus,
       rating: tool.rating, // Rating would need to come from reviews/bookings data

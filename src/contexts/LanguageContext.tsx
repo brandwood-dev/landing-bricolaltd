@@ -16,7 +16,8 @@ interface LanguageContextType {
 
 const translations = {
   fr: {
-    'reservation.deposit.desc' : 'La caution sera gelé 24h avant le début de la location et remboursée après celle-ci si aucun dommage n`est constaté.',
+    'reservation.deposit.desc':
+      'La caution sera gelé 24h avant le début de la location et remboursée après celle-ci si aucun dommage n`est constaté.',
     'login.signing': 'Connexion en cours...',
     'blog.category.general': 'Général',
     // AgeVerificationDialog
@@ -323,7 +324,8 @@ const translations = {
     'review.success': 'Évaluation enregistrée',
     'review.success_message': 'Merci pour votre avis !',
     'review.error': 'Erreur lors de l’évaluation',
-    'review.error_message': "Une erreur s’est produite lors de l’envoi de votre avis.",
+    'review.error_message':
+      'Une erreur s’est produite lors de l’envoi de votre avis.',
 
     // Review buttons
     'booking.rate_tool': "Évaluer l'outil",
@@ -345,18 +347,23 @@ const translations = {
     'resetpwd.verify_in_progress': 'Vérification en cours...',
 
     // deposit payment modal
-    'deposit.modal.title': 'Paiement de l\'acompte requis',
-    'deposit.modal.subtitle': 'Votre réservation nécessite un acompte de {amount} pour être confirmée.',
+    'deposit.modal.title': "Paiement de l'acompte requis",
+    'deposit.modal.subtitle':
+      'Votre réservation nécessite un acompte de {amount} pour être confirmée.',
     'deposit.modal.payment_info': 'Informations de paiement',
-    'deposit.modal.amount_label': 'Montant de l\'acompte',
+    'deposit.modal.amount_label': "Montant de l'acompte",
     'deposit.modal.processing': 'Traitement en cours...',
-    'deposit.modal.pay_button': 'Payer l\'acompte',
+    'deposit.modal.pay_button': "Payer l'acompte",
     'deposit.modal.cancel_button': 'Annuler la réservation',
-    'deposit.modal.success': 'Acompte payé avec succès ! Votre réservation est maintenant confirmée.',
-    'deposit.modal.error': 'Erreur lors du paiement de l\'acompte. Veuillez réessayer.',
-    'deposit.modal.cancel_confirm': 'Êtes-vous sûr de vouloir annuler cette réservation ?',
+    'deposit.modal.success':
+      'Acompte payé avec succès ! Votre réservation est maintenant confirmée.',
+    'deposit.modal.error':
+      "Erreur lors du paiement de l'acompte. Veuillez réessayer.",
+    'deposit.modal.cancel_confirm':
+      'Êtes-vous sûr de vouloir annuler cette réservation ?',
     'deposit.modal.cancel_success': 'Réservation annulée avec succès.',
-    'deposit.modal.cancel_error': 'Erreur lors de l\'annulation. Veuillez réessayer.',
+    'deposit.modal.cancel_error':
+      "Erreur lors de l'annulation. Veuillez réessayer.",
     'deposit.modal.test_mode': 'Mode test activé',
     'deposit.modal.card_error': 'Erreur de carte de paiement',
     'deposit.modal.payment_failed': 'Le paiement a échoué',
@@ -424,11 +431,14 @@ const translations = {
     'validation.condition_required': "L'état de l'outil est obligatoire",
     'validation.price_invalid': 'Le prix par jour doit être supérieur à 0',
     'validation.limit_reached': 'Vous ne pouvez ajouter que 10 photos maximum',
-    'validation.description_max_chars': 'Vous avez dépassé le nombre maximum de caractères autorisés (500).',
-    'validation.instructions_max_chars': 'Vous avez dépassé le nombre maximum de caractères autorisés (300).',
+    'validation.description_max_chars':
+      'Vous avez dépassé le nombre maximum de caractères autorisés (500).',
+    'validation.instructions_max_chars':
+      'Vous avez dépassé le nombre maximum de caractères autorisés (300).',
     'validation.price_max_amount': 'Le prix maximum par jour est de 500 GBP.',
     'validation.deposit_max_amount': 'La caution maximale est de 500 GBP.',
-    'validation.character_counter': 'Attention: {current}/{max} caractères utilisés.',
+    'validation.character_counter':
+      'Attention: {current}/{max} caractères utilisés.',
     'validation.char_count': '{current}/{max} caractères',
 
     // Currency names
@@ -442,24 +452,31 @@ const translations = {
     'currency.label': 'Devise',
 
     // Deposit Payment Modal (duplicated keys removed)
-    'deposit.modal.description': 'Veuillez payer la caution pour confirmer votre réservation. Ce montant sera remboursé après la période de location si aucun dommage ne survient.',
+    'deposit.modal.description':
+      'Veuillez payer la caution pour confirmer votre réservation. Ce montant sera remboursé après la période de location si aucun dommage ne survient.',
     'deposit.modal.amount.label': 'Montant de la caution',
     'deposit.modal.payment.title': 'Informations de paiement',
-    'deposit.modal.payment.description': 'Entrez les détails de votre carte pour payer la caution',
+    'deposit.modal.payment.description':
+      'Entrez les détails de votre carte pour payer la caution',
     'deposit.modal.buttons.cancel': 'Annuler la réservation',
     'deposit.modal.buttons.pay': 'Payer la caution',
     'deposit.modal.buttons.processing': 'Traitement en cours...',
     'deposit.modal.cancel.confirm.title': 'Annuler la réservation ?',
-    'deposit.modal.cancel.confirm.message': 'Êtes-vous sûr de vouloir annuler cette réservation ? Cette action ne peut pas être annulée.',
+    'deposit.modal.cancel.confirm.message':
+      'Êtes-vous sûr de vouloir annuler cette réservation ? Cette action ne peut pas être annulée.',
     'deposit.modal.cancel.confirm.yes': 'Oui, annuler',
     'deposit.modal.cancel.confirm.no': 'Conserver la réservation',
     'deposit.modal.success.title': 'Paiement réussi !',
-    'deposit.modal.success.message': 'Votre caution a été traitée avec succès. Votre réservation est maintenant confirmée.',
+    'deposit.modal.success.message':
+      'Votre caution a été traitée avec succès. Votre réservation est maintenant confirmée.',
     'deposit.modal.error.payment': 'Échec du paiement. Veuillez réessayer.',
-    'deposit.modal.error.cancel': 'Échec de l\'annulation de la réservation. Veuillez réessayer.',
-    'deposit.modal.error.generic': 'Une erreur s\'est produite. Veuillez réessayer.',
-    'deposit.notification.title': 'Paiement d\'acompte requis',
-    'deposit.notification.message': 'Votre réservation commence dans 24 heures. Veuillez payer la caution pour confirmer.',
+    'deposit.modal.error.cancel':
+      "Échec de l'annulation de la réservation. Veuillez réessayer.",
+    'deposit.modal.error.generic':
+      "Une erreur s'est produite. Veuillez réessayer.",
+    'deposit.notification.title': "Paiement d'acompte requis",
+    'deposit.notification.message':
+      'Votre réservation commence dans 24 heures. Veuillez payer la caution pour confirmer.',
     'validation.first_name_required': 'Le prénom est obligatoire',
     'validation.last_name_required': 'Le nom de famille est obligatoire',
     'validation.email_required': "L'adresse email est obligatoire",
@@ -645,13 +662,30 @@ const translations = {
 
     // favorites
     'favorites.title': 'Mes Favoris',
+    'blog.author.bricola_team': 'Équipe Bricola',
     'fav.backhome': 'Retour à l’accueil',
+    'category.unknown': 'Catégorie inconnue',
     'fav.nofav': 'Aucun favori pour le moment',
     'fav.text':
       'Explorez notre catalogue et ajoutez vos outils préférés à vos favoris',
     'fav.btnexplore': 'Explorer le catalogue',
 
     // profile ads
+    'validation.description_required': 'La description est requise',
+    'validation.price_positive': 'Le prix doit être supérieur à 0',
+    'validation.deposit_positive': 'Le dépôt doit être supérieur à 0',
+    'validation.address_required':
+      'Veuillez sélectionner une adresse sur la carte',
+    'validation.fill_all_fields':
+      'Veuillez remplir tous les champs obligatoires',
+
+    'validation.photos_required': 'Au moins une photo est requise',
+
+    'auth.user_not_connected': 'Utilisateur non connecté',
+
+    error: 'Erreur',
+
+    
     'ads.delete.success': 'Votre annonce a été bien supprimée.',
     'ads.delete.confirm.title': 'Confirmer la suppression',
     'ads.delete.confirm.description':
@@ -971,6 +1005,7 @@ const translations = {
     'blog_section.title': 'Derniers articles du blog',
     'blog_section.description':
       'Découvrez nos conseils, guides et actualités pour réussir tous vos projets de bricolage',
+    'blog_section.author_team': 'Équipe Bricola',
     'blog_section.min': 'min',
     'blog_section.read_article': "Lire l'article",
     'blog_section.view_all': 'Voir tous les articles',
@@ -979,6 +1014,7 @@ const translations = {
     'customer_reviews.title': 'Avis de nos clients',
     'customer_reviews.description':
       'Découvrez ce que nos utilisateurs pensent de notre plateforme',
+    'customer_reviews.no_reviews': 'Aucun avis disponible pour le moment.',
 
     // rental process
     'rental_process.title': 'Comment ça marche ?',
@@ -1162,6 +1198,9 @@ const translations = {
     'nav.signup': 'Inscription',
     'nav.profile': 'Profil',
     'nav.wallet': 'Portefeuille',
+    'nav.my_listings': 'Mes annonces',
+    'nav.requests': 'Demandes',
+    'nav.bookings': 'Réservations',
     'nav.settings': 'Paramètres',
     'nav.logout': 'Déconnexion',
 
@@ -1172,6 +1211,8 @@ const translations = {
     'hero.search.placeholder': 'Rechercher un outil...',
     'hero.search.location': 'Localisation',
     'hero.search.button': 'Rechercher',
+    'hero.search.gulf_countries':
+      'Recherche dans les pays du Golfe (Koweït, Bahreïn, Arabie Saoudite, EAU, Qatar, Oman)',
     'hero.available_tools': 'Outils disponibles',
     'hero.active_users': 'Utilisateurs actifs',
     'hero.cities_covered': 'Villes couvertes',
@@ -1314,6 +1355,7 @@ const translations = {
     // Footer
     'footer.about': 'À propos',
     'footer.help': 'Aide',
+    'footer.catalog': 'Catalogue',
     'footer.discover': 'Découvrir Bricola LTD',
     'footer.useful_links': 'Liens utiles',
     'footer.contact': 'Contact',
@@ -1360,6 +1402,8 @@ const translations = {
     'register.select_country': 'Sélectionnez un pays',
 
     // About
+    'signup.address.select_country_first':
+      "Veuillez d'abord sélectionner un pays pour entrer votre adresse",
     'about.title': 'Bienvenue chez Bricola LTD',
     'about.subtitle':
       'Votre plateforme de confiance pour la location d’outils entre particuliers dans toute la région du Golfe.',
@@ -1482,6 +1526,7 @@ const translations = {
     'add_tool.condition_excellent': '🌟 Excellent',
     'add_tool.condition_good': '👍 Bon',
     'add_tool.condition_fair': '👌 Correct',
+    'add_tool.condition_poor': '📉 Mauvais état',
     'add_tool.title_placeholder': 'Entrez le titre de votre outil...',
     'add_tool.brand_placeholder': "Marque de l'outil",
     'add_tool.model_placeholder': "Modèle de l'outil",
@@ -1896,7 +1941,8 @@ const translations = {
       'L’usage continu de la plateforme après modification vaut acceptation tacite de la nouvelle version.',
   },
   en: {
-    'reservation.deposit.desc' : 'The security deposit will be charged 24 hours before the rental starts and refunded after the rental if no damage is found.',
+    'reservation.deposit.desc':
+      'The security deposit will be charged 24 hours before the rental starts and refunded after the rental if no damage is found.',
     'login.signing': 'Signing in...',
     'blog.category.general': 'General',
     'general.loading': 'loading...',
@@ -2164,17 +2210,22 @@ const translations = {
 
     // deposit payment modal
     'deposit.modal.title': 'Deposit Payment Required',
-    'deposit.modal.subtitle': 'Your reservation requires a deposit of {amount} to be confirmed.',
+    'deposit.modal.subtitle':
+      'Your reservation requires a deposit of {amount} to be confirmed.',
     'deposit.modal.payment_info': 'Payment Information',
     'deposit.modal.amount_label': 'Deposit Amount',
     'deposit.modal.processing': 'Processing...',
     'deposit.modal.pay_button': 'Pay Deposit',
     'deposit.modal.cancel_button': 'Cancel Reservation',
-    'deposit.modal.success': 'Deposit paid successfully! Your reservation is now confirmed.',
-    'deposit.modal.error': 'Error processing deposit payment. Please try again.',
-    'deposit.modal.cancel_confirm': 'Are you sure you want to cancel this reservation?',
+    'deposit.modal.success':
+      'Deposit paid successfully! Your reservation is now confirmed.',
+    'deposit.modal.error':
+      'Error processing deposit payment. Please try again.',
+    'deposit.modal.cancel_confirm':
+      'Are you sure you want to cancel this reservation?',
     'deposit.modal.cancel_success': 'Reservation cancelled successfully.',
-    'deposit.modal.cancel_error': 'Error cancelling reservation. Please try again.',
+    'deposit.modal.cancel_error':
+      'Error cancelling reservation. Please try again.',
     'deposit.modal.test_mode': 'Test mode enabled',
     'deposit.modal.card_error': 'Payment card error',
     'deposit.modal.payment_failed': 'Payment failed',
@@ -2317,6 +2368,7 @@ const translations = {
 
     // blog categories
     'blog.subcategory.tools': 'Tools',
+    'blog.author.bricola_team': 'Brica Team',
     'blog.category.safety': 'Safety',
     'blog.category.gardening': 'Gardening',
     'blog.category.maintenance': 'Maintenance',
@@ -2334,12 +2386,30 @@ const translations = {
     // favorites
     'favorites.title': 'My Favorites',
     'fav.backhome': 'Back to Home',
+    'category.unknown': 'Unknown category',
     'fav.nofav': 'No favorites yet',
     'fav.text':
       'Browse our catalog and add your favorite tools to your favorites',
     'fav.btnexplore': 'Browse Catalog',
 
     // ads profile
+    'validation.description_required': 'Description is required',
+    'validation.price_positive': 'Price must be greater than 0',
+    'validation.deposit_positive': 'Deposit must be greater than 0',
+    'validation.address_required': 'Please select an address on the map',
+    'validation.fill_all_fields': 'Please fill in all required fields',
+
+    'validation.photos_required': 'At least one photo is required',
+
+    'auth.user_not_connected': 'User not connected',
+    error: 'Error',
+
+    // Notifications
+    'notifications.just_now': 'Just now',
+    'notifications.minutes_ago': '{minutes} minutes ago',
+    'notifications.hours_ago': '{hours}h ago',
+    'notifications.days_ago': '{days} days ago',
+
     'ads.delete.success': 'Listing Deleted',
     'ads.delete.confirm.title': 'Confirm Deletion',
     'ads.delete.confirm.description':
@@ -2659,6 +2729,7 @@ const translations = {
     'blog_section.title': 'Latest Blog Articles',
     'blog_section.description':
       'Explore our tips, guides, and updates to succeed in all your DIY projects',
+    'blog_section.author_team': 'Bricola Team',
     'blog_section.min': 'min',
     'blog_section.read_article': 'Read Article',
     'blog_section.view_all': 'View all articles',
@@ -2679,6 +2750,7 @@ const translations = {
     'customer_reviews.title': 'What our users say',
     'customer_reviews.description':
       'Find out what our users think about our platform.',
+    'customer_reviews.no_reviews': 'No reviews available at this time.',
 
     // rental process
     'rental_process.title': 'How does it work?',
@@ -2851,6 +2923,9 @@ const translations = {
     'nav.signup': 'Sign up',
     'nav.profile': 'Profile',
     'nav.wallet': 'Wallet',
+    'nav.my_listings': 'My listings',
+    'nav.requests': 'Requests',
+    'nav.bookings': 'Bookings',
     'nav.settings': 'Settings',
     'nav.logout': 'Logout',
 
@@ -2861,6 +2936,8 @@ const translations = {
     'hero.search.placeholder': 'Search for a tool...',
     'hero.search.location': 'Location',
     'hero.search.button': 'Search',
+    'hero.search.gulf_countries':
+      'Search in the Gulf countries (Kuwait, Bahrain, Saudi Arabia, UAE, Qatar, Oman)',
     'hero.available_tools': 'Tools Available',
     'hero.active_users': 'Active Users',
     'hero.cities_covered': 'Cities Covered',
@@ -2970,8 +3047,10 @@ const translations = {
     'validation.condition_required': 'Tool condition is required',
     'validation.price_invalid': 'Price per day must be greater than 0',
     'validation.limit_reached': 'You can add a maximum of 10 photos',
-    'validation.description_max_chars': 'You have exceeded the maximum number of allowed characters (500).',
-    'validation.instructions_max_chars': 'You have exceeded the maximum number of allowed characters (300).',
+    'validation.description_max_chars':
+      'You have exceeded the maximum number of allowed characters (500).',
+    'validation.instructions_max_chars':
+      'You have exceeded the maximum number of allowed characters (300).',
     'validation.price_max_amount': 'The maximum price per day is 500 GBP.',
     'validation.deposit_max_amount': 'The maximum deposit is 500 GBP.',
     'validation.character_counter': 'Warning: {current}/{max} characters used.',
@@ -2988,24 +3067,30 @@ const translations = {
     'currency.label': 'Currency',
 
     // Deposit Payment Modal (duplicated keys removed)
-    'deposit.modal.description': 'Please pay the security deposit to confirm your reservation. This amount will be refunded after the rental period if no damages occur.',
+    'deposit.modal.description':
+      'Please pay the security deposit to confirm your reservation. This amount will be refunded after the rental period if no damages occur.',
     'deposit.modal.amount.label': 'Deposit Amount',
     'deposit.modal.payment.title': 'Payment Information',
-    'deposit.modal.payment.description': 'Enter your card details to pay the deposit',
+    'deposit.modal.payment.description':
+      'Enter your card details to pay the deposit',
     'deposit.modal.buttons.cancel': 'Cancel Reservation',
     'deposit.modal.buttons.pay': 'Pay Deposit',
     'deposit.modal.buttons.processing': 'Processing...',
     'deposit.modal.cancel.confirm.title': 'Cancel Reservation?',
-    'deposit.modal.cancel.confirm.message': 'Are you sure you want to cancel this reservation? This action cannot be undone.',
+    'deposit.modal.cancel.confirm.message':
+      'Are you sure you want to cancel this reservation? This action cannot be undone.',
     'deposit.modal.cancel.confirm.yes': 'Yes, Cancel',
     'deposit.modal.cancel.confirm.no': 'Keep Reservation',
     'deposit.modal.success.title': 'Payment Successful!',
-    'deposit.modal.success.message': 'Your deposit has been processed successfully. Your reservation is now confirmed.',
+    'deposit.modal.success.message':
+      'Your deposit has been processed successfully. Your reservation is now confirmed.',
     'deposit.modal.error.payment': 'Payment failed. Please try again.',
-    'deposit.modal.error.cancel': 'Failed to cancel reservation. Please try again.',
+    'deposit.modal.error.cancel':
+      'Failed to cancel reservation. Please try again.',
     'deposit.modal.error.generic': 'An error occurred. Please try again.',
     'deposit.notification.title': 'Deposit Payment Required',
-    'deposit.notification.message': 'Your reservation starts in 24 hours. Please pay the deposit to confirm.',
+    'deposit.notification.message':
+      'Your reservation starts in 24 hours. Please pay the deposit to confirm.',
     'validation.first_name_required': 'First name is required',
     'validation.last_name_required': 'Last name is required',
     'validation.email_required': 'Email address is required',
@@ -3121,6 +3206,7 @@ const translations = {
     // Footer
     'footer.about': 'About',
     'footer.help': 'Help',
+    'footer.catalog': 'Catalog',
     'footer.discover': 'Discover Bricola',
     'footer.useful_links': 'Useful links',
     'footer.contact': 'Contact',
@@ -3168,6 +3254,8 @@ const translations = {
     'register.select_country': 'Select a country',
 
     // About
+    'signup.address.select_country_first':
+      'Please select a country first to enter your address',
     'about.title': 'Welcome to Bricola LTD ',
     'about.subtitle':
       'Your trusted platform for peer-to-peer tool rentals across the Gulf region',
@@ -3288,6 +3376,7 @@ const translations = {
     'add_tool.condition_excellent': '🌟 Excellent',
     'add_tool.condition_good': '👍 Good',
     'add_tool.condition_fair': '👌 Fair',
+    'add_tool.condition_poor': '📉 Poor condition',
     'add_tool.title_placeholder': 'Enter your tool title...',
     'add_tool.brand_placeholder': 'Tool brand',
     'add_tool.model_placeholder': 'Tool model',
@@ -3752,7 +3841,8 @@ const translations = {
     'notifications.booking_accepted': 'Booking Accepted',
   },
   ar: {
-    'reservation.deposit.desc' : ' سيتم تجميد مبلغ التأمين قبل 24 ساعة من بداية الإيجار، ويُعاد بعد انتهاء الإيجار في حال عدم وجود أي تلف بالأداة المستأجرة.',
+    'reservation.deposit.desc':
+      ' سيتم تجميد مبلغ التأمين قبل 24 ساعة من بداية الإيجار، ويُعاد بعد انتهاء الإيجار في حال عدم وجود أي تلف بالأداة المستأجرة.',
     'login.signing': 'تسجيل الدخول...',
     'blog.category.general': 'عام',
     'general.loading': 'جاري التحميل...',
@@ -4209,6 +4299,7 @@ const translations = {
     // blog categories
     'blog.subcategory.tools': 'الأدوات',
     'blog.category.safety': 'السلامة',
+    'blog.author.bricola_team': 'فريق بريكولا',
     'blog.category.gardening': 'البستنة',
     'blog.category.maintenance': 'الصيانة',
     'blog.category.transport': 'النقل',
@@ -4242,11 +4333,32 @@ const translations = {
     // favorites
     'favorites.title': 'قائمة المفضلات',
     'fav.backhome': 'العودة إلى الصفحة الرئيسية',
+    'category.unknown': 'فئة غير معروفة',
     'fav.nofav': 'لا توجد أدوات مفضلة حالياً',
     'fav.text': 'تصفح الكتالوج وأضف أدواتك المفضلة إلى قائمة المفضلة',
     'fav.btnexplore': 'تصفح الدليل',
 
     // ads profile
+    'validation.title_required': 'العنوان مطلوب',
+    'validation.description_required': 'الوصف مطلوب',
+    'validation.category_required': 'الفئة مطلوبة',
+    'validation.condition_required': 'حالة الأداة مطلوبة',
+    'validation.price_positive': 'يجب أن يكون السعر أكبر من 0',
+    'validation.deposit_positive': 'يجب أن يكون التأمين أكبر من 0',
+    'validation.address_required': 'يرجى تحديد عنوان على الخريطة',
+    'validation.fill_all_fields': 'يرجى ملء جميع الحقول المطلوبة',
+
+    'validation.photos_required': 'مطلوب صورة واحدة على الأقل',
+
+    'auth.user_not_connected': 'المستخدم غير متصل',
+    error: 'خطأ',
+
+    // Notifications
+    'notifications.just_now': 'الآن',
+    'notifications.minutes_ago': 'منذ {minutes} دقيقة',
+    'notifications.hours_ago': 'منذ {hours} ساعة',
+    'notifications.days_ago': 'منذ {days} يوم',
+
     'ads.delete.success': 'تم حذف الإعلان بنجاح',
     'ads.delete.confirm.title': 'تأكيد حذف الإعلان',
     'ads.delete.confirm.description':
@@ -4556,6 +4668,7 @@ const translations = {
     'blog_section.title': 'أحدث مقالات المدونة',
     'blog_section.description':
       'اكتشف نصائحنا وأدلتنا وآخر الأخبار لإنجاح جميع مشاريعك في الأشغال اليدوية',
+    'blog_section.author_team': 'فريق Bricola',
     'blog_section.min': 'دقيقة',
     'blog_section.read_article': 'قراءة المقال',
     'blog_section.view_all': 'عرض جميع المقالات',
@@ -4563,6 +4676,7 @@ const translations = {
     // customer reviews
     'customer_reviews.title': 'آراء عملائنا',
     'customer_reviews.description': 'اكتشف آراء مستخدمينا حول المنصة',
+    'customer_reviews.no_reviews': 'لا توجد آراء متاحة في الوقت الحالي.',
 
     // rental process
     'rental_process.title': 'كيف يعمل النظام؟',
@@ -4619,6 +4733,9 @@ const translations = {
     'nav.signup': 'إنشاء حساب',
     'nav.profile': 'الملف الشخصي',
     'nav.wallet': 'المحفظة',
+    'nav.my_listings': 'إعلاناتي',
+    'nav.requests': 'الطلبات',
+    'nav.bookings': 'الحجوزات',
     'nav.settings': 'الإعدادات',
     'nav.logout': 'تسجيل الخروج',
 
@@ -4629,6 +4746,8 @@ const translations = {
     'hero.search.placeholder': 'البحث عن أداة...',
     'hero.search.location': 'الموقع',
     'hero.search.button': 'بحث',
+    'hero.search.gulf_countries':
+      'البحث في دول الخليج (الكويت، البحرين، المملكة العربية السعودية، الإمارات، قطر، عُمان)',
     'hero.available_tools': 'أداة متاحة',
     'hero.active_users': 'مستخدم نشط',
     'hero.cities_covered': 'مدينة مشمولة',
@@ -4903,6 +5022,7 @@ const translations = {
     // Footer
     'footer.about': 'حول',
     'footer.help': 'مساعدة',
+    'footer.catalog': 'كتالوج',
     'footer.discover': 'اكتشف بريكولا',
     'footer.contact': 'اتصال',
     'footer.legal': 'قانوني',
@@ -4949,6 +5069,8 @@ const translations = {
     'register.select_country': 'اختر بلداً',
 
     // About
+    'signup.address.select_country_first':
+      'يرجى اختيار البلد أولاً لإدخال عنوانك',
     'about.title': 'مرحبًا بكم في Bricola LTD',
     'about.subtitle':
       ' منصتكم الموثوقة لتأجير الأدوات بين الأفراد في منطقة الخليج',
@@ -5064,6 +5186,7 @@ const translations = {
     'add_tool.condition_excellent': '🌟 ممتاز',
     'add_tool.condition_good': '👍 جيد',
     'add_tool.condition_fair': '👌 مقبول',
+    'add_tool.condition_poor': '📉 حالة سيئة',
     'add_tool.title_placeholder': 'أدخل عنوان أداتك...',
     'add_tool.brand_placeholder': 'علامة الأداة التجارية',
     'add_tool.model_placeholder': 'طراز الأداة',
@@ -5385,15 +5508,11 @@ const translations = {
     'contact.category.dispute': 'نزاع',
     'contact.category.suggestion': 'اقتراح',
     'contact.category.other': 'أخرى',
-    'validation.title_required': 'العنوان مطلوب',
-    'validation.description_required': 'الوصف مطلوب',
     'validation.price_required': 'السعر مطلوب',
-    'validation.category_required': 'الفئة مطلوبة',
     'validation.location_required': 'الموقع مطلوب',
     'validation.images_required': 'الصور مطلوبة',
     'validation.deposit_required': 'مبلغ التأمين مطلوب',
     'validation.phone_required': 'رقم الهاتف مطلوب',
-    'validation.address_required': 'العنوان مطلوب',
     'validation.country_required': 'البلد مطلوب',
     'validation.invalid_email': 'البريد الإلكتروني غير صحيح',
     'validation.invalid_phone': 'رقم الهاتف غير صحيح',
@@ -5402,9 +5521,12 @@ const translations = {
     'validation.passwords_dont_match': 'كلمات المرور غير متطابقة',
     'validation.invalid_price': 'السعر غير صحيح',
     'validation.invalid_deposit': 'مبلغ التأمين غير صحيح',
-    'validation.description_max_chars': 'لقد تجاوزت العدد الأقصى المسموح به من الأحرف (500).',
-    'validation.instructions_max_chars': 'لقد تجاوزت العدد الأقصى المسموح به من الأحرف (300).',
-    'validation.price_max_amount': 'الحد الأقصى للسعر اليومي هو 500 جنيه إسترليني.',
+    'validation.description_max_chars':
+      'لقد تجاوزت العدد الأقصى المسموح به من الأحرف (500).',
+    'validation.instructions_max_chars':
+      'لقد تجاوزت العدد الأقصى المسموح به من الأحرف (300).',
+    'validation.price_max_amount':
+      'الحد الأقصى للسعر اليومي هو 500 جنيه إسترليني.',
     'validation.deposit_max_amount': 'الحد الأقصى للتأمين هو 500 جنيه إسترليني',
     'validation.character_counter': 'تحذير: {current}/{max} حرف مستخدم.',
     'validation.char_count': '{current}/{max} حرف',
@@ -5420,7 +5542,8 @@ const translations = {
     'currency.label': 'العملة',
 
     // Deposit Payment Modal (duplicated keys removed)
-    'deposit.modal.description': 'يرجى دفع التأمين لتأكيد حجزك. سيتم استرداد هذا المبلغ بعد فترة الإيجار إذا لم تحدث أضرار.',
+    'deposit.modal.description':
+      'يرجى دفع التأمين لتأكيد حجزك. سيتم استرداد هذا المبلغ بعد فترة الإيجار إذا لم تحدث أضرار.',
     'deposit.modal.amount.label': 'مبلغ التأمين',
     'deposit.modal.payment.title': 'معلومات الدفع',
     'deposit.modal.payment.description': 'أدخل تفاصيل بطاقتك لدفع التأمين',
@@ -5428,16 +5551,19 @@ const translations = {
     'deposit.modal.buttons.pay': 'دفع التأمين',
     'deposit.modal.buttons.processing': 'جاري المعالجة...',
     'deposit.modal.cancel.confirm.title': 'إلغاء الحجز؟',
-    'deposit.modal.cancel.confirm.message': 'هل أنت متأكد من رغبتك في إلغاء هذا الحجز؟ لا يمكن التراجع عن هذا الإجراء.',
+    'deposit.modal.cancel.confirm.message':
+      'هل أنت متأكد من رغبتك في إلغاء هذا الحجز؟ لا يمكن التراجع عن هذا الإجراء.',
     'deposit.modal.cancel.confirm.yes': 'نعم، إلغاء',
     'deposit.modal.cancel.confirm.no': 'الاحتفاظ بالحجز',
     'deposit.modal.success.title': 'تم الدفع بنجاح!',
-    'deposit.modal.success.message': 'تم معالجة التأمين بنجاح. تم تأكيد حجزك الآن.',
+    'deposit.modal.success.message':
+      'تم معالجة التأمين بنجاح. تم تأكيد حجزك الآن.',
     'deposit.modal.error.payment': 'فشل في الدفع. يرجى المحاولة مرة أخرى.',
     'deposit.modal.error.cancel': 'فشل في إلغاء الحجز. يرجى المحاولة مرة أخرى.',
     'deposit.modal.error.generic': 'حدث خطأ. يرجى المحاولة مرة أخرى.',
     'deposit.notification.title': 'مطلوب دفع العربون',
-    'deposit.notification.message': 'يبدأ حجزك خلال 24 ساعة. يرجى دفع التأمين للتأكيد.',
+    'deposit.notification.message':
+      'يبدأ حجزك خلال 24 ساعة. يرجى دفع التأمين للتأكيد.',
   },
 }
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell, X, Check, Clock, AlertCircle, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export interface Notification {
   id: string;
@@ -64,20 +65,21 @@ const getNotificationColor = (type: string) => {
 };
 
 const formatTimeAgo = (dateString: string) => {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-  
-  if (diffInMinutes < 1) return 'À l\'instant';
-  if (diffInMinutes < 60) return `Il y a ${diffInMinutes} min`;
-  
-  const diffInHours = Math.floor(diffInMinutes / 60);
-  if (diffInHours < 24) return `Il y a ${diffInHours}h`;
-  
-  const diffInDays = Math.floor(diffInHours / 24);
-  if (diffInDays < 7) return `Il y a ${diffInDays}j`;
-  
-  return date.toLocaleDateString('fr-FR');
+ const date = new Date(dateString);
+ const now = new Date();
+ const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+ 
+  if (diffInMinutes < 1) return t('notifications.just_now');
+  if (diffInMinutes < 60) return t('notifications.minutes_ago').replace('{minutes}', diffInMinutes.toString());
+ 
+ const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) return t('notifications.hours_ago').replace('{hours}', diffInHours.toString());
+ 
+ const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays < 7) return t('notifications.days_ago').replace('{days}', diffInDays.toString());
+ 
+  const locale = language === 'fr' ? 'fr-FR' : language === 'en' ? 'en-US' : 'ar-SA';
+  return date.toLocaleDateString(locale);
 };
 
 export const NotificationCenter: React.FC<NotificationCenterProps> = ({
@@ -89,8 +91,9 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
   
   const [isOpen, setIsOpen] = useState(false);
-  const navigate = useNavigate();
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+ const navigate = useNavigate();
+  const { language, t } = useLanguage();
+ const unreadCount = notifications.filter(n => !n.isRead).length;
   
   
 

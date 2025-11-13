@@ -274,25 +274,25 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
     const newErrors: Record<string, string> = {}
 
     if (!formData.title.trim()) {
-      newErrors.title = 'Le titre est requis'
-    }
-    if (!formData.description.trim())
-      newErrors.description = 'La description est requise'
-    if (!formData.category) newErrors.category = 'La catégorie est requise'
-    if (!formData.condition)
-      newErrors.condition = "L'état de l'outil est requis"
-    if (!formData.price || formData.price <= 0)
-      newErrors.price = 'Le prix doit être supérieur à 0'
-    if (!formData.deposit || formData.deposit <= 0)
-      newErrors.deposit = 'Le dépôt doit être supérieur à 0'
-    if (!isAddressSelected)
-      newErrors.location = 'Veuillez sélectionner une adresse sur la carte'
+      newErrors.title = t('validation.title_required')
+   }
+   if (!formData.description.trim())
+      newErrors.description = t('validation.description_required')
+    if (!formData.category) newErrors.category = t('validation.category_required')
+   if (!formData.condition)
+      newErrors.condition = t('validation.condition_required')
+   if (!formData.price || formData.price <= 0)
+      newErrors.price = t('validation.price_positive')
+   if (!formData.deposit || formData.deposit <= 0)
+      newErrors.deposit = t('validation.deposit_positive')
+   if (!isAddressSelected)
+      newErrors.location = t('validation.address_required')
 
     // Validation des photos - au moins une photo doit exister
-    const totalPhotos = existingPhotos.length + newPhotos.length
-    if (totalPhotos === 0) {
-      newErrors.photos = 'Au moins une photo est requise'
-    }
+   const totalPhotos = existingPhotos.length + newPhotos.length
+   if (totalPhotos === 0) {
+      newErrors.photos = t('validation.photos_required')
+   }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -786,12 +786,12 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                     <SelectValue placeholder={t('ads.tool_condition')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value='1'>Neuf</SelectItem>
-                    <SelectItem value='2'>Comme neuf</SelectItem>
-                    <SelectItem value='3'>Bon état</SelectItem>
-                    <SelectItem value='4'>État correct</SelectItem>
-                    <SelectItem value='5'>Mauvais état</SelectItem>
-                  </SelectContent>
+                    <SelectItem value='1'>{t('add_tool.condition_new')}</SelectItem>
+                    <SelectItem value='2'>{t('add_tool.condition_excellent')}</SelectItem>
+                    <SelectItem value='3'>{t('add_tool.condition_good')}</SelectItem>
+                    <SelectItem value='4'>{t('add_tool.condition_fair')}</SelectItem>
+                    <SelectItem value='5'>{t('add_tool.condition_poor')}</SelectItem>
+                 </SelectContent>
                 </Select>
                 {errors.condition && (
                   <p className='text-sm text-red-500'>{errors.condition}</p>

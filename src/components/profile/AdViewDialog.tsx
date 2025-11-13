@@ -33,9 +33,9 @@ interface AdViewDialogProps {
 
 const AdViewDialog = ({ ad, onClose }: AdViewDialogProps) => {
   const [toolData, setToolData] = useState<Tool | null>(null)
-  const [reviews, setReviews] = useState<Review[]>([])
-  const [loading, setLoading] = useState(true)
-  const { t } = useLanguage()
+ const [reviews, setReviews] = useState<Review[]>([])
+ const [loading, setLoading] = useState(true)
+  const { t, language } = useLanguage()
 
   // Helper functions to handle both Tool and Ad types
   const isToolType = (obj: Tool | Ad): obj is Tool => {
@@ -90,13 +90,13 @@ const AdViewDialog = ({ ad, onClose }: AdViewDialogProps) => {
   }
 
   const getCategoryName = (obj: Tool | Ad): string => {
-    if (isToolType(obj)) {
-      return obj.category?.name || obj.category?.displayName || 'Catégorie inconnue'
-    }
-    return typeof obj.category === 'object' && obj.category?.name
-      ? obj.category.name
-      : obj.category
-  }
+   if (isToolType(obj)) {
+      return obj.category?.name || obj.category?.displayName || t('category.unknown')
+   }
+   return typeof obj.category === 'object' && obj.category?.name
+     ? obj.category.name
+     : obj.category
+ }
 
   useEffect(() => {
     const fetchToolData = async () => {
@@ -283,14 +283,16 @@ const AdViewDialog = ({ ad, onClose }: AdViewDialogProps) => {
                   </div>
                   {review.comment && (
                     <p className='text-sm text-muted-foreground'>
-                      {review.comment}
-                    </p>
+                   {review.comment}
+                 </p>
+               )}
+               <p className='text-xs text-muted-foreground'>
+                  {new Date(review.createdAt).toLocaleDateString(
+                    language === 'fr' ? 'fr-FR' : language === 'en' ? 'en-US' : 'ar-SA'
                   )}
-                  <p className='text-xs text-muted-foreground'>
-                    {new Date(review.createdAt).toLocaleDateString('fr-FR')}
-                  </p>
-                </div>
-              ))}
+               </p>
+             </div>
+           ))}
             </div>
           </div>
         )}

@@ -92,17 +92,17 @@ const ClaimDialog: React.FC<ClaimDialogProps> = ({
   const handleSubmit = async () => {
     if (!claimType || !claimDescription) {
       toast({
-        title: 'Erreur',
-        description: 'Veuillez remplir tous les champs obligatoires.',
-        variant: 'destructive',
-      })
-      return
-    }
+        title: t('error'),
+        description: t('validation.fill_all_fields'),
+       variant: 'destructive',
+     })
+     return
+   }
 
-    if (!user) {
-      toast({
-        title: 'Erreur',
-        description: 'Utilisateur non connecté.',
+   if (!user) {
+     toast({
+        title: t('error'),
+        description: t('auth.user_not_connected'),
         variant: 'destructive',
       })
       return

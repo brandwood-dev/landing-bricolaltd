@@ -117,10 +117,10 @@ const Footer = () => {
               <li>
                 <Link
                   to='/search'
-                  className='hover:text-white transition-colors'
-                >
-                  {t('nav.catalog')}
-                </Link>
+                 className='hover:text-white transition-colors'
+               >
+                  {t('footer.catalog')}
+               </Link>
               </li>
               <li>
                 <Link

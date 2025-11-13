@@ -153,7 +153,7 @@ const Header = () => {
                     <DropdownMenuItem asChild>
                       <Link to="/profile?tab=wallet" className="flex items-center">
                         <Wallet className="mr-2 h-4 w-4" />
-                        Portefeuille
+                        {t('nav.wallet')}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
@@ -225,25 +225,25 @@ const Header = () => {
                   <DropdownMenuItem asChild>
                     <Link to="/profile?tab=wallet" className="flex items-center">
                       <Wallet className="mr-2 h-4 w-4" />
-                      Portefeuille
+                      {t('nav.wallet')}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/profile?tab=ads" className="flex items-center">
                       <Edit className="mr-2 h-4 w-4" />
-                      Mes annonces
+                      {t('nav.my_listings')}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/profile?tab=requests" className="flex items-center">
                       <MessageSquare className="mr-2 h-4 w-4" />
-                      Demandes
+                      {t('nav.requests')}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/profile?tab=reservations" className="flex items-center">
                       <Calendar className="mr-2 h-4 w-4" />
-                      Réservations
+                      {t('nav.bookings')}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />

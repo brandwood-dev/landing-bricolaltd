@@ -70,7 +70,7 @@ const CustomerReviews = () => {
           </div>
         ) : reviews.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-600">Aucun avis disponible pour le moment.</p>
+            <p className="text-gray-600">{t('customer_reviews.no_reviews')}</p>
           </div>
         ) : (
           <Carousel

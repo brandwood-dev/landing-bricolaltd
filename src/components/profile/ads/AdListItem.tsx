@@ -60,9 +60,9 @@ const AdListItem = ({ ad, onPublishToggle, onDeleteAd, onRefresh, getValidationS
         className="w-12 h-12 rounded object-cover"
       />
       <div className="flex-1">
-        <h3 className="font-semibold text-sm">{ad.title}</h3>
-        <p className="text-xs text-muted-foreground">{ad.category}</p>
-      </div>
+       <h3 className="font-semibold text-sm">{ad.title}</h3>
+        <p className="text-xs text-muted-foreground">{t(`category.${ad.categoryId || 'unknown'}`)}</p>
+     </div>
       <Badge className={getValidationStatusColor(ad.validationStatus)} variant="outline">
         {getValidationStatusText(ad.validationStatus)}
       </Badge>

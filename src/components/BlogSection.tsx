@@ -18,7 +18,7 @@ import { useLanguage } from '@/contexts/LanguageContext'
 const BlogSection = () => {
   const [latestPosts, setLatestPosts] = useState<News[]>([])
   const [loading, setLoading] = useState(true)
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
 
   // Load latest blog posts
   useEffect(() => {
@@ -39,7 +39,8 @@ const BlogSection = () => {
 
   // Format date
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fr-FR', {
+    const locale = language === 'fr' ? 'fr-FR' : language === 'en' ? 'en-US' : 'ar-SA'
+    return new Date(dateString).toLocaleDateString(locale, {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -49,9 +50,17 @@ const BlogSection = () => {
   // Get author name
   const getAuthorName = (article: News) => {
     if (article.admin) {
-      return `${article.admin.firstName} ${article.admin.lastName}`
-    }
-    return 'Équipe Bricola'
+     return `${article.admin.firstName} ${article.admin.lastName}`
+   }
+    return t('blog.author.bricola_team')
+ }
+
+  // Get translated category name
+  const getCategoryName = (category: string) => {
+    const translationKey = `blog.${category}`
+    const translated = t(translationKey)
+    // If translation returns the key itself, it means no translation found, return original
+    return translated === translationKey ? category : translated
   }
 
   if (loading) {
@@ -120,7 +129,7 @@ const BlogSection = () => {
                     }}
                   />
                   <CardContent className='p-6'>
-                    <Badge className='mb-3'>{post.category}</Badge>
+                    <Badge className='mb-3'>{getCategoryName(post.category)}</Badge>
                     <h3 className='text-xl font-semibold mb-3'>
                       <Link
                         to={`/blog/${post.id}`}

@@ -513,13 +513,13 @@ const Reservations = () => {
   // doit etre dynamic -> save in bookings -> save in disputes (add attribut photo)
   const handleSubmitClaim = async () => {
     if (!reportReason || !reportMessage) {
-      toast({
-        title: 'Erreur',
-        description: 'Veuillez remplir tous les champs obligatoires.',
-        variant: 'destructive',
-      })
-      return
-    }
+     toast({
+        title: t('error'),
+        description: t('validation.fill_all_fields'),
+       variant: 'destructive',
+     })
+     return
+   }
 
     if (!selectedReservationId) {
       toast({

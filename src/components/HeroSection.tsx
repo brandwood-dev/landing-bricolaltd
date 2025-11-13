@@ -119,7 +119,7 @@ const HeroSection = () => {
           <div className="mt-3 text-sm text-gray-600 text-center">
             {isAuthenticated 
               ? `Recherche dans votre pays (${user?.country?.name || 'votre région'})`
-              : 'Recherche dans les pays du Golfe (Koweït, Bahreïn, Arabie Saoudite, EAU, Qatar, Oman)'
+              : t('hero.search.gulf_countries')
             }
           </div>
         </div>
