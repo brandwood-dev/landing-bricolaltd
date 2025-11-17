@@ -181,11 +181,11 @@ const FeaturedToolsSection = () => {
                         />
                         <div className='absolute top-3 left-3 flex gap-1'>
                           <Badge className='bg-blue-100 text-blue-800 hover:bg-blue-100'>
-                          {t(`category.${tool.category.id}`)}
-                       </Badge>
-                       <Badge variant='outline' className='bg-white/90'>
-                          {t(`category.${tool.subcategory.id}`)}
-                       </Badge>
+                            {t(`category.${tool.category.name}`)}
+                          </Badge>
+                          <Badge variant='outline' className='bg-white/90'>
+                            {t(`subcategories.${tool.subcategory.name}`)}
+                          </Badge>
                         </div>
                         {isAuthenticated && (
                           <button

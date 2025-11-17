@@ -38,9 +38,15 @@ class WalletService {
   // Create withdrawal request
   async createWithdrawal(userId: string, withdrawalData: WithdrawalRequest): Promise<Transaction> {
     try {
+      const accountDetails = {
+        method: withdrawalData.paymentMethod === 'bank_transfer' ? 'wise' : 'stripe_connect',
+        bankDetails: withdrawalData.bankDetails,
+        stripeAccountId: withdrawalData.stripeAccountId,
+        currency: withdrawalData.currency || 'GBP'
+      };
       const response = await api.post<ApiResponse<Transaction>>(`/wallets/user/${userId}/withdraw`, {
         amount: withdrawalData.amount,
-        accountDetails: withdrawalData
+        accountDetails
       });
       return response.data.data;
     } catch (error) {

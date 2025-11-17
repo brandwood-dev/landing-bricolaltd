@@ -2,13 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
+import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import {
   Wallet as WalletIcon,
   TrendingUp,
@@ -38,6 +32,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { walletService, Transaction, UserStats } from '@/services/walletService'
 import { useToast } from '@/hooks/use-toast'
 import { OptimizedPriceDisplay } from '@/components/OptimizedPriceDisplay'
+import WithdrawalDialog from './WithdrawalDialog'
 
 const Wallet = () => {
   const { t, language } = useLanguage()
@@ -267,43 +262,36 @@ const Wallet = () => {
               </div>
             </div>
 
-            {/* Withdrawal Button */}
+            {/* Withdrawal Button + Dialog */}
             <div className='flex justify-center'>
-              <Dialog
-                open={showWithdrawDialog}
-                onOpenChange={setShowWithdrawDialog}
+              <Button
+                size='lg'
+                className={`px-8 py-3 text-lg font-semibold ${
+                  canWithdraw
+                    ? 'bg-primary hover:bg-primary/90'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+                disabled={!canWithdraw}
+                onClick={() => setShowWithdrawDialog(true)}
               >
-                <DialogTrigger asChild>
-                  <Button
-                    size='lg'
-                    className={`px-8 py-3 text-lg font-semibold ${
-                      canWithdraw
-                        ? 'bg-primary hover:bg-primary/90'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    }`}
-                    disabled={!canWithdraw}
-                  >
-                    <Banknote className='h-5 w-5 mr-2' />
-                    {t('wallet.withdraw_money')}
-                  </Button>
-                </DialogTrigger>
-                <DialogContent
-                  className={language === 'ar' ? '[direction:ltr]' : ''}
-                >
-                  <DialogHeader>
-                    <DialogTitle>{t('wallet.withdraw_money')}</DialogTitle>
-                  </DialogHeader>
-                  <div className='space-y-4'>
-                    <p>{t('message.loading')}</p>{' '}
-                    {/* Adjust if a specific translation is needed */}
-                    <p className='text-sm text-muted-foreground'>
-                      {t('message.loading')}{' '}
-                      {/* Placeholder; replace with actual translation if available */}
-                    </p>
-                  </div>
-                </DialogContent>
-              </Dialog>
+                <Banknote className='h-5 w-5 mr-2' />
+                {t('wallet.withdraw_money')}
+              </Button>
             </div>
+            <WithdrawalDialog
+              open={showWithdrawDialog}
+              onOpenChange={setShowWithdrawDialog}
+              userBalance={{
+                balance: stats?.availableBalance || balance,
+                cumulativeBalance: stats?.cumulativeBalance || 0,
+                availableBalance: stats?.availableBalance || 0,
+                pendingBalance: stats?.pendingBalance || 0,
+              }}
+              userId={user?.id}
+              onWithdrawalCreated={() => {
+                setShowWithdrawDialog(false)
+              }}
+            />
 
             {/* Information Note */}
             <div className='bg-amber-50 border border-amber-200 rounded-lg p-4'>

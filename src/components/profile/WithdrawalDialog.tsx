@@ -34,12 +34,13 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
   const [step, setStep] = useState<'amount' | 'method' | 'details' | 'confirmation'>('amount');
   const [withdrawalData, setWithdrawalData] = useState<WithdrawalRequest>({
     amount: 0,
-    paymentMethod: 'bank_transfer'
+    paymentMethod: 'bank_transfer',
+    currency: 'GBP'
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const minAmount = walletService.getMinimumWithdrawalAmount();
-  const maxAmount = userBalance.availableForWithdrawal;
+  const maxAmount = (userBalance as any).availableBalance ?? userBalance.balance ?? 0;
 
   const validateAmount = (amount: number) => {
     const validation = walletService.validateWithdrawalAmount(amount, maxAmount);
@@ -59,12 +60,11 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
     }
   };
 
-  const handleMethodChange = (method: 'bank_transfer' | 'paypal' | 'stripe') => {
+  const handleMethodChange = (method: 'bank_transfer' | 'stripe_connect' | 'card_payout') => {
     setWithdrawalData(prev => ({ 
       ...prev, 
       paymentMethod: method,
       bankDetails: undefined,
-      paypalEmail: undefined,
       stripeAccountId: undefined
     }));
   };
@@ -140,7 +140,7 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
       onOpenChange(false);
       // Reset form
       setStep('amount');
-      setWithdrawalData({ amount: 0, paymentMethod: 'bank_transfer' });
+      setWithdrawalData({ amount: 0, paymentMethod: 'bank_transfer', currency: 'GBP' });
       setErrors({});
     } catch (error) {
       toast({
@@ -224,18 +224,18 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
 
         <Card 
           className={`cursor-pointer transition-all ${
-            withdrawalData.paymentMethod === 'paypal' 
+            withdrawalData.paymentMethod === 'stripe_connect' 
               ? 'ring-2 ring-primary border-primary' 
               : 'hover:border-gray-300'
           }`}
-          onClick={() => handleMethodChange('paypal')}
+          onClick={() => handleMethodChange('stripe_connect')}
         >
           <CardContent className="p-4">
             <div className="flex items-center space-x-3">
               <CreditCard className="h-5 w-5 text-blue-600" />
               <div>
-                <div className="font-medium">PayPal</div>
-                <div className="text-sm text-gray-500">Délai: Instantané</div>
+                <div className="font-medium">Stripe Connect</div>
+                <div className="text-sm text-gray-500">Délai: 2-7 jours</div>
               </div>
             </div>
           </CardContent>
@@ -300,19 +300,18 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
         </div>
       )}
 
-      {withdrawalData.paymentMethod === 'paypal' && (
+      {withdrawalData.paymentMethod === 'stripe_connect' && (
         <div>
-          <Label htmlFor="paypalEmail">Email PayPal</Label>
+          <Label htmlFor="stripeAccountId">Stripe Connect Account ID</Label>
           <Input
-            id="paypalEmail"
-            type="email"
-            value={withdrawalData.paypalEmail || ''}
-            onChange={(e) => setWithdrawalData(prev => ({ ...prev, paypalEmail: e.target.value }))}
-            placeholder="votre@email.com"
-            className={errors.paypalEmail ? 'border-red-500' : ''}
+            id="stripeAccountId"
+            value={withdrawalData.stripeAccountId || ''}
+            onChange={(e) => setWithdrawalData(prev => ({ ...prev, stripeAccountId: e.target.value }))}
+            placeholder="acct_..."
+            className={errors.stripeAccountId ? 'border-red-500' : ''}
           />
-          {errors.paypalEmail && (
-            <p className="text-sm text-red-500 mt-1">{errors.paypalEmail}</p>
+          {errors.stripeAccountId && (
+            <p className="text-sm text-red-500 mt-1">{errors.stripeAccountId}</p>
           )}
         </div>
       )}
@@ -341,7 +340,7 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
           <div className="flex justify-between">
             <span className="text-gray-600">Méthode:</span>
             <span className="font-semibold">
-              {withdrawalData.paymentMethod === 'bank_transfer' ? 'Virement bancaire' : 'PayPal'}
+              {withdrawalData.paymentMethod === 'bank_transfer' ? 'Virement bancaire' : 'Stripe Connect'}
             </span>
           </div>
           {withdrawalData.paymentMethod === 'bank_transfer' && (
@@ -356,10 +355,10 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
               </div>
             </>
           )}
-          {withdrawalData.paymentMethod === 'paypal' && (
+          {withdrawalData.paymentMethod === 'stripe_connect' && (
             <div className="flex justify-between">
-              <span className="text-gray-600">Email PayPal:</span>
-              <span className="font-semibold">{withdrawalData.paypalEmail}</span>
+              <span className="text-gray-600">Stripe Account:</span>
+              <span className="font-semibold">{withdrawalData.stripeAccountId}</span>
             </div>
           )}
         </CardContent>

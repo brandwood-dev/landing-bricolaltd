@@ -36,7 +36,8 @@ export interface Transaction {
 
 export interface WithdrawalRequest {
   amount: number;
-  accountDetails?: {
+  paymentMethod?: 'bank_transfer' | 'stripe_connect' | 'card_payout';
+  bankDetails?: {
     accountNumber?: string;
     routingNumber?: string;
     bankName?: string;
@@ -44,6 +45,8 @@ export interface WithdrawalRequest {
     iban?: string;
     bic?: string;
   };
+  stripeAccountId?: string;
+  currency?: string;
 }
 
 export interface UserBalance {
