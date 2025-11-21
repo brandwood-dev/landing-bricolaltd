@@ -1,0 +1,118 @@
+export const threeDSTranslations = {
+  en: {
+    // 3DS Authentication
+    '3ds_secure': '3D Secure',
+    '3ds_authentication': '3D Secure Authentication',
+    '3ds_authentication_description': 'Additional security verification for your payment',
+    '3ds_authentication_may_be_required': '3D Secure authentication may be required for this payment',
+    '3ds_authentication_enabled': '3D Secure authentication is enabled for enhanced security',
+    'secure_authentication': 'Secure Authentication',
+    '3ds_secure_info_1': 'Your bank may require additional verification for this payment.',
+    '3ds_secure_info_2': 'This helps protect against unauthorized card usage.',
+    '3ds_secure_info_3': 'You will be redirected to your bank\'s secure authentication page.',
+    '3ds_challenge_loading': 'Loading secure authentication page...',
+    '3ds_challenge_instructions': 'Please complete the authentication process with your bank.',
+    '3ds_challenge_alert': 'Do not close this window until authentication is complete.',
+    '3ds_challenge_cancelled': '3D Secure authentication was cancelled',
+    '3ds_authentication_failed': '3D Secure authentication failed',
+    '3ds_error': 'Authentication Error',
+    '3ds_error_description': 'An error occurred during 3D Secure authentication',
+    '3ds_completed': 'Authentication Completed',
+    '3ds_completed_description': 'Your payment has been successfully authenticated',
+    'processing_3ds': 'Processing 3D Secure Authentication',
+    'processing_3ds_description': 'Please wait while we verify your payment',
+    '3ds_session_id': 'Session ID',
+    
+    // Billing Details
+    'billing_details': 'Billing Details',
+    'cardholder_name': 'Cardholder Name',
+    'enter_cardholder_name': 'Enter cardholder name',
+    'email': 'Email',
+    'enter_email': 'Enter email address',
+    'billing_address': 'Billing Address',
+    'address_line_1': 'Address Line 1',
+    'city': 'City',
+    'postal_code': 'Postal Code',
+    'country': 'Country',
+    'billing_details_required': 'Please provide billing details',
+    
+    // Actions
+    'cancel_payment': 'Cancel Payment',
+    'restart_challenge': 'Restart Challenge',
+    'retry': 'Retry',
+    'continue': 'Continue',
+    'hide': 'Hide',
+    'show': 'Show',
+    
+    // Payment Security
+    'payment_secured_by_stripe': 'Payment secured by Stripe with bank-level encryption',
+    'digital_wallet_security': 'Your payment information is encrypted and never stored on our servers',
+    
+    // Errors
+    'challenge_timeout': 'Authentication timed out. Please try again.',
+    'digital_wallet_3ds_not_supported': '3D Secure is not supported for digital wallet payments',
+    'card_element_not_found': 'Card element not found',
+    'payment_failed': 'Payment failed',
+    'payment_not_completed': 'Payment not completed',
+    'authentication_required': 'Authentication required',
+    'stripe_not_loaded': 'Stripe not loaded',
+  },
+  fr: {
+    // 3DS Authentication
+    '3ds_secure': '3D Secure',
+    '3ds_authentication': 'Authentification 3D Secure',
+    '3ds_authentication_description': 'Vérification de sécurité supplémentaire pour votre paiement',
+    '3ds_authentication_may_be_required': 'L\'authentification 3D Secure peut être requise pour ce paiement',
+    '3ds_authentication_enabled': 'L\'authentification 3D Secure est activée pour une sécurité renforcée',
+    'secure_authentication': 'Authentification Sécurisée',
+    '3ds_secure_info_1': 'Votre banque peut exiger une vérification supplémentaire pour ce paiement.',
+    '3ds_secure_info_2': 'Cela aide à protéger contre l\'utilisation non autorisée de la carte.',
+    '3ds_secure_info_3': 'Vous serez redirigé vers la page d\'authentification sécurisée de votre banque.',
+    '3ds_challenge_loading': 'Chargement de la page d\'authentification sécurisée...',
+    '3ds_challenge_instructions': 'Veuillez compléter le processus d\'authentification avec votre banque.',
+    '3ds_challenge_alert': 'Ne fermez pas cette fenêtre jusqu\'à ce que l\'authentification soit terminée.',
+    '3ds_challenge_cancelled': 'L\'authentification 3D Secure a été annulée',
+    '3ds_authentication_failed': 'L\'authentification 3D Secure a échoué',
+    '3ds_error': 'Erreur d\'Authentification',
+    '3ds_error_description': 'Une erreur s\'est produite pendant l\'authentification 3D Secure',
+    '3ds_completed': 'Authentification Terminée',
+    '3ds_completed_description': 'Votre paiement a été authentifié avec succès',
+    'processing_3ds': 'Traitement de l\'Authentification 3D Secure',
+    'processing_3ds_description': 'Veuillez patienter pendant que nous vérifions votre paiement',
+    '3ds_session_id': 'ID de Session',
+    
+    // Billing Details
+    'billing_details': 'Détails de Facturation',
+    'cardholder_name': 'Nom du Titulaire de la Carte',
+    'enter_cardholder_name': 'Entrez le nom du titulaire de la carte',
+    'email': 'Email',
+    'enter_email': 'Entrez l\'adresse email',
+    'billing_address': 'Adresse de Facturation',
+    'address_line_1': 'Adresse Ligne 1',
+    'city': 'Ville',
+    'postal_code': 'Code Postal',
+    'country': 'Pays',
+    'billing_details_required': 'Veuillez fournir les détails de facturation',
+    
+    // Actions
+    'cancel_payment': 'Annuler le Paiement',
+    'restart_challenge': 'Recommencer le Défi',
+    'retry': 'Réessayer',
+    'continue': 'Continuer',
+    'hide': 'Masquer',
+    'show': 'Afficher',
+    
+    // Payment Security
+    'payment_secured_by_stripe': 'Paiement sécurisé par Stripe avec cryptage bancaire',
+    'digital_wallet_security': 'Vos informations de paiement sont cryptées et jamais stockées sur nos serveurs',
+    
+    // Errors
+    'challenge_timeout': 'L\'authentification a expiré. Veuillez réessayer.',
+    'digital_wallet_3ds_not_supported': '3D Secure n\'est pas pris en charge pour les paiements par portefeuille numérique',
+    'card_element_not_found': 'Élément de carte introuvable',
+    'payment_failed': 'Le paiement a échoué',
+    'payment_not_completed': 'Paiement non terminé',
+    'authentication_required': 'Authentification requise',
+    'stripe_not_loaded': 'Stripe non chargé',
+  },
+};

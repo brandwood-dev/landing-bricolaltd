@@ -38,18 +38,22 @@ class WalletService {
   // Create withdrawal request
   async createWithdrawal(userId: string, withdrawalData: WithdrawalRequest): Promise<Transaction> {
     try {
+      console.log('[WalletService] Prepare withdrawal request', { userId, withdrawalData })
       const accountDetails = {
         method: withdrawalData.paymentMethod === 'bank_transfer' ? 'wise' : 'stripe_connect',
         bankDetails: withdrawalData.bankDetails,
         stripeAccountId: withdrawalData.stripeAccountId,
         currency: withdrawalData.currency || 'GBP'
       };
+      console.log('[WalletService] Account details payload', accountDetails)
       const response = await api.post<ApiResponse<Transaction>>(`/wallets/user/${userId}/withdraw`, {
         amount: withdrawalData.amount,
         accountDetails
       });
+      console.log('[WalletService] Withdrawal API response', response.data)
       return response.data.data;
     } catch (error) {
+      console.error('[WalletService] Withdrawal API error', error)
       throw error;
     }
   }
@@ -111,7 +115,7 @@ class WalletService {
 
   // Check minimum withdrawal threshold
   getMinimumWithdrawalAmount(): number {
-    return 50; // 50€ minimum
+    return 50; // GBP minimum
   }
 
   // Validate withdrawal amount
@@ -124,7 +128,7 @@ class WalletService {
     if (amount < minAmount) {
       return {
         isValid: false,
-        error: `Le montant minimum de retrait est de ${minAmount}€`
+        error: `Le montant minimum de retrait est de £${minAmount}`
       };
     }
     

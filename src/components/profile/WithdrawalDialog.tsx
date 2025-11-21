@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Banknote, CreditCard, Building, AlertCircle, CheckCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useCurrency } from '@/contexts/CurrencyContext';
 import { walletService } from '@/services/walletService';
 import { WithdrawalRequest, UserBalance } from '@/types/bridge/wallet.types';
 import { useToast } from '@/hooks/use-toast';
@@ -29,6 +30,7 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
   onWithdrawalCreated
 }) => {
   const { t } = useLanguage();
+  const { currency, convertInstantly, formatInstantPrice } = useCurrency();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<'amount' | 'method' | 'details' | 'confirmation'>('amount');
@@ -39,11 +41,14 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const minAmount = walletService.getMinimumWithdrawalAmount();
-  const maxAmount = (userBalance as any).availableBalance ?? userBalance.balance ?? 0;
+  const minAmountGBP = walletService.getMinimumWithdrawalAmount();
+  const maxAmountGBP = (userBalance as any).availableBalance ?? userBalance.balance ?? 0;
+  const minAmountInSelected = convertInstantly(minAmountGBP, 'GBP', currency.code) || minAmountGBP;
+  const maxAmountInSelected = convertInstantly(maxAmountGBP, 'GBP', currency.code) || maxAmountGBP;
 
-  const validateAmount = (amount: number) => {
-    const validation = walletService.validateWithdrawalAmount(amount, maxAmount);
+  const validateAmount = (amountSelected: number) => {
+    const amountGBP = convertInstantly(amountSelected, currency.code, 'GBP') || amountSelected;
+    const validation = walletService.validateWithdrawalAmount(amountGBP, maxAmountGBP);
     if (!validation.isValid) {
       setErrors({ amount: validation.error! });
       return false;
@@ -53,10 +58,10 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
   };
 
   const handleAmountChange = (value: string) => {
-    const amount = parseFloat(value) || 0;
-    setWithdrawalData(prev => ({ ...prev, amount }));
-    if (amount > 0) {
-      validateAmount(amount);
+    const amountSelected = parseFloat(value) || 0;
+    setWithdrawalData(prev => ({ ...prev, amount: amountSelected }));
+    if (amountSelected > 0) {
+      validateAmount(amountSelected);
     }
   };
 
@@ -131,7 +136,15 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
 
     setLoading(true);
     try {
-      await walletService.createWithdrawal(userId, withdrawalData);
+      const amountGBP = convertInstantly(withdrawalData.amount || 0, currency.code, 'GBP') || (withdrawalData.amount || 0);
+      const payload = {
+        ...withdrawalData,
+        amount: amountGBP,
+        currency: 'GBP'
+      };
+      console.log('[WithdrawalDialog] Submitting withdrawal', { selectedCurrency: currency.code, enteredAmount: withdrawalData.amount, amountGBP, method: withdrawalData.paymentMethod, bankDetails: withdrawalData.bankDetails })
+      await walletService.createWithdrawal(userId, payload as any);
+      console.log('[WithdrawalDialog] Withdrawal created successfully')
       toast({
         title: 'Demande de retrait créée',
         description: 'Votre demande de retrait a été soumise avec succès. Elle sera traitée sous 24-48h.',
@@ -143,6 +156,7 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
       setWithdrawalData({ amount: 0, paymentMethod: 'bank_transfer', currency: 'GBP' });
       setErrors({});
     } catch (error) {
+      console.error('[WithdrawalDialog] Withdrawal creation failed', error)
       toast({
         title: 'Erreur',
         description: 'Une erreur est survenue lors de la création de votre demande de retrait.',
@@ -155,26 +169,26 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
 
   const renderAmountStep = () => (
     <div className="space-y-6">
-      <div className="text-center">
-        <div className="p-4 bg-green-50 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-          <Banknote className="h-8 w-8 text-green-600" />
-        </div>
-        <h3 className="text-lg font-semibold mb-2">Montant du retrait</h3>
-        <p className="text-sm text-gray-600">Solde disponible: {maxAmount}€</p>
-      </div>
+            <div className="text-center">
+              <div className="p-4 bg-green-50 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                <Banknote className="h-8 w-8 text-green-600" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Montant du retrait</h3>
+              <p className="text-sm text-gray-600">Solde disponible: {formatInstantPrice(maxAmountGBP, 'GBP', currency.code)}</p>
+            </div>
 
       <div className="space-y-4">
         <div>
-          <Label htmlFor="amount">Montant (€)</Label>
+          <Label htmlFor="amount">Montant ({currency.symbol})</Label>
           <Input
             id="amount"
             type="number"
-            min={minAmount}
-            max={maxAmount}
+            min={minAmountInSelected}
+            max={maxAmountInSelected}
             step="0.01"
             value={withdrawalData.amount || ''}
             onChange={(e) => handleAmountChange(e.target.value)}
-            placeholder={`Minimum ${minAmount}€`}
+            placeholder={`Minimum ${formatInstantPrice(minAmountGBP, 'GBP', currency.code)}`}
             className={errors.amount ? 'border-red-500' : ''}
           />
           {errors.amount && (
@@ -185,7 +199,7 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            Montant minimum: {minAmount}€. Les retraits sont traités sous 24-48h ouvrées.
+            Montant minimum: {formatInstantPrice(minAmountGBP, 'GBP', currency.code)}. Les retraits sont traités sous 24-48h ouvrées.
           </AlertDescription>
         </Alert>
       </div>

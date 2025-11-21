@@ -1534,29 +1534,7 @@ const Rent: React.FC = () => {
                                 booking
                               )
 
-                              // Programmer le déclenchement de la modal d'acompte (1 minute pour les tests)
-                              console.log(
-                                "🔍 [Rent.tsx] Programmation de la modal d'acompte..."
-                              )
-                              setTimeout(() => {
-                                if (booking && tool) {
-                                  // Utiliser le contexte global pour ouvrir la modal
-                                  const depositInfo = {
-                                    bookingId: booking.id,
-                                    amount: deposit,
-                                    currency: tool.baseCurrencyCode || 'GBP',
-                                    dueDate: new Date(
-                                      Date.now() + 24 * 60 * 60 * 1000
-                                    ).toISOString(),
-                                    propertyTitle: tool.title,
-                                  }
-
-                                  openModal(depositInfo)
-
-                                  // Afficher une notification avec bouton pour ouvrir la modal
-                                  showDepositToast(depositInfo)
-                                }
-                              }, 60000) // 1 minute pour les tests (au lieu de 24h)
+                              
 
                               // Nettoyer les données
                               console.log(

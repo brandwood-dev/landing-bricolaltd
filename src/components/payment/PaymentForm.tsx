@@ -8,10 +8,12 @@ import {
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, CreditCard, AlertCircle, CheckCircle } from 'lucide-react'
+import { Loader2, CreditCard, AlertCircle, CheckCircle, Shield } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useCurrency } from '@/contexts/CurrencyContext'
 import { OptimizedPriceDisplay } from '@/components/OptimizedPriceDisplay'
+import { useThreeDSecure } from '@/hooks/useThreeDSecure'
+import ThreeDSChallengeModal from './ThreeDSChallengeModal'
 
 const API_BASE_URL = import.meta.env.VITE_BASE_URL
   ? `${import.meta.env.VITE_BASE_URL}`
@@ -46,6 +48,17 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   const [cardComplete, setCardComplete] = useState(false)
   const [paymentRequest, setPaymentRequest] = useState<any>(null)
   const [canMakePayment, setCanMakePayment] = useState(false)
+  const [cardholderName, setCardholderName] = useState('')
+  const [cardholderEmail, setCardholderEmail] = useState('')
+  const [billingAddress, setBillingAddress] = useState({
+    line1: '',
+    city: '',
+    postalCode: '',
+    country: 'GB',
+  })
+  const [showBillingForm, setShowBillingForm] = useState(false)
+  const [requires3DS, setRequires3DS] = useState(false)
+  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null)
 
   // Calculer le montant affiché dans la devise sélectionnée
   const displayAmount = calculatePrice(amount, 'GBP', currency.code)
@@ -109,8 +122,8 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
 
           // Create Payment Intent
           const requestBody = {
-            amount: apiAmountInCents, // Montant en centimes GBP
-            currency: 'gbp', // Changé de eur à gbp
+            amount: amountInGBP,
+            currency: 'gbp',
             bookingId: bookingId,
             metadata: {
               bookingId: bookingId || '',
@@ -270,8 +283,8 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       
       // Create Payment Intent
       const requestBody = {
-        amount: amountInCents, // Utiliser la variable pour plus de clarté
-        currency: 'gbp', // Changé de eur à gbp
+        amount: amountInGBP,
+        currency: 'gbp',
         bookingId: bookingId,
         metadata: {
           bookingId: bookingId || '',
@@ -308,11 +321,10 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       const { data } = responseData
       console.log('🔍 [PaymentForm] Data extraite (Carte):', data)
 
-      // Correction: extraire client_secret et payment_intent_id depuis data.data
       const {
         client_secret: clientSecret,
         payment_intent_id: paymentIntentId,
-      } = data.data || {}
+      } = data || {}
       console.log('🔍 [PaymentForm] clientSecret extraite (Carte):', clientSecret)
       console.log('🔍 [PaymentForm] paymentIntentId extraite (Carte):', paymentIntentId)
 
