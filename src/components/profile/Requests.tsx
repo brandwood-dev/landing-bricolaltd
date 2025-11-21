@@ -234,7 +234,14 @@ const Requests = () => {
 
   const handleAcceptRequest = async (requestId: string) => {
     try {
+      console.log('[REQUESTS] Accepting booking', { requestId })
       const updatedBooking = await bookingService.acceptBooking(requestId)
+      console.log('[REQUESTS] Booking accepted response', {
+        id: updatedBooking?.id,
+        status: (updatedBooking as any)?.status,
+        validationCode: (updatedBooking as any)?.validationCode,
+        paymentStatus: (updatedBooking as any)?.paymentStatus,
+      })
 
       // Update local state after successful API call
       setRequests((prev) =>
@@ -254,6 +261,7 @@ const Requests = () => {
         description: `${t('request.ACCEPTED.message')}` ,
       })
     } catch (error: any) {
+      console.error('[REQUESTS] Accept booking failed', { requestId, error: error?.message, response: error?.response?.data })
       toast({
         title: t('general.error'),
         description: error.message || 'Failed to accept booking',
