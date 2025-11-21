@@ -243,7 +243,7 @@ const Requests = () => {
             ? {
                 ...req,
                 status: 'ACCEPTED',
-                validationCode: updatedBooking.validation_code,
+                validationCode: (updatedBooking as any).validationCode,
               }
             : req
         )
@@ -251,9 +251,7 @@ const Requests = () => {
 
       toast({
         title: t('request.ACCEPTED.title'),
-        description: `${t('request.ACCEPTED.message')} Code de validation: ${
-          updatedBooking.validation_code
-        }`,
+        description: `${t('request.ACCEPTED.message')}` ,
       })
     } catch (error: any) {
       toast({
