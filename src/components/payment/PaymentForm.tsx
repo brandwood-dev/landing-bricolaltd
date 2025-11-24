@@ -399,7 +399,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             <div className='text-lg font-semibold'>
               Montant à payer:{' '}
               <OptimizedPriceDisplay
-                                price={totalToPay}
+                                price={displayAmount}
                                 baseCurrency={'GBP'}
                                 size='lg'
                                 cible='totalPrice'

@@ -346,28 +346,7 @@ const translations = {
     'resetpwd.verify': 'Vérifier',
     'resetpwd.verify_in_progress': 'Vérification en cours...',
 
-    // deposit payment modal
-    'deposit.modal.title': "Paiement de l'acompte requis",
-    'deposit.modal.subtitle':
-      'Votre réservation nécessite un acompte de {amount} pour être confirmée.',
-    'deposit.modal.payment_info': 'Informations de paiement',
-    'deposit.modal.amount_label': "Montant de l'acompte",
-    'deposit.modal.processing': 'Traitement en cours...',
-    'deposit.modal.pay_button': "Payer l'acompte",
-    'deposit.modal.cancel_button': 'Annuler la réservation',
-    'deposit.modal.success':
-      'Acompte payé avec succès ! Votre réservation est maintenant confirmée.',
-    'deposit.modal.error':
-      "Erreur lors du paiement de l'acompte. Veuillez réessayer.",
-    'deposit.modal.cancel_confirm':
-      'Êtes-vous sûr de vouloir annuler cette réservation ?',
-    'deposit.modal.cancel_success': 'Réservation annulée avec succès.',
-    'deposit.modal.cancel_error':
-      "Erreur lors de l'annulation. Veuillez réessayer.",
-    'deposit.modal.test_mode': 'Mode test activé',
-    'deposit.modal.card_error': 'Erreur de carte de paiement',
-    'deposit.modal.payment_failed': 'Le paiement a échoué',
-    'deposit.modal.network_error': 'Erreur de connexion',
+
 
     // create password
     'password.create.title': 'Nouveau mot de passe',
@@ -451,32 +430,8 @@ const translations = {
     'currency.AED': 'Dirham des Émirats Arabes Unis',
     'currency.label': 'Devise',
 
-    // Deposit Payment Modal (duplicated keys removed)
-    'deposit.modal.description':
-      'Veuillez payer la caution pour confirmer votre réservation. Ce montant sera remboursé après la période de location si aucun dommage ne survient.',
-    'deposit.modal.amount.label': 'Montant de la caution',
-    'deposit.modal.payment.title': 'Informations de paiement',
-    'deposit.modal.payment.description':
-      'Entrez les détails de votre carte pour payer la caution',
-    'deposit.modal.buttons.cancel': 'Annuler la réservation',
-    'deposit.modal.buttons.pay': 'Payer la caution',
-    'deposit.modal.buttons.processing': 'Traitement en cours...',
-    'deposit.modal.cancel.confirm.title': 'Annuler la réservation ?',
-    'deposit.modal.cancel.confirm.message':
-      'Êtes-vous sûr de vouloir annuler cette réservation ? Cette action ne peut pas être annulée.',
-    'deposit.modal.cancel.confirm.yes': 'Oui, annuler',
-    'deposit.modal.cancel.confirm.no': 'Conserver la réservation',
-    'deposit.modal.success.title': 'Paiement réussi !',
-    'deposit.modal.success.message':
-      'Votre caution a été traitée avec succès. Votre réservation est maintenant confirmée.',
-    'deposit.modal.error.payment': 'Échec du paiement. Veuillez réessayer.',
-    'deposit.modal.error.cancel':
-      "Échec de l'annulation de la réservation. Veuillez réessayer.",
-    'deposit.modal.error.generic':
-      "Une erreur s'est produite. Veuillez réessayer.",
-    'deposit.notification.title': "Paiement d'acompte requis",
-    'deposit.notification.message':
-      'Votre réservation commence dans 24 heures. Veuillez payer la caution pour confirmer.',
+
+
     'validation.first_name_required': 'Le prénom est obligatoire',
     'validation.last_name_required': 'Le nom de famille est obligatoire',
     'validation.email_required': "L'adresse email est obligatoire",
@@ -638,6 +593,7 @@ const translations = {
     'blog.description':
       "Découvrez nos conseils, guides et actualités sur l'univers des outils et du bricolage",
     'blog.popular_categories': 'Catégories  populaires',
+    'blog.popular_categories.subtitle': 'Découvrez nos articles organisés par thématiques pour trouver exactement ce que vous cherchez',
 
     'blog.return': 'Retour au blog',
     'blog.share': 'Partager',
@@ -659,6 +615,23 @@ const translations = {
     'blog.category.decoration': 'Décoration',
     'blog.category.guide': 'Guide',
     'blog.category.safety': 'Sécurité',
+
+    // Category descriptions
+    'blog.category.gardening.desc':
+      'Conseils et astuces pour entretenir votre jardin',
+    'blog.category.maintenance.desc':
+      "Guide d'entretien pour vos outils et équipements",
+    'blog.category.transport.desc': 'Solutions de transport et logistique',
+    'blog.category.diy.desc': 'Projets de bricolage et réparations maison',
+    'blog.category.electricity.desc': 'Installation et sécurité électrique',
+    'blog.category.lighting.desc': 'Éclairage et ambiance pour votre espace',
+    'blog.category.painting.desc': 'Techniques et conseils de peinture',
+    'blog.category.construction.desc':
+      'Construction et rénovation de bâtiments',
+    'blog.category.plants.desc': 'Soins et culture des plantes',
+    'blog.category.cleaning.desc': 'Nettoyage et entretien des espaces',
+    'blog.category.decoration.desc': 'Idées déco pour embellir votre intérieur',
+    'blog.category.guide.desc': 'Guides complets et tutoriels détaillés',
 
     // favorites
     'favorites.title': 'Mes Favoris',
@@ -685,7 +658,6 @@ const translations = {
 
     error: 'Erreur',
 
-    
     'ads.delete.success': 'Votre annonce a été bien supprimée.',
     'ads.delete.confirm.title': 'Confirmer la suppression',
     'ads.delete.confirm.description':
@@ -1266,7 +1238,8 @@ const translations = {
     'subcategories.structure': 'Structure',
 
     'categories.transport': 'Transport',
-
+'subcategories.waste-and-dust-management': 'Gestion des déchets et des poussières',
+'subcategories.entertainment-games' : 'Divertissements et jeux',
     // Tools
     'tools.featured': 'Outils en vedette',
     'tools.description':
@@ -2208,28 +2181,7 @@ const translations = {
     'resetpwd.verify': 'Verify',
     'resetpwd.verify_in_progress': 'Verifying...',
 
-    // deposit payment modal
-    'deposit.modal.title': 'Deposit Payment Required',
-    'deposit.modal.subtitle':
-      'Your reservation requires a deposit of {amount} to be confirmed.',
-    'deposit.modal.payment_info': 'Payment Information',
-    'deposit.modal.amount_label': 'Deposit Amount',
-    'deposit.modal.processing': 'Processing...',
-    'deposit.modal.pay_button': 'Pay Deposit',
-    'deposit.modal.cancel_button': 'Cancel Reservation',
-    'deposit.modal.success':
-      'Deposit paid successfully! Your reservation is now confirmed.',
-    'deposit.modal.error':
-      'Error processing deposit payment. Please try again.',
-    'deposit.modal.cancel_confirm':
-      'Are you sure you want to cancel this reservation?',
-    'deposit.modal.cancel_success': 'Reservation cancelled successfully.',
-    'deposit.modal.cancel_error':
-      'Error cancelling reservation. Please try again.',
-    'deposit.modal.test_mode': 'Test mode enabled',
-    'deposit.modal.card_error': 'Payment card error',
-    'deposit.modal.payment_failed': 'Payment failed',
-    'deposit.modal.network_error': 'Connection error',
+
 
     // create password
     'password.create.title': 'New Password',
@@ -2359,6 +2311,7 @@ const translations = {
     'blog.description':
       'Explore our tips, guides, and news from the world of tools and DIY',
     'blog.popular_categories': 'Popular Categories',
+    'blog.popular_categories.subtitle': 'Discover our articles organized by themes to find exactly what you are looking for',
 
     'blog.return': 'Return to Blog',
     'blog.share': 'Share',
@@ -2383,6 +2336,22 @@ const translations = {
     'blog.category.decoration': 'Decoration',
     'blog.category.guide': 'Guide',
     'tool.returned': 'Returned tools',
+    // Category descriptions
+    'blog.category.gardening.desc':
+      'Tips and tricks to maintain your garden',
+    'blog.category.maintenance.desc':
+      'Maintenance guide for your tools and equipment',
+    'blog.category.transport.desc': 'Transport and logistics solutions',
+    'blog.category.diy.desc': 'DIY projects and home repairs',
+    'blog.category.electricity.desc': 'Electrical installation and safety',
+    'blog.category.lighting.desc': 'Lighting and ambiance for your space',
+    'blog.category.painting.desc': 'Painting techniques and advice',
+    'blog.category.construction.desc':
+      'Building construction and renovation',
+    'blog.category.plants.desc': 'Plant care and cultivation',
+    'blog.category.cleaning.desc': 'Cleaning and maintenance of spaces',
+    'blog.category.decoration.desc': 'Decor ideas to beautify your interior',
+    'blog.category.guide.desc': 'Complete guides and detailed tutorials',
     // favorites
     'favorites.title': 'My Favorites',
     'fav.backhome': 'Back to Home',
@@ -3066,31 +3035,8 @@ const translations = {
     'currency.AED': 'United Arab Emirates Dirham',
     'currency.label': 'Currency',
 
-    // Deposit Payment Modal (duplicated keys removed)
-    'deposit.modal.description':
-      'Please pay the security deposit to confirm your reservation. This amount will be refunded after the rental period if no damages occur.',
-    'deposit.modal.amount.label': 'Deposit Amount',
-    'deposit.modal.payment.title': 'Payment Information',
-    'deposit.modal.payment.description':
-      'Enter your card details to pay the deposit',
-    'deposit.modal.buttons.cancel': 'Cancel Reservation',
-    'deposit.modal.buttons.pay': 'Pay Deposit',
-    'deposit.modal.buttons.processing': 'Processing...',
-    'deposit.modal.cancel.confirm.title': 'Cancel Reservation?',
-    'deposit.modal.cancel.confirm.message':
-      'Are you sure you want to cancel this reservation? This action cannot be undone.',
-    'deposit.modal.cancel.confirm.yes': 'Yes, Cancel',
-    'deposit.modal.cancel.confirm.no': 'Keep Reservation',
-    'deposit.modal.success.title': 'Payment Successful!',
-    'deposit.modal.success.message':
-      'Your deposit has been processed successfully. Your reservation is now confirmed.',
-    'deposit.modal.error.payment': 'Payment failed. Please try again.',
-    'deposit.modal.error.cancel':
-      'Failed to cancel reservation. Please try again.',
-    'deposit.modal.error.generic': 'An error occurred. Please try again.',
-    'deposit.notification.title': 'Deposit Payment Required',
-    'deposit.notification.message':
-      'Your reservation starts in 24 hours. Please pay the deposit to confirm.',
+
+
     'validation.first_name_required': 'First name is required',
     'validation.last_name_required': 'Last name is required',
     'validation.email_required': 'Email address is required',
@@ -4175,16 +4121,7 @@ const translations = {
     'password.update': 'تحديث كلمة المرور',
     'password.back_to_login': 'العودة إلى تسجيل الدخول',
 
-    // deposit payment modal
-    'deposit.modal.title': 'دفع الأمانة',
-    'deposit.modal.subtitle': 'يجب دفع الأمانة لتأكيد حجزك',
-    'deposit.modal.payment_info': 'معلومات الدفع',
-    'deposit.modal.amount_label': 'مبلغ الأمانة',
-    'deposit.modal.processing': 'جاري المعالجة...',
-    'deposit.modal.success': 'تم دفع الأمانة بنجاح!',
-    'deposit.modal.error': 'حدث خطأ أثناء معالجة الدفع',
-    'deposit.modal.cancel_reservation': 'إلغاء الحجز',
-    'deposit.modal.test_mode': 'وضع الاختبار - لن يتم خصم أي مبلغ',
+
 
     'resetpwd.popupsuccupdate': 'تم تغيير كلمة المرور',
     'resetpwd.txtsucc': '.تم تغيير كلمة المرور الخاصة بك بنجاح',
@@ -4296,6 +4233,7 @@ const translations = {
     'blog.description':
       'اكتشف نصائحنا، وأدلّتنا، وآخر الأخبار في عالم الأدوات والأعمال اليدوية',
     'blog.popular_categories': 'الفئات الشائعة',
+    'blog.popular_categories.subtitle': 'اكتشف مقالاتنا المنظمة حسب الموضوعات للعثور بالضبط على ما تبحث عنه',
     // blog categories
     'blog.subcategory.tools': 'الأدوات',
     'blog.category.safety': 'السلامة',
@@ -4312,6 +4250,20 @@ const translations = {
     'blog.category.cleaning': 'التنظيف',
     'blog.category.decoration': 'الديكور',
     'blog.category.guide': 'دليل',
+
+    // Category descriptions
+    'blog.category.gardening.desc': 'نصائح وإرشادات للعناية بحديقتك',
+    'blog.category.maintenance.desc': 'دليل الصيانة لأدواتك ومعداتك',
+    'blog.category.transport.desc': 'حلول النقل والخدمات اللوجستية',
+    'blog.category.diy.desc': 'مشاريع الأعمال اليدوية وإصلاحات المنزل',
+    'blog.category.electricity.desc': 'التركيبات والسلامة الكهربائية',
+    'blog.category.lighting.desc': 'الإضاءة والأجواء لمساحتك',
+    'blog.category.painting.desc': 'تقنيات ونصائح الطلاء',
+    'blog.category.construction.desc': 'بناء وتجديد المباني',
+    'blog.category.plants.desc': 'رعاية النباتات والزراعة',
+    'blog.category.cleaning.desc': 'تنظيف وصيانة المساحات',
+    'blog.category.decoration.desc': 'أفكار ديكور لتجميل منزلك',
+    'blog.category.guide.desc': 'أدلة شاملة ودروس مفصلة',
 
     'blog.return': 'عودة إلى المدونة',
     'blog.share': 'مشاركة',
@@ -5541,29 +5493,8 @@ const translations = {
     'currency.AED': 'درهم الإمارات العربية المتحدة',
     'currency.label': 'العملة',
 
-    // Deposit Payment Modal (duplicated keys removed)
-    'deposit.modal.description':
-      'يرجى دفع التأمين لتأكيد حجزك. سيتم استرداد هذا المبلغ بعد فترة الإيجار إذا لم تحدث أضرار.',
-    'deposit.modal.amount.label': 'مبلغ التأمين',
-    'deposit.modal.payment.title': 'معلومات الدفع',
-    'deposit.modal.payment.description': 'أدخل تفاصيل بطاقتك لدفع التأمين',
-    'deposit.modal.buttons.cancel': 'إلغاء الحجز',
-    'deposit.modal.buttons.pay': 'دفع التأمين',
-    'deposit.modal.buttons.processing': 'جاري المعالجة...',
-    'deposit.modal.cancel.confirm.title': 'إلغاء الحجز؟',
-    'deposit.modal.cancel.confirm.message':
-      'هل أنت متأكد من رغبتك في إلغاء هذا الحجز؟ لا يمكن التراجع عن هذا الإجراء.',
-    'deposit.modal.cancel.confirm.yes': 'نعم، إلغاء',
-    'deposit.modal.cancel.confirm.no': 'الاحتفاظ بالحجز',
-    'deposit.modal.success.title': 'تم الدفع بنجاح!',
-    'deposit.modal.success.message':
-      'تم معالجة التأمين بنجاح. تم تأكيد حجزك الآن.',
-    'deposit.modal.error.payment': 'فشل في الدفع. يرجى المحاولة مرة أخرى.',
-    'deposit.modal.error.cancel': 'فشل في إلغاء الحجز. يرجى المحاولة مرة أخرى.',
-    'deposit.modal.error.generic': 'حدث خطأ. يرجى المحاولة مرة أخرى.',
-    'deposit.notification.title': 'مطلوب دفع العربون',
-    'deposit.notification.message':
-      'يبدأ حجزك خلال 24 ساعة. يرجى دفع التأمين للتأكيد.',
+
+
   },
 }
 
@@ -5598,12 +5529,19 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }
 
-  const t = (key: string): string => {
-    return (
-      translations[language][
-        key as keyof (typeof translations)[typeof language]
-      ] || key
-    )
+  const t = (key: string, params?: Record<string, string | number>): string => {
+    let translation = translations[language][
+      key as keyof (typeof translations)[typeof language]
+    ] || key
+    
+    // Replace parameters if provided
+    if (params) {
+      Object.entries(params).forEach(([param, value]) => {
+        translation = translation.replace(new RegExp(`{${param}}`, 'g'), String(value))
+      })
+    }
+    
+    return translation
   }
 
   // Set document direction for Arabic
@@ -5632,7 +5570,21 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
 export const useLanguage = () => {
   const context = useContext(LanguageContext)
   if (context === undefined) {
-    throw new Error('useLanguage must be used within a LanguageProvider')
+    // Return a fallback object instead of throwing an error
+    console.warn('useLanguage called outside LanguageProvider, returning fallback')
+    return {
+      language: 'fr' as Language,
+      setLanguage: () => {},
+      t: (key: string, params?: Record<string, string | number>) => {
+        let translation = key
+        if (params) {
+          Object.entries(params).forEach(([param, value]) => {
+            translation = translation.replace(new RegExp(`{${param}}`, 'g'), String(value))
+          })
+        }
+        return translation
+      }
+    }
   }
   return context
 }

@@ -44,7 +44,12 @@ const AddTool = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { toast } = useToast()
-  const { validateDescription, validateInstructions, validatePrice, validateDeposit } = useValidation()
+  const {
+    validateDescription,
+    validateInstructions,
+    validatePrice,
+    validateDeposit,
+  } = useValidation()
 
   // Debug logs pour le pays de l'utilisateur
   console.log('🔍 [AddTool] Debug user country data:', {
@@ -57,7 +62,8 @@ const AddTool = () => {
   })
 
   // Déterminer le pays de l'utilisateur avec fallback
-  const userCountryCode = user?.countryId || user?.country?.code || user?.country || 'BH'
+  const userCountryCode =
+    user?.countryId || user?.country?.code || user?.country || 'BH'
   console.log('🌍 [AddTool] Final user country code:', userCountryCode)
 
   // Form state
@@ -91,7 +97,7 @@ const AddTool = () => {
         const validation = validatePrice(formData.basePrice, null)
         setPriceValidation({
           isValid: validation.isValid,
-          message: validation.message
+          message: validation.message,
         })
       }
       return
@@ -103,7 +109,11 @@ const AddTool = () => {
       setPriceInGBP(formData.basePrice)
     } else {
       // Use instant conversion from CurrencyContext
-      convertedAmount = currencyContext.convertInstantly(formData.basePrice, currency.code, 'GBP')
+      convertedAmount = currencyContext.convertInstantly(
+        formData.basePrice,
+        currency.code,
+        'GBP'
+      )
       setPriceInGBP(convertedAmount)
     }
 
@@ -111,7 +121,7 @@ const AddTool = () => {
     const validation = validatePrice(formData.basePrice, convertedAmount)
     setPriceValidation({
       isValid: validation.isValid,
-      message: validation.message
+      message: validation.message,
     })
   }, [formData.basePrice, currency.code, currencyContext, validatePrice])
 
@@ -124,7 +134,7 @@ const AddTool = () => {
         const validation = validateDeposit(formData.depositAmount, null)
         setDepositValidation({
           isValid: validation.isValid,
-          message: validation.message
+          message: validation.message,
         })
       }
       return
@@ -136,7 +146,11 @@ const AddTool = () => {
       setDepositInGBP(formData.depositAmount)
     } else {
       // Use instant conversion from CurrencyContext
-      convertedAmount = currencyContext.convertInstantly(formData.depositAmount, currency.code, 'GBP')
+      convertedAmount = currencyContext.convertInstantly(
+        formData.depositAmount,
+        currency.code,
+        'GBP'
+      )
       setDepositInGBP(convertedAmount)
     }
 
@@ -144,7 +158,7 @@ const AddTool = () => {
     const validation = validateDeposit(formData.depositAmount, convertedAmount)
     setDepositValidation({
       isValid: validation.isValid,
-      message: validation.message
+      message: validation.message,
     })
   }, [formData.depositAmount, currency.code, currencyContext, validateDeposit])
 
@@ -251,7 +265,7 @@ const AddTool = () => {
       setDescriptionValidation({
         isValid: validation.isValid,
         message: validation.message,
-        charCount: (value || '').length
+        charCount: (value || '').length,
       })
     }
 
@@ -260,7 +274,7 @@ const AddTool = () => {
       setInstructionsValidation({
         isValid: validation.isValid,
         message: validation.message,
-        charCount: (value || '').length
+        charCount: (value || '').length,
       })
     }
 
@@ -268,7 +282,7 @@ const AddTool = () => {
       const validation = validatePrice(value, priceInGBP)
       setPriceValidation({
         isValid: validation.isValid,
-        message: validation.message
+        message: validation.message,
       })
     }
 
@@ -276,7 +290,7 @@ const AddTool = () => {
       const validation = validateDeposit(value, depositInGBP)
       setDepositValidation({
         isValid: validation.isValid,
-        message: validation.message
+        message: validation.message,
       })
     }
 
@@ -390,7 +404,8 @@ const AddTool = () => {
       formData.basePrice > 0 &&
       isAddressSelected &&
       formData.latitude &&
-      formData.longitude
+      formData.longitude &&
+      selectedFiles.length > 0 // At least one image is required
       // nameValidation.isUnique === true && // DISABLED - uniqueness check removed
       // !nameValidation.isChecking // DISABLED - uniqueness check removed
     )
@@ -437,7 +452,8 @@ const AddTool = () => {
     if (!isAddressSelected || !formData.latitude || !formData.longitude) {
       toast({
         title: 'Adresse requise',
-        description: 'Veuillez sélectionner une adresse en cliquant sur la carte',
+        description:
+          'Veuillez sélectionner une adresse en cliquant sur la carte',
         variant: 'destructive',
       })
       return false
@@ -459,6 +475,15 @@ const AddTool = () => {
       toast({
         title: 'Année invalide',
         description: "L'année doit être comprise entre 1900 et 2030",
+        variant: 'destructive',
+      })
+      return false
+    }
+
+    if (selectedFiles.length === 0) {
+      toast({
+        title: 'Photos requises',
+        description: 'Au moins une photo est obligatoire pour créer l\'annonce',
         variant: 'destructive',
       })
       return false
@@ -890,14 +915,24 @@ const AddTool = () => {
                       }
                     >
                       <SelectTrigger className='h-12 text-base'>
-                        <SelectValue placeholder={t('add_tool.condition')} />
+                        <SelectValue placeholder={t('ads.tool_condition')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value='1'>Neuf</SelectItem>
-                        <SelectItem value='2'>Comme neuf</SelectItem>
-                        <SelectItem value='3'>Bon état</SelectItem>
-                        <SelectItem value='4'>État correct</SelectItem>
-                        <SelectItem value='5'>Mauvais état</SelectItem>
+                        <SelectItem value='1'>
+                          {t('add_tool.condition_new')}
+                        </SelectItem>
+                        <SelectItem value='2'>
+                          {t('add_tool.condition_excellent')}
+                        </SelectItem>
+                        <SelectItem value='3'>
+                          {t('add_tool.condition_good')}
+                        </SelectItem>
+                        <SelectItem value='4'>
+                          {t('add_tool.condition_fair')}
+                        </SelectItem>
+                        <SelectItem value='5'>
+                          {t('add_tool.condition_poor')}
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -1134,6 +1169,8 @@ const AddTool = () => {
                     className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200 ${
                       dragActive
                         ? 'border-accent bg-accent/10 scale-[1.02]'
+                        : selectedFiles.length === 0
+                        ? 'border-destructive hover:border-destructive/70'
                         : 'border-border hover:border-accent hover:bg-accent/5'
                     }`}
                     onDragEnter={handleDrag}
@@ -1175,6 +1212,11 @@ const AddTool = () => {
                       </p>
                     </div>
                   </div>
+                  {selectedFiles.length === 0 && (
+                    <p className='text-sm text-destructive mt-2'>
+                      Au moins une photo est requise pour créer l'annonce
+                    </p>
+                  )}
 
                   {/* Selected Files Preview */}
                   {selectedFiles.length > 0 && (

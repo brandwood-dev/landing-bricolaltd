@@ -109,6 +109,7 @@ export class ToolsService {
     
     // Apply sorting
     if (filters?.sortBy) {
+      console.log(`🔧 [toolsService] Tri par: ${filters.sortBy}, ordre: ${filters.sortOrder}`);
       allTools.sort((a, b) => {
         let aValue: any, bValue: any;
         
@@ -120,6 +121,10 @@ export class ToolsService {
           case 'basePrice':
             aValue = a.basePrice || 0;
             bValue = b.basePrice || 0;
+            break;
+          case 'rating':
+            aValue = a.rating || 0;
+            bValue = b.rating || 0;
             break;
           case 'createdAt':
             aValue = new Date(a.createdAt || 0).getTime();
@@ -133,6 +138,7 @@ export class ToolsService {
         if (aValue > bValue) return filters.sortOrder === 'asc' ? 1 : -1;
         return 0;
       });
+      console.log(`✅ [toolsService] Tri terminé, premier outil: ${allTools[0]?.title} (${filters.sortBy}: ${allTools[0]?.[filters.sortBy]})`);
     }
     
     // Apply pagination

@@ -10,12 +10,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import { CurrencyProvider } from '@/contexts/CurrencyContext';
 import { AgeVerificationProvider } from '@/contexts/AgeVerificationContext';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { DepositModalProvider, useDepositModal } from '@/contexts/DepositModalContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import DepositPaymentModal from '@/components/payment/DepositPaymentModal';
-import { StripeProvider } from '@/contexts/StripeContext';
-import { useToast } from '@/hooks/use-toast';
-import { useLanguage } from '@/contexts/LanguageContext';
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
@@ -52,84 +47,19 @@ import CategorySelectorExample from "./pages/CategorySelectorExample";
 
 const queryClient = new QueryClient();
 
-// Composant pour gérer la modal d'acompte globale
-const GlobalDepositModal = () => {
-  const { isOpen, depositInfo, closeModal, hasDepositPending } = useDepositModal();
-  const { toast } = useToast();
-  const { t } = useLanguage();
-
-  // Vérifier automatiquement s'il y a un acompte en attente au chargement
-  React.useEffect(() => {
-    if (hasDepositPending && depositInfo && !isOpen) {
-      // Afficher une notification discrète qu'il y a un acompte en attente
-      toast({
-        title: 'Acompte en attente',
-        description: `Vous avez un acompte de ${depositInfo.amount} ${depositInfo.currency} en attente pour ${depositInfo.propertyTitle}. Cliquez ici pour payer.`,
-        className: 'bg-orange-50 border-orange-200 text-orange-800 cursor-pointer',
-        duration: 8000,
-        onClick: () => {
-          // Ouvrir la modal quand on clique sur le toast
-          // Note: Cette fonctionnalité dépend de l'implémentation du toast
-        }
-      });
-    }
-  }, [hasDepositPending, depositInfo, isOpen, toast]);
-
-  if (!depositInfo) return null;
-
-  return (
-    <StripeProvider>
-      <DepositPaymentModal
-        isOpen={isOpen}
-        onClose={closeModal}
-        booking={{
-          id: depositInfo.bookingId,
-          tool_name: depositInfo.propertyTitle,
-          start_date: depositInfo.dueDate,
-          end_date: depositInfo.dueDate,
-        }}
-        depositAmount={depositInfo.amount}
-        onPaymentSuccess={(paymentIntentId: string) => {
-          closeModal();
-          // Nettoyer les données d'acompte du localStorage
-          localStorage.removeItem('pendingDeposit');
-          toast({
-            title: t('deposit.modal.success'),
-            description: 'Votre acompte a été payé avec succès.',
-            className: 'bg-green-50 border-green-200 text-green-800',
-          });
-        }}
-        onCancelReservation={() => {
-          closeModal();
-          // Nettoyer les données d'acompte du localStorage
-          localStorage.removeItem('pendingDeposit');
-          toast({
-            title: 'Réservation annulée',
-            description: 'Votre réservation a été annulée avec succès.',
-            className: 'bg-red-50 border-red-200 text-red-800',
-          });
-        }}
-        testMode={true}
-      />
-    </StripeProvider>
-  );
-};
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <LanguageProvider>
-        <Toaster />
-        <Sonner />
         <AuthProvider>
           <CurrencyProvider>
             <AgeVerificationProvider>
-              <DepositModalProvider>
-                <BrowserRouter>
+              <BrowserRouter>
                 <ScrollToTop />
+                <Toaster />
+                <Sonner />
                 <AgeVerificationDialog />
                 <FloatingActionButton />
-                <GlobalDepositModal />
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route 
@@ -216,8 +146,7 @@ const App = () => (
 
                   <Route path="*" element={<NotFound />} />
                 </Routes>
-                </BrowserRouter>
-              </DepositModalProvider>
+              </BrowserRouter>
             </AgeVerificationProvider>
           </CurrencyProvider>
         </AuthProvider>

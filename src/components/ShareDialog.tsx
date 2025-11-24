@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Share2, Copy, Check } from 'lucide-react';
+import { Share2, Copy, Check, Link2, MessageCircle, Mail, ChevronRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { generateShareUrls, copyToClipboard, openInNewTab } from '@/utils/shareUtils';
 
@@ -59,25 +59,29 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
     {
       id: 'copy',
       name: t('general.copy_link'),
-      icon: Copy,
+      icon: Link2,
+      color: 'bg-gray-100 hover:bg-gray-200 text-gray-900',
       action: handleCopyLink
     },
     {
       id: 'facebook',
       name: 'Facebook',
       icon: FacebookIcon,
+      color: 'bg-blue-100 hover:bg-blue-200 text-blue-900',
       action: () => openInNewTab(shareUrls.facebook)
     },
     {
       id: 'x',
       name: 'X',
       icon: XIcon,
+      color: 'bg-gray-100 hover:bg-gray-200 text-gray-900',
       action: () => openInNewTab(shareUrls.twitter)
     },
     {
       id: 'whatsapp',
       name: 'WhatsApp',
       icon: WhatsAppIcon,
+      color: 'bg-green-100 hover:bg-green-200 text-green-900',
       action: () => openInNewTab(shareUrls.whatsapp)
     }
   ];
@@ -85,31 +89,50 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant={triggerVariant} size={triggerSize}>
-          <Share2 className="h-4 w-4 mr-1" />
+        <Button 
+          variant={triggerVariant} 
+          size={triggerSize}
+          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+        >
+          <Share2 className="h-4 w-4 mr-2" />
           {t('blog.share')}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg rounded-2xl p-6">
         <DialogHeader className={language === 'ar' ? 'justify-end' : ''}>
-          <DialogTitle>{t('blog.share_article')}</DialogTitle>
+          <DialogTitle className="text-xl font-bold text-center mb-6">
+            {t('blog.share_article')}
+          </DialogTitle>
         </DialogHeader>
-        <div className="space-y-3">
+        
+        <div className="space-y-4">
           {shareOptions.map((option) => (
-            <Button
+            <button
               key={option.id}
-              variant="outline"
-              className="w-full justify-start"
               onClick={option.action}
+              className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-300 transform hover:scale-105 ${option.color} group`}
             >
-              {option.id === 'copy' && copied ? (
-                <Check className="h-4 w-4 mr-2 text-green-600" />
-              ) : (
-                <option.icon className="h-4 w-4 mr-2" />
-              )}
-              {option.id === 'copy' && copied ? t('general.copy_link_message') : option.name}
-            </Button>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/50 group-hover:bg-white/70 transition-colors">
+                {option.id === 'copy' && copied ? (
+                  <Check className="h-5 w-5 text-green-600" />
+                ) : (
+                  <option.icon className="h-5 w-5" />
+                )}
+              </div>
+              <span className="font-semibold flex-1 text-left">
+                {option.id === 'copy' && copied ? t('general.copy_link_message') : option.name}
+              </span>
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                <ChevronRight className="h-4 w-4" />
+              </div>
+            </button>
           ))}
+        </div>
+        
+        <div className="mt-6 pt-6 border-t border-gray-100">
+          <p className="text-sm text-gray-600 text-center">
+            Partagez cet article avec vos amis et votre famille
+          </p>
         </div>
       </DialogContent>
     </Dialog>
