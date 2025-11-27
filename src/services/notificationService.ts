@@ -2,6 +2,7 @@ import { api } from './api';
 import { ApiResponse } from '../types/bridge/common.types';
 
 export interface CreateNotificationData {
+  userId: string;
   type: string;
   title: string;
   message: string;

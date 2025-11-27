@@ -24,6 +24,7 @@ import {
   Loader2,
   ChevronLeft,
   ChevronRight,
+  DollarSign,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { OptimizedPriceDisplay } from '../OptimizedPriceDisplay'
@@ -67,6 +68,7 @@ const Requests = () => {
   const [isClaimDialogOpen, setIsClaimDialogOpen] = useState(false)
   const [selectedRequestId, setSelectedRequestId] = useState('')
   const [filteredRequests, setFilteredRequests] = useState<Request[]>([])
+  const [isFiltering, setIsFiltering] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(3)
   const previousFilteredDataRef = useRef<Request[]>([])
@@ -137,7 +139,7 @@ const Requests = () => {
       basePrice: booking.tool?.basePrice || 0,
       totalPrice: booking.totalPrice || 0,
       fees: booking.fees || 0,
-      deposit: booking.deposit || 0,
+      deposit: booking.tool?.depositAmount || 0,
       totalAmount: booking.totalAmount || booking.totalPrice || 0,
       status: booking.status,
       paymentMethod: booking.paymentMethod,
@@ -567,8 +569,7 @@ const Requests = () => {
   }
 
   // Données à paginer
-  const dataToDisplay =
-    filteredRequests.length > 0 ? filteredRequests : requests
+  const dataToDisplay = isFiltering ? filteredRequests : requests
   
   // 🔍 Debug: Log final data for display
   console.log('🔍 [Requests] Final data to display:', dataToDisplay)
@@ -659,10 +660,7 @@ const Requests = () => {
       rentalDuration:
         calculateRentalDuration(request.startDate, request.endDate) + ' days',
       // total Price = (basePrice + 6%) * RentalDuration
-      totalPrice: Math.round(
-        (request.basePrice + request.basePrice * 0.06) *
-          Number(calculateRentalDuration(request.startDate, request.endDate))
-      ),
+      totalPrice: request.totalPrice || 0,
       deposit: request.deposit || 0,
     }
 
@@ -696,12 +694,18 @@ const Requests = () => {
         <RequestsAndReservationsFilters
           data={requests}
           onFilteredDataChange={handleFilteredDataChange}
+          onFilterStateChange={setIsFiltering}
           searchPlaceholder={t('request.search')}
           statusOptions={statusOptions}
         />
 
         <div className='space-y-4'>
-          {paginatedRequests.map((req) => (
+          {dataToDisplay.length === 0 ? (
+            <div className='text-center py-12 text-muted-foreground'>
+              Aucune demande trouvée.
+            </div>
+          ) : (
+          paginatedRequests.map((req) => (
             <div key={req.id} className='border rounded-lg p-4 space-y-3'>
               <div className='flex items-start justify-between'>
                 <div className='flex gap-4'>
@@ -767,14 +771,33 @@ const Requests = () => {
                   <Clock className='h-4 w-4' />
                   {t('request.pickup_time')} : {req.pickupHour}
                 </div>
-                <div className='font-semibold text-primary'>
+                
+              </div>
+
+              <div className='flex items-center gap-2 text-sm mt-2'>
+                <DollarSign className='h-4 w-4 text-primary' />
+                <span>
+                  {language === 'ar'
+                    ? 'المبلغ الإجمالي :'
+                    : language === 'en'
+                    ? 'Total amount:'
+                    : 'Montant total :'}
+                </span>
+                <span className='font-semibold text-primary'>
                   <OptimizedPriceDisplay
                     price={req.totalPrice}
                     baseCurrency='GBP'
-                    size='md'
+                    size='sm'
                     cible='totalPrice'
                   />
-                </div>
+                </span>
+                <span className='text-muted-foreground'>
+                  {language === 'ar'
+                    ? '(دون 15% من عمولة المنصة)'
+                    : language === 'en'
+                    ? '(including 15% platform commission)'
+                    : '(dont 15% de commission plateforme)'}
+                </span>
               </div>
 
               {req.message && (
@@ -932,7 +955,8 @@ const Requests = () => {
                 )}
               </div>
             </div>
-          ))}
+          ))
+          )}
         </div>
 
         {/* Pagination */}

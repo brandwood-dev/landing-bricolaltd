@@ -239,12 +239,7 @@ const ClaimDialog: React.FC<ClaimDialogProps> = ({
                     <SelectItem value='late'>
                       Client late for pickup or return
                     </SelectItem>
-                    <SelectItem value='misuse'>
-                      Improper use of the tool (misuse, risk of damage)
-                    </SelectItem>
-                    <SelectItem value='damaged'>
-                      Return of a damaged or incomplete tool
-                    </SelectItem>
+                    
                     <SelectItem value='payment'>
                       Non-payment or payment issue
                     </SelectItem>
@@ -270,13 +265,7 @@ const ClaimDialog: React.FC<ClaimDialogProps> = ({
                     <SelectItem value='late'>
                       Client en retard pour la prise ou le retour
                     </SelectItem>
-                    <SelectItem value='misuse'>
-                      Utilisation inappropriée de l'outil (mauvais usage, risque
-                      de dommage)
-                    </SelectItem>
-                    <SelectItem value='damaged'>
-                      Retour d'un outil endommagé ou incomplet
-                    </SelectItem>
+                    
                     <SelectItem value='payment'>
                       Non-paiement ou problème de paiement
                     </SelectItem>
@@ -302,12 +291,7 @@ const ClaimDialog: React.FC<ClaimDialogProps> = ({
                     <SelectItem value='late'>
                       تأخر العميل في الاستلام أو الإرجاع
                     </SelectItem>
-                    <SelectItem value='misuse'>
-                      سوء استخدام الأداة (إساءة استخدام، خطر التلف)
-                    </SelectItem>
-                    <SelectItem value='damaged'>
-                      إرجاع أداة تالفة أو غير مكتملة
-                    </SelectItem>
+                    
                     <SelectItem value='payment'>
                       عدم الدفع أو مشكلة في الدفع
                     </SelectItem>

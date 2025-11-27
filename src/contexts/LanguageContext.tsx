@@ -346,8 +346,6 @@ const translations = {
     'resetpwd.verify': 'Vérifier',
     'resetpwd.verify_in_progress': 'Vérification en cours...',
 
-
-
     // create password
     'password.create.title': 'Nouveau mot de passe',
     'password.create.description':
@@ -429,8 +427,6 @@ const translations = {
     'currency.QAR': 'Riyal Qatarien',
     'currency.AED': 'Dirham des Émirats Arabes Unis',
     'currency.label': 'Devise',
-
-
 
     'validation.first_name_required': 'Le prénom est obligatoire',
     'validation.last_name_required': 'Le nom de famille est obligatoire',
@@ -593,7 +589,8 @@ const translations = {
     'blog.description':
       "Découvrez nos conseils, guides et actualités sur l'univers des outils et du bricolage",
     'blog.popular_categories': 'Catégories  populaires',
-    'blog.popular_categories.subtitle': 'Découvrez nos articles organisés par thématiques pour trouver exactement ce que vous cherchez',
+    'blog.popular_categories.subtitle':
+      'Découvrez nos articles organisés par thématiques pour trouver exactement ce que vous cherchez',
 
     'blog.return': 'Retour au blog',
     'blog.share': 'Partager',
@@ -1238,8 +1235,9 @@ const translations = {
     'subcategories.structure': 'Structure',
 
     'categories.transport': 'Transport',
-'subcategories.waste-and-dust-management': 'Gestion des déchets et des poussières',
-'subcategories.entertainment-games' : 'Divertissements et jeux',
+    'subcategories.waste-and-dust-management':
+      'Gestion des déchets et des poussières',
+    'subcategories.entertainment-games': 'Divertissements et jeux',
     // Tools
     'tools.featured': 'Outils en vedette',
     'tools.description':
@@ -1495,11 +1493,11 @@ const translations = {
     'add_tool.publish': "Publier l'annonce",
     'add_tool.choose_category': 'Choisir une catégorie',
     'add_tool.choose_subcategory': 'Choisir une sous-catégorie',
-    'add_tool.condition_new': '✨ Neuf',
-    'add_tool.condition_excellent': '🌟 Excellent',
-    'add_tool.condition_good': '👍 Bon',
-    'add_tool.condition_fair': '👌 Correct',
-    'add_tool.condition_poor': '📉 Mauvais état',
+    'add_tool.condition_new': 'Neuf',
+    'add_tool.condition_excellent': 'Excellent',
+    'add_tool.condition_good': 'Bon',
+    'add_tool.condition_fair': 'Correct',
+    'add_tool.condition_poor': 'Mauvais état',
     'add_tool.title_placeholder': 'Entrez le titre de votre outil...',
     'add_tool.brand_placeholder': "Marque de l'outil",
     'add_tool.model_placeholder': "Modèle de l'outil",
@@ -1539,6 +1537,13 @@ const translations = {
     'category.event.decoration': 'Décoration',
     'category.event.structure': 'Structure',
 
+    'category.events': 'Événementiel',
+    'category.events.lighting': 'Éclairage',
+    'category.events.kitchen': 'Cuisine',
+    'category.events.entertainment_and_games': 'Animation et Jeux',
+    'category.events.furniture': 'Mobilier',
+    'category.events.decoration': 'Décoration',
+    'category.events.structure': 'Structure',
     // Common
     'common.yes': 'Oui',
     'common.no': 'Non',
@@ -2181,8 +2186,6 @@ const translations = {
     'resetpwd.verify': 'Verify',
     'resetpwd.verify_in_progress': 'Verifying...',
 
-
-
     // create password
     'password.create.title': 'New Password',
     'password.create.description': 'Choose a secure new password',
@@ -2311,7 +2314,8 @@ const translations = {
     'blog.description':
       'Explore our tips, guides, and news from the world of tools and DIY',
     'blog.popular_categories': 'Popular Categories',
-    'blog.popular_categories.subtitle': 'Discover our articles organized by themes to find exactly what you are looking for',
+    'blog.popular_categories.subtitle':
+      'Discover our articles organized by themes to find exactly what you are looking for',
 
     'blog.return': 'Return to Blog',
     'blog.share': 'Share',
@@ -2337,8 +2341,7 @@ const translations = {
     'blog.category.guide': 'Guide',
     'tool.returned': 'Returned tools',
     // Category descriptions
-    'blog.category.gardening.desc':
-      'Tips and tricks to maintain your garden',
+    'blog.category.gardening.desc': 'Tips and tricks to maintain your garden',
     'blog.category.maintenance.desc':
       'Maintenance guide for your tools and equipment',
     'blog.category.transport.desc': 'Transport and logistics solutions',
@@ -2346,8 +2349,7 @@ const translations = {
     'blog.category.electricity.desc': 'Electrical installation and safety',
     'blog.category.lighting.desc': 'Lighting and ambiance for your space',
     'blog.category.painting.desc': 'Painting techniques and advice',
-    'blog.category.construction.desc':
-      'Building construction and renovation',
+    'blog.category.construction.desc': 'Building construction and renovation',
     'blog.category.plants.desc': 'Plant care and cultivation',
     'blog.category.cleaning.desc': 'Cleaning and maintenance of spaces',
     'blog.category.decoration.desc': 'Decor ideas to beautify your interior',
@@ -3035,8 +3037,6 @@ const translations = {
     'currency.AED': 'United Arab Emirates Dirham',
     'currency.label': 'Currency',
 
-
-
     'validation.first_name_required': 'First name is required',
     'validation.last_name_required': 'Last name is required',
     'validation.email_required': 'Email address is required',
@@ -3318,11 +3318,11 @@ const translations = {
     'add_tool.publish': 'Publish ad',
     'add_tool.choose_category': 'Choose a category',
     'add_tool.choose_subcategory': 'Choose a subcategory',
-    'add_tool.condition_new': '✨ New',
-    'add_tool.condition_excellent': '🌟 Excellent',
-    'add_tool.condition_good': '👍 Good',
-    'add_tool.condition_fair': '👌 Fair',
-    'add_tool.condition_poor': '📉 Poor condition',
+    'add_tool.condition_new': 'New',
+    'add_tool.condition_excellent': 'Excellent',
+    'add_tool.condition_good': 'Good',
+    'add_tool.condition_fair': 'Fair',
+    'add_tool.condition_poor': 'Poor condition',
     'add_tool.title_placeholder': 'Enter your tool title...',
     'add_tool.brand_placeholder': 'Tool brand',
     'add_tool.model_placeholder': 'Tool model',
@@ -3361,7 +3361,13 @@ const translations = {
     'category.event.furniture': 'Furniture',
     'category.event.decoration': 'Decoration',
     'category.event.structure': 'Structure',
-
+    'category.events': 'Event',
+    'category.events.lighting': 'Lighting',
+    'category.events.kitchen': 'Kitchen',
+    'category.events.entertainment_and_games': 'Entertainment and Games',
+    'category.events.furniture': 'Furniture',
+    'category.events.decoration': 'Decoration',
+    'category.events.structure': 'Structure',
     // Common
     'common.yes': 'Yes',
     'common.no': 'No',
@@ -4121,8 +4127,6 @@ const translations = {
     'password.update': 'تحديث كلمة المرور',
     'password.back_to_login': 'العودة إلى تسجيل الدخول',
 
-
-
     'resetpwd.popupsuccupdate': 'تم تغيير كلمة المرور',
     'resetpwd.txtsucc': '.تم تغيير كلمة المرور الخاصة بك بنجاح',
 
@@ -4233,7 +4237,8 @@ const translations = {
     'blog.description':
       'اكتشف نصائحنا، وأدلّتنا، وآخر الأخبار في عالم الأدوات والأعمال اليدوية',
     'blog.popular_categories': 'الفئات الشائعة',
-    'blog.popular_categories.subtitle': 'اكتشف مقالاتنا المنظمة حسب الموضوعات للعثور بالضبط على ما تبحث عنه',
+    'blog.popular_categories.subtitle':
+      'اكتشف مقالاتنا المنظمة حسب الموضوعات للعثور بالضبط على ما تبحث عنه',
     // blog categories
     'blog.subcategory.tools': 'الأدوات',
     'blog.category.safety': 'السلامة',
@@ -5134,11 +5139,11 @@ const translations = {
     'add_tool.publish': 'نشر الإعلان',
     'add_tool.choose_category': 'اختر فئة',
     'add_tool.choose_subcategory': 'اختر فئة فرعية',
-    'add_tool.condition_new': '✨ جديد',
-    'add_tool.condition_excellent': '🌟 ممتاز',
-    'add_tool.condition_good': '👍 جيد',
-    'add_tool.condition_fair': '👌 مقبول',
-    'add_tool.condition_poor': '📉 حالة سيئة',
+    'add_tool.condition_new': 'جديد',
+    'add_tool.condition_excellent': 'ممتاز',
+    'add_tool.condition_good': 'جيد',
+    'add_tool.condition_fair': 'مقبول',
+    'add_tool.condition_poor': 'حالة سيئة',
     'add_tool.title_placeholder': 'أدخل عنوان أداتك...',
     'add_tool.brand_placeholder': 'علامة الأداة التجارية',
     'add_tool.model_placeholder': 'طراز الأداة',
@@ -5176,7 +5181,13 @@ const translations = {
     'category.event.furniture': 'الأثاث',
     'category.event.decoration': 'الزينة',
     'category.event.structure': 'الهياكل',
-
+    'category.events': 'معدات المناسبات',
+    'category.events.lighting': 'الإضاءة',
+    'category.events.kitchen': 'المطبخ',
+    'category.events.entertainment_and_games': 'الترفيه والألعاب',
+    'category.events.furniture': 'الأثاث',
+    'category.events.decoration': 'الزينة',
+    'category.events.structure': 'الهياكل',
     // AddTool verification and messages
     'addtool.verification_in_progress': 'التحقق جاري...',
     'addtool.name_available': 'الاسم متاح ✓',
@@ -5492,9 +5503,6 @@ const translations = {
     'currency.QAR': 'الريال القطري',
     'currency.AED': 'درهم الإمارات العربية المتحدة',
     'currency.label': 'العملة',
-
-
-
   },
 }
 
@@ -5530,17 +5538,21 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
   }
 
   const t = (key: string, params?: Record<string, string | number>): string => {
-    let translation = translations[language][
-      key as keyof (typeof translations)[typeof language]
-    ] || key
-    
+    let translation =
+      translations[language][
+        key as keyof (typeof translations)[typeof language]
+      ] || key
+
     // Replace parameters if provided
     if (params) {
       Object.entries(params).forEach(([param, value]) => {
-        translation = translation.replace(new RegExp(`{${param}}`, 'g'), String(value))
+        translation = translation.replace(
+          new RegExp(`{${param}}`, 'g'),
+          String(value)
+        )
       })
     }
-    
+
     return translation
   }
 
@@ -5571,7 +5583,9 @@ export const useLanguage = () => {
   const context = useContext(LanguageContext)
   if (context === undefined) {
     // Return a fallback object instead of throwing an error
-    console.warn('useLanguage called outside LanguageProvider, returning fallback')
+    console.warn(
+      'useLanguage called outside LanguageProvider, returning fallback'
+    )
     return {
       language: 'fr' as Language,
       setLanguage: () => {},
@@ -5579,11 +5593,14 @@ export const useLanguage = () => {
         let translation = key
         if (params) {
           Object.entries(params).forEach(([param, value]) => {
-            translation = translation.replace(new RegExp(`{${param}}`, 'g'), String(value))
+            translation = translation.replace(
+              new RegExp(`{${param}}`, 'g'),
+              String(value)
+            )
           })
         }
         return translation
-      }
+      },
     }
   }
   return context

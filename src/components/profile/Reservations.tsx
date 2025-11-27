@@ -68,6 +68,7 @@ import { reviewsService } from '@/services/reviewsService'
 import { api } from '@/services/api'
 import { Booking, BookingStatus, Reservation } from '@/types/bridge'
 import { OptimizedPriceDisplay } from '../OptimizedPriceDisplay'
+import notificationService from '@/services/notificationService'
 
 
 
@@ -103,6 +104,7 @@ const Reservations = () => {
   const [filteredReservations, setFilteredReservations] = useState<
     Reservation[]
   >([])
+  const [isFiltering, setIsFiltering] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(5)
 
@@ -168,6 +170,7 @@ const Reservations = () => {
       message: booking.message,
       status: booking.status,
       price: booking.totalPrice || 0,
+      deposit: booking.tool.depositAmount || 0,
       dailyPrice: booking.tool?.basePrice || 0,
       location:
         booking.tool?.pickupAddress || t('general.location_not_specified'),
@@ -364,8 +367,8 @@ const Reservations = () => {
       renterAddress: reservation.renterAddress,
       renterEmail: reservation.renterEmail,
       renterPhone: reservation.renterPhone,
-      startDate: reservation.pickupHour,
-      endDate: reservation.pickupHour,
+      startDate: reservation.startDate,
+      endDate: reservation.endDate,
       pickupHour: reservation.pickupHour,
       handoverLocation: reservation.pickupAddress,
       returnLocation: reservation.pickupAddress,
@@ -374,12 +377,8 @@ const Reservations = () => {
         calculateRentalDuration(reservation.startDate, reservation.endDate) +
         ' days',
       // total Price = (basePrice + 6%) * RentalDuration
-      totalPrice:
-        (reservation.dailyPrice + reservation.dailyPrice * 0.06) *
-        Number(
-          calculateRentalDuration(reservation.startDate, reservation.endDate)
-        ),
-      deposit: reservation.price / 10 || 0,
+      totalPrice:reservation.price,
+      deposit: reservation.deposit,
     }
 
     generateRentalContract(contractData)
@@ -394,7 +393,7 @@ const Reservations = () => {
     navigate(`/tool/${toolId}`)
     // }
   }
-  //doit etre dynamic
+  
   const handleReport = async (reservationId: string) => {
     if (!reportReason || !reportMessage) {
       toast({
@@ -706,8 +705,7 @@ const Reservations = () => {
   ]
 
   // Données à paginer
-  const dataToDisplay =
-    filteredReservations.length > 0 ? filteredReservations : reservations
+  const dataToDisplay = isFiltering ? filteredReservations : reservations
 
   // Calcul de la pagination
   const totalPages = Math.ceil(dataToDisplay.length / itemsPerPage)
@@ -918,240 +916,176 @@ const Reservations = () => {
         <RequestsAndReservationsFilters
           data={reservations}
           onFilteredDataChange={handleFilteredDataChange}
+          onFilterStateChange={setIsFiltering}
           searchPlaceholder={t('booking.search')}
           statusOptions={statusOptions}
         />
 
         <div className='space-y-6'>
-          {paginatedReservations.map((reservation) => (
-            <Card key={reservation.id} className='overflow-hidden'>
-              <CardContent className='p-0'>
-                <div className='flex flex-col md:flex-row'>
-                  {/* Image de l'outil */}
-                  <div className='w-full md:w-32 h-48 md:h-32 flex-shrink-0'>
-                    <Link
-                      to={`/tool/${reservation.toolId}`}
-                      className='block w-full h-full'
-                    >
-                      <img
-                        src={reservation.toolImage}
-                        alt={reservation.toolName}
-                        className='w-full h-full object-cover hover:opacity-90 transition-opacity cursor-pointer'
-                      />
-                    </Link>
-                  </div>
+          {dataToDisplay.length === 0 ? (
+            <div className='text-center py-12 text-muted-foreground'>
+              {language === 'ar'
+                ? 'لا توجد حجوزات.'
+                : language === 'en'
+                ? 'No reservations found.'
+                : 'Aucune réservation trouvée.'}
+            </div>
+          ) : (
+            paginatedReservations.map((reservation) => (
+              <Card key={reservation.id} className='overflow-hidden'>
+                <CardContent className='p-0'>
+                  <div className='flex flex-col md:flex-row'>
+                    {/* Image de l'outil */}
+                    <div className='w-full md:w-32 h-48 md:h-32 flex-shrink-0'>
+                      <Link
+                        to={`/tool/${reservation.toolId}`}
+                        className='block w-full h-full'
+                      >
+                        <img
+                          src={reservation.toolImage}
+                          alt={reservation.toolName}
+                          className='w-full h-full object-cover hover:opacity-90 transition-opacity cursor-pointer'
+                        />
+                      </Link>
+                    </div>
 
-                  {/* Contenu principal */}
-                  <div className='flex-1 p-4 md:p-6'>
-                    <div className='flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4'>
-                      <div className='flex-1'>
-                        <div className='flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2'>
-                          <Link
-                            to={`/tool/${reservation.toolId}`}
-                            className='hover:text-blue-600 transition-colors'
-                          >
-                            <h3 className='text-lg font-semibold text-gray-900 cursor-pointer'>
-                              {reservation.toolName}
-                            </h3>
-                          </Link>
-                          <Badge className={getStatusColor(reservation.status)}>
-                            {t(`status.${reservation.status.toLowerCase()}`)}
-                          </Badge>
-                          {(reservation.status === 'ONGOING' ||
-                            reservation.status === 'ACCEPTED') &&
-                            reservation.renterHasReturned &&
-                            !reservation.pickupTool && (
-                              <Badge
-                                variant='outline'
-                                className='bg-blue-50 text-blue-800 border-blue-200'
-                              >
-                                {t('booking.wait')}
-                              </Badge>
-                            )}
-                          {reservation.status === 'ONGOING' &&
-                            reservation.hasActiveClaim && (
-                              <Badge
-                                variant='outline'
-                                className='bg-orange-50 text-orange-800 border-orange-200'
-                              >
-                                {t('claim.in_progress')}
-                              </Badge>
-                            )}
-                          {reservation.status === 'ACCEPTED' &&
-                            reservation.hasActiveClaim && (
-                              <Badge
-                                variant='outline'
-                                className='bg-orange-50 text-orange-800 border-orange-200'
-                              >
-                                {t('claim.in_progress')}
-                              </Badge>
-                            )}
-                          {(reservation.status === 'ONGOING' ||
-                            reservation.status === 'ACCEPTED') &&
-                            reservation.pickupTool && (
-                              <Badge
-                                variant='outline'
-                                className='bg-blue-50 text-orange-800 border-orange-200'
-                              >
-                                {t('tool.returned')}
-                              </Badge>
-                            )}
-                        </div>
+                    {/* Contenu principal */}
+                    <div className='flex-1 p-4 md:p-6'>
+                      <div className='flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4'>
+                        <div className='flex-1'>
+                          <div className='flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2'>
+                            <Link
+                              to={`/tool/${reservation.toolId}`}
+                              className='hover:text-blue-600 transition-colors'
+                            >
+                              <h3 className='text-lg font-semibold text-gray-900 cursor-pointer'>
+                                {reservation.toolName}
+                              </h3>
+                            </Link>
+                            <Badge
+                              className={getStatusColor(reservation.status)}
+                            >
+                              {t(`status.${reservation.status.toLowerCase()}`)}
+                            </Badge>
+                            {(reservation.status === 'ONGOING' ||
+                              reservation.status === 'ACCEPTED') &&
+                              reservation.renterHasReturned &&
+                              !reservation.pickupTool && (
+                                <Badge
+                                  variant='outline'
+                                  className='bg-blue-50 text-blue-800 border-blue-200'
+                                >
+                                  {t('booking.wait')}
+                                </Badge>
+                              )}
+                            {reservation.status === 'ONGOING' &&
+                              reservation.hasActiveClaim && (
+                                <Badge
+                                  variant='outline'
+                                  className='bg-orange-50 text-orange-800 border-orange-200'
+                                >
+                                  {t('claim.in_progress')}
+                                </Badge>
+                              )}
+                            {reservation.status === 'ACCEPTED' &&
+                              reservation.hasActiveClaim && (
+                                <Badge
+                                  variant='outline'
+                                  className='bg-orange-50 text-orange-800 border-orange-200'
+                                >
+                                  {t('claim.in_progress')}
+                                </Badge>
+                              )}
+                            {(reservation.status === 'ONGOING' ||
+                              reservation.status === 'ACCEPTED') &&
+                              reservation.pickupTool && (
+                                <Badge
+                                  variant='outline'
+                                  className='bg-blue-50 text-orange-800 border-orange-200'
+                                >
+                                  {t('tool.returned')}
+                                </Badge>
+                              )}
+                          </div>
 
-                        <div className='flex items-center gap-2 text-sm text-gray-600 mb-2'>
-                          <User className='h-4 w-4' />
-                          <span>
-                            {t('general.by')} {reservation.owner}
-                          </span>
-                        </div>
-
-                        <div className='text-xs text-gray-500 mb-3'>
-                          {language === 'ar'
-                            ? `${reservation.referenceId} : ${t(
-                                'general.reference'
-                              )}`
-                            : `${t('general.reference')}: ${
-                                reservation.referenceId
-                              }`}
-                        </div>
-
-                        <p className='text-sm text-gray-600 mb-4'>
-                          D! : {reservation.toolDescription}
-                        </p>
-
-                        <div className='flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-600 mb-4'>
-                          <div className='flex items-center gap-1'>
-                            <Calendar className='h-4 w-4' />
+                          <div className='flex items-center gap-2 text-sm text-gray-600 mb-2'>
+                            <User className='h-4 w-4' />
                             <span>
-                              {t('general.from')} {reservation.startDate}{' '}
-                              {t('general.to')} {reservation.endDate}
+                              {t('general.by')} {reservation.owner}
                             </span>
                           </div>
-                          <div className='flex items-center gap-1'>
-                            <MapPin className='h-4 w-4' />
-                            <span>{reservation.location}</span>
-                          </div>
-                        </div>
-                      </div>
 
-                      <div className='text-left lg:text-right mt-4 lg:mt-0'>
-                        <div className='text-2xl font-bold text-blue-600 mb-2'>
-                          {/* optimizedPriceDisplay */}
-
-                          <OptimizedPriceDisplay
-                            price={reservation.price}
-                            baseCurrency='GBP'
-                            size='md'
-                            cible='totalPrice'
-                          />
-                        </div>
-                        <div className='text-sm text-gray-500'>
-                          <OptimizedPriceDisplay
-                            price={reservation.dailyPrice}
-                            baseCurrency='GBP'
-                            size='md'
-                            cible='basePrice'
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    {reservation.status === 'REJECTED' &&
-                      reservation.refusalReason && (
-                        <div className='bg-muted/50 p-3 rounded text-sm'>
-                          <div className='flex items-start gap-2'>
-                            <MessageSquare className='h-4 w-4 mt-0.5 text-muted-foreground' />
-                            <p>
-                              {reservation.owner} : {reservation.refusalReason}
-                            </p>
-                            <p>{reservation.refusalMessage}</p>
+                          <div className='text-xs text-gray-500 mb-3'>
+                            {language === 'ar'
+                              ? `${reservation.referenceId} : ${t(
+                                  'general.reference'
+                                )}`
+                              : `${t('general.reference')}: ${
+                                  reservation.referenceId
+                                }`}
                           </div>
-                        </div>
-                      )}
-                    {/* Actions */}
-                    <div className='flex gap-2 flex-wrap'>
-                      {/* Actions pour statut "En attente" */}
-                      {reservation.status === 'PENDING' && (
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant='outline' size='sm'>
-                              {t('action.cancel')}
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader
-                              className={`${
-                                language === 'ar' ? 'flex justify-end' : ''
-                              }`}
-                            >
-                              <DialogTitle>
-                                {t('reservation.cancel.title')}
-                              </DialogTitle>
-                            </DialogHeader>
-                            <div className='space-y-4'>
-                              <Select
-                                value={cancellationReason}
-                                onValueChange={setCancellationReason}
-                              >
-                                <SelectTrigger>
-                                  <SelectValue
-                                    placeholder={t('reservation.cancel.reason')}
-                                  />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value='change-plans'>
-                                    {t('reservation.cancel.reason.unavailable')}
-                                  </SelectItem>
-                                  <SelectItem value='found-alternative'>
-                                    {t(
-                                      'reservation.cancel.reason.other_alternative'
-                                    )}
-                                  </SelectItem>
-                                  <SelectItem value='no-longer-needed'>
-                                    {t('reservation.cancel.reason.not_needed')}
-                                  </SelectItem>
-                                  <SelectItem value='other'>
-                                    {t('reservation.cancel.reason.other')}
-                                  </SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <Textarea
-                                placeholder={t('reservation.cancel.message')}
-                                value={cancellationMessage}
-                                onChange={(e) =>
-                                  setCancellationMessage(e.target.value)
-                                }
-                              />
-                              <Button
-                                onClick={() =>
-                                  handleCancelReservation(reservation.id)
-                                }
-                                className='w-full'
-                              >
-                                {t('reservation.cancel.confirm')}
-                              </Button>
+
+                          <p className='text-sm text-gray-600 mb-4'>
+                            D! : {reservation.toolDescription}
+                          </p>
+
+                          <div className='flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-600 mb-4'>
+                            <div className='flex items-center gap-1'>
+                              <Calendar className='h-4 w-4' />
+                              <span>
+                                {t('general.from')} {reservation.startDate}{' '}
+                                {t('general.to')} {reservation.endDate}
+                              </span>
                             </div>
-                          </DialogContent>
-                        </Dialog>
-                      )}
+                            <div className='flex items-center gap-1'>
+                              <MapPin className='h-4 w-4' />
+                              <span>{reservation.location}</span>
+                            </div>
+                          </div>
+                        </div>
 
-                      {/* Actions pour statut "Acceptée" */}
-                      {reservation.status === 'ACCEPTED' && (
-                        <>
+                        <div className='text-left lg:text-right mt-4 lg:mt-0'>
+                          <div className='text-2xl font-bold text-blue-600 mb-2'>
+                            {/* optimizedPriceDisplay */}
+
+                            <OptimizedPriceDisplay
+                              price={reservation.price}
+                              baseCurrency='GBP'
+                              size='md'
+                              cible='totalPrice'
+                            />
+                          </div>
+                          <div className='text-sm text-gray-500'>
+                            <OptimizedPriceDisplay
+                              price={reservation.dailyPrice}
+                              baseCurrency='GBP'
+                              size='md'
+                              cible='basePrice'
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      {reservation.status === 'REJECTED' &&
+                        reservation.refusalReason && (
+                          <div className='bg-muted/50 p-3 rounded text-sm'>
+                            <div className='flex items-start gap-2'>
+                              <MessageSquare className='h-4 w-4 mt-0.5 text-muted-foreground' />
+                              <p>
+                                {reservation.owner} :{' '}
+                                {reservation.refusalReason}
+                              </p>
+                              <p>{reservation.refusalMessage}</p>
+                            </div>
+                          </div>
+                        )}
+                      {/* Actions */}
+                      <div className='flex gap-2 flex-wrap'>
+                        {/* Actions pour statut "En attente" */}
+                        {reservation.status === 'PENDING' && (
                           <Dialog>
                             <DialogTrigger asChild>
-                              <Button
-                                variant='outline'
-                                size='sm'
-                                disabled={
-                                  !isCancellationAllowed(reservation.startDate)
-                                }
-                                className={
-                                  !isCancellationAllowed(reservation.startDate)
-                                    ? 'opacity-50 cursor-not-allowed'
-                                    : ''
-                                }
-                              >
-                                {t('general.cancel')}
+                              <Button variant='outline' size='sm'>
+                                {t('action.cancel')}
                               </Button>
                             </DialogTrigger>
                             <DialogContent>
@@ -1179,7 +1113,7 @@ const Reservations = () => {
                                   <SelectContent>
                                     <SelectItem value='change-plans'>
                                       {t(
-                                        'reservation.cancel.reason.not_needed'
+                                        'reservation.cancel.reason.unavailable'
                                       )}
                                     </SelectItem>
                                     <SelectItem value='found-alternative'>
@@ -1189,7 +1123,7 @@ const Reservations = () => {
                                     </SelectItem>
                                     <SelectItem value='no-longer-needed'>
                                       {t(
-                                        'reservation.cancel.reason.unavailable'
+                                        'reservation.cancel.reason.not_needed'
                                       )}
                                     </SelectItem>
                                     <SelectItem value='other'>
@@ -1215,559 +1149,761 @@ const Reservations = () => {
                               </div>
                             </DialogContent>
                           </Dialog>
+                        )}
 
-                          <Button
-                            variant='outline'
-                            size='sm'
-                            onClick={() => handleDownloadContract(reservation)}
-                            className='flex items-center gap-2'
-                          >
-                            <Download className='h-4 w-4' />
-                            {t('general.download_contract')}
-                          </Button>
-
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button variant='outline' size='sm'>
-                                {t('general.contact')}
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                              <DialogHeader
-                                className={`${
-                                  language === 'ar' ? 'flex justify-end' : ''
-                                }`}
-                              >
-                                <DialogTitle>
-                                  {t('request.contact_owner_information')}
-                                </DialogTitle>
-                              </DialogHeader>
-                              <div className='space-y-4'>
-                                <div
-                                  className={`flex items-center gap-3 ${
-                                    language === 'ar' ? 'justify-end' : ''
+                        {/* Actions pour statut "Acceptée" */}
+                        {reservation.status === 'ACCEPTED' && (
+                          <>
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button
+                                  variant='outline'
+                                  size='sm'
+                                  disabled={
+                                    !isCancellationAllowed(
+                                      reservation.startDate
+                                    )
+                                  }
+                                  className={
+                                    !isCancellationAllowed(
+                                      reservation.startDate
+                                    )
+                                      ? 'opacity-50 cursor-not-allowed'
+                                      : ''
+                                  }
+                                >
+                                  {t('general.cancel')}
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent>
+                                <DialogHeader
+                                  className={`${
+                                    language === 'ar' ? 'flex justify-end' : ''
                                   }`}
                                 >
-                                  {language === 'ar' ? (
-                                    <>
-                                      <div>
-                                        <h3 className='font-semibold'>
-                                          {reservation.owner}
-                                        </h3>
-                                        <p className='text-sm text-muted-foreground'>
-                                          {reservation.ownerEmail}
-                                        </p>
-                                        <p className='text-sm text-muted-foreground'>
-                                          {reservation.ownerPhone}
-                                        </p>
-                                      </div>
-                                      <Avatar className='h-12 w-12'>
-                                        <AvatarImage src='' />
-                                        <AvatarFallback>
-                                          {reservation.owner
-                                            ?.split(' ')
-                                            .map((n) => n[0])
-                                            .join('')}
-                                        </AvatarFallback>
-                                      </Avatar>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Avatar className='h-12 w-12'>
-                                        <AvatarImage src='' />
-                                        <AvatarFallback>
-                                          {reservation.owner
-                                            ?.split(' ')
-                                            .map((n) => n[0])
-                                            .join('')}
-                                        </AvatarFallback>
-                                      </Avatar>
-                                      <div>
-                                        <h3 className='font-semibold'>
-                                          {reservation.owner}
-                                        </h3>
-                                        <p className='text-sm text-muted-foreground'>
-                                          {reservation.ownerEmail}
-                                        </p>
-                                        <p className='text-sm text-muted-foreground'>
-                                          {reservation.ownerPhone}
-                                        </p>
-                                      </div>
-                                    </>
-                                  )}
-                                </div>
-
-                                <div className='flex gap-2'>
-                                  <Button
-                                    onClick={() =>
-                                      handleCall(reservation.ownerPhone)
-                                    }
-                                    className='flex-1 flex items-center gap-2'
+                                  <DialogTitle>
+                                    {t('reservation.cancel.title')}
+                                  </DialogTitle>
+                                </DialogHeader>
+                                <div className='space-y-4'>
+                                  <Select
+                                    value={cancellationReason}
+                                    onValueChange={setCancellationReason}
                                   >
-                                    <Phone className='h-4 w-4' />
-                                    {t('request.call')}
-                                  </Button>
-                                  <Button
-                                    variant='outline'
-                                    onClick={() =>
-                                      handleEmail(reservation.ownerEmail)
-                                    }
-                                    className='flex-1 flex items-center gap-2'
-                                  >
-                                    <Mail className='h-4 w-4' />
-                                    {t('request.mail')}
-                                  </Button>
-                                </div>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button
-                                variant='outline'
-                                size='sm'
-                                disabled={reservation.hasActiveClaim}
-                              >
-                                <Flag className='h-4 w-4 mr-1' />
-                                {t('general.report')}
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                              <DialogHeader
-                                className={`${
-                                  language === 'ar' ? 'flex justify-end' : ''
-                                }`}
-                              >
-                                <DialogTitle>
-                                  {t('booking.report.title')}
-                                </DialogTitle>
-                              </DialogHeader>
-                              <div className='space-y-4'>
-                                <Select
-                                  value={reportReason}
-                                  onValueChange={setReportReason}
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue
-                                      placeholder={t('booking.report.reason')}
-                                    />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {language === 'en' ? (
-                                      <>
-                                        <SelectItem value='not-compliant'>
-                                          Tool not compliant with the listing
-                                        </SelectItem>
-                                        <SelectItem value='poor-condition'>
-                                          Tool in poor condition or defective
-                                        </SelectItem>
-                                        <SelectItem value='delay'>
-                                          Delay in delivery / pickup
-                                        </SelectItem>
-                                        <SelectItem value='unsafe'>
-                                          Dangerous / unsafe tool
-                                        </SelectItem>
-                                        <SelectItem value='inappropriate'>
-                                          Inappropriate behavior of the provider
-                                        </SelectItem>
-                                        <SelectItem value='fraud'>
-                                          Suspicion of scam or fraud
-                                        </SelectItem>
-                                        <SelectItem value='no-response'>
-                                          No response from the provider
-                                        </SelectItem>
-                                        <SelectItem value='wrong-contact'>
-                                          Incorrect / unreachable phone number
-                                        </SelectItem>
-                                        <SelectItem value='other'>
-                                          Other
-                                        </SelectItem>
-                                      </>
-                                    ) : language === 'fr' ? (
-                                      <>
-                                        <SelectItem value='not-compliant'>
-                                          Outil non conforme à l'annonce
-                                        </SelectItem>
-                                        <SelectItem value='poor-condition'>
-                                          Outil en mauvais état ou défectueux
-                                        </SelectItem>
-                                        <SelectItem value='delay'>
-                                          Retard de livraison / récupération
-                                        </SelectItem>
-                                        <SelectItem value='unsafe'>
-                                          Outil dangereux / non sécurisé
-                                        </SelectItem>
-                                        <SelectItem value='inappropriate'>
-                                          Comportement inapproprié du
-                                          propriétaire
-                                        </SelectItem>
-                                        <SelectItem value='fraud'>
-                                          Suspicion d'arnaque ou fraude
-                                        </SelectItem>
-                                        <SelectItem value='no-response'>
-                                          Pas de réponse du propriétaire
-                                        </SelectItem>
-                                        <SelectItem value='wrong-contact'>
-                                          Numéro incorrect / injoignable
-                                        </SelectItem>
-                                        <SelectItem value='other'>
-                                          Autre
-                                        </SelectItem>
-                                      </>
-                                    ) : (
-                                      <>
-                                        <SelectItem value='not-compliant'>
-                                          الأداة غير مطابقة للإعلان
-                                        </SelectItem>
-                                        <SelectItem value='poor-condition'>
-                                          أداة في حالة سيئة أو معطلة
-                                        </SelectItem>
-                                        <SelectItem value='delay'>
-                                          تأخير في التسليم / الاستلام
-                                        </SelectItem>
-                                        <SelectItem value='unsafe'>
-                                          أداة خطرة / غير آمنة
-                                        </SelectItem>
-                                        <SelectItem value='inappropriate'>
-                                          سلوك غير لائق من المزود
-                                        </SelectItem>
-                                        <SelectItem value='fraud'>
-                                          شبهة احتيال أو نصب
-                                        </SelectItem>
-                                        <SelectItem value='no-response'>
-                                          لا يوجد رد من المزود
-                                        </SelectItem>
-                                        <SelectItem value='wrong-contact'>
-                                          رقم هاتف غير صحيح / لا يمكن الوصول
-                                          إليه
-                                        </SelectItem>
-                                        <SelectItem value='other'>
-                                          أخرى
-                                        </SelectItem>
-                                      </>
+                                    <SelectTrigger>
+                                      <SelectValue
+                                        placeholder={t(
+                                          'reservation.cancel.reason'
+                                        )}
+                                      />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value='change-plans'>
+                                        {t(
+                                          'reservation.cancel.reason.not_needed'
+                                        )}
+                                      </SelectItem>
+                                      <SelectItem value='found-alternative'>
+                                        {t(
+                                          'reservation.cancel.reason.other_alternative'
+                                        )}
+                                      </SelectItem>
+                                      <SelectItem value='no-longer-needed'>
+                                        {t(
+                                          'reservation.cancel.reason.unavailable'
+                                        )}
+                                      </SelectItem>
+                                      <SelectItem value='other'>
+                                        {t('reservation.cancel.reason.other')}
+                                      </SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <Textarea
+                                    placeholder={t(
+                                      'reservation.cancel.message'
                                     )}
-                                  </SelectContent>
-                                </Select>
-                                <Textarea
-                                  placeholder={t('booking.report.describe')}
-                                  value={reportMessage}
-                                  onChange={(e) =>
-                                    setReportMessage(e.target.value)
-                                  }
-                                />
-                                <Button
-                                  onClick={() => handleReport(reservation.id)}
-                                  className='w-full'
-                                >
-                                  {t('booking.report.submit')}
-                                </Button>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                        </>
-                      )}
-
-                      {/* Actions pour statut "En cours" */}
-                      {reservation.status === 'ONGOING' && (
-                        <>
-                          <Button
-                            variant='outline'
-                            size='sm'
-                            onClick={() => handleToolReturn(reservation.id)}
-                            disabled={reservation.hasUsedReturnButton}
-                            className={
-                              reservation.hasUsedReturnButton
-                                ? 'opacity-50 cursor-not-allowed'
-                                : ''
-                            }
-                          >
-                            {t('booking.tool_returned')}
-                          </Button>
-
-                          <Button
-                            variant='outline'
-                            size='sm'
-                            onClick={() => handleDownloadContract(reservation)}
-                            className='flex items-center gap-2'
-                          >
-                            <Download className='h-4 w-4' />
-                            {t('general.download_contract')}
-                          </Button>
-
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button variant='outline' size='sm'>
-                                {t('general.contact')}
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle>
-                                  Informations du propriétaire
-                                </DialogTitle>
-                              </DialogHeader>
-                              <div className='space-y-4'>
-                                <div className='flex items-center gap-3'>
-                                  <Avatar className='h-12 w-12'>
-                                    <AvatarImage src='' />
-                                    <AvatarFallback>
-                                      {reservation.owner
-                                        .split(' ')
-                                        .map((n) => n[0])
-                                        .join('')}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  <div>
-                                    <h3 className='font-semibold'>
-                                      {reservation.owner}
-                                    </h3>
-                                    <p className='text-sm text-muted-foreground'>
-                                      {reservation.ownerEmail}
-                                    </p>
-                                    <p className='text-sm text-muted-foreground'>
-                                      {reservation.ownerPhone}
-                                    </p>
-                                  </div>
-                                </div>
-
-                                <div className='flex gap-2'>
+                                    value={cancellationMessage}
+                                    onChange={(e) =>
+                                      setCancellationMessage(e.target.value)
+                                    }
+                                  />
                                   <Button
                                     onClick={() =>
-                                      handleCall(reservation.ownerPhone)
+                                      handleCancelReservation(reservation.id)
                                     }
-                                    className='flex-1 flex items-center gap-2'
+                                    className='w-full'
                                   >
-                                    <Phone className='h-4 w-4' />
-                                    Appeler
-                                  </Button>
-                                  <Button
-                                    variant='outline'
-                                    onClick={() =>
-                                      handleEmail(reservation.ownerEmail)
-                                    }
-                                    className='flex-1 flex items-center gap-2'
-                                  >
-                                    <Mail className='h-4 w-4' />
-                                    E-mail
+                                    {t('reservation.cancel.confirm')}
                                   </Button>
                                 </div>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                          {/* conditionner avec status */}
-                          {reservation.hasActiveClaim === false && (
+                              </DialogContent>
+                            </Dialog>
+
                             <Button
                               variant='outline'
                               size='sm'
                               onClick={() =>
-                                handleOpenReturnClaim(reservation.id)
+                                handleDownloadContract(reservation)
                               }
                               className='flex items-center gap-2'
                             >
-                              <Flag className='h-4 w-4 mr-1' />
-                              {t('general.report')}
+                              <Download className='h-4 w-4' />
+                              {t('general.download_contract')}
                             </Button>
-                          )}
-                          {/* <Dialog>
+
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button variant='outline' size='sm'>
+                                  {t('general.contact')}
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent>
+                                <DialogHeader
+                                  className={`${
+                                    language === 'ar' ? 'flex justify-end' : ''
+                                  }`}
+                                >
+                                  <DialogTitle>
+                                    {t('request.contact_owner_information')}
+                                  </DialogTitle>
+                                </DialogHeader>
+                                <div className='space-y-4'>
+                                  <div
+                                    className={`flex items-center gap-3 ${
+                                      language === 'ar' ? 'justify-end' : ''
+                                    }`}
+                                  >
+                                    {language === 'ar' ? (
+                                      <>
+                                        <div>
+                                          <h3 className='font-semibold'>
+                                            {reservation.owner}
+                                          </h3>
+                                          <p className='text-sm text-muted-foreground'>
+                                            {reservation.ownerEmail}
+                                          </p>
+                                          <p className='text-sm text-muted-foreground'>
+                                            {reservation.ownerPhone}
+                                          </p>
+                                        </div>
+                                        <Avatar className='h-12 w-12'>
+                                          <AvatarImage src='' />
+                                          <AvatarFallback>
+                                            {reservation.owner
+                                              ?.split(' ')
+                                              .map((n) => n[0])
+                                              .join('')}
+                                          </AvatarFallback>
+                                        </Avatar>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Avatar className='h-12 w-12'>
+                                          <AvatarImage src='' />
+                                          <AvatarFallback>
+                                            {reservation.owner
+                                              ?.split(' ')
+                                              .map((n) => n[0])
+                                              .join('')}
+                                          </AvatarFallback>
+                                        </Avatar>
+                                        <div>
+                                          <h3 className='font-semibold'>
+                                            {reservation.owner}
+                                          </h3>
+                                          <p className='text-sm text-muted-foreground'>
+                                            {reservation.ownerEmail}
+                                          </p>
+                                          <p className='text-sm text-muted-foreground'>
+                                            {reservation.ownerPhone}
+                                          </p>
+                                        </div>
+                                      </>
+                                    )}
+                                  </div>
+
+                                  <div className='flex gap-2'>
+                                    <Button
+                                      onClick={() =>
+                                        handleCall(reservation.ownerPhone)
+                                      }
+                                      className='flex-1 flex items-center gap-2'
+                                    >
+                                      <Phone className='h-4 w-4' />
+                                      {t('request.call')}
+                                    </Button>
+                                    <Button
+                                      variant='outline'
+                                      onClick={() =>
+                                        handleEmail(reservation.ownerEmail)
+                                      }
+                                      className='flex-1 flex items-center gap-2'
+                                    >
+                                      <Mail className='h-4 w-4' />
+                                      {t('request.mail')}
+                                    </Button>
+                                  </div>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+
+                            {reservation.hasActiveClaim === false && (
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button
+                                    variant='outline'
+                                    size='sm'
+                                    disabled={reservation.hasActiveClaim}
+                                  >
+                                    <Flag className='h-4 w-4 mr-1' />
+                                    {t('general.report')}
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                  <DialogHeader
+                                    className={`${
+                                      language === 'ar'
+                                        ? 'flex justify-end'
+                                        : ''
+                                    }`}
+                                  >
+                                    <DialogTitle>
+                                      {t('booking.report.title')}
+                                    </DialogTitle>
+                                  </DialogHeader>
+                                  <div className='space-y-4'>
+                                    <Select
+                                      value={reportReason}
+                                      onValueChange={setReportReason}
+                                    >
+                                      <SelectTrigger>
+                                        <SelectValue
+                                          placeholder={t(
+                                            'booking.report.reason'
+                                          )}
+                                        />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {language === 'en' ? (
+                                          <>
+                                            <SelectItem value='not-compliant'>
+                                              Tool not compliant with the
+                                              listing
+                                            </SelectItem>
+                                            <SelectItem value='poor-condition'>
+                                              Tool in poor condition or
+                                              defective
+                                            </SelectItem>
+                                            <SelectItem value='delay'>
+                                              Delay in delivery / pickup
+                                            </SelectItem>
+                                            <SelectItem value='unsafe'>
+                                              Dangerous / unsafe tool
+                                            </SelectItem>
+                                            <SelectItem value='inappropriate'>
+                                              Inappropriate behavior of the
+                                              provider
+                                            </SelectItem>
+                                            <SelectItem value='fraud'>
+                                              Suspicion of scam or fraud
+                                            </SelectItem>
+                                            <SelectItem value='no-response'>
+                                              No response from the provider
+                                            </SelectItem>
+                                            <SelectItem value='wrong-contact'>
+                                              Incorrect / unreachable phone
+                                              number
+                                            </SelectItem>
+                                            <SelectItem value='other'>
+                                              Other
+                                            </SelectItem>
+                                          </>
+                                        ) : language === 'fr' ? (
+                                          <>
+                                            <SelectItem value='not-compliant'>
+                                              Outil non conforme à l'annonce
+                                            </SelectItem>
+                                            <SelectItem value='poor-condition'>
+                                              Outil en mauvais état ou
+                                              défectueux
+                                            </SelectItem>
+                                            <SelectItem value='delay'>
+                                              Retard de livraison / récupération
+                                            </SelectItem>
+                                            <SelectItem value='unsafe'>
+                                              Outil dangereux / non sécurisé
+                                            </SelectItem>
+                                            <SelectItem value='inappropriate'>
+                                              Comportement inapproprié du
+                                              propriétaire
+                                            </SelectItem>
+                                            <SelectItem value='fraud'>
+                                              Suspicion d'arnaque ou fraude
+                                            </SelectItem>
+                                            <SelectItem value='no-response'>
+                                              Pas de réponse du propriétaire
+                                            </SelectItem>
+                                            <SelectItem value='wrong-contact'>
+                                              Numéro incorrect / injoignable
+                                            </SelectItem>
+                                            <SelectItem value='other'>
+                                              Autre
+                                            </SelectItem>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <SelectItem value='not-compliant'>
+                                              الأداة غير مطابقة للإعلان
+                                            </SelectItem>
+                                            <SelectItem value='poor-condition'>
+                                              أداة في حالة سيئة أو معطلة
+                                            </SelectItem>
+                                            <SelectItem value='delay'>
+                                              تأخير في التسليم / الاستلام
+                                            </SelectItem>
+                                            <SelectItem value='unsafe'>
+                                              أداة خطرة / غير آمنة
+                                            </SelectItem>
+                                            <SelectItem value='inappropriate'>
+                                              سلوك غير لائق من المزود
+                                            </SelectItem>
+                                            <SelectItem value='fraud'>
+                                              شبهة احتيال أو نصب
+                                            </SelectItem>
+                                            <SelectItem value='no-response'>
+                                              لا يوجد رد من المزود
+                                            </SelectItem>
+                                            <SelectItem value='wrong-contact'>
+                                              رقم هاتف غير صحيح / لا يمكن الوصول
+                                              إليه
+                                            </SelectItem>
+                                            <SelectItem value='other'>
+                                              أخرى
+                                            </SelectItem>
+                                          </>
+                                        )}
+                                      </SelectContent>
+                                    </Select>
+                                    <Textarea
+                                      placeholder={t('booking.report.describe')}
+                                      value={reportMessage}
+                                      onChange={(e) =>
+                                        setReportMessage(e.target.value)
+                                      }
+                                    />
+                                    <Button
+                                      onClick={() =>
+                                        handleReport(reservation.id)
+                                      }
+                                      className='w-full'
+                                    >
+                                      {t('booking.report.submit')}
+                                    </Button>
+                                  </div>
+                                </DialogContent>
+                              </Dialog>
+                            )}
+                          </>
+                        )}
+
+                        {/* Actions pour statut "En cours" */}
+                        {reservation.status === 'ONGOING' && (
+                          <>
+                            <Button
+                              variant='outline'
+                              size='sm'
+                              onClick={() => handleToolReturn(reservation.id)}
+                              disabled={reservation.hasUsedReturnButton}
+                              className={
+                                reservation.hasUsedReturnButton
+                                  ? 'opacity-50 cursor-not-allowed'
+                                  : ''
+                              }
+                            >
+                              {t('booking.tool_returned')}
+                            </Button>
+
+                            <Button
+                              variant='outline'
+                              size='sm'
+                              onClick={() =>
+                                handleDownloadContract(reservation)
+                              }
+                              className='flex items-center gap-2'
+                            >
+                              <Download className='h-4 w-4' />
+                              {t('general.download_contract')}
+                            </Button>
+
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button variant='outline' size='sm'>
+                                  {t('general.contact')}
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>
+                                    Informations du propriétaire
+                                  </DialogTitle>
+                                </DialogHeader>
+                                <div className='space-y-4'>
+                                  <div className='flex items-center gap-3'>
+                                    <Avatar className='h-12 w-12'>
+                                      <AvatarImage src='' />
+                                      <AvatarFallback>
+                                        {reservation.owner
+                                          .split(' ')
+                                          .map((n) => n[0])
+                                          .join('')}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                      <h3 className='font-semibold'>
+                                        {reservation.owner}
+                                      </h3>
+                                      <p className='text-sm text-muted-foreground'>
+                                        {reservation.ownerEmail}
+                                      </p>
+                                      <p className='text-sm text-muted-foreground'>
+                                        {reservation.ownerPhone}
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  <div className='flex gap-2'>
+                                    <Button
+                                      onClick={() =>
+                                        handleCall(reservation.ownerPhone)
+                                      }
+                                      className='flex-1 flex items-center gap-2'
+                                    >
+                                      <Phone className='h-4 w-4' />
+                                      Appeler
+                                    </Button>
+                                    <Button
+                                      variant='outline'
+                                      onClick={() =>
+                                        handleEmail(reservation.ownerEmail)
+                                      }
+                                      className='flex-1 flex items-center gap-2'
+                                    >
+                                      <Mail className='h-4 w-4' />
+                                      E-mail
+                                    </Button>
+                                  </div>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                            {/* conditionner avec status */}
+                            {reservation.hasActiveClaim === false && (
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button
+                                    variant='outline'
+                                    size='sm'
+                                    disabled={reservation.hasActiveClaim}
+                                  >
+                                    <Flag className='h-4 w-4 mr-1' />
+                                    {t('general.report')}
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                  <DialogHeader
+                                    className={`${
+                                      language === 'ar'
+                                        ? 'flex justify-end'
+                                        : ''
+                                    }`}
+                                  >
+                                    <DialogTitle>
+                                      {t('booking.report.title')}
+                                    </DialogTitle>
+                                  </DialogHeader>
+                                  <div className='space-y-4'>
+                                    <Select
+                                      value={reportReason}
+                                      onValueChange={setReportReason}
+                                    >
+                                      <SelectTrigger>
+                                        <SelectValue
+                                          placeholder={t(
+                                            'booking.report.reason'
+                                          )}
+                                        />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {language === 'en' ? (
+                                          <>
+                                            <SelectItem value='not-compliant'>
+                                              Tool not compliant with the
+                                              listing
+                                            </SelectItem>
+                                            <SelectItem value='poor-condition'>
+                                              Tool in poor condition or
+                                              defective
+                                            </SelectItem>
+                                            <SelectItem value='delay'>
+                                              Delay in delivery / pickup
+                                            </SelectItem>
+                                            <SelectItem value='unsafe'>
+                                              Dangerous / unsafe tool
+                                            </SelectItem>
+                                            <SelectItem value='inappropriate'>
+                                              Inappropriate behavior of the
+                                              provider
+                                            </SelectItem>
+                                            <SelectItem value='fraud'>
+                                              Suspicion of scam or fraud
+                                            </SelectItem>
+                                            <SelectItem value='no-response'>
+                                              No response from the provider
+                                            </SelectItem>
+                                            <SelectItem value='wrong-contact'>
+                                              Incorrect / unreachable phone
+                                              number
+                                            </SelectItem>
+                                            <SelectItem value='other'>
+                                              Other
+                                            </SelectItem>
+                                          </>
+                                        ) : language === 'fr' ? (
+                                          <>
+                                            <SelectItem value='not-compliant'>
+                                              Outil non conforme à l'annonce
+                                            </SelectItem>
+                                            <SelectItem value='poor-condition'>
+                                              Outil en mauvais état ou
+                                              défectueux
+                                            </SelectItem>
+                                            <SelectItem value='delay'>
+                                              Retard de livraison / récupération
+                                            </SelectItem>
+                                            <SelectItem value='unsafe'>
+                                              Outil dangereux / non sécurisé
+                                            </SelectItem>
+                                            <SelectItem value='inappropriate'>
+                                              Comportement inapproprié du
+                                              propriétaire
+                                            </SelectItem>
+                                            <SelectItem value='fraud'>
+                                              Suspicion d'arnaque ou fraude
+                                            </SelectItem>
+                                            <SelectItem value='no-response'>
+                                              Pas de réponse du propriétaire
+                                            </SelectItem>
+                                            <SelectItem value='wrong-contact'>
+                                              Numéro incorrect / injoignable
+                                            </SelectItem>
+                                            <SelectItem value='other'>
+                                              Autre
+                                            </SelectItem>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <SelectItem value='not-compliant'>
+                                              الأداة غير مطابقة للإعلان
+                                            </SelectItem>
+                                            <SelectItem value='poor-condition'>
+                                              أداة في حالة سيئة أو معطلة
+                                            </SelectItem>
+                                            <SelectItem value='delay'>
+                                              تأخير في التسليم / الاستلام
+                                            </SelectItem>
+                                            <SelectItem value='unsafe'>
+                                              أداة خطرة / غير آمنة
+                                            </SelectItem>
+                                            <SelectItem value='inappropriate'>
+                                              سلوك غير لائق من المزود
+                                            </SelectItem>
+                                            <SelectItem value='fraud'>
+                                              شبهة احتيال أو نصب
+                                            </SelectItem>
+                                            <SelectItem value='no-response'>
+                                              لا يوجد رد من المزود
+                                            </SelectItem>
+                                            <SelectItem value='wrong-contact'>
+                                              رقم هاتف غير صحيح / لا يمكن الوصول
+                                              إليه
+                                            </SelectItem>
+                                            <SelectItem value='other'>
+                                              أخرى
+                                            </SelectItem>
+                                          </>
+                                        )}
+                                      </SelectContent>
+                                    </Select>
+                                    <Textarea
+                                      placeholder={t('booking.report.describe')}
+                                      value={reportMessage}
+                                      onChange={(e) =>
+                                        setReportMessage(e.target.value)
+                                      }
+                                    />
+                                    <Button
+                                      onClick={() =>
+                                        handleReport(reservation.id)
+                                      }
+                                      className='w-full'
+                                    >
+                                      {t('booking.report.submit')}
+                                    </Button>
+                                  </div>
+                                </DialogContent>
+                              </Dialog>
+                            )}
+                          </>
+                        )}
+
+                        {/* Bouton pour voir les détails d'annulation */}
+                        {reservation.status === 'CANCELLED' && (
+                          <Dialog>
                             <DialogTrigger asChild>
                               <Button variant='outline' size='sm'>
-                                <Flag className='h-4 w-4 mr-1' />
-                                {t('general.report')}
+                                <Eye className='h-4 w-4 mr-1' />
+                                {t('general.view_details')}
                               </Button>
                             </DialogTrigger>
                             <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle>Signaler un problème</DialogTitle>
+                              <DialogHeader
+                                className={`${
+                                  language === 'ar' ? 'flex justify-end' : ''
+                                }`}
+                              >
+                                <DialogTitle>
+                                  {t('cancellation.details.title')}
+                                </DialogTitle>
                               </DialogHeader>
-                              <div className='space-y-4'>
-                                <Select
-                                  value={reportReason}
-                                  onValueChange={setReportReason}
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue placeholder='Sélectionnez une raison' />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value='no-response'>
-                                      Ne répond pas
-                                    </SelectItem>
-                                    <SelectItem value='wrong-number'>
-                                      Numéro incorrect
-                                    </SelectItem>
-                                    <SelectItem value='inappropriate'>
-                                      Comportement inapproprié
-                                    </SelectItem>
-                                    <SelectItem value='other'>Autre</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <Textarea
-                                  placeholder='Décrivez le problème'
-                                  value={reportMessage}
-                                  onChange={(e) =>
-                                    setReportMessage(e.target.value)
-                                  }
-                                />
-                                <Button
-                                  onClick={() => handleReport(reservation.id)}
-                                  className='w-full'
-                                >
-                                  Envoyer le signalement
-                                </Button>
-                              </div>
-                            </DialogContent>
-                          </Dialog> */}
-                        </>
-                      )}
-
-                      {/* Bouton pour voir les détails d'annulation */}
-                      {reservation.status === 'CANCELLED' && (
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant='outline' size='sm'>
-                              <Eye className='h-4 w-4 mr-1' />
-                              {t('general.view_details')}
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader
-                              className={`${
-                                language === 'ar' ? 'flex justify-end' : ''
-                              }`}
-                            >
-                              <DialogTitle>
-                                {t('cancellation.details.title')}
-                              </DialogTitle>
-                            </DialogHeader>
-                            <div className='space-y-3'>
-                              <div>
-                                <strong>
-                                  {t('cancellation.details.reason')} :
-                                </strong>{' '}
-                                {reservation.cancellationReason}
-                              </div>
-                              {reservation.cancellationMessage && (
+                              <div className='space-y-3'>
                                 <div>
                                   <strong>
-                                    {t('cancellation.details.message')} :
+                                    {t('cancellation.details.reason')} :
                                   </strong>{' '}
-                                  {reservation.cancellationMessage}
+                                  {reservation.cancellationReason}
                                 </div>
-                              )}
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-                      )}
-                    </div>
-
-                    {/* Section code de validation modernisée */}
-                    {reservation.status === 'ACCEPTED' &&
-                      reservation.validationCode && (
-                        <div className='mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200'>
-                          <div className='flex items-center justify-between'>
-                            <div className='flex items-center gap-3'>
-                              <div className='w-2 h-2 bg-blue-500 rounded-full animate-pulse'></div>
-                              <span className='text-sm font-medium text-blue-900'>
-                                {t('booking.verification_code')}
-                              </span>
-                            </div>
-                            <Button
-                              variant='ghost'
-                              size='sm'
-                              onClick={() =>
-                                toggleValidationCode(reservation.id)
-                              }
-                              className='text-blue-700 hover:text-blue-900 hover:bg-blue-100'
-                            >
-                              {showValidationCode[reservation.id] ? (
-                                <>
-                                  <EyeOff className='h-4 w-4 mr-1' />
-                                  {t('general.hide')}
-                                </>
-                              ) : (
-                                <>
-                                  <Eye className='h-4 w-4 mr-1' />
-                                  {t('general.show')}
-                                </>
-                              )}
-                            </Button>
-                          </div>
-
-                          {showValidationCode[reservation.id] && (
-                            <div className='mt-3 p-3 bg-white rounded-md border border-blue-200 shadow-sm'>
-                              <div className='flex items-center justify-between'>
-                                <div className='font-mono text-xl font-bold text-gray-900 tracking-wider'>
-                                  {reservation.validationCode}
-                                </div>
-                                <Button
-                                  variant='ghost'
-                                  size='sm'
-                                  onClick={() =>
-                                    copyValidationCode(
-                                      reservation.validationCode!,
-                                      reservation.id
-                                    )
-                                  }
-                                  className='text-blue-700 hover:text-blue-900 hover:bg-blue-50'
-                                >
-                                  {copiedCode[reservation.id] ? (
-                                    <>
-                                      <Check className='h-4 w-4 mr-1' />
-                                      Copié
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Copy className='h-4 w-4 mr-1' />
-                                      {t('general.copy')}
-                                    </>
-                                  )}
-                                </Button>
+                                {reservation.cancellationMessage && (
+                                  <div>
+                                    <strong>
+                                      {t('cancellation.details.message')} :
+                                    </strong>{' '}
+                                    {reservation.cancellationMessage}
+                                  </div>
+                                )}
                               </div>
-                              <p className='text-xs text-blue-600 mt-2'>
-                                {t('booking.present_code')}
-                              </p>
+                            </DialogContent>
+                          </Dialog>
+                        )}
+                      </div>
+
+                      {/* Section code de validation modernisée */}
+                      {reservation.status === 'ACCEPTED' &&
+                        reservation.validationCode && (
+                          <div className='mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200'>
+                            <div className='flex items-center justify-between'>
+                              <div className='flex items-center gap-3'>
+                                <div className='w-2 h-2 bg-blue-500 rounded-full animate-pulse'></div>
+                                <span className='text-sm font-medium text-blue-900'>
+                                  {t('booking.verification_code')}
+                                </span>
+                              </div>
+                              <Button
+                                variant='ghost'
+                                size='sm'
+                                onClick={() =>
+                                  toggleValidationCode(reservation.id)
+                                }
+                                className='text-blue-700 hover:text-blue-900 hover:bg-blue-100'
+                              >
+                                {showValidationCode[reservation.id] ? (
+                                  <>
+                                    <EyeOff className='h-4 w-4 mr-1' />
+                                    {t('general.hide')}
+                                  </>
+                                ) : (
+                                  <>
+                                    <Eye className='h-4 w-4 mr-1' />
+                                    {t('general.show')}
+                                  </>
+                                )}
+                              </Button>
                             </div>
+
+                            {showValidationCode[reservation.id] && (
+                              <div className='mt-3 p-3 bg-white rounded-md border border-blue-200 shadow-sm'>
+                                <div className='flex items-center justify-between'>
+                                  <div className='font-mono text-xl font-bold text-gray-900 tracking-wider'>
+                                    {reservation.validationCode}
+                                  </div>
+                                  <Button
+                                    variant='ghost'
+                                    size='sm'
+                                    onClick={() =>
+                                      copyValidationCode(
+                                        reservation.validationCode!,
+                                        reservation.id
+                                      )
+                                    }
+                                    className='text-blue-700 hover:text-blue-900 hover:bg-blue-50'
+                                  >
+                                    {copiedCode[reservation.id] ? (
+                                      <>
+                                        <Check className='h-4 w-4 mr-1' />
+                                        Copié
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Copy className='h-4 w-4 mr-1' />
+                                        {t('general.copy')}
+                                      </>
+                                    )}
+                                  </Button>
+                                </div>
+                                <p className='text-xs text-blue-600 mt-2'>
+                                  {t('booking.present_code')}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      {/* review if status completed  */}
+                      {reservation.status === 'COMPLETED' && (
+                        <div className='flex gap-2'>
+                          {!hasReviewedToolMap[reservation.id] && (
+                            <Button
+                              variant='outline'
+                              size='sm'
+                              onClick={() => {
+                                setReviewType('tool')
+                                handleOpenReview(reservation.id)
+                              }}
+                              className='flex items-center gap-2'
+                            >
+                              <Star className='h-4 w-4 mr-1' />
+                              {t('booking.rate_tool')}
+                            </Button>
+                          )}
+                          {!hasReviewedApp && (
+                            <Button
+                              variant='outline'
+                              size='sm'
+                              onClick={() => {
+                                setReviewType('app')
+                                handleOpenReview(reservation.id)
+                              }}
+                              className='flex items-center gap-2'
+                            >
+                              <Star className='h-4 w-4 mr-1' />
+                              {t('booking.rate_app')}
+                            </Button>
                           )}
                         </div>
                       )}
-                    {/* review if status completed  */}
-                    {reservation.status === 'COMPLETED' && (
-                      <div className='flex gap-2'>
-                        {!hasReviewedToolMap[reservation.id] && (
-                          <Button
-                            variant='outline'
-                            size='sm'
-                            onClick={() => {
-                              setReviewType('tool')
-                              handleOpenReview(reservation.id)
-                            }}
-                            className='flex items-center gap-2'
-                          >
-                            <Star className='h-4 w-4 mr-1' />
-                            {t('booking.rate_tool')}
-                          </Button>
-                        )}
-                        {!hasReviewedApp && (
-                          <Button
-                            variant='outline'
-                            size='sm'
-                            onClick={() => {
-                              setReviewType('app')
-                              handleOpenReview(reservation.id)
-                            }}
-                            className='flex items-center gap-2'
-                          >
-                            <Star className='h-4 w-4 mr-1' />
-                            {t('booking.rate_app')}
-                          </Button>
-                        )}
-                      </div>
-                    )}
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))
+          )}
         </div>
 
         {/* Pagination */}
@@ -1834,12 +1970,31 @@ const Reservations = () => {
         <Dialog open={isReturnDialogOpen} onOpenChange={setIsReturnDialogOpen}>
           <DialogContent>
             <DialogHeader
-              className={`${language === 'ar' ? 'flex justify-end' : ''}`}
+              className={`${
+                language === 'ar' ? 'flex justify-end items-center' : ''
+              }`}
             >
               <DialogTitle>{t('tool.return.title')}</DialogTitle>
             </DialogHeader>
             <div className='space-y-4'>
-              <p></p>
+              <p className={language === 'ar' ? 'text-right' : ''}>
+                {language === 'ar'
+                  ? 'يرجى تأكيد أن الأداة قد تمت إعادتها وهي في حالة جيدة وتم تسليمها إلى الشخص الصحيح. سيؤدي هذا الإجراء إلى اعتماد عملية الإرجاع بشكل نهائي.'
+                  : language === 'en'
+                  ? 'Please confirm that the tool has been returned in good condition and handed over to the correct person. This action will definitively validate the return.'
+                  : 'Veuillez confirmer que l’outil est rendu en bon état et remis à la bonne personne. Cette action validera définitivement le retour.'}
+              </p>
+              <p
+                className={`text-sm text-muted-foreground ${
+                  language === 'ar' ? 'text-right' : ''
+                }`}
+              >
+                {language === 'ar'
+                  ? 'وفي حال تم اكتشاف أي مشكلة في الأداة، يحقّ للمالك تقييم الخلل، ويمكنكما بعد ذلك التفاوض معًا بشأن مبلغ التأمين.'
+                  : language === 'en'
+                  ? 'If any issue is detected on the tool, the owner has the right to assess the anomaly, and you may then negotiate together the amount of the deposit.'
+                  : 'En cas de problème constaté sur l’outil, le propriétaire est en droit d’en évaluer l’anomalie et vous pourrez alors négocier ensemble le montant de la caution.'}
+              </p>
               <div className='flex flex-col gap-2'>
                 <Button onClick={handleConfirmReturn} className='w-full'>
                   {t('tool.return.confirm')}
@@ -2037,7 +2192,7 @@ const Reservations = () => {
             </div>
           </DialogContent>
         </Dialog>
-{/* review app dialog */}
+        {/* review app dialog */}
         <Dialog open={isReviewDialogOpen} onOpenChange={setIsReviewDialogOpen}>
           <DialogContent>
             <DialogHeader

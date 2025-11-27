@@ -20,6 +20,7 @@ interface FilterOptions {
 interface RequestsAndReservationsFiltersProps {
   data: any[]
   onFilteredDataChange: (filteredData: any[]) => void
+  onFilterStateChange?: (active: boolean) => void
   searchPlaceholder?: string
   statusOptions: { value: string; label: string }[]
 }
@@ -27,6 +28,7 @@ interface RequestsAndReservationsFiltersProps {
 const RequestsAndReservationsFilters = ({
   data,
   onFilteredDataChange,
+  onFilterStateChange,
   searchPlaceholder = "Rechercher par titre d'annonce...",
   statusOptions,
 }: RequestsAndReservationsFiltersProps) => {
@@ -70,33 +72,34 @@ const RequestsAndReservationsFilters = ({
       )
     }
 
-    // Status filter
+    // Status filter with alias support
     if (filters.statusFilter !== 'all') {
-      result = result.filter((item) => item.status === filters.statusFilter)
+      const desired = String(filters.statusFilter).toLowerCase()
+      const statusAliases: Record<string, string[]> = {
+        accepted: ['accepted', 'confirmed', 'ACCEPTED', 'CONFIRMED'],
+        pending: ['pending', 'PENDING'],
+        ongoing: ['ongoing', 'ONGOING'],
+        completed: ['completed', 'COMPLETED'],
+        cancelled: ['cancelled', 'CANCELLED'],
+        rejected: ['rejected', 'declined', 'REJECTED', 'DECLINED'],
+      }
+      const allowed = (statusAliases[desired] || [desired]).map((s) => s.toLowerCase())
+      result = result.filter((item) => allowed.includes(String(item.status || '').toLowerCase()))
     }
 
-    // Period filter
+    // Period filter (rolling windows: last 7/30/365 days)
     if (filters.periodFilter !== 'all') {
       const now = new Date()
-      const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()))
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-      const startOfYear = new Date(now.getFullYear(), 0, 1)
+      const threshold = new Date(now)
+      const daysMap: Record<string, number> = { week: 7, month: 30, year: 365 }
+      const days = daysMap[filters.periodFilter] || 0
+      threshold.setDate(now.getDate() - days)
+      threshold.setHours(0, 0, 0, 0)
 
       result = result.filter((item) => {
-        const itemDate = new Date(
-          item.startDate || item.createdAt || Date.now()
-        )
-
-        switch (filters.periodFilter) {
-          case 'week':
-            return itemDate >= startOfWeek
-          case 'month':
-            return itemDate >= startOfMonth
-          case 'year':
-            return itemDate >= startOfYear
-          default:
-            return true
-        }
+        const raw = item.startDate || item.createdAt || Date.now()
+        const itemDate = new Date(raw)
+        return itemDate >= threshold
       })
     }
 
@@ -106,6 +109,11 @@ const RequestsAndReservationsFilters = ({
   // Update parent component when filtered data changes
   React.useEffect(() => {
     onFilteredDataChange(filteredData)
+    const isActive =
+      !!filters.searchTerm ||
+      filters.statusFilter !== 'all' ||
+      filters.periodFilter !== 'all'
+    onFilterStateChange?.(isActive)
   }, [filteredData, onFilteredDataChange])
 
   const handleFilterChange = (key: keyof FilterOptions, value: string) => {

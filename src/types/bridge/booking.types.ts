@@ -84,6 +84,7 @@ export interface Reservation {
   pickupHour: string
   status: BookingStatus
   price: number
+  deposit: number
   dailyPrice: number
   location: string
   message: string
