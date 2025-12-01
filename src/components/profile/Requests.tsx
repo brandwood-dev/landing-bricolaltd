@@ -518,14 +518,14 @@ const Requests = () => {
         pickupTool: true,
       })
 
-      // Send notification
-      await notificationService.createNotification({
-        userId: user.id,
-        type: 'dispute_created',
-        title: 'Dispute créée',
-        message: `Une dispute a été créée pour la réservation ${selectedRequestId}`,
-        data: { bookingId: selectedRequestId },
-      })
+      // // Send notification
+      // await notificationService.createNotification({
+      //   userId: user.id,
+      //   type: 'dispute_created',
+      //   title: 'Dispute créée',
+      //   message: `Une dispute a été créée pour la réservation ${selectedRequestId}`,
+      //   data: { bookingId: selectedRequestId },
+      // })
 
       // Update local state after successful API calls
       setRequests((prev) =>
@@ -785,7 +785,7 @@ const Requests = () => {
                 </span>
                 <span className='font-semibold text-primary'>
                   <OptimizedPriceDisplay
-                    price={req.totalPrice}
+                    price={Math.max(Number(req.totalPrice) * 0.94, 0)}
                     baseCurrency='GBP'
                     size='sm'
                     cible='totalPrice'

@@ -66,10 +66,7 @@ const Wallet = () => {
           walletService.getUserTransactions(user.id, {
             page: currentPage,
             limit: itemsPerPage,
-            type:
-              transactionType === 'all'
-                ? undefined
-                : transactionType.toUpperCase(),
+            type: transactionType === 'withdrawals' ? 'WITHDRAWAL' : undefined,
           }),
           walletService.getUserStats(user.id),
         ])
@@ -108,9 +105,16 @@ const Wallet = () => {
   // Filter transactions by date range (type filtering is handled by API)
   const filteredTransactions = useMemo(() => {
     if (!Array.isArray(transactions)) return []
-    if (!dateRange?.from) return transactions
+    let base = transactions
+    if (transactionType === 'withdrawals') {
+      base = base.filter((t) => t.type === 'WITHDRAWAL')
+    } else if (transactionType === 'receipts') {
+      base = base.filter((t) => t.type !== 'WITHDRAWAL')
+    }
 
-    return transactions.filter((transaction) => {
+    if (!dateRange?.from) return base
+
+    return base.filter((transaction) => {
       const transactionDate = parseISO(transaction.createdAt)
       if (dateRange.to) {
         return isWithinInterval(transactionDate, {
@@ -121,7 +125,7 @@ const Wallet = () => {
         return transactionDate >= dateRange.from!
       }
     })
-  }, [transactions, dateRange])
+  }, [transactions, transactionType, dateRange])
 
   // Pagination
   const totalPages = Math.ceil(totalTransactions / itemsPerPage)

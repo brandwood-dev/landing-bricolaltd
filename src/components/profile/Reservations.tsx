@@ -1057,7 +1057,7 @@ const Reservations = () => {
                           </div>
                           <div className='text-sm text-gray-500'>
                             <OptimizedPriceDisplay
-                              price={reservation.dailyPrice}
+                              price={(reservation.dailyPrice || 0) * 1.06}
                               baseCurrency='GBP'
                               size='md'
                               cible='basePrice'

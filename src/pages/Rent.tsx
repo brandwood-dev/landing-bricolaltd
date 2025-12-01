@@ -62,6 +62,7 @@ import { PaymentMethod } from '@/types/bridge'
 const API_BASE_URL = import.meta.env.VITE_BASE_URL
   ? `${import.meta.env.VITE_BASE_URL}`
   : 'http://localhost:4000/api'
+import googlePayLogo from '@/assets/Google_Pay-Logo.wine.png'
 // Interface pour les données persistées
 interface PersistedFormData {
   startDate: Date | null
@@ -958,27 +959,17 @@ const Rent: React.FC = () => {
                           {t('reservation.rental_period')}
                         </h3>
 
-                        {/* Légende du calendrier */}
+                        {/* Légende du calendrier (simplifiée) */}
                         <div className='bg-blue-50 p-4 rounded-lg'>
                           <h4 className='font-medium text-sm mb-3 flex items-center gap-2'>
                             <Info className='h-4 w-4' />
                             {t('calendar.legend')}
                           </h4>
-                          <div className='grid grid-cols-2 gap-3 text-xs'>
+                          <div className='grid grid-cols-1 gap-3 text-xs'>
                             <div className='flex items-center gap-2'>
                               <div className='w-4 h-4 bg-red-600 rounded'></div>
                               <span>{t('calendar.reserved_in_progress')}</span>
                             </div>
-                            <div className='flex items-center gap-2'>
-                              <div className='w-4 h-4 bg-orange-500 rounded'></div>
-                              <span>{t('calendar.pending_accepted')}</span>
-                            </div>
-                            {/* Message de limite de 5 jours SUPPRIMÉ
-                            <div className='flex items-center gap-2'>
-                              <AlertCircle className='h-4 w-4 text-amber-600' />
-                              <span>{t('calendar.max_5_days')}</span>
-                            </div>
-                            */}
                           </div>
                         </div>
 
@@ -1006,10 +997,12 @@ const Rent: React.FC = () => {
                                   selected={startDate}
                                   onSelect={handleStartDateChange}
                                   disabled={(date) => {
-                                    const minimumStartDate =
-                                      getMinimumStartDate()
+                                    const today = new Date()
+                                    today.setHours(0, 0, 0, 0)
+                                    const d = new Date(date)
+                                    d.setHours(0, 0, 0, 0)
                                     return (
-                                      date < minimumStartDate ||
+                                      d <= today ||
                                       isDateUnavailable(date) ||
                                       isDateConfirmed(date) ||
                                       isDatePending(date) ||
@@ -1025,9 +1018,9 @@ const Rent: React.FC = () => {
                                   }}
                                   modifiersStyles={{
                                     unavailable: {
-                                      backgroundColor: '#d1d5db',
-                                      color: '#6b7280',
-                                      textDecoration: 'line-through',
+                                      backgroundColor: '#dc2626',
+                                      color: '#ffffff',
+                                      fontWeight: 'bold',
                                     },
                                     confirmed: {
                                       backgroundColor: '#dc2626',
@@ -1086,6 +1079,7 @@ const Rent: React.FC = () => {
                                     // Empêcher la sélection de dates ≤ date de début (même date ou antérieure)
                                     if (
                                       date <= startDate ||
+                                      (() => { const today = new Date(); today.setHours(0,0,0,0); const d = new Date(date); d.setHours(0,0,0,0); return d <= today })() ||
                                       isDateUnavailable(date) ||
                                       isDateConfirmed(date) ||
                                       isDatePending(date) ||
@@ -1122,9 +1116,9 @@ const Rent: React.FC = () => {
                                   }}
                                   modifiersStyles={{
                                     unavailable: {
-                                      backgroundColor: '#d1d5db',
-                                      color: '#6b7280',
-                                      textDecoration: 'line-through',
+                                      backgroundColor: '#dc2626',
+                                      color: '#ffffff',
+                                      fontWeight: 'bold',
                                     },
                                     confirmed: {
                                       backgroundColor: '#dc2626',
@@ -1144,7 +1138,6 @@ const Rent: React.FC = () => {
                                     exceeding: {
                                       backgroundColor: '#fef3c7',
                                       color: '#d97706',
-                                      textDecoration: 'line-through',
                                     },
                                   }}
                                   initialFocus
@@ -1319,7 +1312,7 @@ const Rent: React.FC = () => {
                               className='h-4 w-4 text-green-600'
                             />
                             <img
-                              src='/src/assets/Google_Pay-Logo.wine.png'
+                              src={googlePayLogo}
                               alt='Google Pay'
                               className='h-5 w-auto'
                             />
