@@ -208,6 +208,8 @@ const BlogPost = () => {
                     title={post.title}
                     excerpt={post.summary}
                     imageUrl={absoluteImage || '/placeholder-blog.svg'}
+                    triggerVariant='default'
+                    triggerClassName='bg-[#ED8021] hover:bg-[#ED8021] text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300'
                   />
                 </div>
               </div>

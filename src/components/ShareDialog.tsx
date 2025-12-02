@@ -33,6 +33,7 @@ interface ShareDialogProps {
   imageUrl?: string;
   triggerSize?: 'sm' | 'default' | 'lg';
   triggerVariant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+  triggerClassName?: string;
 }
 
 const ShareDialog: React.FC<ShareDialogProps> = ({
@@ -41,7 +42,8 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
   excerpt,
   imageUrl,
   triggerSize = 'sm',
-  triggerVariant = 'outline'
+  triggerVariant = 'outline',
+  triggerClassName,
 }) => {
   const { t, language } = useLanguage();
   const [copied, setCopied] = useState(false);
@@ -92,7 +94,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
         <Button 
           variant={triggerVariant} 
           size={triggerSize}
-          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+          className={triggerClassName || "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"}
         >
           <Share2 className="h-4 w-4 mr-2" />
           {t('blog.share')}
