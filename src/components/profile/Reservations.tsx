@@ -287,9 +287,22 @@ const Reservations = () => {
   const isCancellationAllowed = (startDate: string) => {
     const today = new Date()
     const start = new Date(startDate)
-    today.setHours(0, 0, 0, 0)
-    start.setHours(0, 0, 0, 0)
-    return today < start
+    // If pickup hour is available (though not passed here directly, assuming logic needs to be robust)
+    // For now simple date comparison 24h check:
+    
+    // We need to compare full timestamps if possible. 
+    // Assuming startDate is YYYY-MM-DD, we treat it as 00:00 of that day if no hour.
+    // If we want stricter 24h rule relative to pickup time, we need pickupHour.
+    
+    // Logic from BookingsCancellationService:
+    // const hoursDiff = (pickupDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+    // return hoursDiff >= 24;
+    
+    // Simple check: is NOW < (Start Date - 1 Day)?
+    const deadline = new Date(start);
+    deadline.setDate(deadline.getDate() - 1); // 24h before
+    
+    return today < deadline;
   }
 
   //doit etre dynamic
@@ -320,10 +333,35 @@ const Reservations = () => {
           res.id === reservationId ? transformedReservation : res
         )
       )
+      
+      // Calculate refund message based on status and time
+      const reservation = reservations.find(r => r.id === reservationId);
+      let refundMessage = '';
+      
+      if (reservation) {
+          if (reservation.status === 'PENDING') {
+              refundMessage = t('success.reservation.cancelled.refund_full');
+          } else if (reservation.status === 'ACCEPTED') {
+               const pickupDate = new Date(reservation.startDate);
+               // Assuming pickupHour is handled or start of day
+               if (reservation.pickupHour) {
+                  const [hours, minutes] = reservation.pickupHour.split(':').map(Number);
+                  pickupDate.setHours(hours, minutes, 0, 0);
+               }
+               const now = new Date();
+               const hoursDiff = (pickupDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+               
+               if (hoursDiff >= 24) {
+                   refundMessage = t('success.reservation.cancelled.refund_full');
+               } else {
+                   refundMessage = t('success.reservation.cancelled.no_refund');
+               }
+          }
+      }
 
       toast({
         title: t('success.reservation.cancelled.title'),
-        description: t('success.reservation.cancelled.message'),
+        description: refundMessage || t('success.reservation.cancelled.message'),
         duration: 5000,
         className: "bg-green-50 border-green-200 text-green-800",
       })
@@ -1235,6 +1273,12 @@ const Reservations = () => {
                                   >
                                     {t('reservation.cancel.confirm')}
                                   </Button>
+                                  <div className="text-xs text-muted-foreground mt-2 bg-muted p-2 rounded">
+                                    <strong>{t('requests.refund_notice')}:</strong> 
+                                    {isCancellationAllowed(reservation.startDate) 
+                                        ? t('requests.renter_cancel_refund_full') 
+                                        : t('requests.renter_cancel_refund_none')}
+                                  </div>
                                 </div>
                               </DialogContent>
                             </Dialog>

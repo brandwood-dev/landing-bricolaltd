@@ -66,6 +66,9 @@ const RefusalDialog: React.FC<RefusalDialogProps> = ({ onDecline, requestId }) =
               {t('reservation.refused_confirm')}
             </Button>
           </div>
+          <div className="text-xs text-muted-foreground mt-2 bg-muted p-2 rounded">
+            <strong>{t('requests.refund_notice')}:</strong> {t('requests.owner_reject_refund_policy')}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

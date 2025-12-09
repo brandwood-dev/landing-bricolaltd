@@ -296,7 +296,7 @@ const Requests = () => {
 
       toast({
         title: t('request.refuse'),
-        description: t('request.refuse.message'),
+        description: t('requests.owner_reject_refund_policy') || t('request.refuse.message'),
       })
     } catch (error: any) {
       toast({

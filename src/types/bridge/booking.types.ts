@@ -110,6 +110,7 @@ export interface CreateBookingData {
   ownerId: string
   totalPrice: number
   paymentStatus?: string
+  paymentIntentId?: string
 }
 
 // Booking update data

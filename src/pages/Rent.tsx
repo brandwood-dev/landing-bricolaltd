@@ -113,8 +113,6 @@ const Rent: React.FC = () => {
   const [pendingBookingData, setPendingBookingData] =
     useState<CreateBookingData | null>(null)
 
-
-
   // Fonction pour générer la clé de stockage unique
   const getStorageKey = (toolId: string, userId?: string): string => {
     return `rent_form_${toolId}_${userId || 'anonymous'}`
@@ -234,8 +232,6 @@ const Rent: React.FC = () => {
     loading,
   ])
 
- 
-
   // États supplémentaires pour la gestion des réservations
   const [bookingDates, setBookingDates] = useState<{
     confirmed: Date[]
@@ -298,16 +294,13 @@ const Rent: React.FC = () => {
       }
 
       // Récupérer les réservations existantes depuis l'API avec authentification
-      const response = await fetch(
-        `${API_BASE_URL}/bookings/tool/${toolId}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+      const response = await fetch(`${API_BASE_URL}/bookings/tool/${toolId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      })
 
       if (!response.ok) {
         throw new Error('Failed to fetch existing bookings')
@@ -400,8 +393,6 @@ const Rent: React.FC = () => {
     refreshRates(RateFetchTrigger.RENT_PAGE_ENTRY)
   }, [id, refreshRates])
 
-
-
   const isDateUnavailable = (date: Date) => {
     return unavailableDates.some(
       (unavailable) => date.toDateString() === unavailable.toDateString()
@@ -464,14 +455,14 @@ const Rent: React.FC = () => {
   // Vérifier si une heure de pickup est désactivée pour une date donnée
   const isPickupTimeDisabled = (selectedDate: Date, pickupTime: string) => {
     if (!selectedDate) return false
-    
+
     const [hours, minutes] = pickupTime.split(':').map(Number)
     const pickupDateTime = new Date(selectedDate)
     pickupDateTime.setHours(hours, minutes, 0, 0)
-    
+
     const now = new Date()
     const minimumDateTime = new Date(now.getTime() + 48 * 60 * 60 * 1000)
-    
+
     return pickupDateTime < minimumDateTime
   }
 
@@ -492,11 +483,16 @@ const Rent: React.FC = () => {
       })
     }
     // Vérifier si l'heure de pickup actuelle est encore valide avec la nouvelle date
-    if (date && formData.pickupHour && isPickupTimeDisabled(date, formData.pickupHour)) {
+    if (
+      date &&
+      formData.pickupHour &&
+      isPickupTimeDisabled(date, formData.pickupHour)
+    ) {
       setFormData({ ...formData, pickupHour: '' })
       toast({
         title: 'Heure de récupération réinitialisée',
-        description: 'L\'heure sélectionnée n\'est plus disponible pour cette date. Veuillez en choisir une autre.',
+        description:
+          "L'heure sélectionnée n'est plus disponible pour cette date. Veuillez en choisir une autre.",
         variant: 'default',
       })
     }
@@ -509,12 +505,13 @@ const Rent: React.FC = () => {
       if (date.toDateString() === startDate.toDateString()) {
         toast({
           title: 'Dates identiques non autorisées',
-          description: 'La date de fin doit être différente de la date de début.',
+          description:
+            'La date de fin doit être différente de la date de début.',
           variant: 'destructive',
         })
         return
       }
-      
+
       // Vérifier la limite de 5 jours - SUPPRIMÉE
       // if (isDateExceeding5Days(date, startDate)) {
       //   toast({
@@ -524,7 +521,7 @@ const Rent: React.FC = () => {
       //   })
       //   return
       // }
-      
+
       // Vérifier si la période contient des dates indisponibles
       if (isPeriodUnavailable(startDate, date)) {
         toast({
@@ -600,23 +597,19 @@ const Rent: React.FC = () => {
     fetchPricing()
   }, [tool, startDate, endDate])
 
- 
-
- 
-
   // Pricing values with fallbacks and validation
   const basePrice = Math.max(
     Number(pricing?.basePrice || tool?.basePrice) || 25,
     0
   )
-  
+
   // 🔍 LOGS DE DÉBOGAGE POUR LE CALCUL DES JOURS
   console.log('🔍 [DEBUG] Calcul des jours:')
   console.log('  - calculateDays():', calculateDays())
   console.log('  - pricing?.totalDays:', pricing?.totalDays)
   console.log('  - startDate:', startDate)
   console.log('  - endDate:', endDate)
-  
+
   // FORCER l'utilisation de calculateDays() au lieu de pricing?.totalDays
   const days = Math.max(calculateDays() || 1, 1)
   const totalPrice = Math.max(Number(pricing?.subtotal) || basePrice * days, 0)
@@ -669,8 +662,7 @@ const Rent: React.FC = () => {
     if (startDate.toDateString() === endDate.toDateString()) {
       toast({
         title: t('errors.validation_error'),
-        description:
-          'La date de fin doit être différente de la date de début',
+        description: 'La date de fin doit être différente de la date de début',
         variant: 'destructive',
       })
       return
@@ -764,7 +756,9 @@ const Rent: React.FC = () => {
       }
 
       // 🔍 SÉCURITÉ: Toujours utiliser les données actuelles du formulaire
-      console.log('🔍 [Rent.tsx] Création des données de réservation avec les valeurs actuelles:')
+      console.log(
+        '🔍 [Rent.tsx] Création des données de réservation avec les valeurs actuelles:'
+      )
       console.log('🔍 [Rent.tsx] - startDate:', startDate)
       console.log('🔍 [Rent.tsx] - endDate:', endDate)
       console.log('🔍 [Rent.tsx] - pickupHour:', formData.pickupHour)
@@ -778,9 +772,12 @@ const Rent: React.FC = () => {
         startDate: formatDateLocal(startDate),
         endDate: formatDateLocal(endDate),
         pickupHour: formData.pickupHour,
-        paymentMethod: formData.paymentMethod === 'card' ? PaymentMethod.CARD : 
-                      formData.paymentMethod === 'google_pay' ? PaymentMethod.GOOGLE_PAY : 
-                      PaymentMethod.APPLE_PAY,
+        paymentMethod:
+          formData.paymentMethod === 'card'
+            ? PaymentMethod.CARD
+            : formData.paymentMethod === 'google_pay'
+            ? PaymentMethod.GOOGLE_PAY
+            : PaymentMethod.APPLE_PAY,
         message: formData.message || undefined,
         renterId: user?.id!,
         ownerId: tool.ownerId,
@@ -1079,7 +1076,13 @@ const Rent: React.FC = () => {
                                     // Empêcher la sélection de dates ≤ date de début (même date ou antérieure)
                                     if (
                                       date <= startDate ||
-                                      (() => { const today = new Date(); today.setHours(0,0,0,0); const d = new Date(date); d.setHours(0,0,0,0); return d <= today })() ||
+                                      (() => {
+                                        const today = new Date()
+                                        today.setHours(0, 0, 0, 0)
+                                        const d = new Date(date)
+                                        d.setHours(0, 0, 0, 0)
+                                        return d <= today
+                                      })() ||
                                       isDateUnavailable(date) ||
                                       isDateConfirmed(date) ||
                                       isDatePending(date) ||
@@ -1519,6 +1522,7 @@ const Rent: React.FC = () => {
                               const bookingDataWithPaymentStatus = {
                                 ...pendingBookingData,
                                 paymentStatus: 'authorized', // Définir le statut de paiement comme autorisé après paiement réussi
+                                paymentIntentId: paymentIntentId, // Save the Stripe Payment Intent ID
                               }
                               console.log(
                                 '🔍 [Rent.tsx] Booking data with payment status:',

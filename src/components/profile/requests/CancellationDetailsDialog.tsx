@@ -32,6 +32,9 @@ const CancellationDetailsDialog: React.FC<CancellationDetailsDialogProps> = ({ r
               <strong>{t('requests.message')} :</strong> {request.cancellationMessage}
             </div>
           )}
+          <div className="text-xs text-muted-foreground mt-2 bg-muted p-2 rounded">
+            <strong>{t('requests.refund_notice')}:</strong> {t('requests.owner_cancel_refund_policy')}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

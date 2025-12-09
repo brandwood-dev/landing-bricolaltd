@@ -18,6 +18,11 @@ const translations = {
   fr: {
     'reservation.deposit.desc':
       'La caution sera gelé 24h avant le début de la location et remboursée après celle-ci si aucun dommage n`est constaté.',
+    'requests.refund_notice': 'Politique de remboursement',
+    'requests.owner_cancel_refund_policy': 'En cas d\'annulation par le propriétaire, le locataire sera intégralement remboursé.',
+    'requests.owner_reject_refund_policy': 'En cas de refus par le propriétaire, le locataire sera intégralement remboursé.',
+    'requests.renter_cancel_refund_full': 'Annulation plus de 24h avant : Remboursement intégral.',
+    'requests.renter_cancel_refund_none': 'Annulation moins de 24h avant : Aucun remboursement.',
     'login.signing': 'Connexion en cours...',
     'blog.category.general': 'Général',
     // AgeVerificationDialog
@@ -839,6 +844,8 @@ const translations = {
     'pagination.previous': 'Précédent',
 
     // Messages de succès harmonisés
+    'success.reservation.cancelled.refund_full': 'Votre réservation a été annulée. Vous serez remboursé intégralement.',
+    'success.reservation.cancelled.no_refund': 'Votre réservation a été annulée. Conformément aux conditions (moins de 24h), aucun remboursement n\'est possible.',
     'success.reservation.confirmed.title': '✅ Réservation confirmée !',
     'success.reservation.confirmed.message':
       'Votre réservation a été confirmée avec succès. Vous recevrez un email de confirmation.',
