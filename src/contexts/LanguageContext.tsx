@@ -16,13 +16,27 @@ interface LanguageContextType {
 
 const translations = {
   fr: {
+    // MapView
+    'view.details': 'Voir détails',
+    'no.tools.found': 'Aucun outil trouvé',
+    'try.modifying.search.criteria':
+      'Essayez de modifier vos critères de recherche',
+    'tools.found': 'Outils trouvés',
+    results: 'résultats',
+    'map.tools': 'Carte des outils',
+    'search.tools': 'Rechercher des outils sur la carte...',
+    'chargemento.outils': 'Chargement des outils...',
     'reservation.deposit.desc':
       'La caution sera gelé 24h avant le début de la location et remboursée après celle-ci si aucun dommage n`est constaté.',
     'requests.refund_notice': 'Politique de remboursement',
-    'requests.owner_cancel_refund_policy': 'En cas d\'annulation par le propriétaire, le locataire sera intégralement remboursé.',
-    'requests.owner_reject_refund_policy': 'En cas de refus par le propriétaire, le locataire sera intégralement remboursé.',
-    'requests.renter_cancel_refund_full': 'Annulation plus de 24h avant : Remboursement intégral.',
-    'requests.renter_cancel_refund_none': 'Annulation moins de 24h avant : Aucun remboursement.',
+    'requests.owner_cancel_refund_policy':
+      "En cas d'annulation par le propriétaire, le locataire sera intégralement remboursé.",
+    'requests.owner_reject_refund_policy':
+      'En cas de refus par le propriétaire, le locataire sera intégralement remboursé.',
+    'requests.renter_cancel_refund_full':
+      'Annulation plus de 24h avant : Remboursement intégral.',
+    'requests.renter_cancel_refund_none':
+      'Annulation moins de 24h avant : Aucun remboursement.',
     'login.signing': 'Connexion en cours...',
     'blog.category.general': 'Général',
     // AgeVerificationDialog
@@ -844,8 +858,10 @@ const translations = {
     'pagination.previous': 'Précédent',
 
     // Messages de succès harmonisés
-    'success.reservation.cancelled.refund_full': 'Votre réservation a été annulée. Vous serez remboursé intégralement.',
-    'success.reservation.cancelled.no_refund': 'Votre réservation a été annulée. Conformément aux conditions (moins de 24h), aucun remboursement n\'est possible.',
+    'success.reservation.cancelled.refund_full':
+      'Votre réservation a été annulée. Vous serez remboursé intégralement.',
+    'success.reservation.cancelled.no_refund':
+      "Votre réservation a été annulée. Conformément aux conditions (moins de 24h), aucun remboursement n'est possible.",
     'success.reservation.confirmed.title': '✅ Réservation confirmée !',
     'success.reservation.confirmed.message':
       'Votre réservation a été confirmée avec succès. Vous recevrez un email de confirmation.',
@@ -1032,7 +1048,7 @@ const translations = {
     'profile.ads': 'Annonces',
     'profile.reservations': 'Réservations',
     'profile.requests': 'Demandes',
-    'profile.wallet': 'Portefeuille',
+    'profile.wallet': 'Revenus',
     'profile.edit': 'Modifier',
     'profile.member_since': 'Membre depuis {date}',
     'profile.select_country': 'Sélectionnez un pays',
@@ -1053,16 +1069,17 @@ const translations = {
     'action.confirm': 'Confirmer',
 
     // Wallet translations
-    'wallet.title': 'Mon Portefeuille',
+    'wallet.title': 'Revenus',
     'wallet.total': 'Total',
-    'wallet.cumulative_balance': 'Solde cumulé',
+    'wallet.cumulative_balance': 'Revenus cumulés',
     'wallet.available': 'Disponible',
-    'wallet.available_balance': 'Solde disponible',
+    'wallet.available_balance': 'Revenus disponibles',
+    'wallet.pending_balance': 'Revenus en attente',
     'wallet.successful': 'Réussies',
     'wallet.successful_transactions': 'Transactions réussies',
-    'wallet.withdraw_money': 'Retirer mon argent',
+    'wallet.withdraw_money': 'Demander un virement',
     'wallet.withdrawal_note':
-      'Vous pouvez retirer votre argent à partir du moment où votre solde cumulé atteint 50 GBP.',
+      'Vous pouvez demander le paiement dès que vos revenus cumulés atteignent 50 GBP.',
     'wallet.conversion_rate': '50 GBP = {minWithdrawalEUR} EUR',
     'wallet.dynamic_conversion':
       "Le taux de conversion s'actualise dynamiquement en fonction de la devise choisie dans le compte.",
@@ -1173,7 +1190,7 @@ const translations = {
     'nav.login': 'Connexion',
     'nav.signup': 'Inscription',
     'nav.profile': 'Profil',
-    'nav.wallet': 'Portefeuille',
+    'nav.wallet': 'Revenus',
     'nav.my_listings': 'Mes annonces',
     'nav.requests': 'Demandes',
     'nav.bookings': 'Réservations',
@@ -1911,21 +1928,30 @@ const translations = {
     'privacy.section9.title': '9. Transferts Internationaux',
 
     'privacy.section9.p1':
-      'Si certaines données sont transférées en dehors de l’UE/Royaume-Uni, cela se fait dans un cadre contractuel sécurisé, via des clauses contractuelles types ou des accords avec les prestataires respectant les normes internationales de protection des données.',
+      'Si certaines données sont transférées en dehors de l`UE/Royaume-Uni, cela se fait dans un cadre contractuel sécurisé, via des clauses contractuelles types ou des accords avec les prestataires respectant les normes internationales de protection des données.',
 
     'privacy.section10.title':
       '10. Mise à Jour de la Politique de Confidentialité',
 
     'privacy.section10.p1':
-      'Cette politique peut faire l’objet de mises à jour afin de refléter des évolutions techniques, juridiques ou organisationnelles.',
+      'Cette politique peut faire l`objet de mises à jour afin de refléter des évolutions techniques, juridiques ou organisationnelles.',
 
     'privacy.section10.p2':
-      'Les utilisateurs seront informés de toute modification significative par email ou notification via l’application.',
+      'Les utilisateurs seront informés de toute modification significative par email ou notification via l`application.',
 
     'privacy.section10.p3':
-      'L’usage continu de la plateforme après modification vaut acceptation tacite de la nouvelle version.',
+      'L`usage continu de la plateforme après modification vaut acceptation tacite de la nouvelle version.',
   },
   en: {
+    // MapView
+    'view.details': 'View details',
+    'no.tools.found': 'No tools found',
+    'try.modifying.search.criteria': 'Try modifying your search criteria',
+    'tools.found': 'Tools found',
+    results: 'results',
+    'map.tools': 'Map of tools',
+    'search.tools': 'Search for tools on the map...',
+    'chargemento.outils': 'Loading tools...',
     'reservation.deposit.desc':
       'The security deposit will be charged 24 hours before the rental starts and refunded after the rental if no damage is found.',
     'login.signing': 'Signing in...',
@@ -2769,7 +2795,7 @@ const translations = {
     'profile.ads': 'Ads',
     'profile.reservations': 'Reservations',
     'profile.requests': 'Requests',
-    'profile.wallet': 'Wallet',
+    'profile.wallet': 'Earnings',
     'profile.edit': 'Edit',
     'profile.member_since': 'Member since {date}',
     'profile.select_country': 'Select a country',
@@ -2785,16 +2811,17 @@ const translations = {
     'profile.new_password': 'New Password',
 
     // Wallet translations
-    'wallet.title': 'My Wallet',
+    'wallet.title': 'Earnings',
     'wallet.total': 'Total',
-    'wallet.cumulative_balance': 'Cumulative balance',
+    'wallet.cumulative_balance': 'Total earnings due',
     'wallet.available': 'Available',
-    'wallet.available_balance': 'Available balance',
+    'wallet.available_balance': 'Available earnings',
+    'wallet.pending_balance': 'Pending earnings',
     'wallet.successful': 'Successful',
     'wallet.successful_transactions': 'Successful transactions',
-    'wallet.withdraw_money': 'Withdraw my money',
+    'wallet.withdraw_money': 'Request payout',
     'wallet.withdrawal_note':
-      'You can withdraw your money once your cumulative balance reaches 50 GBP.',
+      'You can request a payout once your total earnings reach 50 GBP.',
     'wallet.conversion_rate': '50 GBP = {minWithdrawalEUR} EUR',
     'wallet.dynamic_conversion':
       'The conversion rate updates dynamically based on the currency selected in the account.',
@@ -2900,7 +2927,7 @@ const translations = {
     'nav.login': 'Login',
     'nav.signup': 'Sign up',
     'nav.profile': 'Profile',
-    'nav.wallet': 'Wallet',
+    'nav.wallet': 'Earnings',
     'nav.my_listings': 'My listings',
     'nav.requests': 'Requests',
     'nav.bookings': 'Bookings',
@@ -3800,6 +3827,15 @@ const translations = {
     'notifications.booking_accepted': 'Booking Accepted',
   },
   ar: {
+    // MapView
+    'view.details': 'عرض التفاصيل',
+    'no.tools.found': 'لا توجد أدوات',
+    'try.modifying.search.criteria': 'حاول تعديل معايير البحث',
+    'tools.found': 'أدوات تم العثور عليها',
+    results: 'نتائج',
+    'map.tools': 'خريطة الأدوات',
+    'search.tools': 'بحث عن أدوات على الخريطة...',
+    'chargemento.outils': 'تحميل الأدوات',
     'reservation.deposit.desc':
       ' سيتم تجميد مبلغ التأمين قبل 24 ساعة من بداية الإيجار، ويُعاد بعد انتهاء الإيجار في حال عدم وجود أي تلف بالأداة المستأجرة.',
     'login.signing': 'تسجيل الدخول...',
@@ -4240,7 +4276,7 @@ const translations = {
     'calendar.max_5_days': 'حد أقصى 5 أيام متتالية',
 
     // blog
-    'blog.title': 'مدونة بريكولا المحدودة',
+    'blog.title': 'مدونة Bricola',
     'blog.description':
       'اكتشف نصائحنا، وأدلّتنا، وآخر الأخبار في عالم الأدوات والأعمال اليدوية',
     'blog.popular_categories': 'الفئات الشائعة',
@@ -4659,16 +4695,17 @@ const translations = {
       'استلم دفعاتك بأمان وحقق دخلاً إضافياً.',
 
     // Wallet translations
-    'wallet.title': 'محفظتي',
+    'wallet.title': 'المستحقّات',
     'wallet.total': 'الإجمالي',
-    'wallet.cumulative_balance': 'الرصيد الإجمالي',
+    'wallet.cumulative_balance': 'إجمالي المستحقّات',
     'wallet.available': 'متاح',
-    'wallet.available_balance': 'الرصيد المتاح',
+    'wallet.available_balance': 'مستحقّات جاهزة للدفع',
+    'wallet.pending_balance': 'مستحقّات قيد الانتظار',
     'wallet.successful': 'ناجحة',
     'wallet.successful_transactions': 'المعاملات الناجحة',
-    'wallet.withdraw_money': 'سحب أموالي',
+    'wallet.withdraw_money': 'طلب تحويل المستحقّات',
     'wallet.withdrawal_note':
-      '.يمكنك سحب أموالك بمجرد أن يصل رصيدك الإجمالي إلى 50 جنيهًا إسترلينيًا',
+      'يمكنك طلب تحويل مستحقّاتك عندما يبلغ إجمالي مستحقّاتك 50 جنيهًا إسترلينيًا',
     'wallet.conversion_rate': '50£ = {minWithdrawalEUR} €',
     'wallet.dynamic_conversion':
       'يتم تحديث سعر الصرف تلقائيًا حسب العملة المختارة في الحساب.',
@@ -4696,7 +4733,7 @@ const translations = {
     'nav.login': 'تسجيل الدخول',
     'nav.signup': 'إنشاء حساب',
     'nav.profile': 'الملف الشخصي',
-    'nav.wallet': 'المحفظة',
+    'nav.wallet': 'المستحقّات',
     'nav.my_listings': 'إعلاناتي',
     'nav.requests': 'الطلبات',
     'nav.bookings': 'الحجوزات',
@@ -4888,7 +4925,7 @@ const translations = {
     'tools.fees_and_taxes': 'يشمل الضرائب والرسوم',
     'tools.of': 'من',
     'tools.charged': 'التي يحددها المؤجر',
-    'tools.deposit': 'تأمين',
+    'tools.deposit': 'مبلغ الضمان',
     'tools.refunded': '(يُسترد عند نهاية الإيجار)',
     'tools.rent_now': 'استأجر الآن',
     'tools.add_to_favorites': 'أضف إلى قائمة المفضّلات',
@@ -4925,7 +4962,7 @@ const translations = {
     'profile.ads': 'الإعلانات',
     'profile.reservations': 'الحجوزات',
     'profile.requests': 'الطلبات',
-    'profile.wallet': 'المحفظة',
+    'profile.wallet': 'المستحقّات',
     'profile.edit': 'تعديل',
     'profile.member_since': 'عضو منذ {date}',
     'profile.select_country': 'اختر بلداً',
@@ -5040,22 +5077,22 @@ const translations = {
       ' منصتكم الموثوقة لتأجير الأدوات بين الأفراد في منطقة الخليج',
     'about.mission_title': 'من نحن',
     'about.mission_1':
-      'LTD Bricola هي منصة رائدة مسجلة في المملكة المتحدة منذ عام ،2025 تقدم خدمة رقمية متكاملة لتمكين األفراد من تأجير األدوات فيما بينهم بسهولة وأمان.',
+      'LTD Bricola هي منصة رائدة مسجلة في المملكة المتحدة منذ عام 2025 تقدم خدمة رقمية متكاملة لتمكين الأفراد من تأجير الأدوات فيما بينهم بسهولة وأمان.',
     'about.mission_2':
-      'ولدت فكرتنا من حاجة واضحة: كثير من األشخاص يمتلكون أدوات نادراً ما يستخدمونها، في حين لردم يحتاج آخرون للوصول إلى أدوات عالية الجودة دون الحاجة لشرائها. نحن نوفر حالً عملياً وفعاالً هذه الفجوة.',
+      'انطلقت فكرتنا من ملاحظة بسيطة: يمتلك الكثير من الأشخاص أدوات نادرا ما يستخدمونها، في حين يحتاج آخرون إلى أدوات عالية الجودة دون تكّبد تكلفة شرائها. نحن نوفر حلا عمليا وفعالا يجمع بين العرض والطلب بكفاءة Bricola.',
     'about.mission_3':
-      'خدماتنا تركز على ربط من يحتاج أدوات للصيانة المنزلية، أو األشغال اليدوية، أو البستنة، أو التنظيف، أو المناسبات، مع أصحاب األدوات المحليين عبر تطبيق وموقع إلكتروني سهل االستخدام.',
+      'خدماتنا تركز على ربط من يحتاج أدوات للصيانة المنزلية، أو الأشغال اليدوية، أو البستنة، أو التنظيف، أو المناسبات، مع أصحاب الأدوات المحليين عبر تطبيق وموقع إلكتروني سهل الاستخدام.',
     'about.mission_4':
-      'من خالل منصتنا، يمكن للمستخدمين عرض أدواتهم مع تفاصيل دقيقة )صور، وصف، سعر، تأمين( ليستأجرها اآلخرون لفترات قصيرة أو طويلة، ويتم الدفع عبر نظام رقمي آمن ومتكامل.',
+      'من خلال منصتنا، يمكن للمستخدمين عرض أدواتهم مع تفاصيل دقيقة )صور، وصف، سعر، مبلغ الضمان( ليستأجرها الآخرون لفترات قصيرة أو طويلة، ويتم الدفع عبر نظام رقمي آمن ومتكامل.',
     'about.advantages': 'قيمتنا المضافة تكمن في أننا نوفر:',
-    'about.advantages_1': 'حل اقتصادي يقلل من الهدر ويشجع على االستدامة.',
+    'about.advantages_1': 'حل اقتصادي يقلل من الهدر ويشجع على الاستدامة.',
     'about.advantages_2':
-      ' وسيلة سهلة وسريعة للعثور على األدوات المناسبة في دقائق.',
+      ' وسيلة سهلة وسريعة للعثور على الأدوات المناسبة في دقائق.',
     'about.advantages_3': 'نظام دفع آمن وحماية مدمجة لكل عملية.',
     'about.advantages_4': 'تجربة شفافة تعزز الثقة بين المؤجرين والمستأجرين.',
     'about.mission_5':
-      'اختيارك لـ LTD Bricola يعني توفير المال والوقت، والحصول على ما تحتاجه بطريقة ذكية ومستدامة، والمساهمة في بناء مستقبل لتأجير األدوات في منطقة الخليج.',
-    'about.mission_6': 'شكرا النضمامك إلى مجتمع Bricola.',
+      'اختيارك لـ LTD Bricola يعني توفير المال والوقت، والحصول على ما تحتاجه بطريقة ذكية ومستدامة، والمساهمة في بناء مستقبل لتأجير الأدوات في منطقة الخليج.',
+    'about.mission_6': 'شكرا لانضمامك إلى مجتمع Bricola.',
     'about.values_title': 'قيمنا',
     'about.community': 'المجتمع',
     'about.community_desc': 'إنشاء روابط بين الجيران وتعزيز التعاون المحلي',

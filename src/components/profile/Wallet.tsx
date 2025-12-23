@@ -233,7 +233,7 @@ const Wallet = () => {
                   </Badge>
                 </div>
                 <div className='text-sm text-orange-700 font-medium mb-1'>
-                  Balance en attente
+                  {t('wallet.pending_balance')}
                 </div>
                 <div className='text-3xl font-bold text-orange-900'>
                   <OptimizedPriceDisplay
@@ -267,7 +267,7 @@ const Wallet = () => {
             </div>
 
             {/* Withdrawal Button + Dialog */}
-            <div className='flex justify-center'>
+              <div className='flex justify-center'>
               <Button
                 size='lg'
                 className={`px-8 py-3 text-lg font-semibold ${

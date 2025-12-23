@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User, Wallet as WalletIcon, MessageSquare, Calendar, Edit, Heart } from 'lucide-react';
+import { User, DollarSign, MessageSquare, Calendar, Edit, Heart } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import ProfileInfo from './ProfileInfo';
 import Wallet from './Wallet';
@@ -32,7 +32,7 @@ const ProfileTabs = ({ activeTab, setActiveTab }: ProfileTabsProps) => {
               value="wallet" 
               className="flex flex-col items-center gap-1 sm:gap-2 py-3 sm:py-4 px-2 sm:px-3 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-primary/5"
             >
-              <WalletIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+              <DollarSign className="h-4 w-4 sm:h-5 sm:w-5" />
               <span className="text-xs sm:text-sm font-medium">{t('profile.wallet')}</span>
             </TabsTrigger>
             <TabsTrigger 

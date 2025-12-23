@@ -21,14 +21,10 @@ import { useCurrency } from '@/contexts/CurrencyContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { CurrencySelector } from '@/components/CurrencySelector'
 import {
-  Search,
   User,
   Menu,
-  Wrench,
   Heart,
-  X,
   LogOut,
-  Settings,
   UserCircle,
   DollarSign,
   Calendar,
@@ -39,9 +35,8 @@ import { NavLink, Link, useNavigate } from 'react-router-dom'
 import '/node_modules/flag-icons/css/flag-icons.min.css'
 import { NotificationCenter } from '@/components/notifications/NotificationCenter'
 import { useNotifications } from '@/hooks/useNotifications'
-import { HeaderRTL } from '@/components/HeaderRTL'
 
-const Header = () => {
+export const HeaderRTL: React.FC = () => {
   const { language, setLanguage, t } = useLanguage()
   const { favoritesCount } = useFavorites()
   const { currency, setCurrency, currencies } = useCurrency()
@@ -59,16 +54,20 @@ const Header = () => {
     }
   }
 
-  if (language === 'ar') {
-    return <HeaderRTL />
-  }
+  const navItems = [
+    { to: '/', label: t('nav.home') },
+    { to: '/search', label: t('nav.catalog') },
+    { to: '/about', label: t('nav.propos') },
+    { to: '/blog', label: t('nav.blog') },
+    { to: '/contact', label: t('nav.contact') },
+  ]
 
   return (
-    <header className='bg-white shadow-sm border-b sticky top-0 z-50' dir='ltr'>
+    <header className='bg-white shadow-sm border-b sticky top-0 z-50' dir='rtl'>
       <div className=' mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='flex justify-between items-center h-16'>
-          {/* Logo */}
-          <Link to='/' className='flex items-center space-x-2'>
+          {/* Logo (à droite) */}
+          <Link to='/' className='flex items-center space-x-2 order-last'>
             <img
               src='/lovable-uploads/LOGO BRICOLA LTD VF.webp'
               alt='Bricola'
@@ -76,84 +75,34 @@ const Header = () => {
             />
           </Link>
 
-          {/* Navigation */}
-          <nav
-            className={`hidden md:flex items-center space-x-8 gap-7 ${
-              language === 'ar' ? 'flex-row-reverse space-x-reverse' : ''
-            }`}
-          >
-            <NavLink
-              to='/'
-              end
-              className={({ isActive }) =>
-                `${
-                  isActive ? 'text-accent' : 'text-gray-700 hover:text-accent'
-                } font-medium transition-colors`
-              }
-            >
-              {t('nav.home')}
-            </NavLink>
-            <NavLink
-              to='/search'
-              className={({ isActive }) =>
-                `${
-                  isActive ? 'text-accent' : 'text-gray-700 hover:text-accent'
-                } font-medium transition-colors`
-              }
-            >
-              {t('nav.catalog')}
-            </NavLink>
-            <NavLink
-              to='/about'
-              className={({ isActive }) =>
-                `${
-                  isActive ? 'text-accent' : 'text-gray-700 hover:text-accent'
-                } font-medium transition-colors`
-              }
-            >
-              {t('nav.propos')}
-            </NavLink>
-            <NavLink
-              to='/blog'
-              className={({ isActive }) =>
-                `${
-                  isActive ? 'text-accent' : 'text-gray-700 hover:text-accent'
-                } font-medium transition-colors`
-              }
-            >
-              {t('nav.blog')}
-            </NavLink>
-            <NavLink
-              to='/contact'
-              className={({ isActive }) =>
-                `${
-                  isActive ? 'text-accent' : 'text-gray-700 hover:text-accent'
-                } font-medium transition-colors`
-              }
-            >
-              {t('nav.contact')}
-            </NavLink>
+          {/* Navigation (au centre, ordre visuel RTL) */}
+          <nav className='hidden md:flex items-center space-x-8 space-x-reverse order-2'>
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  `${
+                    isActive ? 'text-accent' : 'text-gray-700 hover:text-accent'
+                  } font-medium transition-colors`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
           </nav>
 
-          {/* Desktop Right side */}
-          <div
-            className={`hidden md:flex items-center space-x-6 ${
-              language === 'ar' ? 'flex-row-reverse space-x-reverse' : ''
-            }`}
-          >
-            {/* Currency selector */}
+          {/* Actions (à gauche) */}
+          <div className='hidden md:flex items-center flex-row-reverse space-x-6 space-x-reverse order-first'>
+            {/* Devise */}
             <CurrencySelector showLabel={false} size='sm' className='w-40' />
 
-            {/* Language selector */}
+            {/* Langue */}
             <Select
               value={language}
               onValueChange={(value: 'fr' | 'en' | 'ar') => setLanguage(value)}
             >
-              <SelectTrigger
-                className={`w-28 border-none bg-transparent ${
-                  language === 'ar' ? 'text-right' : ''
-                }`}
-              >
+              <SelectTrigger className='w-28 border-none bg-transparent text-right'>
                 <SelectValue placeholder='Langue' />
               </SelectTrigger>
               <SelectContent>
@@ -169,7 +118,7 @@ const Header = () => {
               </SelectContent>
             </Select>
 
-            {/* Favorites - Only for authenticated users */}
+            {/* Favoris (auth) */}
             {isAuthenticated && (
               <Link to='/favorites' className='relative'>
                 <Button variant='ghost' size='sm'>
@@ -183,14 +132,14 @@ const Header = () => {
               </Link>
             )}
 
-            {/* List tool button - Only for authenticated users */}
+            {/* Proposer un outil (auth) */}
             {isAuthenticated && (
               <Link to='/add-tool'>
                 <Button variant='outline'>{t('nav.list')}</Button>
               </Link>
             )}
 
-            {/* Notifications */}
+            {/* Notifications (auth) */}
             {isAuthenticated && (
               <NotificationCenter
                 notifications={notifications}
@@ -204,7 +153,7 @@ const Header = () => {
               />
             )}
 
-            {/* User menu - Conditional based on auth state */}
+            {/* Menu utilisateur / Connexion / Inscription */}
             <div className='flex items-center gap-2'>
               {isAuthenticated ? (
                 <DropdownMenu>
@@ -239,7 +188,7 @@ const Header = () => {
                     <DropdownMenuItem asChild>
                       <Link to='/profile?tab=ads' className='flex items-center'>
                         <Edit className='mr-2 h-4 w-4' />
-                        Mes annonces
+                        {t('nav.my_listings')}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
@@ -248,7 +197,7 @@ const Header = () => {
                         className='flex items-center'
                       >
                         <MessageSquare className='mr-2 h-4 w-4' />
-                        Demandes
+                        {t('nav.requests')}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
@@ -257,10 +206,9 @@ const Header = () => {
                         className='flex items-center'
                       >
                         <Calendar className='mr-2 h-4 w-4' />
-                        Réservations
+                        {t('nav.bookings')}
                       </Link>
                     </DropdownMenuItem>
-
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={handleLogout}
@@ -288,12 +236,8 @@ const Header = () => {
             </div>
           </div>
 
-          {/* Mobile Right side */}
-          <div
-            className={`md:hidden flex items-center space-x-2 ${
-              language === 'ar' ? 'flex-row-reverse space-x-reverse' : ''
-            }`}
-          >
+          {/* Mobile */}
+          <div className='md:hidden flex items-center flex-row-reverse space-x-2 space-x-reverse'>
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -315,40 +259,6 @@ const Header = () => {
                       {t('nav.profile')}
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link
-                      to='/profile?tab=wallet'
-                      className='flex items-center'
-                    >
-                      <DollarSign className='mr-2 h-4 w-4' />
-                      {t('nav.wallet')}
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to='/profile?tab=ads' className='flex items-center'>
-                      <Edit className='mr-2 h-4 w-4' />
-                      {t('nav.my_listings')}
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link
-                      to='/profile?tab=requests'
-                      className='flex items-center'
-                    >
-                      <MessageSquare className='mr-2 h-4 w-4' />
-                      {t('nav.requests')}
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link
-                      to='/profile?tab=reservations'
-                      className='flex items-center'
-                    >
-                      <Calendar className='mr-2 h-4 w-4' />
-                      {t('nav.bookings')}
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={handleLogout}
                     className='text-red-600'
@@ -366,7 +276,7 @@ const Header = () => {
               </Link>
             )}
 
-            {/* Mobile Burger Menu */}
+            {/* Menu mobile */}
             <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <SheetTrigger asChild>
                 <Button variant='ghost' size='sm'>
@@ -374,17 +284,11 @@ const Header = () => {
                 </Button>
               </SheetTrigger>
               <SheetContent
-                side={language === 'ar' ? 'left' : 'right'}
-                className={`w-80 p-0 flex !flex-col ${
-                  language === 'ar' ? 'rtl text-right' : 'ltr text-left'
-                }`}
+                side='left'
+                className='w-80 p-0 flex !flex-col rtl text-right'
               >
-                {/* Fixed Header */}
-                <div
-                  className={`flex items-center justify-between p-6 border-b flex-shrink-0 ${
-                    language === 'ar' ? 'flex-row-reverse' : ''
-                  }`}
-                >
+                {/* En-tête fixe */}
+                <div className='flex items-center justify-between p-6 border-b flex-shrink-0 flex-row-reverse'>
                   <Link to='/' className='flex items-center space-x-2'>
                     <img
                       src='/lovable-uploads/LOGO BRICOLA LTD VF.webp'
@@ -394,57 +298,23 @@ const Header = () => {
                   </Link>
                 </div>
 
-                {/* Scrollable Content */}
+                {/* Contenu défilant */}
                 <div className='flex-1 overflow-y-auto'>
                   <div className='p-6 space-y-6'>
-                    {/* Auth Buttons - Conditional based on auth state */}
+                    {/* Auth */}
                     <div className='space-y-4'>
                       {isAuthenticated ? (
-                        <>
-                          <div className='text-center py-4 border-b'>
-                            <div className='font-medium'>
-                              {user?.firstName} {user?.lastName}
-                            </div>
-                            <div className='text-sm text-gray-500'>
-                              {user?.email}
-                            </div>
-                          </div>
-                          <Link
-                            to='/profile'
-                            onClick={() => setIsMenuOpen(false)}
-                          >
-                            <Button
-                              variant='outline'
-                              className='w-full h-12 text-sm'
-                            >
-                              <UserCircle className='mr-2 h-4 w-4' />
-                              {t('nav.profile')}
-                            </Button>
-                          </Link>
-                          <Link
-                            to='/profile?tab=wallet'
-                            onClick={() => setIsMenuOpen(false)}
-                          >
-                            <Button
-                              variant='outline'
-                              className='w-full h-12 text-sm'
-                            >
-                              <Wrench className='mr-2 h-4 w-4' />
-                              {t('nav.wallet')}
-                            </Button>
-                          </Link>
-                          <Button
-                            variant='outline'
-                            className='w-full h-12 text-sm text-red-600 border-red-200 hover:bg-red-50'
-                            onClick={() => {
-                              handleLogout()
-                              setIsMenuOpen(false)
-                            }}
-                          >
-                            <LogOut className='mr-2 h-4 w-4' />
-                            {t('nav.logout')}
-                          </Button>
-                        </>
+                        <Button
+                          variant='outline'
+                          className='w-full h-12 text-sm text-red-600 border-red-200 hover:bg-red-50'
+                          onClick={() => {
+                            handleLogout()
+                            setIsMenuOpen(false)
+                          }}
+                        >
+                          <LogOut className='mr-2 h-4 w-4' />
+                          {t('nav.logout')}
+                        </Button>
                       ) : (
                         <>
                           <Link
@@ -468,111 +338,38 @@ const Header = () => {
                           </Link>
                         </>
                       )}
-                      {/* List tool button - Only for authenticated users */}
-                      {isAuthenticated && (
-                        <Link
-                          to='/add-tool'
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          <Button
-                            variant='outline'
-                            className='w-full  h-12 text-sm'
-                          >
-                            {t('nav.list')}
-                          </Button>
-                        </Link>
-                      )}
                     </div>
 
-                    {/* Navigation Links - RTL optimized */}
+                    {/* Liens de navigation */}
                     <div className='space-y-4 border-t pt-6'>
-                      <h3 className={`font-semibold text-lg `}>
+                      <h3 className='font-semibold text-lg'>
                         {t('nav.navigation')}
                       </h3>
-                      <div
-                        className={`space-y-2 ${
-                          language === 'ar'
-                            ? 'text-right flex flex-col flex-col-reverse space-y-reverse'
-                            : ''
-                        }`}
-                      >
-                        <NavLink
-                          to='/'
-                          end
-                          className={({ isActive }) =>
-                            `${
-                              isActive
-                                ? 'text-accent'
-                                : 'text-gray-700 hover:text-accent'
-                            } block py-3 transition-colors`
-                          }
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          {t('nav.home')}
-                        </NavLink>
-                        <NavLink
-                          to='/search'
-                          className={({ isActive }) =>
-                            `${
-                              isActive
-                                ? 'text-accent'
-                                : 'text-gray-700 hover:text-accent'
-                            } block py-3 transition-colors`
-                          }
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          {t('nav.catalog')}
-                        </NavLink>
-                        <NavLink
-                          to='/about'
-                          className={({ isActive }) =>
-                            `${
-                              isActive
-                                ? 'text-accent'
-                                : 'text-gray-700 hover:text-accent'
-                            } block py-3 transition-colors`
-                          }
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          {t('nav.propos')}
-                        </NavLink>
-                        <NavLink
-                          to='/blog'
-                          className={({ isActive }) =>
-                            `${
-                              isActive
-                                ? 'text-accent'
-                                : 'text-gray-700 hover:text-accent'
-                            } block py-3 transition-colors`
-                          }
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          {t('nav.blog')}
-                        </NavLink>
-                        <NavLink
-                          to='/contact'
-                          className={({ isActive }) =>
-                            `${
-                              isActive
-                                ? 'text-accent'
-                                : 'text-gray-700 hover:text-accent'
-                            } block py-3 transition-colors`
-                          }
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          {t('nav.contact')}
-                        </NavLink>
+                      <div className='space-y-2'>
+                        {navItems.map((item) => (
+                          <NavLink
+                            key={item.to}
+                            to={item.to}
+                            end={item.end as any}
+                            className={({ isActive }) =>
+                              `${
+                                isActive
+                                  ? 'text-accent'
+                                  : 'text-gray-700 hover:text-accent'
+                              } block py-3 transition-colors`
+                            }
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            {item.label}
+                          </NavLink>
+                        ))}
                       </div>
                     </div>
 
-                    {/* Language selector - RTL optimized */}
+                    {/* Sélecteur de langue */}
                     <div className='space-y-3 border-t pt-6'>
-                      <h3
-                        className={`font-semibold text-lg ${
-                          language === 'ar' ? 'text-right' : 'text-left'
-                        }`}
-                      >
-                        {language === 'ar' ? 'اللغة' : 'Langue'}
+                      <h3 className='font-semibold text-lg text-right'>
+                        اللغة
                       </h3>
                       <Select
                         value={language}
@@ -580,11 +377,7 @@ const Header = () => {
                           setLanguage(value)
                         }
                       >
-                        <SelectTrigger
-                          className={`w-full ${
-                            language === 'ar' ? 'text-right' : 'text-left'
-                          }`}
-                        >
+                        <SelectTrigger className='w-full text-right'>
                           <SelectValue placeholder='Langue' />
                         </SelectTrigger>
                         <SelectContent>
@@ -601,14 +394,10 @@ const Header = () => {
                       </Select>
                     </div>
 
-                    {/* Currency selector - RTL optimized */}
+                    {/* Sélecteur de devise */}
                     <div className='space-y-3 border-t pt-6'>
-                      <h3
-                        className={`font-semibold text-lg ${
-                          language === 'ar' ? 'text-right' : 'text-left'
-                        }`}
-                      >
-                        {language === 'ar' ? 'العملة' : 'Devise'}
+                      <h3 className='font-semibold text-lg text-right'>
+                        Devise
                       </h3>
                       <Select
                         value={currency.code}
@@ -619,7 +408,7 @@ const Header = () => {
                           if (selectedCurrency) setCurrency(selectedCurrency)
                         }}
                       >
-                        <SelectTrigger className={`w-full text-left`}>
+                        <SelectTrigger className='w-full text-right'>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -642,5 +431,3 @@ const Header = () => {
     </header>
   )
 }
-
-export default Header

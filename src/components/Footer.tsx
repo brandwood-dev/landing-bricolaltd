@@ -19,6 +19,8 @@ import visaLogo from '@/assets/visa-logo.png'
 import mastercardLogo from '@/assets/mastercard-logo.png'
 import applePayLogo from '@/assets/Apple_Pay-White-Logo.wine.png'
 import googlePayLogo from '@/assets/Google_Pay-Logo.wine.png'
+import stripeLogo from '@/assets/Stripe_Logo.svg'
+import wizeLogo from '@/assets/wize.png'
 import { FaTiktok } from 'react-icons/fa6'
 
 // WhatsApp Icon Component
@@ -72,35 +74,35 @@ const Footer = () => {
                 target='_blank'
                 rel='noopener noreferrer'
               >
-                <Facebook className='h-5 w-5 text-gray-400 hover:text-white cursor-pointer transition-colors' />
+                <Facebook className='h-5 w-5 text-[#1877F2] hover:opacity-80 cursor-pointer transition-colors' />
               </a>
               <a
                 href='https://www.instagram.com/bricola_ltd/'
                 target='_blank'
                 rel='noopener noreferrer'
               >
-                <Instagram className='h-5 w-5 text-gray-400 hover:text-white cursor-pointer transition-colors' />
+                <Instagram className='h-5 w-5 text-[#E1306C] hover:opacity-80 cursor-pointer transition-colors' />
               </a>
               <a
                 href='https://www.tiktok.com/@bricola.ltd'
                 target='_blank'
                 rel='noopener noreferrer'
               >
-                <FaTiktok className='h-5 w-5 text-gray-400 hover:text-white cursor-pointer transition-colors' />
+                <FaTiktok className='h-5 w-5 text-[#e8eeee] hover:opacity-80 cursor-pointer transition-colors' />
               </a>
               <a
                 href='https://www.youtube.com/@bricolaltd'
                 target='_blank'
                 rel='noopener noreferrer'
               >
-                <Youtube className='h-5 w-5 text-gray-400 hover:text-white cursor-pointer transition-colors' />
+                <Youtube className='h-5 w-5 text-[#FF0000] hover:opacity-80 cursor-pointer transition-colors' />
               </a>
               <a
                 href='https://www.linkedin.com/company/bricola-ltd'
                 target='_blank'
                 rel='noopener noreferrer'
               >
-                <Linkedin className='h-5 w-5 text-gray-400 hover:text-white cursor-pointer transition-colors' />
+                <Linkedin className='h-5 w-5 text-[#0A66C2] hover:opacity-80 cursor-pointer transition-colors' />
               </a>
             </div>
           </div>
@@ -117,10 +119,10 @@ const Footer = () => {
               <li>
                 <Link
                   to='/search'
-                 className='hover:text-white transition-colors'
-               >
+                  className='hover:text-white transition-colors'
+                >
                   {t('footer.catalog')}
-               </Link>
+                </Link>
               </li>
               <li>
                 <Link
@@ -224,7 +226,7 @@ const Footer = () => {
                 <Mail
                   className={'h-4 w-4 ' + (language === 'ar' ? 'ml-2' : 'mr-2')}
                 />
-                contact@bricolaltd.com
+                support@bricolaltd.com
               </li>
               <li
                 className={
@@ -235,7 +237,14 @@ const Footer = () => {
                 <WhatsAppIcon
                   className={'h-4 w-4 ' + (language === 'ar' ? 'ml-2' : 'mr-2')}
                 />
-                +44 7782 333879
+                <a
+                  href='https://wa.me/447782333879'
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='hover:text-white transition-colors'
+                >
+                  +44 7782 333879
+                </a>
               </li>
             </ul>
 
@@ -252,21 +261,48 @@ const Footer = () => {
                     : ' justify-items-start')
                 }
               >
-                <img src={visaLogo} alt='Visa' className='h-8 object-contain' />
+                <img
+                  src={visaLogo}
+                  alt='Visa'
+                  className='h-6 object-contain'
+                  height={24}
+                  width={48}
+                />
                 <img
                   src={mastercardLogo}
                   alt='Mastercard'
-                  className='h-8 object-contain'
+                  className='h-6 object-contain'
+                  height={18}
+                  width={36}
                 />
                 <img
                   src={applePayLogo}
                   alt='Apple Pay'
-                  className='h-14 object-contain'
+                  className='h-10 object-contain'
+                  height={30}
+                  width={54}
                 />
                 <img
                   src={googlePayLogo}
                   alt='Google Pay'
-                  className='h-14 object-contain'
+                  className='h-10 object-contain'
+                  height={30}
+                  width={54}
+                />
+
+                <img
+                  src={stripeLogo}
+                  alt='Stripe'
+                  className='h-6 w-auto object-contain'
+                  height={30}
+                  width={54}
+                />
+                <img
+                  src={wizeLogo}
+                  alt='Wise'
+                  className='h-6 object-contain filter invert'
+                  height={28}
+                  width={52}
                 />
               </div>
             </div>

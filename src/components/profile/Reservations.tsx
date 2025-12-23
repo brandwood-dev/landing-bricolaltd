@@ -70,9 +70,6 @@ import { Booking, BookingStatus, Reservation } from '@/types/bridge'
 import { OptimizedPriceDisplay } from '../OptimizedPriceDisplay'
 import notificationService from '@/services/notificationService'
 
-
-
-
 const Reservations = () => {
   //user
   const { user } = useAuth()
@@ -98,7 +95,9 @@ const Reservations = () => {
   const [selectedReservationId, setSelectedReservationId] = useState('')
   const [reviewType, setReviewType] = useState<'tool' | 'app'>('tool')
   const [hasReviewedApp, setHasReviewedApp] = useState(false)
-  const [hasReviewedToolMap, setHasReviewedToolMap] = useState<{ [bookingId: string]: boolean }>({})
+  const [hasReviewedToolMap, setHasReviewedToolMap] = useState<{
+    [bookingId: string]: boolean
+  }>({})
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [filteredReservations, setFilteredReservations] = useState<
@@ -112,11 +111,11 @@ const Reservations = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [reservations, setReservations] = useState<Reservation[]>([])
-  
+
   // Références pour suivre les changements de filtres et éviter la réinitialisation de la pagination
   const previousFilteredDataRef = useRef<Reservation[]>([])
   const isInitialLoadRef = useRef(true)
-  
+
   const transformBookingToReservation = (booking: Booking): Reservation => {
     // Get primary photo or fallback to first photo
     const primaryPhoto = booking.tool?.photos?.find((photo) => photo.isPrimary)
@@ -193,8 +192,7 @@ const Reservations = () => {
     try {
       const result = await reviewsService.checkUserAppReview(user.id)
       setHasReviewedApp(result.hasReviewed)
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
   // Vérifier si l'utilisateur a déjà noté des outils (par réservation)
@@ -202,8 +200,12 @@ const Reservations = () => {
     if (!user?.id) return
 
     try {
-      const userToolReviews = await reviewsService.getToolReviewsByUserId(user.id)
-      const reviewedBookingIds = new Set(userToolReviews.map((r) => r.bookingId))
+      const userToolReviews = await reviewsService.getToolReviewsByUserId(
+        user.id
+      )
+      const reviewedBookingIds = new Set(
+        userToolReviews.map((r) => r.bookingId)
+      )
 
       setHasReviewedToolMap((prev) => {
         const updated: { [bookingId: string]: boolean } = { ...prev }
@@ -289,20 +291,20 @@ const Reservations = () => {
     const start = new Date(startDate)
     // If pickup hour is available (though not passed here directly, assuming logic needs to be robust)
     // For now simple date comparison 24h check:
-    
-    // We need to compare full timestamps if possible. 
+
+    // We need to compare full timestamps if possible.
     // Assuming startDate is YYYY-MM-DD, we treat it as 00:00 of that day if no hour.
     // If we want stricter 24h rule relative to pickup time, we need pickupHour.
-    
+
     // Logic from BookingsCancellationService:
     // const hoursDiff = (pickupDate.getTime() - now.getTime()) / (1000 * 60 * 60);
     // return hoursDiff >= 24;
-    
+
     // Simple check: is NOW < (Start Date - 1 Day)?
-    const deadline = new Date(start);
-    deadline.setDate(deadline.getDate() - 1); // 24h before
-    
-    return today < deadline;
+    const deadline = new Date(start)
+    deadline.setDate(deadline.getDate() - 1) // 24h before
+
+    return today < deadline
   }
 
   //doit etre dynamic
@@ -333,37 +335,41 @@ const Reservations = () => {
           res.id === reservationId ? transformedReservation : res
         )
       )
-      
+
       // Calculate refund message based on status and time
-      const reservation = reservations.find(r => r.id === reservationId);
-      let refundMessage = '';
-      
+      const reservation = reservations.find((r) => r.id === reservationId)
+      let refundMessage = ''
+
       if (reservation) {
-          if (reservation.status === 'PENDING') {
-              refundMessage = t('success.reservation.cancelled.refund_full');
-          } else if (reservation.status === 'ACCEPTED') {
-               const pickupDate = new Date(reservation.startDate);
-               // Assuming pickupHour is handled or start of day
-               if (reservation.pickupHour) {
-                  const [hours, minutes] = reservation.pickupHour.split(':').map(Number);
-                  pickupDate.setHours(hours, minutes, 0, 0);
-               }
-               const now = new Date();
-               const hoursDiff = (pickupDate.getTime() - now.getTime()) / (1000 * 60 * 60);
-               
-               if (hoursDiff >= 24) {
-                   refundMessage = t('success.reservation.cancelled.refund_full');
-               } else {
-                   refundMessage = t('success.reservation.cancelled.no_refund');
-               }
+        if (reservation.status === 'PENDING') {
+          refundMessage = t('success.reservation.cancelled.refund_full')
+        } else if (reservation.status === 'ACCEPTED') {
+          const pickupDate = new Date(reservation.startDate)
+          // Assuming pickupHour is handled or start of day
+          if (reservation.pickupHour) {
+            const [hours, minutes] = reservation.pickupHour
+              .split(':')
+              .map(Number)
+            pickupDate.setHours(hours, minutes, 0, 0)
           }
+          const now = new Date()
+          const hoursDiff =
+            (pickupDate.getTime() - now.getTime()) / (1000 * 60 * 60)
+
+          if (hoursDiff >= 24) {
+            refundMessage = t('success.reservation.cancelled.refund_full')
+          } else {
+            refundMessage = t('success.reservation.cancelled.no_refund')
+          }
+        }
       }
 
       toast({
         title: t('success.reservation.cancelled.title'),
-        description: refundMessage || t('success.reservation.cancelled.message'),
+        description:
+          refundMessage || t('success.reservation.cancelled.message'),
         duration: 5000,
-        className: "bg-green-50 border-green-200 text-green-800",
+        className: 'bg-green-50 border-green-200 text-green-800',
       })
 
       setCancellationReason('')
@@ -392,9 +398,9 @@ const Reservations = () => {
       toolDescription: reservation.toolDescription,
       toolBrand: reservation.toolBrand || '*******',
       toolModel: reservation.toolModel || '*******',
-     
+
       condition: reservation.toolCondition || 'New',
-      
+
       ownerId: reservation.ownerId,
       ownerName: reservation.owner,
       ownerAddress: reservation.ownerAddress,
@@ -415,7 +421,7 @@ const Reservations = () => {
         calculateRentalDuration(reservation.startDate, reservation.endDate) +
         ' days',
       // total Price = (basePrice + 6%) * RentalDuration
-      totalPrice:reservation.price,
+      totalPrice: reservation.price,
       deposit: reservation.deposit,
     }
 
@@ -431,7 +437,7 @@ const Reservations = () => {
     navigate(`/tool/${toolId}`)
     // }
   }
-  
+
   const handleReport = async (reservationId: string) => {
     if (!reportReason || !reportMessage) {
       toast({
@@ -471,7 +477,7 @@ const Reservations = () => {
         title: t('success.report.sent.title'),
         description: t('success.report.sent.message'),
         duration: 5000,
-        className: "bg-green-50 border-green-200 text-green-800",
+        className: 'bg-green-50 border-green-200 text-green-800',
       })
 
       setReportReason('')
@@ -516,7 +522,7 @@ const Reservations = () => {
         title: t('success.tool.return.confirmed.title'),
         description: t('success.tool.return.confirmed.message'),
         duration: 5000,
-        className: "bg-green-50 border-green-200 text-green-800",
+        className: 'bg-green-50 border-green-200 text-green-800',
       })
 
       setIsReturnDialogOpen(false)
@@ -550,13 +556,13 @@ const Reservations = () => {
   // doit etre dynamic -> save in bookings -> save in disputes (add attribut photo)
   const handleSubmitClaim = async () => {
     if (!reportReason || !reportMessage) {
-     toast({
+      toast({
         title: t('error'),
         description: t('validation.fill_all_fields'),
-       variant: 'destructive',
-     })
-     return
-   }
+        variant: 'destructive',
+      })
+      return
+    }
 
     if (!selectedReservationId) {
       toast({
@@ -611,7 +617,7 @@ const Reservations = () => {
         title: t('success.report.sent.title'),
         description: t('success.report.sent.message'),
         duration: 5000,
-        className: "bg-green-50 border-green-200 text-green-800",
+        className: 'bg-green-50 border-green-200 text-green-800',
       })
 
       // Fermer le modal
@@ -768,7 +774,7 @@ const Reservations = () => {
 
     // Comparer avec les données précédentes pour détecter un vrai changement
     const previousData = previousFilteredDataRef.current
-    const hasDataChanged = 
+    const hasDataChanged =
       data.length !== previousData.length ||
       data.some((item, index) => item.id !== previousData[index]?.id)
 
@@ -801,7 +807,9 @@ const Reservations = () => {
         userId: user?.id,
       })
       if (!selectedReservationId || !user?.id) {
-        console.warn('[Reservations] Missing selectedReservationId or user.id, aborting submit')
+        console.warn(
+          '[Reservations] Missing selectedReservationId or user.id, aborting submit'
+        )
         toast({
           title: t('review.error'),
           description: t('review.error_message'),
@@ -812,7 +820,9 @@ const Reservations = () => {
 
       // Validations common to both review types
       if (rating < 1 || rating > 5) {
-        console.warn('[Reservations] Invalid rating, must be between 1 and 5', { rating })
+        console.warn('[Reservations] Invalid rating, must be between 1 and 5', {
+          rating,
+        })
         toast({
           title: t('review.error'),
           description: t('review.error_message'),
@@ -821,7 +831,9 @@ const Reservations = () => {
         return
       }
       if (reviewComment.trim().length < 3) {
-        console.warn('[Reservations] Invalid comment length', { len: reviewComment.trim().length })
+        console.warn('[Reservations] Invalid comment length', {
+          len: reviewComment.trim().length,
+        })
         toast({
           title: t('review.error'),
           description: t('review.error_message'),
@@ -850,9 +862,13 @@ const Reservations = () => {
         setHasReviewedApp(true)
       } else {
         // Créer un avis d'outil avec tous les paramètres requis
-        const selectedReservation = reservations.find(r => r.id === selectedReservationId)
+        const selectedReservation = reservations.find(
+          (r) => r.id === selectedReservationId
+        )
         if (!selectedReservation) {
-          console.error('[Reservations] Selected reservation not found', { selectedReservationId })
+          console.error('[Reservations] Selected reservation not found', {
+            selectedReservationId,
+          })
           toast({
             title: t('review.error'),
             description: t('review.error_message'),
@@ -863,7 +879,9 @@ const Reservations = () => {
 
         // Ensure booking is completed before allowing tool review
         if (selectedReservation.status !== BookingStatus.COMPLETED) {
-          console.warn('[Reservations] Reservation not COMPLETED', { status: selectedReservation.status })
+          console.warn('[Reservations] Reservation not COMPLETED', {
+            status: selectedReservation.status,
+          })
           toast({
             title: t('review.error'),
             description: t('review.error_message'),
@@ -889,7 +907,10 @@ const Reservations = () => {
         })
 
         // Marquer cette réservation comme déjà notée pour masquer le bouton
-        setHasReviewedToolMap((prev) => ({ ...prev, [selectedReservationId]: true }))
+        setHasReviewedToolMap((prev) => ({
+          ...prev,
+          [selectedReservationId]: true,
+        }))
       }
 
       setReviewComment('')
@@ -912,7 +933,10 @@ const Reservations = () => {
           })
           handleFilteredDataChange(transformedReservations)
         } catch (err) {
-          console.error('[Reservations] Failed to refresh bookings after review', err)
+          console.error(
+            '[Reservations] Failed to refresh bookings after review',
+            err
+          )
           toast({
             title: t('review.error'),
             description: t('review.error_message'),
@@ -923,7 +947,11 @@ const Reservations = () => {
     } catch (error) {
       // Vérifier si c'est l'erreur spécifique "A tool review already exists for this booking"
       console.error('[Reservations] Review submission error', error)
-      if (error.response?.data?.message?.includes('A tool review already exists for this booking')) {
+      if (
+        error.response?.data?.message?.includes(
+          'A tool review already exists for this booking'
+        )
+      ) {
         toast({
           title: 'Avis déjà existant',
           description: 'Vous avez déjà laissé un avis pour cette réservation',
@@ -944,7 +972,11 @@ const Reservations = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className='flex items-center gap-2'>
+        <CardTitle
+          className={`flex items-center gap-2 ${
+            language === 'ar' ? 'flex-row-reverse' : ''
+          }`}
+        >
           <Calendar className='h-5 w-5' />
           {t('booking.title')}
         </CardTitle>
@@ -1273,11 +1305,15 @@ const Reservations = () => {
                                   >
                                     {t('reservation.cancel.confirm')}
                                   </Button>
-                                  <div className="text-xs text-muted-foreground mt-2 bg-muted p-2 rounded">
-                                    <strong>{t('requests.refund_notice')}:</strong> 
-                                    {isCancellationAllowed(reservation.startDate) 
-                                        ? t('requests.renter_cancel_refund_full') 
-                                        : t('requests.renter_cancel_refund_none')}
+                                  <div className='text-xs text-muted-foreground mt-2 bg-muted p-2 rounded'>
+                                    <strong>
+                                      {t('requests.refund_notice')}:
+                                    </strong>
+                                    {isCancellationAllowed(
+                                      reservation.startDate
+                                    )
+                                      ? t('requests.renter_cancel_refund_full')
+                                      : t('requests.renter_cancel_refund_none')}
                                   </div>
                                 </div>
                               </DialogContent>
