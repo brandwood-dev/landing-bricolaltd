@@ -17,6 +17,7 @@ interface LanguageContextType {
 const translations = {
   fr: {
     // MapView
+    'errors.validation_error': 'Erreur',
     'view.details': 'Voir détails',
     'no.tools.found': 'Aucun outil trouvé',
     'try.modifying.search.criteria':
@@ -1944,6 +1945,7 @@ const translations = {
   },
   en: {
     // MapView
+    'errors.validation_error': 'Error',
     'view.details': 'View details',
     'no.tools.found': 'No tools found',
     'try.modifying.search.criteria': 'Try modifying your search criteria',
@@ -3828,6 +3830,7 @@ const translations = {
   },
   ar: {
     // MapView
+    'errors.validation_error': 'خطأ',
     'view.details': 'عرض التفاصيل',
     'no.tools.found': 'لا توجد أدوات',
     'try.modifying.search.criteria': 'حاول تعديل معايير البحث',

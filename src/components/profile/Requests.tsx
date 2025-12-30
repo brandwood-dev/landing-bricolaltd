@@ -32,7 +32,6 @@ import { useToast } from '@/hooks/use-toast'
 import { useAuth } from '@/contexts/AuthContext'
 import RequestsAndReservationsFilters from './RequestsAndReservationsFilters'
 
-
 // Import refactored components and utilities
 import { Request, StatusOption } from '@/types/bridge'
 import {
@@ -177,10 +176,10 @@ const Requests = () => {
     try {
       setLoading(true)
       setError(null)
-      
+
       // Debug log: Afficher l'ID utilisateur utilisé pour la requête
       console.log('🔍 [DEBUG] Fetching bookings for user ID:', user.id)
-      
+
       const ownerBookings = await bookingService.getOwnerBookings(user.id, {
         page: 1,
         limit: 100,
@@ -188,21 +187,30 @@ const Requests = () => {
 
       // Debug log: Afficher la réponse complète de l'API
       console.log('🔍 [DEBUG] API Response:', ownerBookings)
-      
+
       // Debug log: Afficher le nombre de réservations récupérées
-      console.log('🔍 [DEBUG] Number of bookings received:', ownerBookings.data?.length || 0)
-      
+      console.log(
+        '🔍 [DEBUG] Number of bookings received:',
+        ownerBookings.data?.length || 0
+      )
+
       // Debug log: Afficher un échantillon de la première réservation si elle existe
       if (ownerBookings.data && ownerBookings.data.length > 0) {
-        console.log('🔍 [DEBUG] Sample booking (first one):', ownerBookings.data[0])
+        console.log(
+          '🔍 [DEBUG] Sample booking (first one):',
+          ownerBookings.data[0]
+        )
       }
 
       const transformedReq = ownerBookings.data.map(transformBookingToRequest)
-      
+
       // Debug log: Afficher les données transformées
       console.log('🔍 [DEBUG] Transformed requests:', transformedReq)
-      console.log('🔍 [DEBUG] Number of transformed requests:', transformedReq.length)
-      
+      console.log(
+        '🔍 [DEBUG] Number of transformed requests:',
+        transformedReq.length
+      )
+
       setBookings(ownerBookings.data)
       setRequests(transformedReq)
     } catch (err: any) {
@@ -260,10 +268,14 @@ const Requests = () => {
 
       toast({
         title: t('request.ACCEPTED.title'),
-        description: `${t('request.ACCEPTED.message')}` ,
+        description: `${t('request.ACCEPTED.message')}`,
       })
     } catch (error: any) {
-      console.error('[REQUESTS] Accept booking failed', { requestId, error: error?.message, response: error?.response?.data })
+      console.error('[REQUESTS] Accept booking failed', {
+        requestId,
+        error: error?.message,
+        response: error?.response?.data,
+      })
       toast({
         title: t('general.error'),
         description: error.message || 'Failed to accept booking',
@@ -296,7 +308,9 @@ const Requests = () => {
 
       toast({
         title: t('request.refuse'),
-        description: t('requests.owner_reject_refund_policy') || t('request.refuse.message'),
+        description:
+          t('requests.owner_reject_refund_policy') ||
+          t('request.refuse.message'),
       })
     } catch (error: any) {
       toast({
@@ -460,10 +474,7 @@ const Requests = () => {
   }
 
   // Submit app review (owner reviews app usage)
-  const handleSubmitAppReview = async (
-    rating: number,
-    comment: string,
-  ) => {
+  const handleSubmitAppReview = async (rating: number, comment: string) => {
     if (!user?.id) {
       toast({
         title: t('general.error'),
@@ -545,7 +556,7 @@ const Requests = () => {
         title: t('success.report.sent.title'),
         description: t('success.report.sent.message'),
         duration: 5000,
-        className: "bg-green-50 border-green-200 text-green-800",
+        className: 'bg-green-50 border-green-200 text-green-800',
       })
 
       setIsClaimDialogOpen(false)
@@ -570,10 +581,13 @@ const Requests = () => {
 
   // Données à paginer
   const dataToDisplay = isFiltering ? filteredRequests : requests
-  
+
   // 🔍 Debug: Log final data for display
   console.log('🔍 [Requests] Final data to display:', dataToDisplay)
-  console.log('🔍 [Requests] Using filtered requests:', filteredRequests.length > 0)
+  console.log(
+    '🔍 [Requests] Using filtered requests:',
+    filteredRequests.length > 0
+  )
   console.log('🔍 [Requests] Total requests:', requests.length)
   console.log('🔍 [Requests] Filtered requests:', filteredRequests.length)
   console.log('🔍 [Requests] Data to display length:', dataToDisplay.length)
@@ -591,39 +605,55 @@ const Requests = () => {
     itemsPerPage,
     startIndex,
     endIndex,
-    paginatedRequestsLength: paginatedRequests.length
+    paginatedRequestsLength: paginatedRequests.length,
   })
 
   // Gestion du changement de page
   const handlePageChange = (page: number) => {
-    console.log('📄 handlePageChange appelée avec page:', page, 'currentPage actuel:', currentPage)
+    console.log(
+      '📄 handlePageChange appelée avec page:',
+      page,
+      'currentPage actuel:',
+      currentPage
+    )
     setCurrentPage(page)
   }
 
   // Reset de la page quand les filtres changent
   const handleFilteredDataChange = (data: Request[]) => {
-    console.log('🔄 handleFilteredDataChange appelée avec', data.length, 'éléments')
-    
+    console.log(
+      '🔄 handleFilteredDataChange appelée avec',
+      data.length,
+      'éléments'
+    )
+
     // Vérifier si les données ont réellement changé
     const previousData = previousFilteredDataRef.current
-    const hasDataChanged = 
-      isInitialLoadRef.current || 
+    const hasDataChanged =
+      isInitialLoadRef.current ||
       data.length !== previousData.length ||
       data.some((item, index) => item.id !== previousData[index]?.id)
-    
-    console.log('📊 Données changées:', hasDataChanged, 'Initial load:', isInitialLoadRef.current)
-    
+
+    console.log(
+      '📊 Données changées:',
+      hasDataChanged,
+      'Initial load:',
+      isInitialLoadRef.current
+    )
+
     setFilteredRequests(data)
-    
+
     // Ne réinitialiser currentPage que si les données ont réellement changé
     if (hasDataChanged) {
       console.log('🔄 Réinitialisation de currentPage à 1')
       setCurrentPage(1)
       isInitialLoadRef.current = false
     } else {
-      console.log('⏭️ Pas de réinitialisation de currentPage, données identiques')
+      console.log(
+        '⏭️ Pas de réinitialisation de currentPage, données identiques'
+      )
     }
-    
+
     // Mettre à jour la référence des données précédentes
     previousFilteredDataRef.current = [...data]
   }
@@ -705,276 +735,284 @@ const Requests = () => {
               Aucune demande trouvée.
             </div>
           ) : (
-          paginatedRequests.map((req) => (
-            <div key={req.id} className='border rounded-lg p-4 space-y-3'>
-              <div className='flex items-start justify-between'>
-                <div className='flex gap-4'>
-                  {/* Tool image */}
-                  <div className='w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0'>
-                    <Link to={`/tool/${req.toolId}`}>
-                      <img
-                        src={req.toolImage}
-                        alt={req.toolName}
-                        className='w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity'
-                      />
-                    </Link>
-                  </div>
-                  <div className='space-y-1'>
-                    <Link
-                      to={`/tool/${req.toolId}`}
-                      className='font-semibold cursor-pointer hover:text-primary transition-colors'
-                    >
-                      {req.toolName}
-                    </Link>
-                    <div className='flex items-center gap-2 text-sm text-muted-foreground'>
-                      <User className='h-4 w-4' />
-                      {req.renterName}
+            paginatedRequests.map((req) => (
+              <div key={req.id} className='border rounded-lg p-4 space-y-3'>
+                <div className='flex items-start justify-between'>
+                  <div className='flex gap-4'>
+                    {/* Tool image */}
+                    <div className='w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0'>
+                      <Link to={`/tool/${req.toolId}`}>
+                        <img
+                          src={req.toolImage}
+                          alt={req.toolName}
+                          className='w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity'
+                        />
+                      </Link>
                     </div>
-                    <div className='text-xs text-muted-foreground'>
-                      {language === 'ar'
-                        ? `${req.referenceId} : ${t('general.reference')}`
-                        : `${t('general.reference')}: ${req.referenceId}`}
+                    <div className='space-y-1'>
+                      <Link
+                        to={`/tool/${req.toolId}`}
+                        className='font-semibold cursor-pointer hover:text-primary transition-colors'
+                      >
+                        {req.toolName}
+                      </Link>
+                      <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+                        <User className='h-4 w-4' />
+                        {req.renterName}
+                      </div>
+                      <div className='text-xs text-muted-foreground'>
+                        {language === 'ar'
+                          ? `${req.referenceId} : ${t('general.reference')}`
+                          : `${t('general.reference')}: ${req.referenceId}`}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className='flex items-center gap-2'>
-                  <Badge className={getStatusColor(req.status)}>
-                    {t(`status.${req.status.toLowerCase()}`)}
-                  </Badge>
-                  {(req.status === 'ONGOING' || req.status === 'ACCEPTED') &&
-                    req.hasActiveClaim && (
+                  <div className='flex items-center gap-2'>
+                    <Badge className={getStatusColor(req.status)}>
+                      {t(`status.${req.status.toLowerCase()}`)}
+                    </Badge>
+                    {(req.status === 'ONGOING' || req.status === 'ACCEPTED') &&
+                      req.hasActiveClaim && (
+                        <Badge
+                          variant='outline'
+                          className='bg-orange-50 text-orange-800 border-orange-200'
+                        >
+                          {t('claim.in_progress')}
+                        </Badge>
+                      )}
+                    {req.status === 'ONGOING' && req.pickupTool && (
                       <Badge
                         variant='outline'
-                        className='bg-orange-50 text-orange-800 border-orange-200'
+                        className='bg-blue-50 text-orange-800 border-orange-200'
                       >
-                        {t('claim.in_progress')}
+                        {t('tool.returned')}
                       </Badge>
                     )}
-                  {req.status === 'ONGOING' && req.pickupTool && (
-                    <Badge
+                  </div>
+                </div>
+
+                <div className='flex items-center gap-4 text-sm text-muted-foreground'>
+                  <div className='flex items-center gap-1'>
+                    <Calendar className='h-4 w-4' />
+                    {t('request.from')} {req.startDate} {t('request.to')}{' '}
+                    {req.endDate}
+                  </div>
+                  <div className='flex items-center gap-1'>
+                    <Clock className='h-4 w-4' />
+                    {t('request.pickup_time')} : {req.pickupHour}
+                  </div>
+                </div>
+
+                <div className='flex items-center gap-2 text-sm mt-2'>
+                  <DollarSign className='h-4 w-4 text-primary' />
+                  <span>
+                    {language === 'ar'
+                      ? 'المبلغ الإجمالي :'
+                      : language === 'en'
+                      ? 'Total amount:'
+                      : 'Montant total :'}
+                  </span>
+                  <span className='font-semibold text-primary'>
+                    <OptimizedPriceDisplay
+                      price={Math.max(Number(req.totalPrice) * 0.94, 0)}
+                      baseCurrency='GBP'
+                      size='sm'
+                      cible='totalPrice'
+                    />
+                  </span>
+                  <span className='text-muted-foreground'>
+                    {language === 'ar'
+                      ? '(دون 15% من عمولة المنصة)'
+                      : language === 'en'
+                      ? '(including 15% platform commission)'
+                      : '(dont 15% de commission plateforme)'}
+                  </span>
+                </div>
+
+                {req.message && (
+                  <div className='bg-muted/50 p-3 rounded text-sm'>
+                    <div className='flex items-start gap-2'>
+                      <MessageSquare className='h-4 w-4 mt-0.5 text-muted-foreground' />
+                      <p>
+                        {req.renterName} : {req.message}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {req.status === 'REJECTED' && req.refusalReason && (
+                  <div className='bg-muted/50 p-3 rounded text-sm'>
+                    <div className='flex items-start gap-2'>
+                      <MessageSquare className='h-4 w-4 mt-0.5 text-muted-foreground' />
+                      <p>
+                        {req.ownerName} : {req.refusalReason}
+                      </p>
+                      <p>{req.refusalMessage}</p>
+                    </div>
+                  </div>
+                )}
+
+                <div className='flex gap-2 flex-wrap'>
+                  {/* Contract download for ACCEPTED and ONGOING requests */}
+                  {['ACCEPTED', 'ONGOING'].includes(req.status) && (
+                    <Button
                       variant='outline'
-                      className='bg-blue-50 text-orange-800 border-orange-200'
+                      size='sm'
+                      onClick={() => handleDownloadContract(req)}
+                      className='flex items-center gap-2'
                     >
-                      {t('tool.returned')}
-                    </Badge>
+                      <Download className='h-4 w-4' />
+                      {t('request.download_contract')}
+                    </Button>
+                  )}
+
+                  {/* Actions pour les propriétaires */}
+                  {req.status === 'PENDING' && (
+                    <>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant='default' size='sm'>
+                            {t('request.accept')}
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader className='!flex !flex-col !space-y-3'>
+                            <AlertDialogTitle
+                              className={
+                                'text-lg font-semibold ' +
+                                (language === 'ar' ? 'text-right' : '')
+                              }
+                            >
+                              {t('request.confirm_acceptence')}
+                            </AlertDialogTitle>
+                            <AlertDialogDescription
+                              className={
+                                'text-sm text-muted-foreground ' +
+                                (language === 'ar' ? 'text-right' : '')
+                              }
+                            >
+                              {t('request.confirm_acceptence_message')}
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>
+                              {t('action.cancel')}
+                            </AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleAcceptRequest(req.id)}
+                            >
+                              {t('action.confirm')}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+
+                      <RefusalDialog
+                        onDecline={handleDeclineRequest}
+                        requestId={req.id}
+                      />
+                    </>
+                  )}
+
+                  {/* Contact pour les demandes acceptées */}
+                  {req.status === 'ACCEPTED' && (
+                    <>
+                      <ContactDialog request={req as any} />
+                      <ReportDialog
+                        requestId={req.id}
+                        onReportSubmit={handleReportSubmit}
+                      />
+                    </>
+                  )}
+                  {req.status === 'ONGOING' && (
+                    <ContactDialog request={req as any} />
+                  )}
+                  {/* Actions pour les demandes en cours */}
+                  {req.status === 'ONGOING' && !req.pickupTool && (
+                    <>
+                      {/* <ReportDialog
+                      requestId={req.id}
+                      onReportSubmit={handleReportSubmit}
+                    /> */}
+
+                      <Button
+                        variant={req.renterHasReturned ? 'default' : 'outline'}
+                        size='sm'
+                        disabled={!req.renterHasReturned}
+                        onClick={() => handleToolRecovery(req.id)}
+                      >
+                        {t('request.pickup_confirm_button')}
+                      </Button>
+                    </>
+                  )}
+
+                  {/* Code de validation pour les demandes acceptées */}
+                  {req.status === 'ACCEPTED' && (
+                    <div className='w-full mt-3 p-3 bg-blue-50 rounded border'>
+                      <p className='text-sm font-medium mb-2'>
+                        {t('request.validation_code')}
+                      </p>
+                      <div className='flex gap-2'>
+                        <Input
+                          placeholder={t('request.enter_code')}
+                          value={validationCode}
+                          onChange={(e) => setValidationCode(e.target.value)}
+                          className={
+                            'flex-1' + (language === 'ar' ? ' text-right' : '')
+                          }
+                        />
+                        <Button onClick={() => handleValidationCode(req.id)}>
+                          {t('action.confirm')}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Bouton pour voir les détails d'annulation */}
+                  {req.status === 'CANCELLED' && (
+                    <CancellationDetailsDialog request={req} />
+                  )}
+
+                  {/* App Review button visible only after completion and hidden once reviewed */}
+                  {req.status === 'COMPLETED' && !hasReviewedApp && (
+                    <Button
+                      variant='outline'
+                      size='sm'
+                      onClick={() => setIsAppReviewDialogOpen(true)}
+                    >
+                      {t('review.app_title')}
+                    </Button>
                   )}
                 </div>
               </div>
-
-              <div className='flex items-center gap-4 text-sm text-muted-foreground'>
-                <div className='flex items-center gap-1'>
-                  <Calendar className='h-4 w-4' />
-                  {t('request.from')} {req.startDate} {t('request.to')}{' '}
-                  {req.endDate}
-                </div>
-                <div className='flex items-center gap-1'>
-                  <Clock className='h-4 w-4' />
-                  {t('request.pickup_time')} : {req.pickupHour}
-                </div>
-                
-              </div>
-
-              <div className='flex items-center gap-2 text-sm mt-2'>
-                <DollarSign className='h-4 w-4 text-primary' />
-                <span>
-                  {language === 'ar'
-                    ? 'المبلغ الإجمالي :'
-                    : language === 'en'
-                    ? 'Total amount:'
-                    : 'Montant total :'}
-                </span>
-                <span className='font-semibold text-primary'>
-                  <OptimizedPriceDisplay
-                    price={Math.max(Number(req.totalPrice) * 0.94, 0)}
-                    baseCurrency='GBP'
-                    size='sm'
-                    cible='totalPrice'
-                  />
-                </span>
-                <span className='text-muted-foreground'>
-                  {language === 'ar'
-                    ? '(دون 15% من عمولة المنصة)'
-                    : language === 'en'
-                    ? '(including 15% platform commission)'
-                    : '(dont 15% de commission plateforme)'}
-                </span>
-              </div>
-
-              {req.message && (
-                <div className='bg-muted/50 p-3 rounded text-sm'>
-                  <div className='flex items-start gap-2'>
-                    <MessageSquare className='h-4 w-4 mt-0.5 text-muted-foreground' />
-                    <p>
-                      {req.renterName} : {req.message}
-                    </p>
-                  </div>
-                </div>
-              )}
-              {req.status === 'REJECTED' && req.refusalReason && (
-                <div className='bg-muted/50 p-3 rounded text-sm'>
-                  <div className='flex items-start gap-2'>
-                    <MessageSquare className='h-4 w-4 mt-0.5 text-muted-foreground' />
-                    <p>
-                      {req.ownerName} : {req.refusalReason}
-                    </p>
-                    <p>{req.refusalMessage}</p>
-                  </div>
-                </div>
-              )}
-
-              <div className='flex gap-2 flex-wrap'>
-                {/* Contract download for ACCEPTED and ONGOING requests */}
-                {['ACCEPTED', 'ONGOING'].includes(req.status) && (
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    onClick={() => handleDownloadContract(req)}
-                    className='flex items-center gap-2'
-                  >
-                    <Download className='h-4 w-4' />
-                    {t('request.download_contract')}
-                  </Button>
-                )}
-
-                {/* Actions pour les propriétaires */}
-                {req.status === 'PENDING' && (
-                  <>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant='default' size='sm'>
-                          {t('request.accept')}
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader className='!flex !flex-col !space-y-3'>
-                          <AlertDialogTitle
-                            className={
-                              'text-lg font-semibold ' +
-                              (language === 'ar' ? 'text-right' : '')
-                            }
-                          >
-                            {t('request.confirm_acceptence')}
-                          </AlertDialogTitle>
-                          <AlertDialogDescription
-                            className={
-                              'text-sm text-muted-foreground ' +
-                              (language === 'ar' ? 'text-right' : '')
-                            }
-                          >
-                            {t('request.confirm_acceptence_message')}
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>
-                            {t('action.cancel')}
-                          </AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleAcceptRequest(req.id)}
-                          >
-                            {t('action.confirm')}
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-
-                    <RefusalDialog
-                      onDecline={handleDeclineRequest}
-                      requestId={req.id}
-                    />
-                  </>
-                )}
-
-                {/* Contact pour les demandes acceptées */}
-                {req.status === 'ACCEPTED' && (
-                  <>
-                    <ContactDialog request={req as any} />
-                    <ReportDialog
-                      requestId={req.id}
-                      onReportSubmit={handleReportSubmit}
-                    />
-                  </>
-                )}
-                {req.status === 'ONGOING' && (
-                  <ContactDialog request={req as any} />
-                )}
-                {/* Actions pour les demandes en cours */}
-                {req.status === 'ONGOING' && !req.pickupTool && (
-                  <>
-                    <ReportDialog
-                      requestId={req.id}
-                      onReportSubmit={handleReportSubmit}
-                    />
-
-                    <Button
-                      variant={req.renterHasReturned ? 'default' : 'outline'}
-                      size='sm'
-                      disabled={!req.renterHasReturned}
-                      onClick={() => handleToolRecovery(req.id)}
-                    >
-                      {t('request.pickup_confirm_button')}
-                    </Button>
-                  </>
-                )}
-
-                {/* Code de validation pour les demandes acceptées */}
-                {req.status === 'ACCEPTED' && (
-                  <div className='w-full mt-3 p-3 bg-blue-50 rounded border'>
-                    <p className='text-sm font-medium mb-2'>
-                      {t('request.validation_code')}
-                    </p>
-                    <div className='flex gap-2'>
-                      <Input
-                        placeholder={t('request.enter_code')}
-                        value={validationCode}
-                        onChange={(e) => setValidationCode(e.target.value)}
-                        className={
-                          'flex-1' + (language === 'ar' ? ' text-right' : '')
-                        }
-                      />
-                      <Button onClick={() => handleValidationCode(req.id)}>
-                        {t('action.confirm')}
-                      </Button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Bouton pour voir les détails d'annulation */}
-                {req.status === 'CANCELLED' && (
-                  <CancellationDetailsDialog request={req} />
-                )}
-
-                {/* App Review button visible only after completion and hidden once reviewed */}
-                {req.status === 'COMPLETED' && !hasReviewedApp && (
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    onClick={() => setIsAppReviewDialogOpen(true)}
-                  >
-                    {t('review.app_title')}
-                  </Button>
-                )}
-              </div>
-            </div>
-          ))
+            ))
           )}
         </div>
 
         {/* Pagination */}
         {totalPages > 1 && (
           <div className='mt-6'>
-            {console.log('🎯 PAGINATION RENDUE - totalPages:', totalPages, 'currentPage:', currentPage)}
-            <div className={`flex flex-row items-center gap-1 ${language === 'ar' ? '[direction:ltr]' : ''}`}>
+            {console.log(
+              '🎯 PAGINATION RENDUE - totalPages:',
+              totalPages,
+              'currentPage:',
+              currentPage
+            )}
+            <div
+              className={`flex flex-row items-center gap-1 ${
+                language === 'ar' ? '[direction:ltr]' : ''
+              }`}
+            >
               {/* Bouton Précédent */}
               <Button
-                variant="outline"
-                size="sm"
+                variant='outline'
+                size='sm'
                 onClick={() => {
                   if (currentPage > 1) handlePageChange(currentPage - 1)
                 }}
                 disabled={currentPage <= 1}
-                className="gap-1 pl-2.5"
+                className='gap-1 pl-2.5'
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className='h-4 w-4' />
                 <span>Précédent</span>
               </Button>
 
@@ -986,10 +1024,10 @@ const Requests = () => {
                 return (
                   <Button
                     key={pageNumber}
-                    variant={isCurrentPage ? "default" : "outline"}
-                    size="sm"
+                    variant={isCurrentPage ? 'default' : 'outline'}
+                    size='sm'
                     onClick={() => handlePageChange(pageNumber)}
-                    className="w-10 h-10"
+                    className='w-10 h-10'
                   >
                     {pageNumber}
                   </Button>
@@ -998,16 +1036,17 @@ const Requests = () => {
 
               {/* Bouton Suivant */}
               <Button
-                variant="outline"
-                size="sm"
+                variant='outline'
+                size='sm'
                 onClick={() => {
-                  if (currentPage < totalPages) handlePageChange(currentPage + 1)
+                  if (currentPage < totalPages)
+                    handlePageChange(currentPage + 1)
                 }}
                 disabled={currentPage >= totalPages}
-                className="gap-1 pr-2.5"
+                className='gap-1 pr-2.5'
               >
                 <span>Suivant</span>
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className='h-4 w-4' />
               </Button>
             </div>
           </div>

@@ -43,6 +43,15 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   const stripe = useStripe()
   const elements = useElements()
 
+  useEffect(() => {
+    if (elements && paymentMethod === 'card') {
+      const card = elements.getElement(CardElement)
+      setTimeout(() => {
+        card?.focus()
+      }, 50)
+    }
+  }, [elements, paymentMethod])
+
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [cardComplete, setCardComplete] = useState(false)

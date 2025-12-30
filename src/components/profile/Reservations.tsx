@@ -719,6 +719,15 @@ const Reservations = () => {
     }))
   }
 
+  const isStartDateReached = (startDateStr: string) => {
+    if (!startDateStr) return false
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const start = new Date(startDateStr)
+    start.setHours(0, 0, 0, 0)
+    return start.getTime() <= today.getTime()
+  }
+
   const copyValidationCode = async (code: string, reservationId: string) => {
     try {
       await navigator.clipboard.writeText(code)
@@ -1676,7 +1685,7 @@ const Reservations = () => {
                               </DialogContent>
                             </Dialog>
                             {/* conditionner avec status */}
-                            {reservation.hasActiveClaim === false && (
+                            {/* {reservation.hasActiveClaim === false && (
                               <Dialog>
                                 <DialogTrigger asChild>
                                   <Button
@@ -1831,7 +1840,7 @@ const Reservations = () => {
                                   </div>
                                 </DialogContent>
                               </Dialog>
-                            )}
+                            )} */}
                           </>
                         )}
 
@@ -1889,10 +1898,9 @@ const Reservations = () => {
                               <Button
                                 variant='ghost'
                                 size='sm'
-                                onClick={() =>
-                                  toggleValidationCode(reservation.id)
-                                }
-                                className='text-blue-700 hover:text-blue-900 hover:bg-blue-100'
+                                onClick={() => toggleValidationCode(reservation.id)}
+                                disabled={!isStartDateReached(reservation.startDate)}
+                                className={`text-blue-700 hover:text-blue-900 hover:bg-blue-100 ${!isStartDateReached(reservation.startDate) ? 'pointer-events-none opacity-50' : ''}`}
                               >
                                 {showValidationCode[reservation.id] ? (
                                   <>
@@ -1907,7 +1915,15 @@ const Reservations = () => {
                                 )}
                               </Button>
                             </div>
-
+                            {!showValidationCode[reservation.id] && (
+                              <div className='mt-2 text-xs text-blue-700'>
+                                {language === 'ar'
+                                  ? 'لا يمكنك عرض الرمز قبل تاريخ بدء الحجز. في ذلك التاريخ، قم بتسليم هذا الرمز للمؤجّر لتفعيل حجزك.'
+                                  : language === 'en'
+                                  ? 'You cannot view the code before the start date of your reservation. On that date, provide this code to the renter to activate your reservation.'
+                                  : 'Vous ne pouvez pas consulter le code avant la date de début de votre réservation. À cette date, transmettez ce code au loueur afin de mettre votre réservation en cours.'}
+                              </div>
+                            )}
                             {showValidationCode[reservation.id] && (
                               <div className='mt-3 p-3 bg-white rounded-md border border-blue-200 shadow-sm'>
                                 <div className='flex items-center justify-between'>

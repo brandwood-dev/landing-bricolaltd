@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { StripeProvider } from '@/contexts/StripeContext'
@@ -86,6 +86,7 @@ const Rent: React.FC = () => {
   const { user } = useAuth()
   const { t, language } = useLanguage()
   const { toast } = useToast()
+  const paymentRef = useRef<HTMLDivElement>(null)
   const { refreshRates } = useCurrencyOptimized()
 
   // États existants
@@ -307,8 +308,14 @@ const Rent: React.FC = () => {
       }
 
       const result = await response.json()
-      const bookings = result.data || []
-
+      console.table(result.data)
+      //bookings are in result.data filtred by status without CANCELED or REJECTED 
+      const bookings = result.data
+        ?.filter(
+          (booking: any) =>
+            booking.status !== 'CANCELLED' && booking.status !== 'REJECTED'
+        ) || []
+console.table(bookings)
       setExistingBookings(bookings)
 
       // Organiser les dates par statut
@@ -328,18 +335,18 @@ const Rent: React.FC = () => {
           allUnavailableDates.push(dateToAdd)
 
           if (
-            booking.status === 'confirmed' ||
-            booking.status === 'in_progress'
+            booking.status === 'ACCEPTED' ||
+            booking.status === 'ONGOING'
           ) {
             confirmedDates.push(new Date(dateToAdd))
           } else if (
-            booking.status === 'pending' ||
-            booking.status === 'accepted'
+            booking.status === 'PENDING' ||
+            booking.status === 'ACCEPTED'
           ) {
             pendingDates.push(new Date(dateToAdd))
           }
 
-          if (booking.status === 'in_progress') {
+          if (booking.status === 'ONGOING') {
             inProgressDates.push(new Date(dateToAdd))
           }
 
@@ -453,17 +460,8 @@ const Rent: React.FC = () => {
   }
 
   // Vérifier si une heure de pickup est désactivée pour une date donnée
-  const isPickupTimeDisabled = (selectedDate: Date, pickupTime: string) => {
-    if (!selectedDate) return false
-
-    const [hours, minutes] = pickupTime.split(':').map(Number)
-    const pickupDateTime = new Date(selectedDate)
-    pickupDateTime.setHours(hours, minutes, 0, 0)
-
-    const now = new Date()
-    const minimumDateTime = new Date(now.getTime() + 48 * 60 * 60 * 1000)
-
-    return pickupDateTime < minimumDateTime
+  const isPickupTimeDisabled = (_selectedDate: Date, _pickupTime: string) => {
+    return false
   }
 
   // Fonction personnalisée pour setStartDate avec validation
@@ -742,6 +740,17 @@ const Rent: React.FC = () => {
       return
     }
 
+    // Vérifier que l'heure de récupération est choisie
+    if (!formData.pickupHour) {
+      toast({
+        title: t('errors.validation_error'),
+        description:
+          "Veuillez choisir l'heure de récupération avant de procéder au paiement",
+        variant: 'destructive',
+      })
+      return
+    }
+
     try {
       setSubmitting(true)
 
@@ -750,6 +759,17 @@ const Rent: React.FC = () => {
         toast({
           title: t('errors.validation_error'),
           description: 'Le prix total est invalide. Veuillez réessayer.',
+          variant: 'destructive',
+        })
+        return
+      }
+
+      // Minimum Stripe: montant total doit être > 0.5 £
+      if (totalToPay < 0.5) {
+        toast({
+          title: t('errors.validation_error'),
+          description:
+            'Le montant total doit être supérieur à 0,5 £ pour procéder au paiement.',
           variant: 'destructive',
         })
         return
@@ -799,6 +819,13 @@ const Rent: React.FC = () => {
       // Afficher le formulaire de paiement
       setShowPayment(true)
       console.log('🔍 ShowPayment set to true')
+      // Focus et scroll vers le formulaire de paiement
+      setTimeout(() => {
+        paymentRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        })
+      }, 50)
     } catch (err: any) {
       // Function to get user-friendly error message
       const getErrorMessage = (error: any) => {
@@ -949,7 +976,11 @@ const Rent: React.FC = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <form className='space-y-6'>
+                    <form
+                      className={`space-y-6 ${
+                        showPayment ? 'pointer-events-none opacity-60' : ''
+                      }`}
+                    >
                       {/* Dates de location */}
                       <div className='space-y-4'>
                         <h3 className='font-semibold text-lg'>
@@ -1394,8 +1425,27 @@ const Rent: React.FC = () => {
                 </Card>
 
                 {/* PaymentForm affiché après validation du formulaire */}
+                {showPayment && (
+                  <div className='mt-6 flex items-center justify-between'>
+                    <div className='text-sm text-gray-600'>
+                      Formulaire de paiement prêt
+                    </div>
+                    <Button
+                      type='button'
+                      variant='outline'
+                      size='sm'
+                      onClick={() => {
+                        setShowPayment(false)
+                        setPendingBookingData(null)
+                      }}
+                    >
+                      Modifier les informations
+                    </Button>
+                  </div>
+                )}
+
                 {showPayment && pendingBookingData && (
-                  <div className='mt-6'>
+                  <div className='mt-3' ref={paymentRef}>
                     <Card>
                       <CardHeader>
                         <CardTitle className='flex items-center gap-2'>
