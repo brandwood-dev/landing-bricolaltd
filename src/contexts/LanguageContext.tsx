@@ -17,6 +17,7 @@ interface LanguageContextType {
 const translations = {
   fr: {
     // MapView
+    search_results: 'Résultats de recherche pour',
     'errors.validation_error': 'Erreur',
     'view.details': 'Voir détails',
     'no.tools.found': 'Aucun outil trouvé',
@@ -24,6 +25,7 @@ const translations = {
       'Essayez de modifier vos critères de recherche',
     'tools.found': 'Outils trouvés',
     results: 'résultats',
+    result: 'résultat',
     'map.tools': 'Carte des outils',
     'search.tools': 'Rechercher des outils sur la carte...',
     'chargemento.outils': 'Chargement des outils...',
@@ -1945,12 +1947,14 @@ const translations = {
   },
   en: {
     // MapView
+    search_results: 'Search results for',
     'errors.validation_error': 'Error',
     'view.details': 'View details',
     'no.tools.found': 'No tools found',
     'try.modifying.search.criteria': 'Try modifying your search criteria',
     'tools.found': 'Tools found',
     results: 'results',
+    result: 'result',
     'map.tools': 'Map of tools',
     'search.tools': 'Search for tools on the map...',
     'chargemento.outils': 'Loading tools...',
@@ -3830,12 +3834,14 @@ const translations = {
   },
   ar: {
     // MapView
+    search_results: 'نتائج البحث عن',
     'errors.validation_error': 'خطأ',
     'view.details': 'عرض التفاصيل',
     'no.tools.found': 'لا توجد أدوات',
     'try.modifying.search.criteria': 'حاول تعديل معايير البحث',
     'tools.found': 'أدوات تم العثور عليها',
     results: 'نتائج',
+    result: 'نتيجة',
     'map.tools': 'خريطة الأدوات',
     'search.tools': 'بحث عن أدوات على الخريطة...',
     'chargemento.outils': 'تحميل الأدوات',
@@ -4887,8 +4893,8 @@ const translations = {
     'subcategories.electricity': 'الكهرباء',
     'subcategories.screws-and-bolts': 'المسامير والصواميل',
 
-    'categories.events': 'معدات الحفلات',
-    'subcategories.party-equipment': 'معدات الحفلات',
+    'categories.events': 'معدات الحفلات و الفعاليات',
+    'subcategories.party-equipment': 'معدات الحفلات و الفعاليات',
     'subcategories.sound-lighting': 'الصوت والضياء',
     'subcategories.event-decoration': 'زينة الحفلات',
     'subcategories.catering-equipment': 'تقديم الطعام',

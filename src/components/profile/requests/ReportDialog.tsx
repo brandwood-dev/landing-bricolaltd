@@ -108,18 +108,8 @@ const ReportDialog: React.FC<ReportDialogProps> = ({ requestId, onReportSubmit }
                   <SelectItem value='no-show'>
                     Client did not show up at the appointment
                   </SelectItem>
-                  <SelectItem value='late'>
-                    Client late for pickup or return
-                  </SelectItem>
-                  <SelectItem value='misuse'>
-                    Improper use of the tool (misuse, risk of damage)
-                  </SelectItem>
-                  <SelectItem value='damaged'>
-                    Return of a damaged or incomplete tool
-                  </SelectItem>
-                  <SelectItem value='payment'>
-                    Non-payment or payment issue
-                  </SelectItem>
+                 
+                 
                   <SelectItem value='suspicious'>
                     Suspicious or fraudulent request
                   </SelectItem>
@@ -139,18 +129,9 @@ const ReportDialog: React.FC<ReportDialogProps> = ({ requestId, onReportSubmit }
                   <SelectItem value='no-show'>
                     Client non présent au rendez-vous
                   </SelectItem>
-                  <SelectItem value='late'>
-                    Client en retard pour la prise ou le retour
-                  </SelectItem>
-                  <SelectItem value='misuse'>
-                    Utilisation inappropriée de l'outil (mauvais usage, risque de dommage)
-                  </SelectItem>
-                  <SelectItem value='damaged'>
-                    Retour d'un outil endommagé ou incomplet
-                  </SelectItem>
-                  <SelectItem value='payment'>
-                    Non-paiement ou problème de paiement
-                  </SelectItem>
+                
+                
+                 
                   <SelectItem value='suspicious'>
                     Demande suspecte ou frauduleuse
                   </SelectItem>
@@ -170,18 +151,8 @@ const ReportDialog: React.FC<ReportDialogProps> = ({ requestId, onReportSubmit }
                   <SelectItem value='no-show'>
                     العميل لم يحضر في الموعد
                   </SelectItem>
-                  <SelectItem value='late'>
-                    تأخر العميل في الاستلام أو الإرجاع
-                  </SelectItem>
-                  <SelectItem value='misuse'>
-                    سوء استخدام الأداة (إساءة استخدام، خطر التلف)
-                  </SelectItem>
-                  <SelectItem value='damaged'>
-                    إرجاع أداة تالفة أو غير مكتملة
-                  </SelectItem>
-                  <SelectItem value='payment'>
-                    عدم الدفع أو مشكلة في الدفع
-                  </SelectItem>
+                 
+                
                   <SelectItem value='suspicious'>
                     طلب مشبوه أو احتيالي
                   </SelectItem>

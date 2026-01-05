@@ -87,7 +87,6 @@ const RequestsAndReservationsFilters = ({
       result = result.filter((item) => allowed.includes(String(item.status || '').toLowerCase()))
     }
 
-    // Period filter (rolling windows: last 7/30/365 days)
     if (filters.periodFilter !== 'all') {
       const now = new Date()
       const threshold = new Date(now)
@@ -97,8 +96,10 @@ const RequestsAndReservationsFilters = ({
       threshold.setHours(0, 0, 0, 0)
 
       result = result.filter((item) => {
-        const raw = item.startDate || item.createdAt || Date.now()
+        const raw = item.startDate
+        if (!raw) return false
         const itemDate = new Date(raw)
+        if (isNaN(itemDate.getTime())) return false
         return itemDate >= threshold
       })
     }

@@ -236,13 +236,9 @@ const ClaimDialog: React.FC<ClaimDialogProps> = ({
                     <SelectItem value='no-show'>
                       Client did not show up at the appointment
                     </SelectItem>
-                    <SelectItem value='late'>
-                      Client late for pickup or return
-                    </SelectItem>
+                   
                     
-                    <SelectItem value='payment'>
-                      Non-payment or payment issue
-                    </SelectItem>
+                    
                     <SelectItem value='suspicious'>
                       Suspicious or fraudulent request
                     </SelectItem>
@@ -262,13 +258,9 @@ const ClaimDialog: React.FC<ClaimDialogProps> = ({
                     <SelectItem value='no-show'>
                       Client non présent au rendez-vous
                     </SelectItem>
-                    <SelectItem value='late'>
-                      Client en retard pour la prise ou le retour
-                    </SelectItem>
+                   
                     
-                    <SelectItem value='payment'>
-                      Non-paiement ou problème de paiement
-                    </SelectItem>
+                    
                     <SelectItem value='suspicious'>
                       Demande suspecte ou frauduleuse
                     </SelectItem>
@@ -288,13 +280,9 @@ const ClaimDialog: React.FC<ClaimDialogProps> = ({
                     <SelectItem value='no-show'>
                       العميل لم يحضر في الموعد
                     </SelectItem>
-                    <SelectItem value='late'>
-                      تأخر العميل في الاستلام أو الإرجاع
-                    </SelectItem>
+                   
                     
-                    <SelectItem value='payment'>
-                      عدم الدفع أو مشكلة في الدفع
-                    </SelectItem>
+                    
                     <SelectItem value='suspicious'>
                       طلب مشبوه أو احتيالي
                     </SelectItem>

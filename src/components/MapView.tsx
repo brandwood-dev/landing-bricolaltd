@@ -408,7 +408,10 @@ const MapView = ({
 
       <div className='flex items-center justify-between'>
         <h2 className='text-xl font-semibold'>
-          {t('map.tools')} ({filteredTools.length} {t('results')})
+         
+          {filteredTools.length > 1 ? t('map.tools') : t('map.tools')} (
+          {filteredTools.length}{' '}
+          {filteredTools.length > 1 ? t('results') : t('result')})
         </h2>
       </div>
 

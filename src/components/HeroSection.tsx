@@ -42,7 +42,9 @@ const HeroSection = () => {
       <section className="py-20 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="mb-6 text-center">
-            <h2 className="text-2xl font-bold mb-4">Résultats de recherche pour "{searchQuery}"</h2>
+            <h2 className="text-2xl font-bold mb-4">
+              {t('search_results')} "{searchQuery}"
+            </h2>
           </div>
           {showMap && (
             <div className="mt-8">
