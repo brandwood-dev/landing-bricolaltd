@@ -154,7 +154,7 @@ const Header = () => {
                   language === 'ar' ? 'text-right' : ''
                 }`}
               >
-                <SelectValue placeholder='Langue' />
+                <SelectValue placeholder={t('common.language')} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value='fr'>
@@ -585,7 +585,7 @@ const Header = () => {
                             language === 'ar' ? 'text-right' : 'text-left'
                           }`}
                         >
-                          <SelectValue placeholder='Langue' />
+                          <SelectValue placeholder={t('common.language')} />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value='fr'>

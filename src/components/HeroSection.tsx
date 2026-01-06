@@ -99,7 +99,7 @@ const HeroSection = () => {
               {searchError && (
                 <div className="flex items-center gap-1 text-red-500 text-sm mt-1">
                   <AlertCircle className="h-4 w-4" />
-                  <span>Ce champ est obligatoire</span>
+                  <span>{t('validation.required_field')}</span>
                 </div>
               )}
             </div>
@@ -113,7 +113,7 @@ const HeroSection = () => {
               onClick={handleSearch}
               disabled={isLoading || !searchQuery.trim()}
             >
-              {isLoading ? 'Recherche...' : t('hero.search.button')}
+              {isLoading ? t('search.searching') : t('hero.search.button')}
             </Button>
           </div>
           

@@ -137,7 +137,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0" align="end">
         <div className="flex items-center justify-between p-4 border-b">
-          <h3 className="font-semibold">Notifications</h3>
+          <h3 className="font-semibold">{t('notifications.title')}</h3>
           {unreadCount > 0 && (
             <Button 
               variant="ghost" 
@@ -145,7 +145,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
               onClick={handleMarkAllAsRead}
               className="text-xs"
             >
-              Tout marquer comme lu
+              {t('notifications.mark_all_read')}
             </Button>
           )}
         </div>
@@ -154,7 +154,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
           {notifications.length === 0 ? (
             <div className="p-4 text-center text-muted-foreground">
               <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p>Aucune notification</p>
+              <p>{t('notifications.no_notifications')}</p>
             </div>
           ) : (
             <div className="divide-y">

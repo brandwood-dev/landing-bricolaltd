@@ -318,7 +318,7 @@ const MapView = ({
         const userMarker = new mapboxgl.default.Marker({ color: 'blue' })
           .setLngLat([userLocation.lng, userLocation.lat])
           .setPopup(
-            new mapboxgl.default.Popup().setHTML('<div>Votre position</div>')
+            new mapboxgl.default.Popup().setHTML(`<div>${t('map.your_position')}</div>`)
           )
           .addTo(map)
       }

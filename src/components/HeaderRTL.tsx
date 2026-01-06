@@ -103,7 +103,7 @@ export const HeaderRTL: React.FC = () => {
               onValueChange={(value: 'fr' | 'en' | 'ar') => setLanguage(value)}
             >
               <SelectTrigger className='w-28 border-none bg-transparent text-right'>
-                <SelectValue placeholder='Langue' />
+                <SelectValue placeholder={t('common.language')} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value='fr'>
@@ -378,7 +378,7 @@ export const HeaderRTL: React.FC = () => {
                         }
                       >
                         <SelectTrigger className='w-full text-right'>
-                          <SelectValue placeholder='Langue' />
+                          <SelectValue placeholder={t('common.language')} />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value='fr'>

@@ -319,7 +319,7 @@ const Contact = () => {
                       value={formData.email}
                       onChange={handleInputChange}
                       onBlur={(e) => handleFieldBlur('email', e.target.value)}
-                      placeholder='email@exemple.com'
+                      placeholder={t('contact.email.placeholder')}
                       className={fieldErrors.email ? 'border-red-500' : ''}
                       required
                     />
@@ -361,7 +361,7 @@ const Contact = () => {
                             <div className='relative'>
                               <Search className='absolute left-2 top-2.5 h-4 w-4 text-gray-400' />
                               <Input
-                                placeholder='Rechercher un pays...'
+                                placeholder={t('contact.country.search')}
                                 value={countrySearch}
                                 onChange={(e) => setCountrySearch(e.target.value)}
                                 className='pl-8 h-9'
@@ -414,7 +414,7 @@ const Contact = () => {
                         <div className="mt-1 text-xs text-gray-500 space-y-1">
                           <p>Longueur: {country ? `${country.minLength}-${country.maxLength}` : '8-15'} chiffres</p>
                           {formattedNumber && (
-                            <p>Aperçu: <span className="font-medium">{formattedNumber}</span></p>
+                            <p>{t('contact.preview')} <span className="font-medium">{formattedNumber}</span></p>
                           )}
                         </div>
                       );

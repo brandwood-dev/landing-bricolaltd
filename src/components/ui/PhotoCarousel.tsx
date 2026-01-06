@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from './button';
 
@@ -10,11 +11,12 @@ interface CarouselProps {
 
 export const Carousel: React.FC<CarouselProps> = ({ images, alt = 'Image', className = '' }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { t } = useLanguage();
 
   if (!images || images.length === 0) {
     return (
       <div className={`bg-gray-200 rounded-lg flex items-center justify-center h-64 ${className}`}>
-        <span className="text-gray-500">Aucune image disponible</span>
+        <span className="text-gray-500">{t('images.none')}</span>
       </div>
     );
   }

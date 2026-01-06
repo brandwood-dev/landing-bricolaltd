@@ -99,7 +99,7 @@ const BlogPost = () => {
       <div className='min-h-screen bg-background flex items-center justify-center'>
         <div className='flex items-center space-x-2'>
           <Loader2 className='h-6 w-6 animate-spin' />
-          <span>Chargement de l'article...</span>
+          <span>{t('blog.loading_article')}</span>
         </div>
       </div>
     )
@@ -298,7 +298,7 @@ const BlogPost = () => {
                       dangerouslySetInnerHTML={{ __html: post.content }}
                     ></div>
                   ) : (
-                    <p className='text-gray-600'>Aucun contenu disponible.</p>
+                    <p className='text-gray-600'>{t('blog.no_content')}</p>
                   )}
                 </>
               )}

@@ -1945,7 +1945,7 @@ const Reservations = () => {
         <Dialog open={isClaimDialogOpen} onOpenChange={setIsClaimDialogOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Signaler un problème </DialogTitle>
+              <DialogTitle>{t('report.title')}</DialogTitle>
             </DialogHeader>
             <div className='space-y-4'>
               <div>
@@ -1954,7 +1954,7 @@ const Reservations = () => {
                 </label>
                 <Select value={reportReason} onValueChange={setReportReason}>
                   <SelectTrigger>
-                    <SelectValue placeholder='Sélectionnez le type de problème' />
+                    <SelectValue placeholder={t('report.select_problem_type')} />
                   </SelectTrigger>
                   <SelectContent>
                     {language === 'en' ? (
@@ -1983,7 +1983,7 @@ const Reservations = () => {
                         <SelectItem value='wrong-contact'>
                           Incorrect / unreachable phone number
                         </SelectItem>
-                        <SelectItem value='other'>Other</SelectItem>
+                        <SelectItem value='other'>{t('general.other')}</SelectItem>
                       </>
                     ) : language === 'fr' ? (
                       <>
@@ -2011,7 +2011,7 @@ const Reservations = () => {
                         <SelectItem value='wrong-contact'>
                           Numéro incorrect / injoignable
                         </SelectItem>
-                        <SelectItem value='other'>Autre</SelectItem>
+                        <SelectItem value='other'>{t('general.other')}</SelectItem>
                       </>
                     ) : (
                       <>
@@ -2039,7 +2039,7 @@ const Reservations = () => {
                         <SelectItem value='wrong-contact'>
                           رقم هاتف غير صحيح / لا يمكن الوصول إليه
                         </SelectItem>
-                        <SelectItem value='other'>أخرى</SelectItem>
+                        <SelectItem value='other'>{t('general.other')}</SelectItem>
                       </>
                     )}
                   </SelectContent>
@@ -2050,7 +2050,7 @@ const Reservations = () => {
                   Description du problème
                 </label>
                 <Textarea
-                  placeholder='Décrivez le problème rencontré...'
+                  placeholder={t('report.describe_problem')}
                   value={reportMessage}
                   onChange={(e) => setReportMessage(e.target.value)}
                 />

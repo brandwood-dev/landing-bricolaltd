@@ -56,7 +56,7 @@ const CustomerReviews = () => {
         {loading ? (
           <div className="flex justify-center items-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-            <span className="ml-2 text-gray-600">Chargement des avis...</span>
+            <span className="ml-2 text-gray-600">{t('reviews.loading')}</span>
           </div>
         ) : error ? (
           <div className="text-center py-12">

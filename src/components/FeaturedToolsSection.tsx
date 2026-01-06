@@ -109,7 +109,7 @@ const FeaturedToolsSection = () => {
           </div>
           <div className='flex justify-center items-center py-12'>
             <Loader2 className='h-8 w-8 animate-spin text-primary' />
-            <span className='ml-2 text-gray-600'>Chargement des outils...</span>
+            <span className='ml-2 text-gray-600'>{t('chargemento.outils')}</span>
           </div>
         </div>
       </section>

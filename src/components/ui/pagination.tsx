@@ -2,8 +2,8 @@ import * as React from "react"
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { useLanguage } from '@/contexts/LanguageContext'
 import { ButtonProps, buttonVariants } from "@/components/ui/button"
-import { useLanguage } from "@/contexts/LanguageContext"
 const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
   
   <nav
@@ -125,16 +125,19 @@ PaginationNext.displayName = "PaginationNext"
 const PaginationEllipsis = ({
   className,
   ...props
-}: React.ComponentProps<"span">) => (
-  <span
-    aria-hidden
-    className={cn("flex h-9 w-9 items-center justify-center", className)}
-    {...props}
-  >
-    <MoreHorizontal className="h-4 w-4" />
-    <span className="sr-only">More pages</span>
-  </span>
-)
+}: React.ComponentProps<"span">) => {
+  const { t } = useLanguage()
+  return (
+    <span
+      aria-hidden
+      className={cn("flex h-9 w-9 items-center justify-center", className)}
+      {...props}
+    >
+      <MoreHorizontal className="h-4 w-4" />
+      <span className="sr-only">{t('a11y.more_pages')}</span>
+    </span>
+  )
+}
 PaginationEllipsis.displayName = "PaginationEllipsis"
 
 export {

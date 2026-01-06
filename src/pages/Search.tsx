@@ -658,7 +658,7 @@ const Search = () => {
                       {isSearching && (
                         <div className='flex items-center gap-1 text-sm text-blue-600'>
                           <Loader2 className='h-3 w-3 animate-spin' />
-                          <span>Recherche...</span>
+                          <span>{t('search.searching')}</span>
                         </div>
                       )}
                     </div>
@@ -694,19 +694,19 @@ const Search = () => {
                       <SelectItem value='createdAt-asc'>
                         <div className='flex items-center gap-2'>
                           <span>📅</span>
-                          <span>Plus anciens</span>
+                          <span>{t('search.sort.oldest')}</span>
                         </div>
                       </SelectItem>
                       <SelectItem value='title-asc'>
                         <div className='flex items-center gap-2'>
                           <span>🔤</span>
-                          <span>Nom A-Z</span>
+                          <span>{t('search.sort.name_asc')}</span>
                         </div>
                       </SelectItem>
                       <SelectItem value='title-desc'>
                         <div className='flex items-center gap-2'>
                           <span>🔤</span>
-                          <span>Nom Z-A</span>
+                          <span>{t('search.sort.name_desc')}</span>
                         </div>
                       </SelectItem>
                       <SelectItem value='basePrice-asc'>
@@ -730,7 +730,7 @@ const Search = () => {
                       <SelectItem value='rating-asc'>
                         <div className='flex items-center gap-2'>
                           <Star className='h-4 w-4 text-gray-400' />
-                          <span>Moins bien notés</span>
+                          <span>{t('search.sort.lowest_rated')}</span>
                         </div>
                       </SelectItem>
                     </SelectContent>
