@@ -95,7 +95,7 @@ export const HeaderRTL: React.FC = () => {
           {/* Actions (à gauche) */}
           <div className='hidden md:flex items-center flex-row-reverse space-x-6 space-x-reverse order-first'>
             {/* Devise */}
-            <CurrencySelector showLabel={false} size='sm' className='w-40' />
+            <CurrencySelector showLabel={false} size='sm' className='w-40 px-5' />
 
             {/* Langue */}
             <Select

@@ -16,7 +16,10 @@ interface LanguageContextType {
 
 const translations = {
   fr: {
+    'catalog_section.show_filters': 'Afficher les filtres',
+    'catalog_section.hide_filters': 'Masquer les filtres',
     // MapView
+    refresh: 'Actualiser',
     search_results: 'Résultats de recherche pour',
     'errors.validation_error': 'Erreur',
     'view.details': 'Voir détails',
@@ -1994,7 +1997,11 @@ const translations = {
       'L`usage continu de la plateforme après modification vaut acceptation tacite de la nouvelle version.',
   },
   en: {
+    'catalog_section.show_filters': 'Show filters',
+    'catalog_section.hide_filters': 'Hide filters',
     // MapView
+    refresh: 'Refresh',
+
     search_results: 'Search results for',
     'errors.validation_error': 'Error',
     'view.details': 'View details',
@@ -3929,7 +3936,10 @@ const translations = {
     'notifications.booking_accepted': 'Booking Accepted',
   },
   ar: {
+    'catalog_section.show_filters': 'إظهار الفلاتر',
+    'catalog_section.hide_filters': 'إخفاء الفلاتر',
     // MapView
+    refresh: 'تحديث',
     search_results: 'نتائج البحث عن',
     'errors.validation_error': 'خطأ',
     'view.details': 'عرض التفاصيل',
@@ -5072,7 +5082,7 @@ const translations = {
     'tools.back_to_results': 'الرجوع إلى النتائج',
     'tools.verified': 'موثق',
     'tools.owner': 'المؤجر',
-    'tools.model': 'لطراز',
+    'tools.model': 'الطراز',
     'tools.brand': 'العلامة التجارية',
     'tools.year_of_purchase': 'سنة الشراء',
     'tools.fees_and_taxes': 'يشمل الضرائب والرسوم',

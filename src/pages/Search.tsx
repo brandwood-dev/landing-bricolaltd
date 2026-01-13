@@ -124,45 +124,60 @@ const Search = () => {
   const debouncedLocationQuery = useDebounce(locationQuery, 300)
 
   // Currency conversion functions for price slider
-  const convertGBPToUserCurrency = useCallback((gbpPrice: number) => {
-    if (selectedCurrency === 'GBP') return gbpPrice
-    return calculatePrice(gbpPrice, 'GBP') || gbpPrice
-  }, [selectedCurrency, calculatePrice])
+  const convertGBPToUserCurrency = useCallback(
+    (gbpPrice: number) => {
+      if (selectedCurrency === 'GBP') return gbpPrice
+      return calculatePrice(gbpPrice, 'GBP') || gbpPrice
+    },
+    [selectedCurrency, calculatePrice]
+  )
 
-  const convertUserCurrencyToGBP = useCallback((userPrice: number) => {
-    if (selectedCurrency === 'GBP') return userPrice
-    // Convert back to GBP by dividing by the rate
-    const rate = calculatePrice(1, 'GBP') || 1
-    return userPrice / rate
-  }, [selectedCurrency, calculatePrice])
+  const convertUserCurrencyToGBP = useCallback(
+    (userPrice: number) => {
+      if (selectedCurrency === 'GBP') return userPrice
+      // Convert back to GBP by dividing by the rate
+      const rate = calculatePrice(1, 'GBP') || 1
+      return userPrice / rate
+    },
+    [selectedCurrency, calculatePrice]
+  )
 
   // Convert slider range for display
-  const displayPriceRange = useMemo(() => [
-    Math.round(convertGBPToUserCurrency(priceRange[0])),
-    Math.round(convertGBPToUserCurrency(priceRange[1]))
-  ], [priceRange, convertGBPToUserCurrency])
+  const displayPriceRange = useMemo(
+    () => [
+      Math.round(convertGBPToUserCurrency(priceRange[0])),
+      Math.round(convertGBPToUserCurrency(priceRange[1])),
+    ],
+    [priceRange, convertGBPToUserCurrency]
+  )
 
   // Convert display range back to GBP for filtering
-  const gbpPriceRange = useMemo(() => [
-    Math.round(convertUserCurrencyToGBP(displayPriceRange[0])),
-    Math.round(convertUserCurrencyToGBP(displayPriceRange[1]))
-  ], [displayPriceRange, convertUserCurrencyToGBP])
+  const gbpPriceRange = useMemo(
+    () => [
+      Math.round(convertUserCurrencyToGBP(displayPriceRange[0])),
+      Math.round(convertUserCurrencyToGBP(displayPriceRange[1])),
+    ],
+    [displayPriceRange, convertUserCurrencyToGBP]
+  )
 
   // Handle price range change from slider
-  const handlePriceRangeChange = useCallback((newDisplayRange: number[]) => {
-    // Convert the display range back to GBP for internal state
-    const newGBPRange = [
-      Math.round(convertUserCurrencyToGBP(newDisplayRange[0])),
-      Math.round(convertUserCurrencyToGBP(newDisplayRange[1]))
-    ]
-    setPriceRange(newGBPRange)
-  }, [convertUserCurrencyToGBP])
+  const handlePriceRangeChange = useCallback(
+    (newDisplayRange: number[]) => {
+      // Convert the display range back to GBP for internal state
+      const newGBPRange = [
+        Math.round(convertUserCurrencyToGBP(newDisplayRange[0])),
+        Math.round(convertUserCurrencyToGBP(newDisplayRange[1])),
+      ]
+      setPriceRange(newGBPRange)
+    },
+    [convertUserCurrencyToGBP]
+  )
 
   // Filter tools on frontend based on GBP price
   const filteredTools = useMemo(() => {
     if (!tools.length) return tools
-    
-    return tools.filter(tool => {
+
+    return tools.filter((tool) => {
       const toolPrice = tool.basePrice || 0
       return toolPrice >= priceRange[0] && toolPrice <= priceRange[1]
     })
@@ -469,8 +484,8 @@ const Search = () => {
                 >
                   <Filter className='mr-2 h-4 w-4' />
                   {filtersVisible
-                    ? 'Masquer les filtres'
-                    : 'Afficher les filtres'}
+                    ? t('catalog_section.hide_filters')
+                    : t('catalog_section.show_filters')}
                 </Button>
               </div>
               <Card
@@ -575,24 +590,26 @@ const Search = () => {
                       </div>
                     )}
 
-                     <div className='space-y-3'>
-                       <Label className='text-sm font-medium'>
-                         {t('catalog_section.daily_price')}
-                       </Label>
-                       <div className='px-2'>
-                         <CustomRangeSlider
-                           value={displayPriceRange}
-                           onValueChange={handlePriceRangeChange}
-                           min={Math.round(convertGBPToUserCurrency(0))}
-                           max={Math.round(convertGBPToUserCurrency(500))}
-                           step={1}
-                           className='mt-2'
-                           currencySymbol={selectedCurrency}
-                           convertValue={(value) => value}
-                           formatValue={(value) => formatPrice(value, selectedCurrency)}
-                         />
-                       </div>
-                     </div>
+                    <div className='space-y-3'>
+                      <Label className='text-sm font-medium'>
+                        {t('catalog_section.daily_price')}
+                      </Label>
+                      <div className='px-2'>
+                        <CustomRangeSlider
+                          value={displayPriceRange}
+                          onValueChange={handlePriceRangeChange}
+                          min={Math.round(convertGBPToUserCurrency(0))}
+                          max={Math.round(convertGBPToUserCurrency(500))}
+                          step={1}
+                          className='mt-2'
+                          currencySymbol={selectedCurrency}
+                          convertValue={(value) => value}
+                          formatValue={(value) =>
+                            formatPrice(value, selectedCurrency)
+                          }
+                        />
+                      </div>
+                    </div>
 
                     <div className='flex gap-2'>
                       <Button
@@ -631,40 +648,7 @@ const Search = () => {
                   (language === 'ar' ? ' [direction:ltr] ' : '')
                 }
               >
-                <div className='flex items-center gap-3'>
-                  <div>
-                    <h1
-                      className={
-                        'text-2xl font-bold ' +
-                        (language === 'ar' ? '[direction:rtl]' : '')
-                      }
-                    >
-                      {totalItems} {t('catalog_section.title')}
-                    </h1>
-                    <div className='flex items-center gap-2 mt-1'>
-                      {selectedCategory !== 'all' && (
-                        <p className='text-gray-600'>
-                          {t('catalog_section.category')}:{' '}
-                          {/* on veut afficher la traduction de selcted category */}
-                          {t(
-                            `categories.${
-                              categories.find(
-                                (cat) => cat.id === selectedCategory
-                              )?.name
-                            }`
-                          ) || t(`categories.${selectedCategory}`)}
-                        </p>
-                      )}
-                      {isSearching && (
-                        <div className='flex items-center gap-1 text-sm text-blue-600'>
-                          <Loader2 className='h-3 w-3 animate-spin' />
-                          <span>{t('search.searching')}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <div className='flex items-center gap-2'>
+                <div className='flex items-center'>
                   <Button
                     variant='outline'
                     size='sm'
@@ -675,8 +659,9 @@ const Search = () => {
                     <RefreshCw
                       className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`}
                     />
-                    Actualiser
+                    {t('refresh')}
                   </Button>
+
                   <Select
                     onValueChange={handleSortChange}
                     value={`${sortBy}-${sortOrder}`}
@@ -735,19 +720,55 @@ const Search = () => {
                       </SelectItem>
                     </SelectContent>
                   </Select>
-                  {(searchQuery ||
-                    locationQuery ||
-                    selectedCategory !== 'all' ||
-                    selectedSubCategory !== 'all') && (
-                    <Button
-                      variant='ghost'
-                      size='sm'
-                      onClick={clearAllFilters}
-                      className='text-gray-500 hover:text-gray-700'
-                    >
-                      <X className='h-4 w-4' />
-                    </Button>
-                  )}
+                </div>
+
+                {(searchQuery ||
+                  locationQuery ||
+                  selectedCategory !== 'all' ||
+                  selectedSubCategory !== 'all') && (
+                  <Button
+                    variant='ghost'
+                    size='sm'
+                    onClick={clearAllFilters}
+                    className='text-gray-500 hover:text-gray-700'
+                  >
+                    <X className='h-4 w-4' />
+                  </Button>
+                )}
+              </div>
+              <div
+                className={
+                  'flex justify-between items-center mb-6 ' +
+                  (language === 'ar' ? ' [direction:ltr] ' : '')
+                }
+              >
+                <div className='flex items-center '>
+                  <div>
+                    <h1 className={'text-2xl font-bold '}>
+                      {totalItems} {t('catalog_section.title')}
+                    </h1>
+                    <div className='flex items-center gap-2 mt-1'>
+                      {selectedCategory !== 'all' && (
+                        <p className='text-gray-600'>
+                          {t('catalog_section.category')}:{' '}
+                          {/* on veut afficher la traduction de selcted category */}
+                          {t(
+                            `categories.${
+                              categories.find(
+                                (cat) => cat.id === selectedCategory
+                              )?.name
+                            }`
+                          ) || t(`categories.${selectedCategory}`)}
+                        </p>
+                      )}
+                      {isSearching && (
+                        <div className='flex items-center gap-1 text-sm text-blue-600'>
+                          <Loader2 className='h-3 w-3 animate-spin' />
+                          <span>{t('search.searching')}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -856,7 +877,6 @@ const Search = () => {
                                 size='md'
                                 cible='basePrice'
                               />
-                              
                             </div>
                             <div className='text-sm text-gray-500'>
                               {t('catalog_section.by')}{' '}

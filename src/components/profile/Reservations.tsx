@@ -1011,28 +1011,35 @@ const Reservations = () => {
             </div>
           ) : (
             paginatedReservations.map((reservation) => (
-              <Card key={reservation.id} className='overflow-hidden'>
-                <CardContent className='p-0'>
-                  <div className='flex flex-col md:flex-row'>
-                    {/* Image de l'outil */}
-                    <div className='w-full md:w-32 h-48 md:h-32 flex-shrink-0'>
-                      <Link
-                        to={`/tool/${reservation.toolId}`}
-                        className='block w-full h-full'
-                      >
-                        <img
-                          src={reservation.toolImage}
-                          alt={reservation.toolName}
-                          className='w-full h-full object-cover hover:opacity-90 transition-opacity cursor-pointer'
-                        />
-                      </Link>
-                    </div>
+              <Card
+                key={reservation.id}
+                className='overflow-hidden border rounded-lg  space-y-3 '
+              >
+                <CardHeader>
+                  <CardTitle className='text-lg font-semibold text-gray-900 flex items-center justify-between'>
+                    <div className='flex items-center justify-start gap-2'>
+                      <div className='w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0'>
+                        <Link
+                          to={`/tool/${reservation.toolId}`}
+                          className='block w-full h-full'
+                        >
+                          <img
+                            src={reservation.toolImage}
+                            alt={reservation.toolName}
+                            className='w-full h-full object-cover hover:opacity-90 transition-opacity cursor-pointer'
+                          />
+                        </Link>
+                      </div>
 
-                    {/* Contenu principal */}
-                    <div className='flex-1 p-4 md:p-6'>
-                      <div className='flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4'>
-                        <div className='flex-1'>
-                          <div className='flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2'>
+                      <div>
+                        <div
+                          className={
+                            'flex items-start' +
+                            (language === 'ar' ? ' [direction:ltr] ' : '')
+                          }
+                        >
+                          {/* espace entre les deux div */}
+                          <div className='pr-2 pl-2'>
                             <Link
                               to={`/tool/${reservation.toolId}`}
                               className='hover:text-blue-600 transition-colors'
@@ -1041,59 +1048,90 @@ const Reservations = () => {
                                 {reservation.toolName}
                               </h3>
                             </Link>
-                            <Badge
-                              className={getStatusColor(reservation.status)}
-                            >
-                              {t(`status.${reservation.status.toLowerCase()}`)}
-                            </Badge>
-                            {(reservation.status === 'ONGOING' ||
-                              reservation.status === 'ACCEPTED') &&
-                              reservation.renterHasReturned &&
-                              !reservation.pickupTool && (
-                                <Badge
-                                  variant='outline'
-                                  className='bg-blue-50 text-blue-800 border-blue-200'
-                                >
-                                  {t('booking.wait')}
-                                </Badge>
-                              )}
-                            {reservation.status === 'ONGOING' &&
-                              reservation.hasActiveClaim && (
-                                <Badge
-                                  variant='outline'
-                                  className='bg-orange-50 text-orange-800 border-orange-200'
-                                >
-                                  {t('claim.in_progress')}
-                                </Badge>
-                              )}
-                            {reservation.status === 'ACCEPTED' &&
-                              reservation.hasActiveClaim && (
-                                <Badge
-                                  variant='outline'
-                                  className='bg-orange-50 text-orange-800 border-orange-200'
-                                >
-                                  {t('claim.in_progress')}
-                                </Badge>
-                              )}
-                            {(reservation.status === 'ONGOING' ||
-                              reservation.status === 'ACCEPTED') &&
-                              reservation.pickupTool && (
-                                <Badge
-                                  variant='outline'
-                                  className='bg-blue-50 text-orange-800 border-orange-200'
-                                >
-                                  {t('tool.returned')}
-                                </Badge>
-                              )}
                           </div>
+                        </div>
+                        <div>
+                          <Badge className={getStatusColor(reservation.status)}>
+                            {t(`status.${reservation.status.toLowerCase()}`)}
+                          </Badge>
+                          {(reservation.status === 'ONGOING' ||
+                            reservation.status === 'ACCEPTED') &&
+                            reservation.renterHasReturned &&
+                            !reservation.pickupTool && (
+                              <Badge
+                                variant='outline'
+                                className='bg-blue-50 text-blue-800 border-blue-200'
+                              >
+                                {t('booking.wait')}
+                              </Badge>
+                            )}
+                          {reservation.status === 'ONGOING' &&
+                            reservation.hasActiveClaim && (
+                              <Badge
+                                variant='outline'
+                                className='bg-orange-50 text-orange-800 border-orange-200'
+                              >
+                                {t('claim.in_progress')}
+                              </Badge>
+                            )}
+                          {reservation.status === 'ACCEPTED' &&
+                            reservation.hasActiveClaim && (
+                              <Badge
+                                variant='outline'
+                                className='bg-orange-50 text-orange-800 border-orange-200'
+                              >
+                                {t('claim.in_progress')}
+                              </Badge>
+                            )}
+                          {(reservation.status === 'ONGOING' ||
+                            reservation.status === 'ACCEPTED') &&
+                            reservation.pickupTool && (
+                              <Badge
+                                variant='outline'
+                                className='bg-blue-50 text-orange-800 border-orange-200'
+                              >
+                                {t('tool.returned')}
+                              </Badge>
+                            )}
+                        </div>
+                      </div>
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className=''>
+                  <div className='flex items-start justify-between'>
+                    {/* Contenu principal */}
+                    <div className='flex-1'>
+                      <div className='flex items-start md:justify-between'>
+                        <div className=''>
+                          <div className='flex items-center gap-2 text-sm text-gray-600 mb-2'>
+                            <div className='text-2xl text-left font-bold text-blue-600 '>
+                              {/* optimizedPriceDisplay */}
 
+                              <OptimizedPriceDisplay
+                                price={reservation.price}
+                                baseCurrency='GBP'
+                                size='md'
+                                cible='totalPrice'
+                              />
+                            </div>
+                            <div className='text-sm text-gray-500'>
+                          
+                              <OptimizedPriceDisplay
+                                price={(reservation.dailyPrice || 0) * 1.06}
+                                baseCurrency='GBP'
+                                size='md'
+                                cible='basePrice'
+                              />
+                             
+                            </div>
+                          </div>
                           <div className='flex items-center gap-2 text-sm text-gray-600 mb-2'>
                             <User className='h-4 w-4' />
                             <span>
                               {t('general.by')} {reservation.owner}
                             </span>
                           </div>
-
                           <div className='text-xs text-gray-500 mb-3'>
                             {language === 'ar'
                               ? `${reservation.referenceId} : ${t(
@@ -1103,13 +1141,15 @@ const Reservations = () => {
                                   reservation.referenceId
                                 }`}
                           </div>
+                          <div>
+                            {' '}
+                            <p className='text-sm text-gray-600 mb-4'>
+                              {reservation.toolDescription}
+                            </p>
+                          </div>
 
-                          <p className='text-sm text-gray-600 mb-4'>
-                            D! : {reservation.toolDescription}
-                          </p>
-
-                          <div className='flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-600 mb-4'>
-                            <div className='flex items-center gap-1'>
+                          <div className='gap-2 sm:gap-4 text-sm text-gray-600 mb-4'>
+                            <div className='flex items-center gap-1 pb-2'>
                               <Calendar className='h-4 w-4' />
                               <span>
                                 {t('general.from')} {reservation.startDate}{' '}
@@ -1120,27 +1160,6 @@ const Reservations = () => {
                               <MapPin className='h-4 w-4' />
                               <span>{reservation.location}</span>
                             </div>
-                          </div>
-                        </div>
-
-                        <div className='text-left lg:text-right mt-4 lg:mt-0'>
-                          <div className='text-2xl font-bold text-blue-600 mb-2'>
-                            {/* optimizedPriceDisplay */}
-
-                            <OptimizedPriceDisplay
-                              price={reservation.price}
-                              baseCurrency='GBP'
-                              size='md'
-                              cible='totalPrice'
-                            />
-                          </div>
-                          <div className='text-sm text-gray-500'>
-                            <OptimizedPriceDisplay
-                              price={(reservation.dailyPrice || 0) * 1.06}
-                              baseCurrency='GBP'
-                              size='md'
-                              cible='basePrice'
-                            />
                           </div>
                         </div>
                       </div>
@@ -1681,7 +1700,6 @@ const Reservations = () => {
                                 </div>
                               </DialogContent>
                             </Dialog>
-                            
                           </>
                         )}
 
@@ -1739,9 +1757,17 @@ const Reservations = () => {
                               <Button
                                 variant='ghost'
                                 size='sm'
-                                onClick={() => toggleValidationCode(reservation.id)}
-                                disabled={!isStartDateReached(reservation.startDate)}
-                                className={`text-blue-700 hover:text-blue-900 hover:bg-blue-100 ${!isStartDateReached(reservation.startDate) ? 'pointer-events-none opacity-50' : ''}`}
+                                onClick={() =>
+                                  toggleValidationCode(reservation.id)
+                                }
+                                disabled={
+                                  !isStartDateReached(reservation.startDate)
+                                }
+                                className={`text-blue-700 hover:text-blue-900 hover:bg-blue-100 ${
+                                  !isStartDateReached(reservation.startDate)
+                                    ? 'pointer-events-none opacity-50'
+                                    : ''
+                                }`}
                               >
                                 {showValidationCode[reservation.id] ? (
                                   <>
@@ -1843,7 +1869,7 @@ const Reservations = () => {
           )}
         </div>
 
-        {/* Pagination */}
+        {/* adapter la Pagination pour l'affichage mobile */}
         {totalPages > 1 && (
           <div className='mt-6'>
             <Pagination>
@@ -1862,7 +1888,7 @@ const Reservations = () => {
                     }
                   />
                 </PaginationItem>
-
+                {/* 
                 {Array.from({ length: totalPages }, (_, index) => {
                   const pageNumber = index + 1
                   const isCurrentPage = pageNumber === currentPage
@@ -1881,7 +1907,7 @@ const Reservations = () => {
                       </PaginationLink>
                     </PaginationItem>
                   )
-                })}
+                })} */}
 
                 <PaginationItem>
                   <PaginationNext
@@ -1954,7 +1980,9 @@ const Reservations = () => {
                 </label>
                 <Select value={reportReason} onValueChange={setReportReason}>
                   <SelectTrigger>
-                    <SelectValue placeholder={t('report.select_problem_type')} />
+                    <SelectValue
+                      placeholder={t('report.select_problem_type')}
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {language === 'en' ? (
@@ -1983,7 +2011,9 @@ const Reservations = () => {
                         <SelectItem value='wrong-contact'>
                           Incorrect / unreachable phone number
                         </SelectItem>
-                        <SelectItem value='other'>{t('general.other')}</SelectItem>
+                        <SelectItem value='other'>
+                          {t('general.other')}
+                        </SelectItem>
                       </>
                     ) : language === 'fr' ? (
                       <>
@@ -2011,7 +2041,9 @@ const Reservations = () => {
                         <SelectItem value='wrong-contact'>
                           Numéro incorrect / injoignable
                         </SelectItem>
-                        <SelectItem value='other'>{t('general.other')}</SelectItem>
+                        <SelectItem value='other'>
+                          {t('general.other')}
+                        </SelectItem>
                       </>
                     ) : (
                       <>
@@ -2039,7 +2071,9 @@ const Reservations = () => {
                         <SelectItem value='wrong-contact'>
                           رقم هاتف غير صحيح / لا يمكن الوصول إليه
                         </SelectItem>
-                        <SelectItem value='other'>{t('general.other')}</SelectItem>
+                        <SelectItem value='other'>
+                          {t('general.other')}
+                        </SelectItem>
                       </>
                     )}
                   </SelectContent>

@@ -174,7 +174,7 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
 
     switch (cible) {
       case 'basePrice':
-        return `${formattedPrice} /${t('tools.day')}`
+        return `(${formattedPrice} /${t('tools.day')})`
       case 'fees':
         return `${t('tools.fees_and_taxes')} : ${formattedPrice}`
       case 'feesInc':

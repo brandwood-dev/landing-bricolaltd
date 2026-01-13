@@ -146,9 +146,7 @@ const ProfileHeader = ({ userInfo, stats }: ProfileHeaderProps) => {
         <div className='flex !flex-col gap-6'>
           {/* Profile info section */}
           <div
-            className={`flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 ${
-              language == 'ar' ? '[direction:ltr]' : ''
-            }`}
+            className='flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 justify-center sm:justify-start'
           >
             <Avatar className='h-20 w-20 sm:h-24 sm:w-24 flex-shrink-0'>
               <AvatarImage src={userInfo.profilePicture || ''} />

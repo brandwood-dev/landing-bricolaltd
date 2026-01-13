@@ -627,7 +627,7 @@ const ProfileInfo = () => {
       {/* Section 1: Photo de profil */}
       <Card>
         <CardHeader className='pb-4'>
-          <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
+          <div className='flex items-start sm:items-center justify-between gap-4'>
             <div>
               <CardTitle className='text-xl font-semibold'>
                 {t('profile.photo_title')}
@@ -693,7 +693,6 @@ const ProfileInfo = () => {
                   </Badge>
                 )}
               </div>
-            
             </div>
           </div>
         </CardContent>
@@ -702,7 +701,7 @@ const ProfileInfo = () => {
       {/* Section 2: Informations personnelles */}
       <Card>
         <CardHeader className='pb-4'>
-          <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
+          <div className='flex  items-start sm:items-center justify-between gap-4'>
             <div>
               <CardTitle className='text-xl font-semibold'>
                 {t('profile.personal_info_title')}
@@ -916,7 +915,7 @@ const ProfileInfo = () => {
       {/* Section 3: Changement de mot de passe */}
       <Card>
         <CardHeader className='pb-4'>
-          <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
+          <div className='flex  items-start sm:items-center justify-between gap-4'>
             <div>
               <CardTitle className='text-xl font-semibold'>
                 {t('profile.change_password')}
@@ -950,7 +949,7 @@ const ProfileInfo = () => {
                     }
                   }}
                   onBlur={handleCurrentPasswordBlur}
-                  className={`pr-20 ${language === 'ar' ? 'text-right' : ''} ${
+                  className={`pr-10 ${language === 'ar' ? 'text-right' : ''} ${
                     currentPasswordChecked
                       ? currentPasswordValid
                         ? 'border-green-500'
@@ -959,12 +958,12 @@ const ProfileInfo = () => {
                   }`}
                   placeholder={t('profile.current_password_placeholder')}
                 />
-                <div className='absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-2'>
+               
                   <Button
                     type='button'
                     variant='ghost'
                     size='sm'
-                    className='h-auto p-0 hover:bg-transparent'
+                    className='absolute right-3 top-1/2 transform -translate-y-1/2 h-auto p-0 hover:bg-transparent'
                     onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                   >
                     {showCurrentPassword ? (
@@ -982,7 +981,6 @@ const ProfileInfo = () => {
                       )}
                     </div>
                   )}
-                </div>
               </div>
               {currentPasswordChecked && !currentPasswordValid && (
                 <p className='text-sm text-red-500'>
@@ -1093,7 +1091,7 @@ const ProfileInfo = () => {
                   value={userInfo.confirmPassword}
                   onChange={(e) => handleConfirmPasswordChange(e.target.value)}
                   disabled={!currentPasswordValid || !userInfo.newPassword}
-                  className={`pr-20 ${language === 'ar' ? 'text-right' : ''} ${
+                  className={`pr-10 ${language === 'ar' ? 'text-right' : ''} ${
                     !currentPasswordValid || !userInfo.newPassword
                       ? 'opacity-50 cursor-not-allowed'
                       : ''

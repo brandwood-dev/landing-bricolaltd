@@ -178,11 +178,22 @@ const BlogPost = () => {
 
           <article>
             <header className='mb-8'>
-              <Badge className='mb-4'>
-                {post.category ? post.category : t('blog.category.general')}
-              </Badge>
+              <div className='flex justify-between items-center'>
+                <Badge className='mb-4'>
+                  {post.category ? post.category : t('blog.category.general')}
+                </Badge>
+                <div className='flex items-center'>
+                  <ShareDialog
+                    url={currentUrl}
+                    title={post.title}
+                    excerpt={post.summary}
+                    imageUrl={absoluteImage || '/placeholder-blog.svg'}
+                    triggerVariant='default'
+                    triggerClassName='bg-[#ED8021] hover:bg-[#ED8021] text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300'
+                  />
+                </div>
+              </div>
               <h1 className='text-4xl font-bold mb-6'>{post.title}</h1>
-
               <div className='flex items-center justify-between mb-6'>
                 <div className='flex items-center gap-4 text-gray-600'>
                   <div className='flex items-center gap-1'>
@@ -201,17 +212,6 @@ const BlogPost = () => {
                     </span>
                   </div>
                 </div>
-
-                <div className='flex items-center'>
-                  <ShareDialog
-                    url={currentUrl}
-                    title={post.title}
-                    excerpt={post.summary}
-                    imageUrl={absoluteImage || '/placeholder-blog.svg'}
-                    triggerVariant='default'
-                    triggerClassName='bg-[#ED8021] hover:bg-[#ED8021] text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300'
-                  />
-                </div>
               </div>
 
               <img
@@ -227,7 +227,10 @@ const BlogPost = () => {
 
             <div className='prose prose-lg max-w-none mb-12 prose-headings:text-left prose-headings:font-bold prose-p:text-justify prose-img:mx-auto prose-img:block'>
               {post.summary && (
-                <p className='text-lg text-gray-700 mb-6' style={{ textAlign: 'justify' }}>
+                <p
+                  className='text-lg text-gray-700 mb-6'
+                  style={{ textAlign: 'justify' }}
+                >
                   {post.summary}
                 </p>
               )}
@@ -244,7 +247,9 @@ const BlogPost = () => {
                     .map((section: any) => (
                       <section key={section.id} className='space-y-6'>
                         {section.title && (
-                          <h2 className='text-2xl font-bold text-left'>{section.title}</h2>
+                          <h2 className='text-2xl font-bold '>
+                            {section.title}
+                          </h2>
                         )}
 
                         {section.images && section.images.length > 0 && (
@@ -267,26 +272,27 @@ const BlogPost = () => {
                           </div>
                         )}
 
-                        {section.paragraphs && section.paragraphs.length > 0 && (
-                          <div className='space-y-6'>
-                            {section.paragraphs
-                              .slice()
-                              .sort(
-                                (a: any, b: any) =>
-                                  new Date(a.createdAt).getTime() -
-                                  new Date(b.createdAt).getTime()
-                              )
-                              .map((paragraph: any) => (
-                                <p
-                                  key={paragraph.id}
-                                  className='text-gray-700 leading-relaxed'
-                                  style={{ textAlign: 'justify' }}
-                                >
-                                  {paragraph.content}
-                                </p>
-                              ))}
-                          </div>
-                        )}
+                        {section.paragraphs &&
+                          section.paragraphs.length > 0 && (
+                            <div className='space-y-6'>
+                              {section.paragraphs
+                                .slice()
+                                .sort(
+                                  (a: any, b: any) =>
+                                    new Date(a.createdAt).getTime() -
+                                    new Date(b.createdAt).getTime()
+                                )
+                                .map((paragraph: any) => (
+                                  <p
+                                    key={paragraph.id}
+                                    className='text-gray-700 leading-relaxed'
+                                    style={{ textAlign: 'justify' }}
+                                  >
+                                    {paragraph.content}
+                                  </p>
+                                ))}
+                            </div>
+                          )}
                       </section>
                     ))}
                 </div>
