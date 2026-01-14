@@ -22,6 +22,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { CurrencySelector } from '@/components/CurrencySelector'
 import {
   User,
+  Wrench,
   Menu,
   Heart,
   LogOut,
@@ -95,7 +96,11 @@ export const HeaderRTL: React.FC = () => {
           {/* Actions (à gauche) */}
           <div className='hidden md:flex items-center flex-row-reverse space-x-6 space-x-reverse order-first'>
             {/* Devise */}
-            <CurrencySelector showLabel={false} size='sm' className='w-40 px-5' />
+            <CurrencySelector
+              showLabel={false}
+              size='sm'
+              className='w-40 px-5'
+            />
 
             {/* Langue */}
             <Select
@@ -238,44 +243,6 @@ export const HeaderRTL: React.FC = () => {
 
           {/* Mobile */}
           <div className='md:hidden flex items-center flex-row-reverse space-x-2 space-x-reverse'>
-            {isAuthenticated ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant='ghost' size='sm'>
-                    <User className='h-5 w-5' />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align='end' className='w-56'>
-                  <div className='px-2 py-1.5 text-sm font-medium'>
-                    {user?.firstName} {user?.lastName}
-                  </div>
-                  <div className='px-2 py-1.5 text-xs text-gray-500'>
-                    {user?.email}
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to='/profile' className='flex items-center'>
-                      <UserCircle className='mr-2 h-4 w-4' />
-                      {t('nav.profile')}
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={handleLogout}
-                    className='text-red-600'
-                  >
-                    <LogOut className='mr-2 h-4 w-4' />
-                    {t('nav.logout')}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <Link to='/login'>
-                <Button variant='ghost' size='sm'>
-                  <User className='h-5 w-5' />
-                </Button>
-              </Link>
-            )}
-
             {/* Menu mobile */}
             <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <SheetTrigger asChild>
@@ -304,17 +271,20 @@ export const HeaderRTL: React.FC = () => {
                     {/* Auth */}
                     <div className='space-y-4'>
                       {isAuthenticated ? (
-                        <Button
-                          variant='outline'
-                          className='w-full h-12 text-sm text-red-600 border-red-200 hover:bg-red-50'
-                          onClick={() => {
-                            handleLogout()
-                            setIsMenuOpen(false)
-                          }}
-                        >
-                          <LogOut className='mr-2 h-4 w-4' />
-                          {t('nav.logout')}
-                        </Button>
+                        <>
+                          <Link
+                            to='/add-tool'
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            <Button
+                              variant='outline'
+                              className='w-full  h-12 text-sm'
+                            >
+                              <Wrench className='mr-2 h-4 w-4' />
+                              {t('nav.list')}
+                            </Button>
+                          </Link>
+                        </>
                       ) : (
                         <>
                           <Link
@@ -425,6 +395,78 @@ export const HeaderRTL: React.FC = () => {
                 </div>
               </SheetContent>
             </Sheet>
+
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant='ghost' size='sm'>
+                    <User className='h-5 w-5' />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='end' className='w-56'>
+                  <div className='px-2 py-1.5 text-sm font-medium'>
+                    {user?.firstName} {user?.lastName}
+                  </div>
+                  <div className='px-2 py-1.5 text-xs text-gray-500'>
+                    {user?.email}
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to='/profile' className='flex items-center'>
+                      <UserCircle className='mr-2 h-4 w-4' />
+                      {t('nav.profile')}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      to='/profile?tab=wallet'
+                      className='flex items-center'
+                    >
+                      <DollarSign className='mr-2 h-4 w-4' />
+                      {t('nav.wallet')}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to='/profile?tab=ads' className='flex items-center'>
+                      <Edit className='mr-2 h-4 w-4' />
+                      {t('nav.my_listings')}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      to='/profile?tab=requests'
+                      className='flex items-center'
+                    >
+                      <MessageSquare className='mr-2 h-4 w-4' />
+                      {t('nav.requests')}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      to='/profile?tab=reservations'
+                      className='flex items-center'
+                    >
+                      <Calendar className='mr-2 h-4 w-4' />
+                      {t('nav.bookings')}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className='text-red-600'
+                  >
+                    <LogOut className='mr-2 h-4 w-4' />
+                    {t('nav.logout')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link to='/login'>
+                <Button variant='ghost' size='sm'>
+                  <User className='h-5 w-5' />
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </div>

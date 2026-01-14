@@ -35,8 +35,6 @@ const MyAdsSearchAndFilters = ({
   onPublicationFilterChange,
   categoryFilter,
   onCategoryFilterChange,
-  viewMode,
-  onViewModeChange,
 }: SearchAndFiltersProps) => {
   const { t } = useLanguage()
   const [categories, setCategories] = useState<Category[]>([])
@@ -135,27 +133,7 @@ const MyAdsSearchAndFilters = ({
           </Select>
         </div>
 
-        {/* Mode d'affichage */}
-        <div className='flex justify-center sm:justify-end gap-2'>
-          <Button
-            variant={viewMode === 'grid' ? 'default' : 'outline'}
-            size='sm'
-            onClick={() => onViewModeChange('grid')}
-            className='flex items-center gap-2'
-          >
-            <Grid className='h-4 w-4' />
-            <span className='hidden sm:inline'>{t('general.grid')}</span>
-          </Button>
-          <Button
-            variant={viewMode === 'list' ? 'default' : 'outline'}
-            size='sm'
-            onClick={() => onViewModeChange('list')}
-            className='flex items-center gap-2'
-          >
-            <List className='h-4 w-4' />
-            <span className='hidden sm:inline'>{t('general.list')}</span>
-          </Button>
-        </div>
+     
       </div>
     </div>
   )

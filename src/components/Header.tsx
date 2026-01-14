@@ -401,49 +401,18 @@ const Header = () => {
                     <div className='space-y-4'>
                       {isAuthenticated ? (
                         <>
-                          <div className='text-center py-4 border-b'>
-                            <div className='font-medium'>
-                              {user?.firstName} {user?.lastName}
-                            </div>
-                            <div className='text-sm text-gray-500'>
-                              {user?.email}
-                            </div>
-                          </div>
-                          <Link
-                            to='/profile'
+                        <Link
+                            to='/add-tool'
                             onClick={() => setIsMenuOpen(false)}
                           >
                             <Button
                               variant='outline'
-                              className='w-full h-12 text-sm'
-                            >
-                              <UserCircle className='mr-2 h-4 w-4' />
-                              {t('nav.profile')}
-                            </Button>
-                          </Link>
-                          <Link
-                            to='/profile?tab=wallet'
-                            onClick={() => setIsMenuOpen(false)}
-                          >
-                            <Button
-                              variant='outline'
-                              className='w-full h-12 text-sm'
+                              className='w-full  h-12 text-sm'
                             >
                               <Wrench className='mr-2 h-4 w-4' />
-                              {t('nav.wallet')}
+                              {t('nav.list')}
                             </Button>
                           </Link>
-                          <Button
-                            variant='outline'
-                            className='w-full h-12 text-sm text-red-600 border-red-200 hover:bg-red-50'
-                            onClick={() => {
-                              handleLogout()
-                              setIsMenuOpen(false)
-                            }}
-                          >
-                            <LogOut className='mr-2 h-4 w-4' />
-                            {t('nav.logout')}
-                          </Button>
                         </>
                       ) : (
                         <>
@@ -467,20 +436,6 @@ const Header = () => {
                             </Button>
                           </Link>
                         </>
-                      )}
-                      {/* List tool button - Only for authenticated users */}
-                      {isAuthenticated && (
-                        <Link
-                          to='/add-tool'
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          <Button
-                            variant='outline'
-                            className='w-full  h-12 text-sm'
-                          >
-                            {t('nav.list')}
-                          </Button>
-                        </Link>
                       )}
                     </div>
 

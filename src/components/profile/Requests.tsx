@@ -81,6 +81,11 @@ const Requests = () => {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isWindows, setIsWindows] = useState(false)
+
+  useEffect(() => {
+    setIsWindows(window.navigator.userAgent.indexOf('Windows') !== -1)
+  }, [])
   const transformBookingToRequest = (booking: Booking): Request => {
     // Get primary photo or fallback to first photo
     const primaryPhoto = booking.tool?.photos?.find((photo) => photo.isPrimary)
@@ -987,69 +992,119 @@ const Requests = () => {
             ))
           )}
         </div>
-
         {/* Pagination */}
-        {totalPages > 1 && (
-          <div className='mt-6'>
-            {console.log(
-              '🎯 PAGINATION RENDUE - totalPages:',
-              totalPages,
-              'currentPage:',
-              currentPage
-            )}
-            <div
-              className={`flex flex-row items-center gap-1 ${
-                language === 'ar' ? '[direction:ltr]' : ''
-              }`}
-            >
-              {/* Bouton Précédent */}
-              <Button
-                variant='outline'
-                size='sm'
-                onClick={() => {
-                  if (currentPage > 1) handlePageChange(currentPage - 1)
-                }}
-                disabled={currentPage <= 1}
-                className='gap-1 pl-2.5'
-              >
-                <ChevronLeft className='h-4 w-4' />
-                <span>Précédent</span>
-              </Button>
-
-              {/* Boutons numérotés */}
-              {Array.from({ length: totalPages }, (_, index) => {
-                const pageNumber = index + 1
-                const isCurrentPage = pageNumber === currentPage
-
-                return (
+        {setIsWindows ? (
+          <>
+            {totalPages > 1 && (
+              <div className='mt-6'>
+                {console.log(
+                  '🎯 PAGINATION RENDUE - totalPages:',
+                  totalPages,
+                  'currentPage:',
+                  currentPage
+                )}
+                <div
+                  className={`flex flex-row items-center gap-1 ${
+                    language === 'ar' ? '[direction:ltr]' : ''
+                  }`}
+                >
+                  {/* Bouton Précédent */}
                   <Button
-                    key={pageNumber}
-                    variant={isCurrentPage ? 'default' : 'outline'}
+                    variant='outline'
                     size='sm'
-                    onClick={() => handlePageChange(pageNumber)}
-                    className='w-10 h-10'
+                    onClick={() => {
+                      if (currentPage > 1) handlePageChange(currentPage - 1)
+                    }}
+                    disabled={currentPage <= 1}
+                    className='gap-1 pl-2.5'
                   >
-                    {pageNumber}
+                    <ChevronLeft className='h-4 w-4' />
+                    <span>Précédent</span>
                   </Button>
-                )
-              })}
 
-              {/* Bouton Suivant */}
-              <Button
-                variant='outline'
-                size='sm'
-                onClick={() => {
-                  if (currentPage < totalPages)
-                    handlePageChange(currentPage + 1)
-                }}
-                disabled={currentPage >= totalPages}
-                className='gap-1 pr-2.5'
-              >
-                <span>Suivant</span>
-                <ChevronRight className='h-4 w-4' />
-              </Button>
-            </div>
-          </div>
+                  {/* Boutons numérotés */}
+                  {Array.from({ length: totalPages }, (_, index) => {
+                    const pageNumber = index + 1
+                    const isCurrentPage = pageNumber === currentPage
+
+                    return (
+                      <Button
+                        key={pageNumber}
+                        variant={isCurrentPage ? 'default' : 'outline'}
+                        size='sm'
+                        onClick={() => handlePageChange(pageNumber)}
+                        className='w-10 h-10'
+                      >
+                        {pageNumber}
+                      </Button>
+                    )
+                  })}
+
+                  {/* Bouton Suivant */}
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={() => {
+                      if (currentPage < totalPages)
+                        handlePageChange(currentPage + 1)
+                    }}
+                    disabled={currentPage >= totalPages}
+                    className='gap-1 pr-2.5'
+                  >
+                    <span>Suivant</span>
+                    <ChevronRight className='h-4 w-4' />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            {totalPages > 1 && (
+              <div className='mt-6'>
+                {console.log(
+                  '🎯 PAGINATION RENDUE - totalPages:',
+                  totalPages,
+                  'currentPage:',
+                  currentPage
+                )}
+                <div
+                  className={`flex flex-row items-center gap-1 ${
+                    language === 'ar' ? '[direction:ltr]' : ''
+                  }`}
+                >
+                  {/* Bouton Précédent */}
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={() => {
+                      if (currentPage > 1) handlePageChange(currentPage - 1)
+                    }}
+                    disabled={currentPage <= 1}
+                    className='gap-1 pl-2.5'
+                  >
+                    <ChevronLeft className='h-4 w-4' />
+                    <span>Précédent</span>
+                  </Button>
+
+                  {/* Bouton Suivant */}
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={() => {
+                      if (currentPage < totalPages)
+                        handlePageChange(currentPage + 1)
+                    }}
+                    disabled={currentPage >= totalPages}
+                    className='gap-1 pr-2.5'
+                  >
+                    <span>Suivant</span>
+                    <ChevronRight className='h-4 w-4' />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </>
         )}
 
         {/* Refactored Dialogs */}

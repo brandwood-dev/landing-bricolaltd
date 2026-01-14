@@ -16,6 +16,12 @@ interface LanguageContextType {
 
 const translations = {
   fr: {
+    // {t('pagination.showof')} {startIndex + 1} {t('pagination.to')}
+    // {Math.min(endIndex, totalItems)} {t('pagination.of')} {totalItems}  {t('pagination.ads')}
+    'pagination.showof': 'Afficher',
+    'pagination.to': 'à',
+    'pagination.of': 'sur',
+    'pagination.ads': 'annonces',
     'catalog_section.show_filters': 'Afficher les filtres',
     'catalog_section.hide_filters': 'Masquer les filtres',
     // MapView
@@ -796,7 +802,7 @@ const translations = {
     'general.location': 'Locations',
 
     'general.published': 'Publié',
-    'general.unpublished': 'Non publié',
+    'general.unpublished': 'Brouillon',
     'general.view_details': 'Voir détails',
     'general.pending': 'En attente',
     'general.accepted': 'Acceptée',
@@ -1127,10 +1133,8 @@ const translations = {
     'wallet.total': 'Total',
     'wallet.cumulative_balance': 'Revenus cumulés',
     'wallet.available': 'Disponible',
-    'wallet.available_balance': 'Revenus disponibles',
     'wallet.pending_balance': 'Revenus en attente',
     'wallet.successful': 'Réussies',
-    'wallet.successful_transactions': 'Transactions réussies',
     'wallet.withdraw_money': 'Demander un virement',
     'wallet.withdrawal_note':
       'Vous pouvez demander le paiement dès que vos revenus cumulés atteignent 50 GBP.',
@@ -1235,7 +1239,7 @@ const translations = {
     // Navigation
     'nav.home': 'Accueil',
     'nav.catalog': 'Catalogue',
-    'nav.navigation': 'navigation',
+    'nav.navigation': 'Menu',
     'nav.propos': 'À propos',
     'nav.blog': 'Blog',
     'nav.contact': 'Contact',
@@ -1400,6 +1404,9 @@ const translations = {
     'message.loading': 'Chargement...',
     'message.no_results': 'Aucun résultat trouvé',
     'message.confirm_delete': 'Êtes-vous sûr de vouloir supprimer ?',
+    'message.no_ads': "Vous n'avez pas encore d'annonces.",
+    'message.no_ads_found':
+      'Aucune annonce trouvée pour les critères sélectionnés.',
 
     // Footer
     'footer.about': 'À propos',
@@ -1997,6 +2004,13 @@ const translations = {
       'L`usage continu de la plateforme après modification vaut acceptation tacite de la nouvelle version.',
   },
   en: {
+    'pagination.showof': 'Show',
+    'pagination.to': 'to',
+    'pagination.of': 'of',
+    'pagination.ads': 'ads',
+    'message.no_ads': "You haven't yet posted any ads.",
+    'message.no_ads_found':
+      'No ads found for the selected criteria.',
     'catalog_section.show_filters': 'Show filters',
     'catalog_section.hide_filters': 'Hide filters',
     // MapView
@@ -2594,7 +2608,7 @@ const translations = {
     'general.public': 'Public',
     'general.categories': 'Categories',
     'general.published': 'Published',
-    'general.unpublished': 'Unpublished',
+    'general.unpublished': 'Draft',
     'general.view_details': 'View Details',
     'general.pending': 'Pending',
     'general.show': 'Show',
@@ -2924,10 +2938,8 @@ const translations = {
     'wallet.total': 'Total',
     'wallet.cumulative_balance': 'Total earnings due',
     'wallet.available': 'Available',
-    'wallet.available_balance': 'Available earnings',
     'wallet.pending_balance': 'Pending earnings',
     'wallet.successful': 'Successful',
-    'wallet.successful_transactions': 'Successful transactions',
     'wallet.withdraw_money': 'Request payout',
     'wallet.withdrawal_note':
       'You can request a payout once your total earnings reach 50 GBP.',
@@ -3027,7 +3039,7 @@ const translations = {
     // Navigation
     'nav.home': 'Home',
     'nav.catalog': 'Catalogue',
-    'nav.navigation': 'navigation',
+    'nav.navigation': 'Menu',
     'nav.propos': 'About Us',
     'nav.blog': 'Blog',
     'nav.contact': 'Contact Us',
@@ -3936,6 +3948,15 @@ const translations = {
     'notifications.booking_accepted': 'Booking Accepted',
   },
   ar: {
+    // {t('pagination.showof')} {startIndex + 1} {t('pagination.to')}
+    // {Math.min(endIndex, totalItems)} {t('pagination.of')} {totalItems}  {t('pagination.ads')}
+    'pagination.showof': 'عرض',
+    'pagination.to': 'إلى',
+    'pagination.of': 'من',
+    'pagination.ads': 'عروض',
+    'message.no_ads': "لا توجد أي إعلانات.",
+    'message.no_ads_found':
+      'لا توجد أي إعلانات مطابقة للمعايير المحددة.',
     'catalog_section.show_filters': 'إظهار الفلاتر',
     'catalog_section.hide_filters': 'إخفاء الفلاتر',
     // MapView
@@ -4593,7 +4614,7 @@ const translations = {
     'general.public': 'عام',
     'general.categories': 'الفئات',
     'general.published': 'تم النشر',
-    'general.unpublished': 'غير منشور',
+    'general.unpublished': 'مؤقت',
     'general.view_details': 'عرض التفاصيل',
     'general.pending': 'قيد الانتظار',
     'general.show': 'عرض',
@@ -4862,10 +4883,8 @@ const translations = {
     'wallet.total': 'الإجمالي',
     'wallet.cumulative_balance': 'إجمالي المستحقّات',
     'wallet.available': 'متاح',
-    'wallet.available_balance': 'مستحقّات جاهزة للدفع',
     'wallet.pending_balance': 'مستحقّات قيد الانتظار',
     'wallet.successful': 'ناجحة',
-    'wallet.successful_transactions': 'المعاملات الناجحة',
     'wallet.withdraw_money': 'طلب تحويل المستحقّات',
     'wallet.withdrawal_note':
       'يمكنك طلب تحويل مستحقّاتك عندما يبلغ إجمالي مستحقّاتك 50 جنيهًا إسترلينيًا',

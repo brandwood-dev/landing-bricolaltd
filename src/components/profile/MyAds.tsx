@@ -297,56 +297,42 @@ const MyAds = () => {
           onPublicationFilterChange={setPublicationFilter}
           categoryFilter={categoryFilter}
           onCategoryFilterChange={setCategoryFilter}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
         />
 
-        <div className={viewMode === 'grid' ? 'space-y-4' : 'space-y-2'}>
+        <div className='space-y-4'>
           {loading ? (
             <div className='text-center py-8 text-muted-foreground'>
               <Loader2 className='h-6 w-6 animate-spin mx-auto mb-2' />
-              <p>Chargement de vos annonces...</p>
+              <p>{t('message.loading')}</p>
             </div>
           ) : filteredAds.length === 0 ? (
             <div className='text-center py-8 text-muted-foreground'>
               {ads.length === 0 ? (
                 <div>
-                  <p className='mb-4'>Vous n'avez pas encore d'annonces.</p>
+                  <p className='mb-4'>{t('message.no_ads')}</p>
                   <Link to='/add-tool'>
                     <Button>
                       <Plus className='h-4 w-4 mr-2' />
-                      Créer votre première annonce
+                      {t('tools.new_ad')}
                     </Button>
                   </Link>
                 </div>
               ) : (
-                'Aucune annonce trouvée pour les critères sélectionnés.'
+                <p className='mb-4'>{t('message.no_ads_found')}</p>
               )}
             </div>
           ) : (
-            currentAds.map((ad) =>
-              viewMode === 'grid' ? (
-                <AdCard
-                  key={ad.id}
-                  ad={ad}
-                  onPublishToggle={handlePublishToggle}
-                  onDeleteAd={handleDeleteAd}
-                  onRefresh={refreshAds}
-                  getValidationStatusColor={getValidationStatusColor}
-                  getValidationStatusText={getValidationStatusText}
-                />
-              ) : (
-                <AdListItem
-                  key={ad.id}
-                  ad={ad}
-                  onPublishToggle={handlePublishToggle}
-                  onDeleteAd={handleDeleteAd}
-                  onRefresh={refreshAds}
-                  getValidationStatusColor={getValidationStatusColor}
-                  getValidationStatusText={getValidationStatusText}
-                />
-              )
-            )
+            currentAds.map((ad) => (
+              <AdCard
+                key={ad.id}
+                ad={ad}
+                onPublishToggle={handlePublishToggle}
+                onDeleteAd={handleDeleteAd}
+                onRefresh={refreshAds}
+                getValidationStatusColor={getValidationStatusColor}
+                getValidationStatusText={getValidationStatusText}
+              />
+            ))
           )}
         </div>
 

@@ -115,6 +115,11 @@ const Reservations = () => {
   // Références pour suivre les changements de filtres et éviter la réinitialisation de la pagination
   const previousFilteredDataRef = useRef<Reservation[]>([])
   const isInitialLoadRef = useRef(true)
+  const [isWindows, setIsWindows] = useState(false)
+
+  useEffect(() => {
+    setIsWindows(window.navigator.userAgent.indexOf('Windows') !== -1)
+  }, [])
 
   const transformBookingToReservation = (booking: Booking): Reservation => {
     // Get primary photo or fallback to first photo
@@ -1116,14 +1121,12 @@ const Reservations = () => {
                               />
                             </div>
                             <div className='text-sm text-gray-500'>
-                          
                               <OptimizedPriceDisplay
                                 price={(reservation.dailyPrice || 0) * 1.06}
                                 baseCurrency='GBP'
                                 size='md'
                                 cible='basePrice'
                               />
-                             
                             </div>
                           </div>
                           <div className='flex items-center gap-2 text-sm text-gray-600 mb-2'>
@@ -1868,66 +1871,120 @@ const Reservations = () => {
             ))
           )}
         </div>
-
-        {/* adapter la Pagination pour l'affichage mobile */}
-        {totalPages > 1 && (
-          <div className='mt-6'>
-            <Pagination>
-              <PaginationContent
-                className={language === 'ar' ? '[direction:ltr]' : ''}
-              >
-                <PaginationItem>
-                  <PaginationPrevious
-                    href='#'
-                    onClick={(e) => {
-                      e.preventDefault()
-                      if (currentPage > 1) handlePageChange(currentPage - 1)
-                    }}
-                    className={
-                      currentPage <= 1 ? 'pointer-events-none opacity-50' : ''
-                    }
-                  />
-                </PaginationItem>
-                {/* 
-                {Array.from({ length: totalPages }, (_, index) => {
-                  const pageNumber = index + 1
-                  const isCurrentPage = pageNumber === currentPage
-
-                  return (
-                    <PaginationItem key={pageNumber}>
-                      <PaginationLink
+        {isWindows ? (
+          <>
+            {totalPages > 1 && (
+              <div className='mt-6'>
+                <Pagination>
+                  <PaginationContent
+                    className={language === 'ar' ? '[direction:ltr]' : ''}
+                  >
+                    <PaginationItem>
+                      <PaginationPrevious
                         href='#'
                         onClick={(e) => {
                           e.preventDefault()
-                          handlePageChange(pageNumber)
+                          if (currentPage > 1) handlePageChange(currentPage - 1)
                         }}
-                        isActive={isCurrentPage}
-                      >
-                        {pageNumber}
-                      </PaginationLink>
+                        className={
+                          currentPage <= 1
+                            ? 'pointer-events-none opacity-50'
+                            : ''
+                        }
+                      />
                     </PaginationItem>
-                  )
-                })} */}
 
-                <PaginationItem>
-                  <PaginationNext
-                    href='#'
-                    onClick={(e) => {
-                      e.preventDefault()
-                      if (currentPage < totalPages)
-                        handlePageChange(currentPage + 1)
-                    }}
-                    className={
-                      currentPage >= totalPages
-                        ? 'pointer-events-none opacity-50'
-                        : ''
-                    }
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          </div>
+                    {Array.from({ length: totalPages }, (_, index) => {
+                      const pageNumber = index + 1
+                      const isCurrentPage = pageNumber === currentPage
+
+                      return (
+                        <PaginationItem key={pageNumber}>
+                          <PaginationLink
+                            href='#'
+                            onClick={(e) => {
+                              e.preventDefault()
+                              handlePageChange(pageNumber)
+                            }}
+                            isActive={isCurrentPage}
+                          >
+                            {pageNumber}
+                          </PaginationLink>
+                        </PaginationItem>
+                      )
+                    })}
+
+                    <PaginationItem>
+                      <PaginationNext
+                        href='#'
+                        onClick={(e) => {
+                          e.preventDefault()
+                          if (currentPage < totalPages)
+                            handlePageChange(currentPage + 1)
+                        }}
+                        className={
+                          currentPage >= totalPages
+                            ? 'pointer-events-none opacity-50'
+                            : ''
+                        }
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            {' '}
+            {totalPages > 1 && (
+              <div className='mt-6'>
+                <Pagination>
+                  <PaginationContent
+                    className={language === 'ar' ? '[direction:ltr]' : ''}
+                  >
+                    <PaginationItem>
+                      <PaginationPrevious
+                        href='#'
+                        onClick={(e) => {
+                          e.preventDefault()
+                          if (currentPage > 1) handlePageChange(currentPage - 1)
+                        }}
+                        className={
+                          currentPage <= 1
+                            ? 'pointer-events-none opacity-50'
+                            : ''
+                        }
+                      />
+                    </PaginationItem>
+                    <PaginationItem>
+                      <PaginationNext
+                        href='#'
+                        onClick={(e) => {
+                          e.preventDefault()
+                          if (currentPage < totalPages)
+                            handlePageChange(currentPage + 1)
+                        }}
+                        className={
+                          currentPage >= totalPages
+                            ? 'pointer-events-none opacity-50'
+                            : ''
+                        }
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
+          </>
         )}
+        {/* {totalItems > 0 && (
+          <div className='mt-4 text-sm text-muted-foreground text-center'>
+            {t('pagination.showof')} {startIndex + 1} {t('pagination.to')}
+            {Math.min(endIndex, totalItems)} {t('pagination.of')} {totalItems}{' '}
+            {t('pagination.ads')}
+          </div>
+        )} */}
 
         {/* Modal de confirmation de retour */}
         <Dialog open={isReturnDialogOpen} onOpenChange={setIsReturnDialogOpen}>
