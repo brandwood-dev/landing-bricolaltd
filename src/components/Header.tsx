@@ -357,6 +357,16 @@ const Header = () => {
                     {t('nav.logout')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
+                <NotificationCenter
+                  notifications={notifications}
+                  onMarkAsRead={markAsRead}
+                  onMarkAllAsRead={markAllAsRead}
+                  onNotificationClick={(notification) => {
+                    if (notification.link) {
+                      navigate(notification.link)
+                    }
+                  }}
+                />
               </DropdownMenu>
             ) : (
               <Link to='/login'>
@@ -401,7 +411,7 @@ const Header = () => {
                     <div className='space-y-4'>
                       {isAuthenticated ? (
                         <>
-                        <Link
+                          <Link
                             to='/add-tool'
                             onClick={() => setIsMenuOpen(false)}
                           >

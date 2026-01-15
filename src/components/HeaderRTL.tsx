@@ -459,6 +459,16 @@ export const HeaderRTL: React.FC = () => {
                     {t('nav.logout')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
+                <NotificationCenter
+                  notifications={notifications}
+                  onMarkAsRead={markAsRead}
+                  onMarkAllAsRead={markAllAsRead}
+                  onNotificationClick={(notification) => {
+                    if (notification.link) {
+                      navigate(notification.link)
+                    }
+                  }}
+                />
               </DropdownMenu>
             ) : (
               <Link to='/login'>
