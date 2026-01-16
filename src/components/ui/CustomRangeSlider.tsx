@@ -1,16 +1,16 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback } from 'react'
 
 interface CustomRangeSliderProps {
-  min: number;
-  max: number;
-  step?: number;
-  value: [number, number];
-  onValueChange: (value: [number, number]) => void;
-  className?: string;
+  min: number
+  max: number
+  step?: number
+  value: [number, number]
+  onValueChange: (value: [number, number]) => void
+  className?: string
   // Nouvelles props pour la conversion de devise
-  currencySymbol?: string;
-  convertValue?: (value: number) => number; // Fonction pour convertir GBP vers devise utilisateur
-  formatValue?: (value: number) => string; // Fonction pour formater l'affichage
+  currencySymbol?: string
+  convertValue?: (value: number) => number // Fonction pour convertir GBP vers devise utilisateur
+  formatValue?: (value: number) => string // Fonction pour formater l'affichage
 }
 
 const CustomRangeSlider: React.FC<CustomRangeSliderProps> = ({
@@ -22,107 +22,138 @@ const CustomRangeSlider: React.FC<CustomRangeSliderProps> = ({
   className = '',
   currencySymbol = '£',
   convertValue,
-  formatValue
+  formatValue,
 }) => {
-  const [isDragging, setIsDragging] = useState<'min' | 'max' | null>(null);
-  const sliderRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState<'min' | 'max' | null>(null)
+  const sliderRef = useRef<HTMLDivElement>(null)
+  const handleRefMin = useRef<HTMLDivElement>(null)
+  const handleRefMax = useRef<HTMLDivElement>(null)
 
   // Fonction pour formater la valeur affichée
-  const getDisplayValue = useCallback((val: number): string => {
-    if (formatValue) {
-      return formatValue(val);
-    }
-    
-    const displayVal = convertValue ? convertValue(val) : val;
-    return `${currencySymbol}${Math.round(displayVal)}`;
-  }, [currencySymbol, convertValue, formatValue]);
+  const getDisplayValue = useCallback(
+    (val: number): string => {
+      if (formatValue) {
+        return formatValue(val)
+      }
 
-  const getPercentage = useCallback((val: number) => {
-    return ((val - min) / (max - min)) * 100;
-  }, [min, max]);
+      const displayVal = convertValue ? convertValue(val) : val
+      return `${currencySymbol}${Math.round(displayVal)}`
+    },
+    [currencySymbol, convertValue, formatValue]
+  )
 
-  const getValueFromPercentage = useCallback((percentage: number) => {
-    const rawValue = min + (percentage / 100) * (max - min);
-    return Math.round(rawValue / step) * step;
-  }, [min, max, step]);
+  const getPercentage = useCallback(
+    (val: number) => {
+      return ((val - min) / (max - min)) * 100
+    },
+    [min, max]
+  )
 
-  const handleMouseDown = useCallback((type: 'min' | 'max') => (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsDragging(type);
-  }, []);
+  const getValueFromPercentage = useCallback(
+    (percentage: number) => {
+      const rawValue = min + (percentage / 100) * (max - min)
+      return Math.round(rawValue / step) * step
+    },
+    [min, max, step]
+  )
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!isDragging || !sliderRef.current) return;
+  const handlePointerDown = useCallback(
+    (type: 'min' | 'max') => (e: React.PointerEvent<HTMLDivElement>) => {
+      e.preventDefault()
+      e.currentTarget.setPointerCapture(e.pointerId)
+      setIsDragging(type)
+    },
+    []
+  )
 
-    const rect = sliderRef.current.getBoundingClientRect();
-    const percentage = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
-    const newValue = getValueFromPercentage(percentage);
+  const handlePointerMove = useCallback(
+    (e: PointerEvent) => {
+      if (!isDragging || !sliderRef.current) return
 
-    if (isDragging === 'min') {
-      const newMin = Math.min(newValue, value[1] - step);
-      onValueChange([Math.max(min, newMin), value[1]]);
-    } else {
-      const newMax = Math.max(newValue, value[0] + step);
-      onValueChange([value[0], Math.min(max, newMax)]);
-    }
-  }, [isDragging, value, onValueChange, getValueFromPercentage, min, max, step]);
+      const rect = sliderRef.current.getBoundingClientRect()
+      const percentage = Math.max(
+        0,
+        Math.min(100, ((e.clientX - rect.left) / rect.width) * 100)
+      )
+      const newValue = getValueFromPercentage(percentage)
 
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(null);
-  }, []);
+      if (isDragging === 'min') {
+        const newMin = Math.min(newValue, value[1] - step)
+        onValueChange([Math.max(min, newMin), value[1]])
+      } else {
+        const newMax = Math.max(newValue, value[0] + step)
+        onValueChange([value[0], Math.min(max, newMax)])
+      }
+    },
+    [isDragging, value, onValueChange, getValueFromPercentage, min, max, step]
+  )
+
+  const handlePointerUp = useCallback(() => {
+    setIsDragging(null)
+  }, [])
 
   React.useEffect(() => {
     if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('pointermove', handlePointerMove, {
+        passive: true,
+      })
+      document.addEventListener('pointerup', handlePointerUp, { passive: true })
       return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-      };
+        document.removeEventListener(
+          'pointermove',
+          handlePointerMove as EventListener
+        )
+        document.removeEventListener(
+          'pointerup',
+          handlePointerUp as EventListener
+        )
+      }
     }
-  }, [isDragging, handleMouseMove, handleMouseUp]);
+  }, [isDragging, handlePointerMove, handlePointerUp])
 
-  const minPercentage = getPercentage(value[0]);
-  const maxPercentage = getPercentage(value[1]);
+  const minPercentage = getPercentage(value[0])
+  const maxPercentage = getPercentage(value[1])
 
   return (
     <div className={`relative w-full ${className}`}>
       {/* Track */}
       <div
         ref={sliderRef}
-        className="relative h-2 bg-gray-200 rounded-full cursor-pointer"
+        className='relative h-2 bg-gray-200 rounded-full cursor-pointer touch-none select-none'
       >
         {/* Active range */}
         <div
-          className="absolute h-2 bg-blue-500 rounded-full"
+          className='absolute h-2 bg-blue-500 rounded-full'
           style={{
             left: `${minPercentage}%`,
             width: `${maxPercentage - minPercentage}%`,
           }}
         />
-        
+
         {/* Min handle */}
         <div
-          className="absolute w-4 h-4 bg-white border-2 border-blue-500 rounded-full cursor-grab active:cursor-grabbing transform -translate-y-1 -translate-x-2 hover:scale-110 transition-transform"
+          ref={handleRefMin}
+          className='absolute w-4 h-4 bg-white border-2 border-blue-500 rounded-full cursor-grab active:cursor-grabbing transform -translate-y-1 -translate-x-2 hover:scale-110 transition-transform touch-none select-none'
           style={{ left: `${minPercentage}%` }}
-          onMouseDown={handleMouseDown('min')}
+          onPointerDown={handlePointerDown('min')}
         />
-        
+
         {/* Max handle */}
         <div
-          className="absolute w-4 h-4 bg-white border-2 border-blue-500 rounded-full cursor-grab active:cursor-grabbing transform -translate-y-1 -translate-x-2 hover:scale-110 transition-transform"
+          ref={handleRefMax}
+          className='absolute w-4 h-4 bg-white border-2 border-blue-500 rounded-full cursor-grab active:cursor-grabbing transform -translate-y-1 -translate-x-2 hover:scale-110 transition-transform touch-none select-none'
           style={{ left: `${maxPercentage}%` }}
-          onMouseDown={handleMouseDown('max')}
+          onPointerDown={handlePointerDown('max')}
         />
       </div>
-      
+
       {/* Value labels */}
-      <div className="flex justify-between mt-2 text-sm text-gray-600">
+      <div className='flex justify-between mt-2 text-sm text-gray-600'>
         <span>{getDisplayValue(value[0])}</span>
         <span>{getDisplayValue(value[1])}</span>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default CustomRangeSlider;
+export default CustomRangeSlider
