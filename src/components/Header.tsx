@@ -150,9 +150,11 @@ const Header = () => {
               onValueChange={(value: 'fr' | 'en' | 'ar') => setLanguage(value)}
             >
               <SelectTrigger
-                className={`w-28 border-none bg-transparent ${
-                  language === 'ar' ? 'text-right' : ''
-                }`}
+                className='w-full bg-white border border-gray-300 rounded-md shadow-sm
+            flex items-center justify-between
+            hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+            disabled:opacity-50 disabled:cursor-not-allowed
+            transition-colors duration-200'
               >
                 <SelectValue placeholder={t('common.language')} />
               </SelectTrigger>
@@ -233,13 +235,13 @@ const Header = () => {
                         className='flex items-center'
                       >
                         <DollarSign className='mr-2 h-4 w-4' />
-                        {t('nav.wallet')}
+                        {t('profile.wallet')}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to='/profile?tab=ads' className='flex items-center'>
                         <Edit className='mr-2 h-4 w-4' />
-                        Mes annonces
+                        {t('profile.ads')}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
@@ -248,7 +250,7 @@ const Header = () => {
                         className='flex items-center'
                       >
                         <MessageSquare className='mr-2 h-4 w-4' />
-                        Demandes
+                        {t('profile.requests')}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
@@ -257,7 +259,7 @@ const Header = () => {
                         className='flex items-center'
                       >
                         <Calendar className='mr-2 h-4 w-4' />
-                        Réservations
+                        {t('profile.reservations')}
                       </Link>
                     </DropdownMenuItem>
 
@@ -312,7 +314,7 @@ const Header = () => {
                   <DropdownMenuItem asChild>
                     <Link to='/profile' className='flex items-center'>
                       <UserCircle className='mr-2 h-4 w-4' />
-                      {t('nav.profile')}
+                      {t('profile.profile')}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
@@ -321,13 +323,13 @@ const Header = () => {
                       className='flex items-center'
                     >
                       <DollarSign className='mr-2 h-4 w-4' />
-                      {t('nav.wallet')}
+                      {t('profile.wallet')}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to='/profile?tab=ads' className='flex items-center'>
                       <Edit className='mr-2 h-4 w-4' />
-                      {t('nav.my_listings')}
+                      {t('profile.ads')}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
@@ -336,7 +338,7 @@ const Header = () => {
                       className='flex items-center'
                     >
                       <MessageSquare className='mr-2 h-4 w-4' />
-                      {t('nav.requests')}
+                      {t('profile.requests')}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
@@ -345,7 +347,7 @@ const Header = () => {
                       className='flex items-center'
                     >
                       <Calendar className='mr-2 h-4 w-4' />
-                      {t('nav.bookings')}
+                      {t('profile.reservations')}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -579,7 +581,7 @@ const Header = () => {
                         value={currency.code}
                         onValueChange={(value) => {
                           const selectedCurrency = currencies.find(
-                            (c) => c.code === value
+                            (c) => c.code === value,
                           )
                           if (selectedCurrency) setCurrency(selectedCurrency)
                         }}

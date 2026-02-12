@@ -75,12 +75,16 @@ export const CurrencySelector: React.FC<CurrencySelectorProps> = ({
           `}
         >
           <div
-            className={`flex items-center ${
-              isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'
+            className={`flex items-center justify-start ${
+              isRTL ? 'space-x-reverse space-x-10' : 'space-x-10'
             }`}
           >
-            <span className={`${currency.flagClass} text-lg`}></span>
-            <span className='text-gray-600'>{currency.code}</span>
+            <div>
+              <span className={`${currency.flagClass} text-lg`}></span>
+            </div>
+            <div>
+              <span className='text-gray-600'>{currency.code}</span>
+            </div>
           </div>
           <ChevronDown
             className={`${
@@ -119,12 +123,16 @@ export const CurrencySelector: React.FC<CurrencySelectorProps> = ({
                   `}
                 >
                   <div
-                    className={`flex items-center ${
+                    className={`flex items-center  ${
                       isRTL ? 'space-x-reverse space-x-3' : 'space-x-3'
                     }`}
                   >
-                    <span className={`${curr.flagClass} text-lg`}></span>
-                    <span className='font-medium'>{curr.code}</span>
+                    <div>
+                      <span className={`${curr.flagClass} text-lg`}></span>
+                    </div>
+                    <div>
+                      <span className='font-medium'>{curr.code}</span>
+                    </div>
                   </div>
                   {curr.code === currency.code && (
                     <Check className='w-4 h-4 text-blue-600' />

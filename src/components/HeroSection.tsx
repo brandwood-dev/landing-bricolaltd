@@ -120,7 +120,7 @@ const HeroSection = () => {
           {/* Info text about automatic location filtering */}
           <div className="mt-3 text-sm text-gray-600 text-center">
             {isAuthenticated 
-              ? `Recherche dans votre pays (${user?.country?.name || 'votre région'})`
+              ? t('hero.search_in_country', { country: user?.country?.name || t('common.your_region') })
               : t('hero.search.gulf_countries')
             }
           </div>

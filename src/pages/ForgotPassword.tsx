@@ -34,7 +34,7 @@ const ForgotPassword = () => {
     setError('');
     
     if (!validateEmail(email)) {
-      setError('Adresse mail non valide');
+      setError(t('resetpwd.invalid_email'));
       return;
     }
 
@@ -46,10 +46,10 @@ const ForgotPassword = () => {
         setUserInfo(result.user);
         setShowConfirmation(true);
       } else {
-        setError('Aucun compte trouvé avec cette adresse email');
+        setError(t('resetpwd.no_account_found'));
       }
     } catch (err: any) {
-      setError(err.message || 'Une erreur est survenue lors de la vérification');
+      setError(err.message || t('resetpwd.check_error'));
     } finally {
       setIsCheckingUser(false);
     }
@@ -115,7 +115,7 @@ const ForgotPassword = () => {
                   
                   <Button type="submit" className="w-full" disabled={isCheckingUser}>
                     {isCheckingUser && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {isCheckingUser ? 'Vérification...' : 'Vérifier l\'email'}
+                    {isCheckingUser ? t('resetpwd.checking') : t('resetpwd.verify_email')}
                   </Button>
                   
                   <div className="text-center">
@@ -134,7 +134,7 @@ const ForgotPassword = () => {
                   
                   <div className="text-center space-y-3">
                     <div className="p-4 bg-gray-50 rounded-lg">
-                      <h3 className="font-semibold text-lg mb-2">Compte trouvé :</h3>
+                      <h3 className="font-semibold text-lg mb-2">{t('resetpwd.account_found')}</h3>
                       <p className="text-gray-700">
                         <strong>{userInfo?.firstName} {userInfo?.lastName}</strong>
                       </p>
@@ -142,7 +142,7 @@ const ForgotPassword = () => {
                     </div>
                     
                     <p className="text-sm text-gray-600">
-                      Confirmez-vous vouloir envoyer un code de réinitialisation à cette adresse ?
+                      {t('resetpwd.confirm_send_code')}
                     </p>
                   </div>
                   
@@ -153,7 +153,7 @@ const ForgotPassword = () => {
                       disabled={isLoading}
                     >
                       {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      {isLoading ? t('resetpwd.sendbtnpending') : 'Confirmer et envoyer le code'}
+                      {isLoading ? t('resetpwd.sendbtnpending') : t('resetpwd.confirm_and_send')}
                     </Button>
                     
                     <Button 
@@ -162,7 +162,7 @@ const ForgotPassword = () => {
                       className="w-full"
                       disabled={isLoading}
                     >
-                      Modifier l'adresse email
+                      {t('resetpwd.change_email')}
                     </Button>
                   </div>
                   

@@ -513,6 +513,11 @@ const AddTool = () => {
         }
       }
 
+      const ownerId = user?.id
+      if (!ownerId) {
+        throw new Error('Authentication required')
+      }
+
       const toolData: CreateToolData = {
         title: formData.title!,
         brand: formData.brand,
@@ -528,7 +533,7 @@ const AddTool = () => {
         latitude: formData.latitude,
         longitude: formData.longitude,
         ownerInstructions: formData.ownerInstructions,
-        ownerId: user?.id!,
+        ownerId,
         primaryPhotoIndex:
           selectedFiles.length > 0 ? primaryPhotoIndex : undefined,
       }

@@ -107,7 +107,13 @@ export const HeaderRTL: React.FC = () => {
               value={language}
               onValueChange={(value: 'fr' | 'en' | 'ar') => setLanguage(value)}
             >
-              <SelectTrigger className='w-28 border-none bg-transparent text-right'>
+              <SelectTrigger
+                className='w-full bg-white border border-gray-300 rounded-md shadow-sm
+            flex items-center justify-between
+            hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+            disabled:opacity-50 disabled:cursor-not-allowed
+            transition-colors duration-200'
+              >
                 <SelectValue placeholder={t('common.language')} />
               </SelectTrigger>
               <SelectContent>
@@ -373,7 +379,7 @@ export const HeaderRTL: React.FC = () => {
                         value={currency.code}
                         onValueChange={(value) => {
                           const selectedCurrency = currencies.find(
-                            (c) => c.code === value
+                            (c) => c.code === value,
                           )
                           if (selectedCurrency) setCurrency(selectedCurrency)
                         }}

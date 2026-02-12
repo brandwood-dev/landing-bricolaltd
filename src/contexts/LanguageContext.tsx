@@ -16,8 +16,43 @@ interface LanguageContextType {
 
 const translations = {
   fr: {
-    // {t('pagination.showof')} {startIndex + 1} {t('pagination.to')}
-    // {Math.min(endIndex, totalItems)} {t('pagination.of')} {totalItems}  {t('pagination.ads')}
+    'rental_process.title': 'Comment ça marche ?',
+    'rental_process.description':
+      'Louez ou mettez en location des outils en quelques étapes simples.',
+    'rental_process.renter.title': 'Pour les locataires',
+    'rental_process.renter.step1.title': 'Recherchez',
+    'rental_process.renter.step1.description':
+      "Trouvez l'outil dont vous avez besoin près de chez vous.",
+    'rental_process.renter.step2.title': 'Réservez',
+    'rental_process.renter.step2.description':
+      'Sélectionnez vos dates et envoyez une demande.',
+    'rental_process.renter.step3.title': 'Utilisez',
+    'rental_process.renter.step3.description':
+      "Récupérez l'outil et réalisez vos travaux.",
+    'rental_process.renter.step4.title': 'Retournez',
+    'rental_process.renter.step4.description':
+      "Rendez l'outil et laissez un avis.",
+    'rental_process.owner.title': 'Pour les propriétaires',
+    'rental_process.owner.step1.title': 'Publiez',
+    'rental_process.owner.step1.description':
+      'Mettez vos outils en ligne gratuitement.',
+    'rental_process.owner.step2.title': 'Acceptez',
+    'rental_process.owner.step2.description':
+      'Gérez les demandes et choisissez vos locataires.',
+    'rental_process.owner.step3.title': 'Louez',
+    'rental_process.owner.step3.description':
+      "Rencontrez le locataire et remettez l'outil.",
+    'rental_process.owner.step4.title': 'Encaissez',
+    'rental_process.owner.step4.description':
+      'Recevez votre paiement en toute sécurité.',
+    //mobile
+    'mobile_app.title': 'Téléchargez notre application mobile',
+    'mobile_app.subtitle':
+      'Accédez à toutes nos outils et services directement depuis votre téléphone mobile.',
+    'mobile_app.app_store': "Téléchargez depuis l'App Store",
+    'mobile_app.google_play': 'Téléchargez depuis Google Play',
+
+    //pagination
     'pagination.showof': 'Afficher',
     'pagination.to': 'à',
     'pagination.of': 'sur',
@@ -226,7 +261,7 @@ const translations = {
       'Mettez-vous d’accord avec le locataire sur le mode et le lieu de remise de l’outil pour que tout se passe facilement.',
     'ownersGuide.step6.title': 'Recevez vos paiements',
     'ownersGuide.step6.description':
-      'Une fois la location terminée, le montant dû sera versé sur votre portefeuille virtuel. Vous pourrez retirer l’argent dès que vous atteindrez le seuil minimum.',
+      'Une fois la location terminée, le montant dû sera versé. Vous pourrez retirer l’argent dès que vous atteindrez le seuil minimum.',
     'ownersGuide.step7.title': 'Conseils',
     'ownersGuide.step7.description':
       'Proposez des outils propres et en bon état, et entretenez de bonnes évaluations pour attirer plus de locataires.',
@@ -1069,9 +1104,7 @@ const translations = {
     'customer_reviews.no_reviews': 'Aucun avis disponible pour le moment.',
 
     // rental process
-    'rental_process.title': 'Comment ça marche ?',
-    'rental_process.description':
-      'Louez vos outils en 4 étapes simples et commencez à générer des revenus',
+
     'rental_process.step1.title': 'Publiez votre annonce en quelques clics',
     'rental_process.step1.description':
       'Ajoutez vos outils avec photos et description détaillée en quelques minutes seulement.',
@@ -1105,10 +1138,10 @@ const translations = {
     'profile.back_home': "Retour à l'accueil",
     'profile.profile': 'Profil',
     'profile.favorites': 'Favoris',
-    'profile.ads': 'Annonces',
-    'profile.reservations': 'Réservations',
-    'profile.requests': 'Demandes',
-    'profile.wallet': 'Revenus',
+    'profile.ads': 'Mes annonces',
+    'profile.reservations': 'Mes réservations',
+    'profile.requests': 'Mes demandes',
+    'profile.wallet': 'Mes revenus',
     'profile.edit': 'Modifier',
     'profile.member_since': 'Membre depuis {date}',
     'profile.select_country': 'Sélectionnez un pays',
@@ -1428,6 +1461,7 @@ const translations = {
     'footer.owner_guide': 'Guide du loueur', // Added
     'footer.renter_guide': 'Guide du locataire', // Added
     'footer.terms_conditions': 'CGU', // Added (synonym for footer.cgu)
+    'footer.whatsapp': 'WhatsApp', // Added
     // Login
     'login.title': 'Connexion',
     'login.subtitle': 'Connectez-vous à votre compte Bricola LTD',
@@ -2002,15 +2036,55 @@ const translations = {
 
     'privacy.section10.p3':
       'L`usage continu de la plateforme après modification vaut acceptation tacite de la nouvelle version.',
+
+    // New translations
+    'hero.search_in_country': 'Recherche dans votre pays ({country})',
+    'common.your_region': 'votre région',
+    'resetpwd.verify_email': "Vérifier l'email",
+    'resetpwd.account_found': 'Compte trouvé :',
+    'resetpwd.confirm_send_code':
+      'Confirmez-vous vouloir envoyer un code de réinitialisation à cette adresse ?',
+    'resetpwd.confirm_and_send': 'Confirmer et envoyer le code',
+    'resetpwd.change_email': "Modifier l'adresse email",
+    'resetpwd.checking': 'Vérification...',
+    'resetpwd.invalid_email': 'Adresse mail non valide',
+    'resetpwd.no_account_found': 'Aucun compte trouvé avec cette adresse email',
+    'resetpwd.check_error': 'Une erreur est survenue lors de la vérification',
   },
   en: {
+    'rental_process.title': 'How it works?',
+    'rental_process.description': 'Rent or list tools in a few simple steps.',
+    'rental_process.renter.title': 'For Renters',
+    'rental_process.renter.step1.title': 'Search',
+    'rental_process.renter.step1.description':
+      'Find the tool you need near you.',
+    'rental_process.renter.step2.title': 'Book',
+    'rental_process.renter.step2.description':
+      'Select your dates and send a request.',
+    'rental_process.renter.step3.title': 'Use',
+    'rental_process.renter.step3.description':
+      'Pick up the tool and get your work done.',
+    'rental_process.renter.step4.title': 'Return',
+    'rental_process.renter.step4.description':
+      'Return the tool and leave a review.',
+    'rental_process.owner.title': 'For Owners',
+    'rental_process.owner.step1.title': 'List',
+    'rental_process.owner.step1.description':
+      'List your tools online for free.',
+    'rental_process.owner.step2.title': 'Accept',
+    'rental_process.owner.step2.description':
+      'Manage requests and choose your renters.',
+    'rental_process.owner.step3.title': 'Rent',
+    'rental_process.owner.step3.description':
+      'Meet the renter and hand over the tool.',
+    'rental_process.owner.step4.title': 'Earn',
+    'rental_process.owner.step4.description': 'Receive your payment securely.',
     'pagination.showof': 'Show',
     'pagination.to': 'to',
     'pagination.of': 'of',
     'pagination.ads': 'ads',
     'message.no_ads': "You haven't yet posted any ads.",
-    'message.no_ads_found':
-      'No ads found for the selected criteria.',
+    'message.no_ads_found': 'No ads found for the selected criteria.',
     'catalog_section.show_filters': 'Show filters',
     'catalog_section.hide_filters': 'Hide filters',
     // MapView
@@ -2245,7 +2319,7 @@ const translations = {
       'Coordinate with the renter on the method and location of delivery for a smooth experience.',
     'ownersGuide.step6.title': 'Receive payments',
     'ownersGuide.step6.description':
-      'After the rental is completed, the due amount will be transferred to your wallet, and you can withdraw it once you reach the minimum payout.',
+      'After the rental is completed, the due amount will be transferred, and you can withdraw it once you reach the minimum payout.',
     'ownersGuide.step7.title': 'Tips',
     'ownersGuide.step7.description':
       'Provide clean, functional tools and maintain high ratings to attract more customers.',
@@ -2880,8 +2954,7 @@ const translations = {
     'customer_reviews.no_reviews': 'No reviews available at this time.',
 
     // rental process
-    'rental_process.title': 'How does it work?',
-    'rental_process.description': 'Rent your tools in 4 simple steps...',
+ 
     'rental_process.step1.title': 'Post your listing in a few clicks',
     'rental_process.step1.description':
       'Add your tools with photos and a detailed description in just a few minutes.',
@@ -2915,10 +2988,10 @@ const translations = {
     'profile.back_home': 'Back to home',
     'profile.profile': 'Profile',
     'profile.favorites': 'Favorites',
-    'profile.ads': 'Ads',
-    'profile.reservations': 'Reservations',
-    'profile.requests': 'Requests',
-    'profile.wallet': 'Earnings',
+    'profile.ads': 'My ads',
+    'profile.reservations': 'My reservations',
+    'profile.requests': 'My requests',
+    'profile.wallet': 'My earnings',
     'profile.edit': 'Edit',
     'profile.member_since': 'Member since {date}',
     'profile.select_country': 'Select a country',
@@ -3091,9 +3164,6 @@ const translations = {
     'subcategories.pressure-washers': 'Pressure Washers',
     'subcategories.floor-care': 'Floor Care',
     'subcategories.cleaning-supplies': 'Cleaning Supplies',
-    //     Nettoyage intérieur | Indoor Cleaning | التنظيف الداخلي
-    // Nettoyage extérieur | Outdoor Cleaning | التنظيف الخارجي
-    // Gestion des déchets et poussière | Waste and Dust Management | إدارة النفايات والغبار
     'subcategories.indoor-cleaning': 'Indoor Cleaning',
     'subcategories.outdoor-cleaning': 'Outdoor Cleaning',
     'subcategories.waste-and-dust-management': 'Waste and Dust Management',
@@ -3114,13 +3184,6 @@ const translations = {
     'subcategories.sound-lighting': 'Sound & Lighting',
     'subcategories.event-decoration': 'Event Decoration',
     'subcategories.catering-equipment': 'Catering Equipment',
-    //     Son | Sound | صوت
-    // Éclairage | Lighting | إضاءة
-    // Cuisine | Cooking | طبخ
-    // Animation et jeux | Entertainment & Games | ترفيه وألعاب
-    // Décoration | Decoration | زينة
-    // Mobilier | Furniture | أثاث
-    // Structure | Structure | هيكل
     'subcategories.sound': 'Sound',
     'subcategories.lighting': 'Lighting',
     'subcategories.cooking': 'Cooking',
@@ -3324,6 +3387,7 @@ const translations = {
     'footer.owner_guide': 'Owner’s Guide', // Added
     'footer.renter_guide': 'Renter’s Guide', // Added
     'footer.terms_conditions': 'Terms & Conditions', // Added
+    'footer.whatsapp': 'WhatsApp', // Added
 
     // Login
     'login.title': 'Login',
@@ -3946,17 +4010,63 @@ const translations = {
     'notifications.tool_returned': 'Tool Returned',
     'notifications.booking_started': 'Booking Started',
     'notifications.booking_accepted': 'Booking Accepted',
+    // New translations
+    'hero.search_in_country': 'Search in your country ({country})',
+    'common.your_region': 'your region',
+    'resetpwd.verify_email': 'Verify email',
+    'resetpwd.account_found': 'Account found:',
+    'resetpwd.confirm_send_code':
+      'Do you confirm sending a reset code to this address?',
+    'resetpwd.confirm_and_send': 'Confirm and send code',
+    'resetpwd.change_email': 'Change email address',
+    'resetpwd.checking': 'Checking...',
+    'resetpwd.invalid_email': 'Invalid email address',
+    'resetpwd.no_account_found': 'No account found with this email address',
+    'resetpwd.check_error': 'An error occurred during verification',
+
+    //mobile
+    'mobile_app.title': 'Download our mobile app',
+    'mobile_app.subtitle':
+      'Access all our tools and services directly from your mobile phone.',
+    'mobile_app.app_store': 'Download from App Store',
+    'mobile_app.google_play': 'Get it from Google Play',
   },
   ar: {
+    'rental_process.title': 'كيف يعمل؟',
+    'rental_process.description': 'استأجر أو اعرض الأدوات في بضع خطوات بسيطة.',
+    'rental_process.renter.title': 'للمستأجرين',
+    'rental_process.renter.step1.title': 'بحث',
+    'rental_process.renter.step1.description':
+      'اعثر على الأداة التي تحتاجها بالقرب منك.',
+    'rental_process.renter.step2.title': 'حجز',
+    'rental_process.renter.step2.description': 'حدد التواريخ وأرسل طلبًا.',
+    'rental_process.renter.step3.title': 'استخدام',
+    'rental_process.renter.step3.description': 'استلم الأداة وأنجز عملك.',
+    'rental_process.renter.step4.title': 'إرجاع',
+    'rental_process.renter.step4.description': 'أعد الأداة واترك تقييمًا.',
+    'rental_process.owner.title': 'لأصحاب الأدوات',
+    'rental_process.owner.step1.title': 'نشر',
+    'rental_process.owner.step1.description':
+      'اعرض أدواتك عبر الإنترنت مجانًا.',
+    'rental_process.owner.step2.title': 'قبول',
+    'rental_process.owner.step2.description': 'أدر الطلبات واختر المستأجرين.',
+    'rental_process.owner.step3.title': 'تأجير',
+    'rental_process.owner.step3.description': 'قابل المستأجر وسلم الأداة.',
+    'rental_process.owner.step4.title': 'كسب',
+    'rental_process.owner.step4.description': 'استلم دفعتك بأمان.',
+    'mobile_app.title': 'حمل تطبيقنا',
+    'mobile_app.subtitle':
+      'الوصول إلى جميع أدواتنا وخدماتنا مباشرة من هاتفك المحمول.',
+    'mobile_app.app_store': 'حمل من App Store',
+    'mobile_app.google_play': 'احصل عليه من Google Play',
     // {t('pagination.showof')} {startIndex + 1} {t('pagination.to')}
     // {Math.min(endIndex, totalItems)} {t('pagination.of')} {totalItems}  {t('pagination.ads')}
     'pagination.showof': 'عرض',
     'pagination.to': 'إلى',
     'pagination.of': 'من',
     'pagination.ads': 'عروض',
-    'message.no_ads': "لا توجد أي إعلانات.",
-    'message.no_ads_found':
-      'لا توجد أي إعلانات مطابقة للمعايير المحددة.',
+    'message.no_ads': 'لا توجد أي إعلانات.',
+    'message.no_ads_found': 'لا توجد أي إعلانات مطابقة للمعايير المحددة.',
     'catalog_section.show_filters': 'إظهار الفلاتر',
     'catalog_section.hide_filters': 'إخفاء الفلاتر',
     // MapView
@@ -4247,7 +4357,7 @@ const translations = {
       'اتفق مع المستأجر على طريقة ومكان التسليم لضمان تجربة سلسة.',
     'ownersGuide.step6.title': 'استلام الأموال',
     'ownersGuide.step6.description':
-      'سيتم تحويل المبلغ المستحق إلى محفظتك في المنصة بعد إتمام الإيجار، ويمكنك سحبه بعد الوصول للحد الأدنى للسحب.',
+      'سيتم تحويل المبلغ المستحق بعد إتمام الإيجار، ويمكنك سحبه بعد الوصول للحد الأدنى للسحب.',
     'ownersGuide.step7.title': 'نصائح',
     'ownersGuide.step7.description':
       'وفر أدوات نظيفة وصالحة للاستعمال، وحافظ على تقييمات عالية لجذب المزيد من العملاء.',
@@ -4863,8 +4973,7 @@ const translations = {
     'customer_reviews.no_reviews': 'لا توجد آراء متاحة في الوقت الحالي.',
 
     // rental process
-    'rental_process.title': 'كيف يعمل النظام؟',
-    'rental_process.description': 'أجر أدواتك في 4 خطوات بسيطة',
+   
     'rental_process.step1.title': 'أنشر إعلانك ببضع نقرات',
     'rental_process.step1.description':
       'أضف أدواتك مع الصور والوصف المفصل  في دقائق معدودة.',
@@ -5026,11 +5135,6 @@ const translations = {
     'subcategories.pruning-tools': ' التخلص',
     'subcategories.watering': ' الري',
     'subcategories.garden-hand-tools': ' اليد',
-    //     Entretien du sol | Soil Maintenance | صيانة التربة
-    // Entretien des plantes | Plant Care | العناية بالنباتات
-    // Taille et coupe | Pruning and Cutting | التقليم والقطع
-    // Nettoyage et ramassage | Cleaning and Collection | التنظيف والجمع
-    // Arrosage et irrigation | Watering and Irrigation | الريّ والسقي
     'subcategories.soil-maintenance': 'صيانة التربة',
     'subcategories.plant-care': 'عناية بالنباتات',
     'subcategories.pruning-and-cutting': 'التقليم والقطع',
@@ -5043,10 +5147,6 @@ const translations = {
     'subcategories.pressure-washers': ' الضغط',
     'subcategories.floor-care': ' التنظيف',
     'subcategories.cleaning-supplies': ' التنظيف',
-
-    // Nettoyage intérieur | Indoor Cleaning | التنظيف الداخلي
-    // Nettoyage extérieur | Outdoor Cleaning | التنظيف الخارجي
-    // Gestion des déchets et poussière | Waste and Dust Management | إدارة النفايات والغبار
     'subcategories.indoor-cleaning': 'التنظيف الداخلي',
     'subcategories.outdoor-cleaning': 'التنظيف الخارجي',
     'subcategories.waste-and-dust-management': 'إدارة النفايات والغبار',
@@ -5056,11 +5156,6 @@ const translations = {
     'subcategories.power-tools': 'الطاقة',
     'subcategories.hand-tools': 'اليد',
     'subcategories.measuring-tools': 'التقييم',
-
-    //     Construction | Construction | البناء
-    // Électricité | Electricity | الكهرباء
-    // Peinture | Painting | الطلاء
-    // Vis et boulons | Screws and Bolts | المسامير والصواميل
     'subcategories.painting': 'الرسم',
     'subcategories.construction': 'البناء',
     'subcategories.electricity': 'الكهرباء',
@@ -5222,6 +5317,7 @@ const translations = {
     'footer.owner_guide': 'دليل المؤجر', // Added
     'footer.renter_guide': 'دليل المستأجر', // Added
     'footer.terms_conditions': 'الشروط والأحكام', // Added
+    'footer.whatsapp': 'واتساب', // Added
     // Login
     'login.title': 'تسجيل الدخول',
     'login.subtitle': 'اتصل بحسابك في Bricola LTD',
@@ -5279,7 +5375,7 @@ const translations = {
     'about.community': 'المجتمع',
     'about.community_desc': 'إنشاء روابط بين الجيران وتعزيز التعاون المحلي',
     'about.security': 'الأمان',
-    'about.security_desc': 'ضمان المعاملات الآمنة والتأمين الشامل',
+    'about.security_desc': 'ضمان المعاملات الآمنة ',
     'about.quality': 'الجودة',
     'about.quality_desc': 'التأكد من أن جميع الأدوات تلبي معايير الجودة لدينا',
     'about.simplicity': 'البساطة',
@@ -5729,11 +5825,25 @@ const translations = {
     'currency.QAR': 'الريال القطري',
     'currency.AED': 'درهم الإمارات العربية المتحدة',
     'currency.label': 'العملة',
+    // New translations
+    'hero.search_in_country': 'البحث في بلدك ({country})',
+    'common.your_region': 'منطقتك',
+    'resetpwd.verify_email': 'التحقق من البريد الإلكتروني',
+    'resetpwd.account_found': 'تم العثور على الحساب:',
+    'resetpwd.confirm_send_code':
+      'هل تؤكد رغبتك في إرسال رمز إعادة التعيين إلى هذا العنوان؟',
+    'resetpwd.confirm_and_send': 'تأكيد وإرسال الرمز',
+    'resetpwd.change_email': 'تغيير عنوان البريد الإلكتروني',
+    'resetpwd.checking': 'جاري التحقق...',
+    'resetpwd.invalid_email': 'عنوان البريد الإلكتروني غير صالح',
+    'resetpwd.no_account_found':
+      'لم يتم العثور على حساب بهذا البريد الإلكتروني',
+    'resetpwd.check_error': 'حدث خطأ أثناء التحقق',
   },
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(
-  undefined
+  undefined,
 )
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -5774,7 +5884,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
       Object.entries(params).forEach(([param, value]) => {
         translation = translation.replace(
           new RegExp(`{${param}}`, 'g'),
-          String(value)
+          String(value),
         )
       })
     }
@@ -5795,7 +5905,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
       setLanguage: updateLanguage,
       t,
     }),
-    [language]
+    [language],
   )
 
   return (
@@ -5810,7 +5920,7 @@ export const useLanguage = () => {
   if (context === undefined) {
     // Return a fallback object instead of throwing an error
     console.warn(
-      'useLanguage called outside LanguageProvider, returning fallback'
+      'useLanguage called outside LanguageProvider, returning fallback',
     )
     return {
       language: 'fr' as Language,
@@ -5821,7 +5931,7 @@ export const useLanguage = () => {
           Object.entries(params).forEach(([param, value]) => {
             translation = translation.replace(
               new RegExp(`{${param}}`, 'g'),
-              String(value)
+              String(value),
             )
           })
         }

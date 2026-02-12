@@ -94,9 +94,9 @@ export const authService = {
   },
 
   // Refresh token
-  refreshToken: async (): Promise<{ token: string }> => {
+  refreshToken: async (refreshToken: string): Promise<LoginResponse> => {
     try {
-      const response = await api.post<ApiResponse<{ token: string }>>('/auth/refresh');
+      const response = await api.post<ApiResponse<LoginResponse>>('/auth/refresh', { refreshToken });
       return response.data.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Token refresh failed');

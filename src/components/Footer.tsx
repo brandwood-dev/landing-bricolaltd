@@ -234,16 +234,14 @@ const Footer = () => {
                   (language === 'ar' ? '[direction:ltr]' : '')
                 }
               >
-                <WhatsAppIcon
-                  className={'h-4 w-4 ' + (language === 'ar' ? 'ml-2' : 'mr-2')}
-                />
                 <a
                   href='https://wa.me/447782333879'
                   target='_blank'
                   rel='noopener noreferrer'
-                  className='hover:text-white transition-colors'
+                  className='inline-flex items-center gap-2 bg-[#25D366] text-white px-3 py-1.5 rounded-md hover:bg-[#128C7E] transition-colors text-sm font-medium'
                 >
-                  +44 7782 333879
+                  <WhatsAppIcon className='h-4 w-4' />
+                  <span>{t('footer.whatsapp')}</span>
                 </a>
               </li>
             </ul>

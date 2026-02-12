@@ -196,7 +196,9 @@ export const useNotifications = (): UseNotificationsReturn => {
     return () => {
       try {
         socketRef.current?.disconnect();
-      } catch {}
+      } catch {
+        console.log('--------No notifications ---------')
+      }
       socketRef.current = null;
     };
   }, [isAuthenticated, fetchNotifications]);

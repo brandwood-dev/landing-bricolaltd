@@ -7,6 +7,7 @@ import FeaturedToolsSection from '@/components/FeaturedToolsSection';
 import RentalProcess from '@/components/RentalProcess';
 import CustomerReviews from '@/components/CustomerReviews';
 import BlogSection from '@/components/BlogSection';
+import MobileAppSection from '@/components/MobileAppSection';
 import Footer from '@/components/Footer';
 
 const Index = () => {
@@ -20,6 +21,7 @@ const Index = () => {
         <RentalProcess />
         <CustomerReviews />
         <BlogSection />
+        <MobileAppSection />
       </main>
       <Footer />
     </div>

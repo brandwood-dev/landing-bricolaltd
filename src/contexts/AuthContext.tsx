@@ -25,6 +25,8 @@ import { RegisterData } from '../types/bridge/auth.types';
 interface LoginResponse {
   user: User;
   token: string;
+  refreshToken: string;
+  expiresIn: number;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -89,10 +91,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       // Use authService for consistent error handling
       const response = await authService.login({ email, password });
-      const { user: userData, token } = response;
+      const { token, refreshToken } = response;
       
       // Store auth token
       localStorage.setItem('authToken', token);
+      localStorage.setItem('refreshToken', refreshToken);
       
       // Get complete user profile with all fields
       const profileResponse = await api.get('/auth/profile');
@@ -136,10 +139,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       // Registration successful - API returns user and token data
       if (response.data && response.data.data) {
-        const { user: registeredUser, token } = response.data.data;
+        const { user: registeredUser, token, refreshToken } = response.data.data;
         
         // Store auth data temporarily (user will verify email before full login)
         localStorage.setItem('authToken', token);
+        localStorage.setItem('refreshToken', refreshToken);
         localStorage.setItem('user', JSON.stringify(registeredUser));
         
         // Set user in context
@@ -155,6 +159,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = (): void => {
     localStorage.removeItem('authToken');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
     setUser(null);
   };
@@ -178,10 +183,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const refreshToken = async (): Promise<void> => {
     try {
-      const response = await api.post<{ token: string }>('/auth/refresh');
-      const { token } = response.data.data;
-      
-      localStorage.setItem('authToken', token);
+      const storedRefreshToken = localStorage.getItem('refreshToken');
+      if (!storedRefreshToken) {
+        logout();
+        throw new Error('Session expired. Please login again.');
+      }
+
+      const response = await authService.refreshToken(storedRefreshToken);
+      localStorage.setItem('authToken', response.token);
+      localStorage.setItem('refreshToken', response.refreshToken);
     } catch (error: any) {
       // If refresh fails, logout user
       logout();
