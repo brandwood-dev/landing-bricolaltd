@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Search,
   Calendar,
@@ -13,9 +13,10 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent } from '@/components/ui/card'
 
+
 const RentalProcess = () => {
   const { t, language } = useLanguage()
-
+const [isWindows, setIsWindows] = useState(false)
   const renterSteps = [
     {
       icon: Search,
@@ -61,7 +62,9 @@ const RentalProcess = () => {
       description: t('rental_process.owner.step4.description'),
     },
   ]
-
+ useEffect(() => {
+   setIsWindows(window.navigator.userAgent.indexOf('Windows') !== -1)
+ }, [])
   const StepCard = ({
     step,
     index,
@@ -128,17 +131,19 @@ const RentalProcess = () => {
 
           <TabsContent value='renter' className='mt-0 animate-fade-in'>
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
-              {/* if lang is ar inverse l'ordre d'affichage des cartes */}
-              {language === 'ar'
-                ? renterSteps.reverse().map((step, index) => (
-                    <StepCard
-                      key={index}
-                      step={step}
-                      index={renterSteps.length - index -1}
-                      colorClass='text-primary'
-                      bgClass='bg-primary/10'
-                    />
-                  ))
+              {/* if lang is ar et not mobile version, inverse l'ordre d'affichage des cartes */}
+              {language === 'ar' && isWindows
+                ? renterSteps
+                    .reverse()
+                    .map((step, index) => (
+                      <StepCard
+                        key={index}
+                        step={step}
+                        index={renterSteps.length - index - 1}
+                        colorClass='text-primary'
+                        bgClass='bg-primary/10'
+                      />
+                    ))
                 : renterSteps.map((step, index) => (
                     <StepCard
                       key={index}
@@ -153,17 +158,19 @@ const RentalProcess = () => {
 
           <TabsContent value='owner' className='mt-0 animate-fade-in'>
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
-              {/* if lang is ar inverse l'ordre d'affichage des cartes */}
-              {language === 'ar'
-                ? ownerSteps.reverse().map((step, index) => (
-                    <StepCard
-                      key={index}
-                      step={step}
-                      index={ownerSteps.length - index -1}
-                      colorClass='text-orange-500'
-                      bgClass='bg-orange-500/10'
-                    />
-                  ))
+              {/* if lang is ar et not mobile version, inverse l'ordre d'affichage des cartes */}
+              {language === 'ar' && isWindows
+                ? ownerSteps
+                    .reverse()
+                    .map((step, index) => (
+                      <StepCard
+                        key={index}
+                        step={step}
+                        index={ownerSteps.length - index - 1}
+                        colorClass='text-orange-500'
+                        bgClass='bg-orange-500/10'
+                      />
+                    ))
                 : ownerSteps.map((step, index) => (
                     <StepCard
                       key={index}

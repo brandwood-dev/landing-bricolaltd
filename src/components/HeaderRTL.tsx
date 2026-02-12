@@ -373,7 +373,7 @@ export const HeaderRTL: React.FC = () => {
                     {/* Sélecteur de devise */}
                     <div className='space-y-3 border-t pt-6'>
                       <h3 className='font-semibold text-lg text-right'>
-                        Devise
+                        العملة
                       </h3>
                       <Select
                         value={currency.code}
