@@ -138,12 +138,9 @@ const Wallet = () => {
   const successfulTransactionsCount = successfulTransactions.length
   const cumulativeBalance = balance // For now, same as available balance
 
-  // Currency conversion (example rates)
-  const gbpToEur = 1.159 // Example conversion rate
-  const minWithdrawalGBP = 50
-  const minWithdrawalEUR = Math.round(minWithdrawalGBP * gbpToEur * 100) / 100
+  // canWithdraw = true if cumulativeBalance >= 50
 
-  const canWithdraw = cumulativeBalance >= minWithdrawalEUR
+  const canWithdraw = cumulativeBalance >= 50
 
   const handleResetFilters = () => {
     setDateRange(undefined)
@@ -267,7 +264,7 @@ const Wallet = () => {
             </div>
 
             {/* Withdrawal Button + Dialog */}
-              <div className='flex justify-center'>
+            <div className='flex justify-center'>
               <Button
                 size='lg'
                 className={`px-8 py-3 text-lg font-semibold ${
@@ -310,7 +307,7 @@ const Wallet = () => {
                       cible='minPrice'
                     />
                   </p>
-                  
+
                   <p className='text-xs text-amber-600'>
                     {t('wallet.dynamic_conversion')}
                   </p>
@@ -408,7 +405,7 @@ const Wallet = () => {
                           {page}
                         </PaginationLink>
                       </PaginationItem>
-                    )
+                    ),
                   )}
                   <PaginationItem>
                     <PaginationNext
