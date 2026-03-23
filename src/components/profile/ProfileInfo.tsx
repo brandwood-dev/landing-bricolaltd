@@ -31,6 +31,7 @@ import {
   EyeOff,
 } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { createVeriffFrame } from '@veriff/incontext-sdk'
 import { useAuth } from '@/contexts/AuthContext'
 import { Country } from '@/types/bridge/common.types'
 import { authService } from '@/services/authService'
@@ -93,7 +94,8 @@ const ProfileInfo = () => {
     latitude: null as number | null,
     longitude: null as number | null,
     country: 'SA',
-    verified: false,
+    verifiedEmail: false,
+    isVerified: false,
     profileImage: '',
     currentPassword: '',
     newPassword: '',
@@ -149,7 +151,8 @@ const ProfileInfo = () => {
         latitude: user.latitude || null,
         longitude: user.longitude || null,
         country: countryId,
-        verified: user.isEmailVerified || false,
+        verifiedEmail: user.verifiedEmail || false,
+        isVerified: user.isVerified || false,
         profileImage: user.profilePicture || '',
         currentPassword: '',
         newPassword: '',
@@ -190,6 +193,52 @@ const ProfileInfo = () => {
     label: prefix.value,
     flag: prefix.flag,
   }))
+
+  const handleVeriff = async () => {
+    try {
+      const response = await fetch('https://stationapi.veriff.com/v1/sessions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-AUTH-CLIENT': '4d9b5010-592d-460c-84ae-8461d1a109c7'
+        },
+        body: JSON.stringify({
+          verification: {
+            person: {
+              firstName: userInfo.firstName,
+              lastName: userInfo.lastName,
+            },
+            vendorData: user?.id
+          }
+        })
+      });
+      const data = await response.json();
+      if (data.verification && data.verification.url) {
+        createVeriffFrame({
+          url: data.verification.url,
+          onEvent: async function(msg) {
+            switch(msg) {
+              case 'CANCELED':
+                console.log('Veriff CANCELED');
+                break;
+              case 'FINISHED':
+                console.log('Veriff FINISHED');
+                try {
+                  await userService.verifyUserIdentity();
+                  // Reload page or update state to reflect verified status
+                  window.location.reload();
+                } catch (err) {
+                  console.error('Failed to update verification status', err);
+                }
+                break;
+            }
+          }
+        });
+      }
+    } catch (err) {
+      console.error('Error starting veriff', err);
+    }
+  };
 
   const handleInputChange = (field: string, value: string) => {
     setUserInfo((prev) => ({ ...prev, [field]: value }))
@@ -683,7 +732,7 @@ const ProfileInfo = () => {
                 {userInfo.firstName} {userInfo.lastName}
               </h3>
               <div className='flex flex-wrap items-center justify-center gap-2 mt-2'>
-                {userInfo.verified && (
+                {userInfo.isVerified ? (
                   <Badge
                     variant='default'
                     className='flex items-center gap-1 text-xs'
@@ -691,6 +740,16 @@ const ProfileInfo = () => {
                     <Shield className='h-3 w-3' />
                     {t('profile.verified')}
                   </Badge>
+                ) : (
+                  <Button 
+                    variant="default" 
+                    size="sm" 
+                    className="h-7 text-xs flex items-center gap-1"
+                    onClick={handleVeriff}
+                  >
+                    <Shield className="h-3 w-3" />
+                    {t('profile.verify_account')}
+                  </Button>
                 )}
               </div>
             </div>

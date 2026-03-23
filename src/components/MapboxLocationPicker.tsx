@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { MapPin, Loader2, RotateCcw, AlertCircle } from 'lucide-react'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { getCountryCoordinates } from '@/utils/countryCoordinates'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface MapboxLocationPickerProps {
   coordinates?: { lat: number; lng: number }
@@ -12,6 +13,7 @@ interface MapboxLocationPickerProps {
   className?: string
   height?: string
   userCountry?: string // Nouveau prop pour le pays de l'utilisateur
+  language?: string
 }
 
 const MapboxLocationPicker: React.FC<MapboxLocationPickerProps> = ({
@@ -20,7 +22,8 @@ const MapboxLocationPicker: React.FC<MapboxLocationPickerProps> = ({
   onAddressChange,
   className = '',
   height = '400px',
-  userCountry
+  userCountry,
+  language = 'en'
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<any>(null)
@@ -29,6 +32,7 @@ const MapboxLocationPicker: React.FC<MapboxLocationPickerProps> = ({
   const [error, setError] = useState<string | null>(null)
   const [currentCoordinates, setCurrentCoordinates] = useState(coordinates)
   const [mapboxLoaded, setMapboxLoaded] = useState(false)
+  const { t } = useLanguage()
 
   // Fonction pour obtenir les coordonnées par défaut basées sur le pays de l'utilisateur
   const getDefaultCoordinates = () => {
@@ -56,7 +60,7 @@ const MapboxLocationPicker: React.FC<MapboxLocationPickerProps> = ({
       }
 
       const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${token}&language=fr`
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${token}&language=${language}`
       )
       
       if (!response.ok) {
@@ -262,7 +266,7 @@ const MapboxLocationPicker: React.FC<MapboxLocationPickerProps> = ({
             <AlertCircle className="h-12 w-12 text-red-500" />
             <div className="text-center">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Carte indisponible
+                {t('map.map_unavailable')}
               </h3>
               <p className="text-sm text-gray-600 mb-4">
                 {error}
@@ -270,10 +274,10 @@ const MapboxLocationPicker: React.FC<MapboxLocationPickerProps> = ({
               <div className="space-y-2">
                 <Button onClick={retryLoading} variant="outline" size="sm">
                   <RotateCcw className="h-4 w-4 mr-2" />
-                  Réessayer
+                  {t('map.retry')}
                 </Button>
                 <p className="text-xs text-gray-500">
-                  Vous pouvez saisir manuellement les coordonnées si nécessaire
+                  {t('map.manual_coordinates')}
                 </p>
               </div>
             </div>
@@ -290,7 +294,7 @@ const MapboxLocationPicker: React.FC<MapboxLocationPickerProps> = ({
           <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
             <div className="flex items-center space-x-2">
               <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
-              <span className="text-sm text-gray-600">Chargement de la carte...</span>
+              <span className="text-sm text-gray-600">{t('general.loading')}</span>
             </div>
           </div>
         )}
@@ -307,10 +311,10 @@ const MapboxLocationPicker: React.FC<MapboxLocationPickerProps> = ({
             <MapPin className="h-5 w-5 text-red-500 mt-0.5 flex-shrink-0" />
             <div>
               <p className="text-xs font-medium text-gray-800 mb-1">
-                Sélectionnez l'emplacement
+                {t('map.location_select')}
               </p>
               <p className="text-xs text-gray-600">
-                Cliquez sur la carte ou faites glisser le marqueur pour définir l'adresse de ramassage
+                {t('map.location_select_hint')}
               </p>
             </div>
           </div>
@@ -324,7 +328,7 @@ const MapboxLocationPicker: React.FC<MapboxLocationPickerProps> = ({
           onClick={resetToDefaultLocation}
         >
           <RotateCcw className="h-4 w-4 mr-2" />
-          Ma position
+          {t('map.your_position')}
         </Button>
 
         {/* Coordinates display */}

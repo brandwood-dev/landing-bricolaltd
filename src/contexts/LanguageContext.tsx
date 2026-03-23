@@ -333,6 +333,13 @@ const translations = {
     'validation.required_field': 'Ce champ est obligatoire',
     'search.searching': 'Recherche...',
     'map.your_position': 'Votre position',
+    'map.location_select': "Sélectionnez l'emplacement",
+    'map.location_select_hint':
+      "Cliquez sur la carte ou faites glisser le marqueur pour définir l'adresse de ramassage",
+    'map.map_unavailable': 'Carte indisponible',
+    'map.retry': 'Réessayer',
+    'map.manual_coordinates':
+      'Vous pouvez saisir manuellement les coordonnées si nécessaire',
     'reviews.loading': 'Chargement des avis...',
     'a11y.previous_slide': 'Diapositive précédente',
     'a11y.next_slide': 'Diapositive suivante',
@@ -348,8 +355,8 @@ const translations = {
     'search.sort.name_desc': 'Nom Z-A',
     'search.sort.lowest_rated': 'Moins bien notés',
     'wallet.subtitle': 'Gérez vos finances et suivez vos transactions',
-    'wallet.available_balance': 'Solde disponible',
-    'wallet.total_balance': 'Solde cumulé',
+    'wallet.available_balance': 'Revenus disponibles pour paiement',
+    'wallet.total_balance': 'Revenus cumulés',
     'wallet.successful_transactions': 'Transactions réussies',
     'wallet.history': 'Historique des transactions',
     'wallet.no_transactions': 'Aucune transaction trouvée',
@@ -1128,6 +1135,7 @@ const translations = {
     'profile.edit_profile_photo':
       'Cliquez sur "Modifier" pour changer votre photo de profil',
     'profile.verified': 'Vérifié',
+    'profile.verify_account': 'Vérifier le compte',
     'profile.account_type_individual': 'Particulier',
     'profile.account_type_company': 'Entreprise',
     'profile.average_rating': 'Note moyenne',
@@ -1185,6 +1193,64 @@ const translations = {
     'wallet.completed': 'Terminée',
     'wallet.pending': 'En attente',
     'wallet.failed': 'Échouée',
+    'wallet.no_transactions_found':
+      'Aucune transaction trouvée pour les filtres sélectionnés.',
+
+    // Wallet Dialog
+    'wallet.dialog.title': 'Retrait de fonds',
+    'wallet.dialog.amount_step.title': 'Montant du retrait',
+    'wallet.dialog.amount_step.subtitle': 'Solde disponible: {amount}',
+    'wallet.dialog.amount_step.label': 'Montant ({symbol})',
+    'wallet.dialog.amount_step.placeholder': 'Minimum {amount}',
+    'wallet.dialog.amount_step.error.min':
+      'Le montant minimum de retrait est de £50',
+    'wallet.dialog.amount_step.error.max':
+      'Montant supérieur au solde disponible',
+    'wallet.dialog.amount_step.alert':
+      'Montant minimum: {amount}. Les retraits sont traités sous 24-48h ouvrées.',
+    'wallet.dialog.method_step.title': 'Méthode de paiement',
+    'wallet.dialog.method_step.subtitle':
+      'Choisissez comment recevoir vos fonds',
+    'wallet.dialog.method_step.bank_transfer': 'Virement bancaire',
+    'wallet.dialog.method_step.bank_delay': 'Délai: 1-3 jours ouvrés',
+    'wallet.dialog.method_step.stripe': 'Stripe Connect',
+    'wallet.dialog.method_step.stripe_delay': 'Délai: 2-7 jours',
+    'wallet.dialog.details_step.title': 'Informations de paiement',
+    'wallet.dialog.details_step.subtitle':
+      'Saisissez vos coordonnées bancaires',
+    'wallet.dialog.details_step.account_name': 'Nom du titulaire',
+    'wallet.dialog.details_step.account_name_placeholder':
+      'Nom complet du titulaire du compte',
+    'wallet.dialog.details_step.iban': 'IBAN',
+    'wallet.dialog.details_step.bic': 'BIC/SWIFT',
+    'wallet.dialog.details_step.stripe_account': 'Stripe Connect Account ID',
+    'wallet.dialog.confirm_step.title': 'Confirmation',
+    'wallet.dialog.confirm_step.subtitle':
+      'Vérifiez les détails de votre retrait',
+    'wallet.dialog.confirm_step.summary': 'Récapitulatif',
+    'wallet.dialog.confirm_step.amount': 'Montant:',
+    'wallet.dialog.confirm_step.method': 'Méthode:',
+    'wallet.dialog.confirm_step.holder': 'Titulaire:',
+    'wallet.dialog.confirm_step.stripe_account': 'Stripe Account:',
+    'wallet.dialog.confirm_step.alert':
+      'Votre demande sera traitée sous 24-48h ouvrées. Vous recevrez une confirmation par email.',
+    'wallet.dialog.buttons.back': 'Retour',
+    'wallet.dialog.buttons.next': 'Suivant',
+    'wallet.dialog.buttons.confirm': 'Confirmer le retrait',
+    'wallet.dialog.buttons.processing': 'Traitement...',
+    'wallet.dialog.errors.invalid_amount': 'Veuillez saisir un montant valide',
+    'wallet.dialog.errors.iban_required': 'IBAN requis',
+    'wallet.dialog.errors.bic_required': 'BIC requis',
+    'wallet.dialog.errors.name_required': 'Nom du titulaire requis',
+    'wallet.dialog.errors.paypal_required': 'Email PayPal requis',
+    'wallet.dialog.errors.creation_failed':
+      'Une erreur est survenue lors de la création de votre demande de retrait.',
+    'wallet.dialog.success.title': 'Demande de retrait créée',
+    'wallet.dialog.success.desc':
+      'Votre demande de retrait a été soumise avec succès. Elle sera traitée sous 24-48h.',
+    'wallet.withdrawal_success_toast':
+      'Opération bien effectuée. Le montant a été déduit.',
+    'wallet.dialog.error.title': 'Erreur',
 
     // New FAQ translations
     'faq.hero.title': 'Questions Fréquentes',
@@ -1601,14 +1667,23 @@ const translations = {
     'add_tool.price_per_day': 'Prix par jour ',
     'add_tool.deposit': 'Caution ',
     'add_tool.location_title': 'Localisation',
-    'add_tool.address': 'Adresse ou ville',
+    'add_tool.address': 'Adresse ou Ville',
+    'add_tool.select_on_map': 'Sélectionnez directement sur la carte',
+    'add_tool.click_map_hint':
+      "Cliquez sur la carte pour sélectionner l'adresse de récupération de votre outil",
+    'add_tool.address_label': 'Adresse:',
+    'add_tool.coordinates_label': 'Coordonnées:',
     'add_tool.photos_title': 'Photos',
     'add_tool.add_photos': 'Ajoutez vos photos',
     'add_tool.drop_images': 'Glissez vos images ici ou cliquez pour parcourir',
     'add_tool.browse_files': 'Parcourir les fichiers',
     'add_tool.file_format': "PNG, JPG jusqu'à 10MB • 5 photos maximum",
     'add_tool.instructions_title': "Consignes d'utilisation",
-    'add_tool.owner_instructions': 'Consignes du propriétaire',
+    'add_tool.instructions_placeholder':
+      'Ex: Prévoir une rallonge électrique, nettoyer après usage, manipulation délicate...',
+    'add_tool.photo_required':
+      "Au moins une photo est requise pour créer l'annonce",
+    'add_tool.owner_instructions': 'Instructions du propriétaire',
     'add_tool.publish': "Publier l'annonce",
     'add_tool.choose_category': 'Choisir une catégorie',
     'add_tool.choose_subcategory': 'Choisir une sous-catégorie',
@@ -1684,35 +1759,38 @@ const translations = {
     'cgu.section1.title': '1. Introduction',
 
     'cgu.section1.p1':
-      'La société Bricola LTD exploite une plateforme numérique de mise en relation entre particuliers, spécialisée dans la location d’outils et d’équipements destinés au bricolage, au jardinage, au nettoyage et à l’organisation d’événements.',
+      'Bienvenue sur Bricola LTD. Bricola fonctionne comme une plateforme numérique basée sur un modèle SaaS permettant aux utilisateurs de publier des annonces, effectuer des réservations et gérer les paiements liés à la location d’outils et d’équipements pour le bricolage, le jardinage, le nettoyage et l’événementiel.',
 
     'cgu.section1.p2':
-      'Bricola agit exclusivement en qualité d’intermédiaire de confiance. À ce titre, elle n’est ni propriétaire, ni dépositaire des objets loués, et n’assure ni leur transport, ni leur manutention.',
+      'Bricola ne fournit pas les outils et n’agit comme l’agent d’aucune partie. Son rôle se limite à fournir l’infrastructure technique facilitant les interactions entre les utilisateurs.',
+    'cgu.section1.p3':
+      'La relation de location se déroule directement entre le Propriétaire et le Locataire. Le Propriétaire agit en tant que prestataire indépendant et aucune relation d’agence, de partenariat ou de représentation n’est créée avec Bricola.',
+    'cgu.section1.p4':
+      'L’utilisation de la plateforme constitue une acceptation totale des présentes conditions.',
+    'cgu.section1.p5':
+      'Ces conditions sont applicables à partir du 1er septembre 2025.',
 
     'cgu.section2.title': '2. Accès à la Plateforme',
 
     'cgu.section2.p1':
-      'L’accès à la plateforme est possible via les applications web et mobiles.',
+      'La plateforme est accessible via le site web ou les applications mobiles.',
 
     'cgu.section2.p2':
-      'L’utilisation du service est réservée aux personnes majeures (18 ans révolus) et juridiquement capables.',
+      'L’utilisateur doit être majeur (18+) et légalement apte.',
 
     'cgu.section2.p3':
-      'Bricola se réserve le droit de suspendre ou clôturer tout compte utilisateur en cas de manquement aux présentes conditions, d’activités frauduleuses ou d’abus constaté.',
+      'Bricola se réserve le droit de suspendre ou désactiver un compte en cas de violation.',
 
-    'cgu.section3.title': '3. Inscription et Vérification des Utilisateurs',
+    'cgu.section3.title': '3. Inscription et Vérification d’Identité',
 
     'cgu.section3.li1':
-      'L’inscription requiert une adresse email valide, un numéro de téléphone actif et une pièce d’identité officielle.',
+      'L’utilisateur doit fournir une adresse e‑mail valide, un numéro de téléphone et des informations personnelles exactes.',
 
     'cgu.section3.li2':
-      'Pour toute demande de retrait, l’utilisateur doit fournir des coordonnées bancaires exactes.',
+      'Bricola peut demander des documents supplémentaires avant d’activer certaines opérations.',
 
     'cgu.section3.li3':
-      'Bricola se réserve le droit de demander des documents de vérification d’identité (KYC) pour les transactions de montant élevé.',
-
-    'cgu.section3.li4':
-      'L’accès au compte est strictement personnel et non transférable. Le partage, la duplication ou la cession du compte sont interdits',
+      'Le partage ou la vente de comptes est strictement interdit.',
 
     'cgu.section4.title': '4. Règles de Location et Responsabilités',
 
@@ -2109,6 +2187,12 @@ const translations = {
     'validation.required_field': 'This field is required',
     'search.searching': 'Searching...',
     'map.your_position': 'Your location',
+    'map.location_select': 'Select location',
+    'map.location_select_hint':
+      'Click on the map or drag the marker to set the pickup address',
+    'map.map_unavailable': 'Map unavailable',
+    'map.retry': 'Retry',
+    'map.manual_coordinates': 'You can manually enter coordinates if needed',
     'reviews.loading': 'Loading reviews...',
     'a11y.previous_slide': 'Previous slide',
     'a11y.next_slide': 'Next slide',
@@ -2124,8 +2208,8 @@ const translations = {
     'search.sort.name_desc': 'Name Z–A',
     'search.sort.lowest_rated': 'Lowest rated',
     'wallet.subtitle': 'Manage your finances and track your transactions',
-    'wallet.available_balance': 'Available balance',
-    'wallet.total_balance': 'Total balance',
+    'wallet.available_balance': 'Earnings available for payout',
+    'wallet.total_balance': 'Total earnings',
     'wallet.successful_transactions': 'Successful transactions',
     'wallet.history': 'Transaction history',
     'wallet.no_transactions': 'No transactions found',
@@ -2954,7 +3038,7 @@ const translations = {
     'customer_reviews.no_reviews': 'No reviews available at this time.',
 
     // rental process
- 
+
     'rental_process.step1.title': 'Post your listing in a few clicks',
     'rental_process.step1.description':
       'Add your tools with photos and a detailed description in just a few minutes.',
@@ -2978,6 +3062,7 @@ const translations = {
     'profile.edit_profile_photo':
       'Click on "Edit" to change your profile photo',
     'profile.verified': 'Verified',
+    'profile.verify_account': 'Verify account',
     'profile.account_type_individual': 'Individual',
     'profile.account_type_company': 'Company',
     'profile.average_rating': 'Average rating',
@@ -3030,6 +3115,62 @@ const translations = {
     'wallet.completed': 'Completed',
     'wallet.pending': 'Pending',
     'wallet.failed': 'Failed',
+    'wallet.no_transactions_found': 'No transactions available at this time.',
+
+    // Wallet Dialog
+    'wallet.dialog.title': 'Withdrawal',
+    'wallet.dialog.amount_step.title': 'Withdrawal Amount',
+    'wallet.dialog.amount_step.subtitle': 'Available balance: {amount}',
+    'wallet.dialog.amount_step.label': 'Amount ({symbol})',
+    'wallet.dialog.amount_step.placeholder': 'Minimum {amount}',
+    'wallet.dialog.amount_step.alert':
+      'Minimum amount: {amount}. Withdrawals are processed within 24-48 business hours.',
+    //english
+    'wallet.dialog.amount_step.error.min': 'Minimum withdrawal amount is £50',
+    'wallet.dialog.amount_step.error.max':
+      'Withdrawal amount cannot exceed available balance',
+
+    'wallet.dialog.method_step.title': 'Payment Method',
+    'wallet.dialog.method_step.subtitle': 'Choose how to receive your funds',
+    'wallet.dialog.method_step.bank_transfer': 'Bank Transfer',
+    'wallet.dialog.method_step.bank_delay':
+      'Processing time: 1-3 business days',
+    'wallet.dialog.method_step.stripe': 'Stripe Connect',
+    'wallet.dialog.method_step.stripe_delay': 'Processing time: 2-7 days',
+    'wallet.dialog.details_step.title': 'Payment Information',
+    'wallet.dialog.details_step.subtitle': 'Enter your bank details',
+    'wallet.dialog.details_step.account_name': 'Account Holder Name',
+    'wallet.dialog.details_step.account_name_placeholder':
+      'Full name of the account holder',
+    'wallet.dialog.details_step.iban': 'IBAN',
+    'wallet.dialog.details_step.bic': 'BIC/SWIFT',
+    'wallet.dialog.details_step.stripe_account': 'Stripe Connect Account ID',
+    'wallet.dialog.confirm_step.title': 'Confirmation',
+    'wallet.dialog.confirm_step.subtitle': 'Check your withdrawal details',
+    'wallet.dialog.confirm_step.summary': 'Summary',
+    'wallet.dialog.confirm_step.amount': 'Amount:',
+    'wallet.dialog.confirm_step.method': 'Method:',
+    'wallet.dialog.confirm_step.holder': 'Holder:',
+    'wallet.dialog.confirm_step.stripe_account': 'Stripe Account:',
+    'wallet.dialog.confirm_step.alert':
+      'Your request will be processed within 24-48 business hours. You will receive an email confirmation.',
+    'wallet.dialog.buttons.back': 'Back',
+    'wallet.dialog.buttons.next': 'Next',
+    'wallet.dialog.buttons.confirm': 'Confirm Withdrawal',
+    'wallet.dialog.buttons.processing': 'Processing...',
+    'wallet.dialog.errors.invalid_amount': 'Please enter a valid amount',
+    'wallet.dialog.errors.iban_required': 'IBAN is required',
+    'wallet.dialog.errors.bic_required': 'BIC is required',
+    'wallet.dialog.errors.name_required': 'Account holder name is required',
+    'wallet.dialog.errors.paypal_required': 'PayPal email is required',
+    'wallet.dialog.errors.creation_failed':
+      'An error occurred while creating your withdrawal request.',
+    'wallet.dialog.success.title': 'Withdrawal Request Created',
+    'wallet.dialog.success.desc':
+      'Your withdrawal request has been successfully submitted. It will be processed within 24-48h.',
+    'wallet.withdrawal_success_toast':
+      'Operation completed successfully. The amount has been deducted.',
+    'wallet.dialog.error.title': 'Error',
 
     // New FAQ translations
     'faq.hero.title': 'Frequently Asked Questions',
@@ -3526,13 +3667,22 @@ const translations = {
     'add_tool.price_per_day': 'Price per day ',
     'add_tool.deposit': 'Deposit ',
     'add_tool.location_title': 'Location',
-    'add_tool.address': 'Address or city',
+    'add_tool.address': 'Address or City',
+    'add_tool.select_on_map': 'Select directly on the map',
+    'add_tool.click_map_hint':
+      'Click on the map to select the pickup address for your tool',
+    'add_tool.address_label': 'Address:',
+    'add_tool.coordinates_label': 'Coordinates: city',
     'add_tool.photos_title': 'Photos',
     'add_tool.add_photos': 'Add your photos',
     'add_tool.drop_images': 'Drop your images here or click to browse',
     'add_tool.browse_files': 'Browse files',
     'add_tool.file_format': 'PNG, JPG up to 10MB • 5 photos maximum',
     'add_tool.instructions_title': 'Usage instructions',
+    'add_tool.instructions_placeholder':
+      'Ex: Provide an extension cord, clean after use, delicate handling...',
+    'add_tool.photo_required':
+      'At least one photo is required to create the ad',
     'add_tool.owner_instructions': 'Owner instructions',
     'add_tool.publish': 'Publish ad',
     'add_tool.choose_category': 'Choose a category',
@@ -4032,7 +4182,7 @@ const translations = {
     'mobile_app.google_play': 'Get it from Google Play',
   },
   ar: {
-    'rental_process.title': 'كيف يعمل؟',
+    'rental_process.title': 'كيف يعمل النظام؟',
     'rental_process.description': 'استأجر أو اعرض الأدوات في بضع خطوات بسيطة.',
     'rental_process.renter.title': 'للمستأجرين',
     'rental_process.renter.step1.title': 'بحث',
@@ -4083,13 +4233,19 @@ const translations = {
     'search.tools': 'بحث عن أدوات على الخريطة...',
     'chargemento.outils': 'تحميل الأدوات',
     'reservation.deposit.desc':
-      ' سيتم تجميد مبلغ التأمين قبل 24 ساعة من بداية الإيجار، ويُعاد بعد انتهاء الإيجار في حال عدم وجود أي تلف بالأداة المستأجرة.',
+      ' سيتم تجميد مبلغ الضمان قبل 24 ساعة من بداية الإيجار، ويُعاد بعد انتهاء الإيجار في حال عدم وجود أي تلف بالأداة المستأجرة.',
     'login.signing': 'تسجيل الدخول...',
     'blog.category.general': 'عام',
     'general.loading': 'جاري التحميل...',
     'validation.required_field': 'هذا الحقل مطلوب',
     'search.searching': 'جارٍ البحث...',
     'map.your_position': 'موقعك',
+    'map.location_select': 'اختر الموقع',
+    'map.location_select_hint':
+      'انقر على الخريطة أو اسحب العلامة لتحديد عنوان الاستلام',
+    'map.map_unavailable': 'الخريطة غير متاحة',
+    'map.retry': 'إعادة المحاولة',
+    'map.manual_coordinates': 'يمكنك إدخال الإحداثيات يدوياً إذا لزم الأمر',
     'reviews.loading': 'جارٍ تحميل المراجعات...',
     'a11y.previous_slide': 'الشريحة السابقة',
     'a11y.next_slide': 'الشريحة التالية',
@@ -4105,8 +4261,8 @@ const translations = {
     'search.sort.name_desc': 'الاسم من ي إلى أ',
     'search.sort.lowest_rated': 'الأقل تقييماً',
     'wallet.subtitle': 'إدارة أموالك وتتبع معاملاتك',
-    'wallet.available_balance': 'الرصيد المتاح',
-    'wallet.total_balance': 'الرصيد الإجمالي',
+    'wallet.available_balance': 'مستحقّات جاهزة للدفع',
+    'wallet.total_balance': 'إجمالي المستحقّات',
     'wallet.successful_transactions': 'المعاملات الناجحة',
     'wallet.history': 'سجل المعاملات',
     'wallet.no_transactions': 'لم يتم العثور على معاملات',
@@ -4117,7 +4273,7 @@ const translations = {
     'wallet.filters.type.income': 'الدخل',
     'wallet.filters.type.refund': 'الاستردادات',
     'wallet.filters.status.all': 'كل الحالات',
-    'wallet.filters.status.pending': 'قيد الانتظار',
+    'wallet.filters.status.pending': 'مستحقّات قيد الانتظار',
     'wallet.filters.status.completed': 'مكتمل',
     'wallet.filters.status.failed': 'فاشل',
     'form.email.placeholder': 'your@email.com',
@@ -4258,7 +4414,7 @@ const translations = {
     'rentalContract.article3.title': 'المادة 3 - السعر وشروط الدفع',
     'rentalContract.article3.fields.rentalPrice':
       'سعر الإيجار: [المبلغ] € لمدة [المدة]',
-    'rentalContract.article3.fields.deposit': 'التأمين: [مبلغ التأمين] €',
+    'rentalContract.article3.fields.deposit': 'الضمان: [مبلغ الضمان] €',
     'rentalContract.article3.fields.paymentMethod':
       'طريقة الدفع: عبر منصة Bricola',
     'rentalContract.article4.title': 'المادة 4 - التزامات المستأجر',
@@ -4275,7 +4431,7 @@ const translations = {
     'rentalContract.article5.list.2': 'تقديم تعليمات الاستخدام إذا لزم الأمر',
     'rentalContract.article5.list.3': 'ضمان مطابقة الأداة لوصفها',
     'rentalContract.article5.list.4': 'التواجد لتسليم واستلام الأداة',
-    'rentalContract.article6.title': 'المادة 6 - التأمين والمسؤولية',
+    'rentalContract.article6.title': 'المادة 6 - الضمان والمسؤولية',
     'rentalContract.article6.intro':
       'الأداة مشمولة بتأمين Bricola طوال مدة الإيجار ضد:',
     'rentalContract.article6.coverage.1': 'الأضرار العرضية',
@@ -4345,7 +4501,7 @@ const translations = {
       'قم بإنشاء حساب مؤجر على المنصة وأدخل بدقة بياناتك الشخصية، بما في ذلك رقم الهاتف والبريد الإلكتروني.',
     'ownersGuide.step2.title': 'إضافة أداة',
     'ownersGuide.step2.description':
-      'التقط صوراً واضحة وعالية الجودة، وأضف وصفاً شاملاً للأداة، وحدد السعر اليومي ومبلغ التأمين.',
+      'التقط صوراً واضحة وعالية الجودة، وأضف وصفاً شاملاً للأداة، وحدد السعر اليومي ومبلغ الضمان.',
     'ownersGuide.step3.title': 'تحديد شروطك',
     'ownersGuide.step3.description':
       'حدد مدة الإيجار المسموح بها، وأي تعليمات خاصة باستخدام الأداة.',
@@ -4638,7 +4794,7 @@ const translations = {
     'validation.category_required': 'الفئة مطلوبة',
     'validation.condition_required': 'حالة الأداة مطلوبة',
     'validation.price_positive': 'يجب أن يكون السعر أكبر من 0',
-    'validation.deposit_positive': 'يجب أن يكون التأمين أكبر من 0',
+    'validation.deposit_positive': 'يجب أن يكون الضمان أكبر من 0',
     'validation.address_required': 'يرجى تحديد عنوان على الخريطة',
     'validation.fill_all_fields': 'يرجى ملء جميع الحقول المطلوبة',
 
@@ -4677,7 +4833,7 @@ const translations = {
     'ads.tool_condition': 'حالة الأداة',
     'ads.pricing': 'التسعير',
     'ads.pricing_placeholder': 'لسعر يومياً ',
-    'ads.deposit': 'التأمين ',
+    'ads.deposit': 'الضمان ',
     'ads.location': 'الموقع',
     'ads.location_placeholder': 'العنوان أو المدينة',
     'ads.photos': 'الصور',
@@ -4973,7 +5129,7 @@ const translations = {
     'customer_reviews.no_reviews': 'لا توجد آراء متاحة في الوقت الحالي.',
 
     // rental process
-   
+
     'rental_process.step1.title': 'أنشر إعلانك ببضع نقرات',
     'rental_process.step1.description':
       'أضف أدواتك مع الصور والوصف المفصل  في دقائق معدودة.',
@@ -5011,6 +5167,60 @@ const translations = {
     'wallet.completed': 'مكتملة',
     'wallet.pending': 'قيد الانتظار',
     'wallet.failed': 'فشلت',
+    // Aucune transaction trouvée pour les filtres sélectionnés. // arabe
+    'wallet.no_transactions_found': 'لا توجد معاملات متاحة في الوقت الحالي.',
+
+    // Wallet Dialog
+    'wallet.dialog.title': 'سحب الأموال',
+    'wallet.dialog.amount_step.title': 'مبلغ السحب',
+    'wallet.dialog.amount_step.subtitle': 'الرصيد المتاح: {amount}',
+    'wallet.dialog.amount_step.label': 'المبلغ ({symbol})',
+    'wallet.dialog.amount_step.placeholder': 'الحد الأدنى {amount}',
+    'wallet.dialog.amount_step.alert':
+      'الحد الأدنى للمبلغ: {amount}. تتم معالجة السحوبات خلال 24-48 ساعة عمل.',
+    //arabic
+    'wallet.dialog.amount_step.error.min': '  الحد الأدنى للمبلغ: 50£',
+    'wallet.dialog.amount_step.error.max':
+      'المبلغ لا يمكن أن يتجاوز الرصيد المتاح',
+    'wallet.dialog.method_step.title': 'طريقة الدفع',
+    'wallet.dialog.method_step.subtitle': 'اختر كيفية استلام أموالك',
+    'wallet.dialog.method_step.bank_transfer': 'تحويل بنكي',
+    'wallet.dialog.method_step.bank_delay': 'وقت المعالجة: 1-3 أيام عمل',
+    'wallet.dialog.method_step.stripe': 'سترايب كونكت',
+    'wallet.dialog.method_step.stripe_delay': 'وقت المعالجة: 2-7 أيام',
+    'wallet.dialog.details_step.title': 'معلومات الدفع',
+    'wallet.dialog.details_step.subtitle': 'أدخل تفاصيل حسابك البنكي',
+    'wallet.dialog.details_step.account_name': 'اسم صاحب الحساب',
+    'wallet.dialog.details_step.account_name_placeholder':
+      'الاسم الكامل لصاحب الحساب',
+    'wallet.dialog.details_step.iban': 'رقم الحساب المصرفي الدولي (IBAN)',
+    'wallet.dialog.details_step.bic': 'رمز البنك (BIC/SWIFT)',
+    'wallet.dialog.details_step.stripe_account': 'معرف حساب سترايب كونكت',
+    'wallet.dialog.confirm_step.title': 'تأكيد',
+    'wallet.dialog.confirm_step.subtitle': 'تحقق من تفاصيل السحب',
+    'wallet.dialog.confirm_step.summary': 'ملخص',
+    'wallet.dialog.confirm_step.amount': 'المبلغ:',
+    'wallet.dialog.confirm_step.method': 'الطريقة:',
+    'wallet.dialog.confirm_step.holder': 'المالك:',
+    'wallet.dialog.confirm_step.stripe_account': 'حساب سترايب:',
+    'wallet.dialog.confirm_step.alert':
+      'ستتم معالجة طلبك خلال 24-48 ساعة عمل. ستتلقى تأكيدًا عبر البريد الإلكتروني.',
+    'wallet.dialog.buttons.back': 'رجوع',
+    'wallet.dialog.buttons.next': 'التالي',
+    'wallet.dialog.buttons.confirm': 'تأكيد السحب',
+    'wallet.dialog.buttons.processing': 'جاري المعالجة...',
+    'wallet.dialog.errors.invalid_amount': 'الرجاء إدخال مبلغ صحيح',
+    'wallet.dialog.errors.iban_required': 'رقم IBAN مطلوب',
+    'wallet.dialog.errors.bic_required': 'رمز BIC مطلوب',
+    'wallet.dialog.errors.name_required': 'اسم صاحب الحساب مطلوب',
+    'wallet.dialog.errors.paypal_required': 'البريد الإلكتروني لـ PayPal مطلوب',
+    'wallet.dialog.errors.creation_failed':
+      'حدث خطأ أثناء إنشاء طلب السحب الخاص بك.',
+    'wallet.dialog.success.title': 'تم إنشاء طلب السحب',
+    'wallet.dialog.success.desc':
+      'تم تقديم طلب السحب الخاص بك بنجاح. ستتم معالجته خلال 24-48 ساعة.',
+    'wallet.withdrawal_success_toast': 'تمت العملية بنجاح. تم خصم المبلغ.',
+    'wallet.dialog.error.title': 'خطأ',
 
     // Navigation
     'nav.home': 'الرئيسية',
@@ -5084,11 +5294,11 @@ const translations = {
       'تأكد من التحقق من هويتك، واتفق مع المالك على شروط الإيجار، وافحص الأداة عند استلامها.',
     'faq.renters.q4': 'ماذا لو تعرضت الأداة للتلف أثناء فترة الإيجار؟',
     'faq.renters.a4':
-      'أخطر المالك وفريق الدعم فورًا. قد يُطلب منك تقديم أدلة لمعالجة المشكلة من خلال مبلغ التأمين.',
+      'أخطر المالك وفريق الدعم فورًا. قد يُطلب منك تقديم أدلة لمعالجة المشكلة من خلال مبلغ الضمان.',
     'faq.owners.title': 'لأصحاب الأدوات',
     'faq.owners.q1': 'كيف أعرض أداة للإيجار؟',
     'faq.owners.a1':
-      'انتقل إلى "عرض أداة"، وقم برفع صور واضحة، وأضف وصفًا للحالة، والضمانات إن وُجدت، وسعر الإيجار اليومي، وحدد مبلغ التأمين المطلوب.',
+      'انتقل إلى "عرض أداة"، وقم برفع صور واضحة، وأضف وصفًا للحالة، والضمانات إن وُجدت، وسعر الإيجار اليومي، وحدد مبلغ الضمان المطلوب.',
     'faq.owners.q2': 'ماذا يحدث بعد أن أُدرج أداتي؟',
     'faq.owners.a2':
       'سيتم مراجعة الإعلان من قبل فريق الإشراف قبل أن يظهر للمستخدمين. سيتم إشعارك عند قيام أحدهم بالحجز.',
@@ -5100,14 +5310,14 @@ const translations = {
       'تحقق من هوية المستأجر، وثق حالة الأداة بالصور، واتفق معه على شروط الإرجاع.',
     'faq.owners.q5': 'ماذا أفعل إذا تضررت أداتي؟',
     'faq.owners.a5':
-      'أرسل الأدلة خلال 24 ساعة من استرجاع الأداة. ستقوم Bricola بمراجعة الحالة وقد تُصدر تعويضًا من مبلغ التأمين.',
+      'أرسل الأدلة خلال 24 ساعة من استرجاع الأداة. ستقوم Bricola بمراجعة الحالة وقد تُصدر تعويضًا من مبلغ الضمان.',
     'faq.owners.q6': 'هل توجد تأمينات على الأدوات المعروضة؟',
     'faq.owners.a6':
       'حاليًا، لا توفر Bricola تأمينًا. ننصح بعرض الأدوات التي يمكنك تحمل تأجيرها في حال حدوث أي ضرر.',
     'faq.payment.title': 'الدفع والسلامة',
     'faq.payment.q1': 'كيف تتم معالجة عملية الدفع؟',
     'faq.payment.a1':
-      'تتم جميع الدفعات بأمان من خلال نظام Stripe. يدفع المستأجر مقدمًا، بما في ذلك مبلغ التأمين.',
+      'تتم جميع الدفعات بأمان من خلال نظام Stripe. يدفع المستأجر مقدمًا، بما في ذلك مبلغ الضمان.',
     'faq.payment.q2': 'ما هو مبلغ التأمين؟',
     'faq.payment.a2':
       'هو مبلغ قابل للاسترداد تحتفظ به Stripe لتغطية أي أضرار أو حالات عدم الإرجاع. يُعاد تلقائيًا بعد استرجاع الأداة بنجاح.',
@@ -5226,6 +5436,7 @@ const translations = {
     'profile.address': 'العنوان',
     'profile.edit_profile_photo': 'انقر على "تعديل" لتغيير صورة ملفك الشخصي',
     'profile.verified': 'موثّق',
+    'profile.verify_account': 'توثيق الحساب',
     'profile.account_type_individual': 'شخصي',
     'profile.account_type_company': 'شركة',
     'profile.average_rating': 'متوسط التقييم',
@@ -5448,15 +5659,22 @@ const translations = {
     'add_tool.condition': 'حالة الأداة',
     'add_tool.pricing': 'التسعير',
     'add_tool.price_per_day': 'السعر في اليوم ',
-    'add_tool.deposit': 'التأمين ',
+    'add_tool.deposit': 'الضمان ',
     'add_tool.location_title': 'الموقع',
     'add_tool.address': 'العنوان أو المدينة',
+    'add_tool.select_on_map': 'حدد مباشرة على الخريطة',
+    'add_tool.click_map_hint': 'أنقر على الخريطة لتحديد العنوان',
+    'add_tool.address_label': 'العنوان:',
+    'add_tool.coordinates_label': 'الإحداثيات:',
     'add_tool.photos_title': 'الصور',
     'add_tool.add_photos': 'أضف صورك',
     'add_tool.drop_images': 'اسحب صورك هنا أو انقر للتصفح',
     'add_tool.browse_files': 'تصفح الملفات',
     'add_tool.file_format': 'PNG، JPG حتى 10MB • 5 صور كحد أقصى',
     'add_tool.instructions_title': 'تعليمات الاستخدام',
+    'add_tool.instructions_placeholder':
+      'مثال: توفير سلك تمديد، التنظيف بعد الاستخدام، التعامل بعناية...',
+    'add_tool.photo_required': 'مطلوب صورة واحدة على الأقل لإنشاء الإعلان',
     'add_tool.owner_instructions': 'تعليمات المالك',
     'add_tool.publish': 'نشر الإعلان',
     'add_tool.choose_category': 'اختر فئة',
@@ -5796,7 +6014,7 @@ const translations = {
     'validation.price_required': 'السعر مطلوب',
     'validation.location_required': 'الموقع مطلوب',
     'validation.images_required': 'الصور مطلوبة',
-    'validation.deposit_required': 'مبلغ التأمين مطلوب',
+    'validation.deposit_required': 'مبلغ الضمان مطلوب',
     'validation.phone_required': 'رقم الهاتف مطلوب',
     'validation.country_required': 'البلد مطلوب',
     'validation.invalid_email': 'البريد الإلكتروني غير صحيح',
@@ -5805,7 +6023,7 @@ const translations = {
       'كلمة المرور قصيرة جداً (8 أحرف على الأقل)',
     'validation.passwords_dont_match': 'كلمات المرور غير متطابقة',
     'validation.invalid_price': 'السعر غير صحيح',
-    'validation.invalid_deposit': 'مبلغ التأمين غير صحيح',
+    'validation.invalid_deposit': 'مبلغ الضمان غير صحيح',
     'validation.description_max_chars':
       'لقد تجاوزت العدد الأقصى المسموح به من الأحرف (500).',
     'validation.instructions_max_chars':

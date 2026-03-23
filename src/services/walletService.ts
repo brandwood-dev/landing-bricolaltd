@@ -128,14 +128,14 @@ class WalletService {
     if (amount < minAmount) {
       return {
         isValid: false,
-        error: `Le montant minimum de retrait est de £${minAmount}`
+        error: '1'
       };
     }
     
     if (amount > availableBalance) {
       return {
         isValid: false,
-        error: 'Montant supérieur au solde disponible'
+        error: '2'
       };
     }
     

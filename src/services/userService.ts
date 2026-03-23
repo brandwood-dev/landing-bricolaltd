@@ -26,9 +26,18 @@ class UserService {
   async updateUserProfile(userId: string, userData: any) {
     try {
       const response = await api.patch<ApiResponse<any>>(
-        `/users/${userId}`,
+        `/users/me`,
         userData
       )
+      return response.data.data
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async verifyUserIdentity() {
+    try {
+      const response = await api.post<ApiResponse<any>>(`/users/me/verify-identity`)
       return response.data.data
     } catch (error) {
       throw error

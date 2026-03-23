@@ -26,23 +26,26 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import authService from '@/services/authService'
 import { OptimizedPriceDisplay } from '../OptimizedPriceDisplay'
+import { createVeriffFrame } from '@veriff/incontext-sdk'
+import { userService } from '@/services/userService'
 interface ProfileHeaderProps {
   userInfo: {
-    id: string
+    id?: string
     firstName: string
     lastName: string
     email: string
-    verified: boolean
+    verifiedEmail?: boolean
+    isVerified?: boolean
     memberSince: string
-    profilePicture?: string
     phoneNumber?: string
     phone_prefix?: string
+    profilePicture?: string
   }
   stats: {
-    activeAds: number
-    averageRating: number
-    completedRentals: number
     totalEarnings: number
+    activeAds: number
+    completedRentals: number
+    averageRating: number
   }
   isAccountDeletionPending: boolean
   onAccountDeletion: () => void
@@ -162,7 +165,7 @@ const ProfileHeader = ({ userInfo, stats }: ProfileHeaderProps) => {
                   {userInfo.firstName} {userInfo.lastName}
                 </h1>
                 <div className='flex flex-wrap justify-center sm:justify-start gap-2'>
-                  {userInfo.verified && (
+                  {userInfo.isVerified ? (
                     <Badge
                       variant='default'
                       className='flex items-center gap-1 text-xs'
@@ -170,6 +173,60 @@ const ProfileHeader = ({ userInfo, stats }: ProfileHeaderProps) => {
                       <Shield className='h-3 w-3' />
                       {t('profile.verified')}
                     </Badge>
+                  ) : (
+                    <Button 
+                      variant="default" 
+                      size="sm" 
+                      className="h-7 text-xs flex items-center gap-1"
+                      onClick={async () => {
+                        try {
+                          const response = await fetch('https://stationapi.veriff.com/v1/sessions', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                              'X-AUTH-CLIENT': '4d9b5010-592d-460c-84ae-8461d1a109c7'
+                            },
+                            body: JSON.stringify({
+                              verification: {
+                                person: {
+                                  firstName: userInfo.firstName,
+                                  lastName: userInfo.lastName,
+                                },
+                                vendorData: userInfo.id || 'user_id'
+                              }
+                            })
+                          });
+                          const data = await response.json();
+                          if (data.verification && data.verification.url) {
+                            createVeriffFrame({
+                              url: data.verification.url,
+                              onEvent: async function(msg) {
+                                switch(msg) {
+                                  case 'CANCELED':
+                                    console.log('Veriff CANCELED');
+                                    break;
+                                  case 'FINISHED':
+                                    console.log('Veriff FINISHED');
+                                    try {
+                                      await userService.verifyUserIdentity();
+                                      // Reload page or update state to reflect verified status
+                                      window.location.reload();
+                                    } catch (err) {
+                                      console.error('Failed to update verification status', err);
+                                    }
+                                    break;
+                                }
+                              }
+                            });
+                          }
+                        } catch (err) {
+                          console.error('Error starting veriff', err);
+                        }
+                      }}
+                    >
+                      <Shield className="h-3 w-3" />
+                      {t('profile.verify_account')}
+                    </Button>
                   )}
                 </div>
               </div>

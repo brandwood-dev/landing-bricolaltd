@@ -1102,8 +1102,7 @@ const AddTool = () => {
                     {/* Map for location selection */}
                     <div className='space-y-3'>
                       <Label className='text-sm font-medium text-foreground'>
-                        {t('add_tool.address')} * - Sélectionnez directement sur
-                        la carte
+                        {t('add_tool.address')} * - {t('add_tool.select_on_map')}
                       </Label>
                       <MapboxLocationPicker
                         coordinates={
@@ -1124,6 +1123,7 @@ const AddTool = () => {
                         }
                         className='h-96'
                         userCountry={userCountryCode}
+                        language={language}
                       />
                     </div>
 
@@ -1133,13 +1133,13 @@ const AddTool = () => {
                       <div className='bg-muted p-4 rounded-lg space-y-2'>
                         {formData.pickupAddress && (
                           <div className='text-sm text-foreground'>
-                            📍 <strong>Adresse:</strong>{' '}
+                            📍 <strong>{t('add_tool.address_label')}</strong>{' '}
                             {formData.pickupAddress}
                           </div>
                         )}
                         {formData.latitude && formData.longitude && (
                           <div className='text-xs text-muted-foreground'>
-                            🌍 <strong>Coordonnées:</strong>{' '}
+                            🌍 <strong>{t('add_tool.coordinates_label')}</strong>{' '}
                             {typeof formData.latitude === 'number'
                               ? formData.latitude.toFixed(6)
                               : formData.latitude}
@@ -1152,8 +1152,7 @@ const AddTool = () => {
                       </div>
                     ) : (
                       <div className='text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg border-l-4 border-accent'>
-                        💡 Cliquez sur la carte pour sélectionner l'adresse de
-                        récupération de votre outil
+                        💡 {t('add_tool.click_map_hint')}
                       </div>
                     )}
                   </div>
@@ -1219,7 +1218,7 @@ const AddTool = () => {
                   </div>
                   {selectedFiles.length === 0 && (
                     <p className='text-sm text-destructive mt-2'>
-                      Au moins une photo est requise pour créer l'annonce
+                      {t('add_tool.photo_required')}
                     </p>
                   )}
 
@@ -1297,7 +1296,7 @@ const AddTool = () => {
                         onChange={(e) =>
                           handleInputChange('ownerInstructions', e.target.value)
                         }
-                        placeholder='Ex: Prévoir une rallonge électrique, nettoyer après usage, manipulation délicate...'
+                        placeholder={t('add_tool.instructions_placeholder')}
                         className={`min-h-[100px] resize-none text-base pr-16 ${
                           !instructionsValidation.isValid
                             ? 'border-destructive focus:border-destructive'

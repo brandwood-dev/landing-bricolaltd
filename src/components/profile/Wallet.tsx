@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
+import { createVeriffFrame } from '@veriff/incontext-sdk'
+import { userService } from '@/services/userService'
 import {
   Wallet as WalletIcon,
   TrendingUp,
@@ -13,6 +15,7 @@ import {
   ChevronRight,
   Loader2,
   Clock,
+  Shield,
 } from 'lucide-react'
 import { PriceDisplay } from '@/components/PriceDisplay'
 import { DateRange } from 'react-day-picker'
@@ -140,7 +143,7 @@ const Wallet = () => {
 
   // canWithdraw = true if cumulativeBalance >= 50
 
-  const canWithdraw = cumulativeBalance >= 50
+  const canWithdraw = availableBalance >= 50
 
   const handleResetFilters = () => {
     setDateRange(undefined)
@@ -265,19 +268,80 @@ const Wallet = () => {
 
             {/* Withdrawal Button + Dialog */}
             <div className='flex justify-center'>
-              <Button
-                size='lg'
-                className={`px-8 py-3 text-lg font-semibold ${
-                  canWithdraw
-                    ? 'bg-primary hover:bg-primary/90'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-                disabled={!canWithdraw}
-                onClick={() => setShowWithdrawDialog(true)}
-              >
-                <Banknote className='h-5 w-5 mr-2' />
-                {t('wallet.withdraw_money')}
-              </Button>
+              {!user?.isVerified ? (
+                <Button
+                  size='lg'
+                  className='px-8 py-3 text-lg font-semibold bg-primary hover:bg-primary/90'
+                  onClick={async () => {
+                    try {
+                      const response = await fetch(
+                        'https://stationapi.veriff.com/v1/sessions',
+                        {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                            'X-AUTH-CLIENT':
+                              '4d9b5010-592d-460c-84ae-8461d1a109c7',
+                          },
+                          body: JSON.stringify({
+                            verification: {
+                              person: {
+                                firstName: user?.firstName || '',
+                                lastName: user?.lastName || '',
+                              },
+                              vendorData: user?.id,
+                            },
+                          }),
+                        },
+                      )
+                      const data = await response.json()
+                      if (data.verification && data.verification.url) {
+                        createVeriffFrame({
+                          url: data.verification.url,
+                          onEvent: async function (msg) {
+                            switch (msg) {
+                              case 'CANCELED':
+                                console.log('Veriff CANCELED')
+                                break
+                              case 'FINISHED':
+                                console.log('Veriff FINISHED')
+                                try {
+                                  await userService.verifyUserIdentity()
+                                  window.location.reload()
+                                } catch (err) {
+                                  console.error(
+                                    'Failed to update verification status',
+                                    err,
+                                  )
+                                }
+                                break
+                            }
+                          },
+                        })
+                      }
+                    } catch (err) {
+                      console.error('Error starting veriff', err)
+                    }
+                  }}
+                >
+                  <Shield className='h-5 w-5 mr-2' />
+                  {t('profile.verify_account')}
+                </Button>
+              ) : (
+                <Button
+                  size='lg'
+                  className={`px-8 py-3 text-lg font-semibold ${
+                    canWithdraw
+                      ? 'bg-primary hover:bg-primary/90'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                  disabled={!canWithdraw}
+                  onClick={() => setShowWithdrawDialog(true)}
+                >
+                  <Banknote className='h-5 w-5 mr-2' />
+                  {t('wallet.withdraw_money')}
+                </Button>
+              )}
             </div>
             <WithdrawalDialog
               open={showWithdrawDialog}
@@ -370,7 +434,8 @@ const Wallet = () => {
               ) : (
                 <div className='text-center py-8 text-gray-500'>
                   <p>
-                    Aucune transaction trouvée pour les filtres sélectionnés.
+                    {/* Aucune transaction trouvée pour les filtres sélectionnés. */}
+                    {t('wallet.no_transactions_found')}
                   </p>
                 </div>
               )}

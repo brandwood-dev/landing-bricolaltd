@@ -50,7 +50,11 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
     const amountGBP = convertInstantly(amountSelected, currency.code, 'GBP') || amountSelected;
     const validation = walletService.validateWithdrawalAmount(amountGBP, maxAmountGBP);
     if (!validation.isValid) {
-      setErrors({ amount: validation.error! });
+      if (validation.error === '1') {
+        setErrors({ amount: t('wallet.dialog.amount_step.error.min') });
+      } else if (validation.error === '2') {
+        setErrors({ amount: t('wallet.dialog.amount_step.error.max') });
+      }
       return false;
     }
     setErrors({});
@@ -89,7 +93,7 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
 
     if (step === 'amount') {
       if (!withdrawalData.amount || withdrawalData.amount <= 0) {
-        newErrors.amount = 'Veuillez saisir un montant valide';
+        newErrors.amount = t('wallet.dialog.errors.invalid_amount');
       } else if (!validateAmount(withdrawalData.amount)) {
         return false;
       }
@@ -98,17 +102,17 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
     if (step === 'details') {
       if (withdrawalData.paymentMethod === 'bank_transfer') {
         if (!withdrawalData.bankDetails?.iban) {
-          newErrors.iban = 'IBAN requis';
+          newErrors.iban = t('wallet.dialog.errors.iban_required');
         }
         if (!withdrawalData.bankDetails?.bic) {
-          newErrors.bic = 'BIC requis';
+          newErrors.bic = t('wallet.dialog.errors.bic_required');
         }
         if (!withdrawalData.bankDetails?.accountHolderName) {
-          newErrors.accountHolderName = 'Nom du titulaire requis';
+          newErrors.accountHolderName = t('wallet.dialog.errors.name_required');
         }
       } else if (withdrawalData.paymentMethod === 'paypal') {
         if (!withdrawalData.paypalEmail) {
-          newErrors.paypalEmail = 'Email PayPal requis';
+          newErrors.paypalEmail = t('wallet.dialog.errors.paypal_required');
         }
       }
     }
@@ -146,8 +150,8 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
       await walletService.createWithdrawal(userId, payload as any);
       console.log('[WithdrawalDialog] Withdrawal created successfully')
       toast({
-        title: 'Demande de retrait créée',
-        description: 'Votre demande de retrait a été soumise avec succès. Elle sera traitée sous 24-48h.',
+        title: t('wallet.dialog.success.title'),
+        description: t('wallet.dialog.success.desc'),
       });
       onWithdrawalCreated?.();
       onOpenChange(false);
@@ -158,8 +162,8 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
     } catch (error) {
       console.error('[WithdrawalDialog] Withdrawal creation failed', error)
       toast({
-        title: 'Erreur',
-        description: 'Une erreur est survenue lors de la création de votre demande de retrait.',
+        title: t('wallet.dialog.error.title'),
+        description: t('wallet.dialog.errors.creation_failed'),
         variant: 'destructive'
       });
     } finally {
@@ -173,13 +177,13 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
               <div className="p-4 bg-green-50 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                 <Banknote className="h-8 w-8 text-green-600" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">Montant du retrait</h3>
-              <p className="text-sm text-gray-600">Solde disponible: {formatInstantPrice(maxAmountGBP, 'GBP', currency.code)}</p>
+              <h3 className="text-lg font-semibold mb-2">{t('wallet.dialog.amount_step.title')}</h3>
+              <p className="text-sm text-gray-600">{t('wallet.dialog.amount_step.subtitle').replace('{amount}', formatInstantPrice(maxAmountGBP, 'GBP', currency.code))}</p>
             </div>
 
       <div className="space-y-4">
         <div>
-          <Label htmlFor="amount">Montant ({currency.symbol})</Label>
+          <Label htmlFor="amount">{t('wallet.dialog.amount_step.label').replace('{symbol}', currency.symbol)}</Label>
           <Input
             id="amount"
             type="number"
@@ -188,7 +192,7 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
             step="0.01"
             value={withdrawalData.amount || ''}
             onChange={(e) => handleAmountChange(e.target.value)}
-            placeholder={`Minimum ${formatInstantPrice(minAmountGBP, 'GBP', currency.code)}`}
+            placeholder={t('wallet.dialog.amount_step.placeholder').replace('{amount}', formatInstantPrice(minAmountGBP, 'GBP', currency.code))}
             className={errors.amount ? 'border-red-500' : ''}
           />
           {errors.amount && (
@@ -199,7 +203,7 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            Montant minimum: {formatInstantPrice(minAmountGBP, 'GBP', currency.code)}. Les retraits sont traités sous 24-48h ouvrées.
+            {t('wallet.dialog.amount_step.alert').replace('{amount}', formatInstantPrice(minAmountGBP, 'GBP', currency.code))}
           </AlertDescription>
         </Alert>
       </div>
@@ -212,8 +216,8 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
         <div className="p-4 bg-blue-50 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
           <CreditCard className="h-8 w-8 text-blue-600" />
         </div>
-        <h3 className="text-lg font-semibold mb-2">Méthode de paiement</h3>
-        <p className="text-sm text-gray-600">Choisissez comment recevoir vos fonds</p>
+        <h3 className="text-lg font-semibold mb-2">{t('wallet.dialog.method_step.title')}</h3>
+        <p className="text-sm text-gray-600">{t('wallet.dialog.method_step.subtitle')}</p>
       </div>
 
       <div className="space-y-3">
@@ -229,14 +233,14 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
             <div className="flex items-center space-x-3">
               <Building className="h-5 w-5 text-gray-600" />
               <div>
-                <div className="font-medium">Virement bancaire</div>
-                <div className="text-sm text-gray-500">Délai: 1-3 jours ouvrés</div>
+                <div className="font-medium">{t('wallet.dialog.method_step.bank_transfer')}</div>
+                <div className="text-sm text-gray-500">{t('wallet.dialog.method_step.bank_delay')}</div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card 
+        {/* <Card 
           className={`cursor-pointer transition-all ${
             withdrawalData.paymentMethod === 'stripe_connect' 
               ? 'ring-2 ring-primary border-primary' 
@@ -248,12 +252,12 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
             <div className="flex items-center space-x-3">
               <CreditCard className="h-5 w-5 text-blue-600" />
               <div>
-                <div className="font-medium">Stripe Connect</div>
-                <div className="text-sm text-gray-500">Délai: 2-7 jours</div>
+                <div className="font-medium">{t('wallet.dialog.method_step.stripe')}</div>
+                <div className="text-sm text-gray-500">{t('wallet.dialog.method_step.stripe_delay')}</div>
               </div>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </div>
   );
@@ -264,19 +268,19 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
         <div className="p-4 bg-purple-50 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
           <Building className="h-8 w-8 text-purple-600" />
         </div>
-        <h3 className="text-lg font-semibold mb-2">Informations de paiement</h3>
-        <p className="text-sm text-gray-600">Saisissez vos coordonnées bancaires</p>
+        <h3 className="text-lg font-semibold mb-2">{t('wallet.dialog.details_step.title')}</h3>
+        <p className="text-sm text-gray-600">{t('wallet.dialog.details_step.subtitle')}</p>
       </div>
 
       {withdrawalData.paymentMethod === 'bank_transfer' && (
         <div className="space-y-4">
           <div>
-            <Label htmlFor="accountHolderName">Nom du titulaire</Label>
+            <Label htmlFor="accountHolderName">{t('wallet.dialog.details_step.account_name')}</Label>
             <Input
               id="accountHolderName"
               value={withdrawalData.bankDetails?.accountHolderName || ''}
               onChange={(e) => handleBankDetailsChange('accountHolderName', e.target.value)}
-              placeholder="Nom complet du titulaire du compte"
+              placeholder={t('wallet.dialog.details_step.account_name_placeholder')}
               className={errors.accountHolderName ? 'border-red-500' : ''}
             />
             {errors.accountHolderName && (
@@ -285,7 +289,7 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
           </div>
 
           <div>
-            <Label htmlFor="iban">IBAN</Label>
+            <Label htmlFor="iban">{t('wallet.dialog.details_step.iban')}</Label>
             <Input
               id="iban"
               value={withdrawalData.bankDetails?.iban || ''}
@@ -299,7 +303,7 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
           </div>
 
           <div>
-            <Label htmlFor="bic">BIC/SWIFT</Label>
+            <Label htmlFor="bic">{t('wallet.dialog.details_step.bic')}</Label>
             <Input
               id="bic"
               value={withdrawalData.bankDetails?.bic || ''}
@@ -316,7 +320,7 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
 
       {withdrawalData.paymentMethod === 'stripe_connect' && (
         <div>
-          <Label htmlFor="stripeAccountId">Stripe Connect Account ID</Label>
+          <Label htmlFor="stripeAccountId">{t('wallet.dialog.details_step.stripe_account')}</Label>
           <Input
             id="stripeAccountId"
             value={withdrawalData.stripeAccountId || ''}
@@ -338,40 +342,40 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
         <div className="p-4 bg-green-50 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
           <CheckCircle className="h-8 w-8 text-green-600" />
         </div>
-        <h3 className="text-lg font-semibold mb-2">Confirmation</h3>
-        <p className="text-sm text-gray-600">Vérifiez les détails de votre retrait</p>
+        <h3 className="text-lg font-semibold mb-2">{t('wallet.dialog.confirm_step.title')}</h3>
+        <p className="text-sm text-gray-600">{t('wallet.dialog.confirm_step.subtitle')}</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Récapitulatif</CardTitle>
+          <CardTitle className="text-lg">{t('wallet.dialog.confirm_step.summary')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex justify-between">
-            <span className="text-gray-600">Montant:</span>
-            <span className="font-semibold">{withdrawalData.amount}€</span>
+            <span className="text-gray-600">{t('wallet.dialog.confirm_step.amount')}</span>
+            <span className="font-semibold">{withdrawalData.amount}{currency.symbol}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600">Méthode:</span>
+            <span className="text-gray-600">{t('wallet.dialog.confirm_step.method')}</span>
             <span className="font-semibold">
-              {withdrawalData.paymentMethod === 'bank_transfer' ? 'Virement bancaire' : 'Stripe Connect'}
+              {withdrawalData.paymentMethod === 'bank_transfer' ? t('wallet.dialog.method_step.bank_transfer') : t('wallet.dialog.method_step.stripe')}
             </span>
           </div>
           {withdrawalData.paymentMethod === 'bank_transfer' && (
             <>
               <div className="flex justify-between">
-                <span className="text-gray-600">Titulaire:</span>
+                <span className="text-gray-600">{t('wallet.dialog.confirm_step.holder')}</span>
                 <span className="font-semibold">{withdrawalData.bankDetails?.accountHolderName}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">IBAN:</span>
+                <span className="text-gray-600">{t('wallet.dialog.details_step.iban')}:</span>
                 <span className="font-mono text-sm">{withdrawalData.bankDetails?.iban}</span>
               </div>
             </>
           )}
           {withdrawalData.paymentMethod === 'stripe_connect' && (
             <div className="flex justify-between">
-              <span className="text-gray-600">Stripe Account:</span>
+              <span className="text-gray-600">{t('wallet.dialog.confirm_step.stripe_account')}</span>
               <span className="font-semibold">{withdrawalData.stripeAccountId}</span>
             </div>
           )}
@@ -381,7 +385,7 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
       <Alert>
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          Votre demande sera traitée sous 24-48h ouvrées. Vous recevrez une confirmation par email.
+          {t('wallet.dialog.confirm_step.alert')}
         </AlertDescription>
       </Alert>
     </div>
@@ -391,7 +395,7 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Retrait de fonds</DialogTitle>
+          <DialogTitle>{t('wallet.dialog.title')}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
@@ -424,7 +428,7 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
               onClick={handleBack}
               disabled={step === 'amount'}
             >
-              Retour
+              {t('wallet.dialog.buttons.back')}
             </Button>
             
             {step === 'confirmation' ? (
@@ -433,14 +437,14 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
                 disabled={loading}
                 className="bg-green-600 hover:bg-green-700"
               >
-                {loading ? 'Traitement...' : 'Confirmer le retrait'}
+                {loading ? t('wallet.dialog.buttons.processing') : t('wallet.dialog.buttons.confirm')}
               </Button>
             ) : (
               <Button
                 onClick={handleNext}
                 disabled={step === 'amount' && (!withdrawalData.amount || errors.amount)}
               >
-                Suivant
+                {t('wallet.dialog.buttons.next')}
               </Button>
             )}
           </div>

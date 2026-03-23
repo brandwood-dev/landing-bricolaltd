@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { Notification } from '@/components/notifications/NotificationCenter';
 import { apiClient } from '@/services/api';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface UseNotificationsReturn {
   notifications: Notification[];
@@ -18,6 +19,7 @@ interface UseNotificationsReturn {
 
 export const useNotifications = (): UseNotificationsReturn => {
   const { isAuthenticated } = useAuth();
+  const { t } = useLanguage();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -171,6 +173,11 @@ export const useNotifications = (): UseNotificationsReturn => {
       socket.on('new_notification', (notification: Notification) => {
         // Prepend new notification to the list
         setNotifications(prev => [notification, ...prev]);
+        
+        // Handle specific notification types that require a toast
+        if (notification.type === 'withdrawal_completed') {
+          toast.success(t('wallet.withdrawal_success_toast') || 'Opération bien effectuée. Le montant a été déduit.');
+        }
       });
 
       socket.on('notifications', (payload: { notifications: Notification[]; unreadCount: number }) => {
