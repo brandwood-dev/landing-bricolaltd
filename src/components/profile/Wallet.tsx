@@ -269,64 +269,67 @@ const Wallet = () => {
             {/* Withdrawal Button + Dialog */}
             <div className='flex justify-center'>
               {!user?.isVerified ? (
-                <Button
-                  size='lg'
-                  className='px-8 py-3 text-lg font-semibold bg-primary hover:bg-primary/90'
-                  onClick={async () => {
-                    try {
-                      const response = await fetch(
-                        'https://stationapi.veriff.com/v1/sessions',
-                        {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/json',
-                            'X-AUTH-CLIENT':
-                              '4d9b5010-592d-460c-84ae-8461d1a109c7',
-                          },
-                          body: JSON.stringify({
-                            verification: {
-                              person: {
-                                firstName: user?.firstName || '',
-                                lastName: user?.lastName || '',
-                              },
-                              vendorData: user?.id,
+                <div className='flex flex-col items-center gap-2'>
+                  <Button
+                    size='lg'
+                    className={`px-8 py-3 text-lg font-semibold ${
+                      canWithdraw
+                        ? 'bg-primary hover:bg-primary/90'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
+                    disabled={!canWithdraw}
+                    onClick={async () => {
+                      if (!canWithdraw) return;
+                      try {
+                        const data = await userService.createVeriffSession()
+                        if (data && data.verification && data.verification.url) {
+                          createVeriffFrame({
+                            url: data.verification.url,
+                            onEvent: async function (msg) {
+                              switch (msg) {
+                                case 'CANCELED':
+                                  console.log('Veriff CANCELED')
+                                  break
+                                case 'FINISHED':
+                                  console.log('Veriff FINISHED')
+                                  // Polling the status instead of directly verifying
+                                  let attempts = 0;
+                                  const maxAttempts = 12; // 1 minute max polling (every 5s)
+                                  const pollInterval = setInterval(async () => {
+                                    try {
+                                      attempts++;
+                                      const statusData = await userService.checkVeriffStatus();
+                                      if (statusData && statusData.isVerified) {
+                                        clearInterval(pollInterval);
+                                        window.location.reload();
+                                      } else if (attempts >= maxAttempts) {
+                                        clearInterval(pollInterval);
+                                        console.log("Polling timed out. Wait for webhook.");
+                                        // Optional: show a message that it's taking longer
+                                      }
+                                    } catch (err) {
+                                      console.error("Polling error:", err);
+                                    }
+                                  }, 5000);
+                                  break
+                              }
                             },
-                          }),
-                        },
-                      )
-                      const data = await response.json()
-                      if (data.verification && data.verification.url) {
-                        createVeriffFrame({
-                          url: data.verification.url,
-                          onEvent: async function (msg) {
-                            switch (msg) {
-                              case 'CANCELED':
-                                console.log('Veriff CANCELED')
-                                break
-                              case 'FINISHED':
-                                console.log('Veriff FINISHED')
-                                try {
-                                  await userService.verifyUserIdentity()
-                                  window.location.reload()
-                                } catch (err) {
-                                  console.error(
-                                    'Failed to update verification status',
-                                    err,
-                                  )
-                                }
-                                break
-                            }
-                          },
-                        })
+                          })
+                        }
+                      } catch (err) {
+                        console.error('Error starting veriff', err)
                       }
-                    } catch (err) {
-                      console.error('Error starting veriff', err)
-                    }
-                  }}
-                >
-                  <Shield className='h-5 w-5 mr-2' />
-                  {t('profile.verify_account')}
-                </Button>
+                    }}
+                  >
+                    <Shield className='h-5 w-5 mr-2' />
+                    {t('profile.verify_account')}
+                  </Button>
+                  {!canWithdraw && (
+                    <p className='text-sm text-amber-600'>
+                      {t('wallet.verify_min_amount_required')}
+                    </p>
+                  )}
+                </div>
               ) : (
                 <Button
                   size='lg'

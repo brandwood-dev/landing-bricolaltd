@@ -36,7 +36,7 @@ const PolitiqueRemboursement = () => {
               </CardContent>
             </Card>
 
-            {/* Section 2: Access to the Platform */}
+            {/* Section 2: Access to the Platform
             <Card>
               <CardHeader className={`flex ${language === 'ar' ? 'justify-end' : 'justify-start'}`}>
                 <CardTitle>{t('refundPolicy.deposit.title')}</CardTitle>
@@ -52,7 +52,7 @@ const PolitiqueRemboursement = () => {
                   {t('refundPolicy.deposit.rule3')}
                 </p>
               </CardContent>
-            </Card>
+            </Card> */}
 
             {/* Section 3: Registration and User Verification */}
             <Card>
@@ -75,9 +75,7 @@ const PolitiqueRemboursement = () => {
                 <p className="text-gray-600 mb-4">
                   {t('refundPolicy.disputes.rule1')}
                 </p>
-                <p className="text-gray-600 mb-4">
-                  {t('refundPolicy.disputes.rule2')}
-                </p>
+               
               </CardContent>
             </Card>
             <Card>

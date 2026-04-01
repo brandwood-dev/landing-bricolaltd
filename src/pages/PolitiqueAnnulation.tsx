@@ -50,7 +50,7 @@ const PolitiqueAnnulation = () => {
               </CardContent>
             </Card>
 
-            {/* Section 3: Registration and User Verification */}
+            {/* Section 3: Registration and User Verification
             <Card>
               <CardHeader className={`flex ${language === 'ar' ? 'justify-end' : 'justify-start'}`}>
                 <CardTitle>{t('cancellationPolicy.maxDuration.title')}</CardTitle>
@@ -60,7 +60,7 @@ const PolitiqueAnnulation = () => {
                   {t('cancellationPolicy.maxDuration.rule')}
                 </p>
               </CardContent>
-            </Card>
+            </Card> */}
 
             {/* Section 4: Rental Rules and Responsibilities */}
             <Card>

@@ -35,9 +35,18 @@ class UserService {
     }
   }
 
-  async verifyUserIdentity() {
+  async createVeriffSession() {
     try {
-      const response = await api.post<ApiResponse<any>>(`/users/me/verify-identity`)
+      const response = await api.post<ApiResponse<any>>(`/users/me/veriff-session`)
+      return response.data.data
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async checkVeriffStatus() {
+    try {
+      const response = await api.get<ApiResponse<{ isVerified: boolean }>>(`/users/me/veriff-status`)
       return response.data.data
     } catch (error) {
       throw error

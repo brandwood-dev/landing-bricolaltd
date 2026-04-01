@@ -196,24 +196,8 @@ const ProfileInfo = () => {
 
   const handleVeriff = async () => {
     try {
-      const response = await fetch('https://stationapi.veriff.com/v1/sessions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-AUTH-CLIENT': '4d9b5010-592d-460c-84ae-8461d1a109c7'
-        },
-        body: JSON.stringify({
-          verification: {
-            person: {
-              firstName: userInfo.firstName,
-              lastName: userInfo.lastName,
-            },
-            vendorData: user?.id
-          }
-        })
-      });
-      const data = await response.json();
-      if (data.verification && data.verification.url) {
+      const data = await userService.createVeriffSession()
+      if (data && data.verification && data.verification.url) {
         createVeriffFrame({
           url: data.verification.url,
           onEvent: async function(msg) {
@@ -223,13 +207,24 @@ const ProfileInfo = () => {
                 break;
               case 'FINISHED':
                 console.log('Veriff FINISHED');
-                try {
-                  await userService.verifyUserIdentity();
-                  // Reload page or update state to reflect verified status
-                  window.location.reload();
-                } catch (err) {
-                  console.error('Failed to update verification status', err);
-                }
+                // Polling the status
+                let attempts = 0;
+                const maxAttempts = 12;
+                const pollInterval = setInterval(async () => {
+                  try {
+                    attempts++;
+                    const statusData = await userService.checkVeriffStatus();
+                    if (statusData && statusData.isVerified) {
+                      clearInterval(pollInterval);
+                      window.location.reload();
+                    } else if (attempts >= maxAttempts) {
+                      clearInterval(pollInterval);
+                      console.log("Polling timed out. Wait for webhook.");
+                    }
+                  } catch (err) {
+                    console.error("Polling error:", err);
+                  }
+                }, 5000);
                 break;
             }
           }
@@ -732,25 +727,15 @@ const ProfileInfo = () => {
                 {userInfo.firstName} {userInfo.lastName}
               </h3>
               <div className='flex flex-wrap items-center justify-center gap-2 mt-2'>
-                {userInfo.isVerified ? (
-                  <Badge
-                    variant='default'
-                    className='flex items-center gap-1 text-xs'
-                  >
-                    <Shield className='h-3 w-3' />
-                    {t('profile.verified')}
-                  </Badge>
-                ) : (
-                  <Button 
-                    variant="default" 
-                    size="sm" 
-                    className="h-7 text-xs flex items-center gap-1"
-                    onClick={handleVeriff}
-                  >
-                    <Shield className="h-3 w-3" />
-                    {t('profile.verify_account')}
-                  </Button>
-                )}
+                   {userInfo.isVerified && (
+                                    <Badge
+                                      variant='default'
+                                      className='flex items-center gap-1 text-xs'
+                                    >
+                                      <Shield className='h-3 w-3' />
+                                      {t('profile.verified')}
+                                    </Badge>
+                                  )}
               </div>
             </div>
           </div>

@@ -5,6 +5,8 @@ import {
   Twitter,
   Instagram,
   Mail,
+  // adresse
+  MapPin,
   Youtube,
   Linkedin,
 } from 'lucide-react'
@@ -64,6 +66,12 @@ const Footer = () => {
             <p className='text-gray-400 mb-4 max-w-md md:mb-10'>
               {t('footer.description')}
             </p>
+            {/* integrer l'adresse de societé : 24-26 Arcadia Avenue, Fin009, London, United Kingdom, N3 2JU */}
+
+            <div className='text-gray-400 mb-4 max-w-md md:mb-10 flex items-center justify-center'>
+              <MapPin className='h-5 w-5 ' />
+              <p>24-26 Arcadia Avenue, Fin009, London, United Kingdom</p>
+            </div>
             <div
               className={`flex space-x-4 ${
                 language === 'ar' ? 'justify-end' : 'justify-start'
@@ -219,18 +227,20 @@ const Footer = () => {
             <ul className='space-y-2 text-gray-400  '>
               <li
                 className={
-                  'flex items-center ' +
+                  'flex items-center inline-flex items-center gap-2 bg-[#22d6d6] text-white text-bold px-3 py-1.5 rounded-md hover:bg-[#128C7E] transition-colors text-sm font-medium' +
                   (language === 'ar' ? '[direction:ltr]' : '')
                 }
               >
                 <Mail
-                  className={'h-4 w-4 ' + (language === 'ar' ? 'ml-2' : 'mr-2')}
+                  className={
+                    'h-4 w-4  ' + (language === 'ar' ? 'ml-2' : 'mr-2')
+                  }
                 />
                 support@bricolaltd.com
               </li>
               <li
                 className={
-                  'flex items-center ' +
+                  'flex items-center  ' +
                   (language === 'ar' ? '[direction:ltr]' : '')
                 }
               >

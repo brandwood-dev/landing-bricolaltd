@@ -282,7 +282,7 @@ const translations = {
       'Cette caution est libérée 24 heures après la restitution de l’outil, sous réserve de vérification de son bon état.',
     'refundPolicy.deposit.rule3':
       'En cas de dommages, perte ou litige, Bricola peut retenir tout ou partie de la caution après avoir informé l’utilisateur par email.',
-    'refundPolicy.lateReturns.title': 'Retards de retour et pénalités :',
+    'refundPolicy.lateReturns.title': 'Retards de retour :',
     // Profile translations
     'profile.photo_title': 'Photo de profil',
     'profile.photo_description': 'Gérez votre photo de profil',
@@ -392,10 +392,10 @@ const translations = {
     'notifications.booking_accepted': 'Réservation acceptée',
 
     'refundPolicy.lateReturns.rule':
-      'Les retards dans la restitution peuvent entraîner des pénalités calculées à l’heure ou à la journée, selon les règles fixées par la plateforme.',
+      'Tout retard dans la restitution de l`objet peut entraîner la déduction par le bailleur d`une partie du dépôt de garantie, calculée sur une base horaire ou journalière.',
     'refundPolicy.disputes.title': 'Gestion des litiges :',
     'refundPolicy.disputes.rule1':
-      'Toute réclamation doit être signalée dans les 24 heures suivant la date prévue de retour.',
+      'En cas de problème quelconque avec le processus de location, le locataire a le droit d`annuler la transaction et de recevoir un remboursement automatique avant la confirmation définitive.',
     'refundPolicy.disputes.rule2':
       'L’équipe support de Bricola enquête sous 72 heures et prend une décision finale, qui est contraignante pour les deux parties.',
     'refundPolicy.payments.title': 'Paiements et frais :',
@@ -1240,6 +1240,8 @@ const translations = {
     'wallet.dialog.buttons.processing': 'Traitement...',
     'wallet.dialog.errors.invalid_amount': 'Veuillez saisir un montant valide',
     'wallet.dialog.errors.iban_required': 'IBAN requis',
+    'wallet.verify_min_amount_required':
+      'Un solde de 50£ minimum est requis pour vérifier votre compte et retirer vos fonds',
     'wallet.dialog.errors.bic_required': 'BIC requis',
     'wallet.dialog.errors.name_required': 'Nom du titulaire requis',
     'wallet.dialog.errors.paypal_required': 'Email PayPal requis',
@@ -2424,12 +2426,12 @@ const translations = {
       'The deposit is released 24 hours after the tool’s return, pending condition verification.',
     'refundPolicy.deposit.rule3':
       'In cases of damage, loss, or disputes, Bricola may withhold part or all of the deposit after notifying the user by email.',
-    'refundPolicy.lateReturns.title': 'Late returns and penalties:',
+    'refundPolicy.lateReturns.title': 'Late returns:',
     'refundPolicy.lateReturns.rule':
-      'Late returns may result in penalties charged hourly or daily, according to platform rules.',
+      'Delay in returning the item may result in the lessor deducting part of the security deposit on an hourly or daily basis.',
     'refundPolicy.disputes.title': 'Dispute resolution:',
     'refundPolicy.disputes.rule1':
-      'Disputes must be reported within 24 hours after the scheduled return date.',
+      'In the event of any problem with the rental process, the tenant has the right to cancel the transaction and receive an automatic refund before final confirmation.',
     'refundPolicy.disputes.rule2':
       'Bricola’s support team investigates within 72 hours and issues a final, binding decision.',
     'refundPolicy.payments.title': 'Payments and fees:',
@@ -3160,7 +3162,9 @@ const translations = {
     'wallet.dialog.buttons.processing': 'Processing...',
     'wallet.dialog.errors.invalid_amount': 'Please enter a valid amount',
     'wallet.dialog.errors.iban_required': 'IBAN is required',
-    'wallet.dialog.errors.bic_required': 'BIC is required',
+    'wallet.verify_min_amount_required':
+      'A minimum balance of £50 is required to verify your account and withdraw funds',
+    'wallet.dialog.errors.bic_required': 'BIC required',
     'wallet.dialog.errors.name_required': 'Account holder name is required',
     'wallet.dialog.errors.paypal_required': 'PayPal email is required',
     'wallet.dialog.errors.creation_failed':
@@ -4260,7 +4264,7 @@ const translations = {
     'search.sort.name_asc': 'الاسم من أ إلى ي',
     'search.sort.name_desc': 'الاسم من ي إلى أ',
     'search.sort.lowest_rated': 'الأقل تقييماً',
-    'wallet.subtitle': 'إدارة أموالك وتتبع معاملاتك',
+    'wallet.subtitle': 'إدارة مستحقاتك وتتبع معاملاتك',
     'wallet.available_balance': 'مستحقّات جاهزة للدفع',
     'wallet.total_balance': 'إجمالي المستحقّات',
     'wallet.successful_transactions': 'المعاملات الناجحة',
@@ -4534,12 +4538,12 @@ const translations = {
       'تُفرج الودیعة بعد 24 ساعة من إرجاع الأداة، بشرط التحقق من حالتھا.',
     'refundPolicy.deposit.rule3':
       'في حالات التلف أو الفقدان أو النزاعات، قد تحتفظ Bricola بجزء أو كامل الودیعة بعد إعلام المستخدم عبر البريد الإلكتروني.',
-    'refundPolicy.lateReturns.title': 'التأخیر في الإرجاع والعقوبات:',
+    'refundPolicy.lateReturns.title': 'التأخیر في الإرجاع:',
     'refundPolicy.lateReturns.rule':
-      'قد یؤدي التأخیر في الإرجاع إلى فرض عقوبات تُحسب بالساعة أو الیوم وفقًا لقواعد المنصة.',
+      'قد یؤدي التأخیر في الإرجاع إلى اقتطاع جزء من مبلغ الضمان من طرف المؤجر بالساعة  أو الیوم.',
     'refundPolicy.disputes.title': 'حل النزاعات:',
     'refundPolicy.disputes.rule1':
-      'یجب الإبلاغ عن النزاعات خلال 24 ساعة من تاریخ الإرجاع المحدد.',
+      'في حالة حدوث أي مشكلة في عملية التأجير، يحق للمستأجر إلغاء المعاملة واسترداد المبلغ المدفوع تلقائيًا قبل التأكيد النهائي.',
     'refundPolicy.disputes.rule2':
       'یحقق فریق الدعم خلال 72 ساعة ویصدر قرارًا نھائیًا وملزمًا للطرفین.',
     'refundPolicy.payments.title': 'المدفوعات والرسوم:',
@@ -5183,7 +5187,7 @@ const translations = {
     'wallet.dialog.amount_step.error.max':
       'المبلغ لا يمكن أن يتجاوز الرصيد المتاح',
     'wallet.dialog.method_step.title': 'طريقة الدفع',
-    'wallet.dialog.method_step.subtitle': 'اختر كيفية استلام أموالك',
+    'wallet.dialog.method_step.subtitle': 'اختر كيفية استلام مستحقاتك',
     'wallet.dialog.method_step.bank_transfer': 'تحويل بنكي',
     'wallet.dialog.method_step.bank_delay': 'وقت المعالجة: 1-3 أيام عمل',
     'wallet.dialog.method_step.stripe': 'سترايب كونكت',
@@ -5211,6 +5215,8 @@ const translations = {
     'wallet.dialog.buttons.processing': 'جاري المعالجة...',
     'wallet.dialog.errors.invalid_amount': 'الرجاء إدخال مبلغ صحيح',
     'wallet.dialog.errors.iban_required': 'رقم IBAN مطلوب',
+    'wallet.verify_min_amount_required':
+      'يلزم وجود رصيد بحد أدنى 50 جنيهًا إسترلينيًا لتوثيق حسابك وسحب مستحقاتك',
     'wallet.dialog.errors.bic_required': 'رمز BIC مطلوب',
     'wallet.dialog.errors.name_required': 'اسم صاحب الحساب مطلوب',
     'wallet.dialog.errors.paypal_required': 'البريد الإلكتروني لـ PayPal مطلوب',

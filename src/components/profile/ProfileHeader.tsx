@@ -165,7 +165,7 @@ const ProfileHeader = ({ userInfo, stats }: ProfileHeaderProps) => {
                   {userInfo.firstName} {userInfo.lastName}
                 </h1>
                 <div className='flex flex-wrap justify-center sm:justify-start gap-2'>
-                  {userInfo.isVerified ? (
+                  {userInfo.isVerified && (
                     <Badge
                       variant='default'
                       className='flex items-center gap-1 text-xs'
@@ -173,68 +173,10 @@ const ProfileHeader = ({ userInfo, stats }: ProfileHeaderProps) => {
                       <Shield className='h-3 w-3' />
                       {t('profile.verified')}
                     </Badge>
-                  ) : (
-                    <Button 
-                      variant="default" 
-                      size="sm" 
-                      className="h-7 text-xs flex items-center gap-1"
-                      onClick={async () => {
-                        try {
-                          const response = await fetch('https://stationapi.veriff.com/v1/sessions', {
-                            method: 'POST',
-                            headers: {
-                              'Content-Type': 'application/json',
-                              'X-AUTH-CLIENT': '4d9b5010-592d-460c-84ae-8461d1a109c7'
-                            },
-                            body: JSON.stringify({
-                              verification: {
-                                person: {
-                                  firstName: userInfo.firstName,
-                                  lastName: userInfo.lastName,
-                                },
-                                vendorData: userInfo.id || 'user_id'
-                              }
-                            })
-                          });
-                          const data = await response.json();
-                          if (data.verification && data.verification.url) {
-                            createVeriffFrame({
-                              url: data.verification.url,
-                              onEvent: async function(msg) {
-                                switch(msg) {
-                                  case 'CANCELED':
-                                    console.log('Veriff CANCELED');
-                                    break;
-                                  case 'FINISHED':
-                                    console.log('Veriff FINISHED');
-                                    try {
-                                      await userService.verifyUserIdentity();
-                                      // Reload page or update state to reflect verified status
-                                      window.location.reload();
-                                    } catch (err) {
-                                      console.error('Failed to update verification status', err);
-                                    }
-                                    break;
-                                }
-                              }
-                            });
-                          }
-                        } catch (err) {
-                          console.error('Error starting veriff', err);
-                        }
-                      }}
-                    >
-                      <Shield className="h-3 w-3" />
-                      {t('profile.verify_account')}
-                    </Button>
                   )}
                 </div>
               </div>
-              {/* {isAccountDeletionPending && (
-                <Badge variant='destructive' className='mb-2 text-xs'>
-                  {t('profile.account_deletion_pending')}
-                </Badge>
-              )} */}
+             
               <div
                 className={`text-gray-600 mb-4 text-sm sm:text-base ${
                   language === 'ar' ? 'text-right sm:text-right' : ''

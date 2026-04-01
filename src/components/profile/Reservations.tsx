@@ -51,7 +51,11 @@ import {
   Check,
 } from 'lucide-react'
 
-import { generateRentalContract } from '@/utils/contractGenerator'
+import {
+  generateRentalContract,
+  generateRentalContractFr,
+  generateRentalContractAr,
+} from '@/utils/contractGenerator'
 import RequestsAndReservationsFilters from './RequestsAndReservationsFilters'
 import {
   Pagination,
@@ -429,14 +433,32 @@ const Reservations = () => {
       totalPrice: reservation.price,
       deposit: reservation.deposit,
     }
-
-    generateRentalContract(contractData)
-
-    toast({
+// selon la langue 
+    if (language === 'fr') {
+      generateRentalContractFr(contractData)
+      toast({
       title: 'Contrat téléchargé',
       description:
         'Le contrat de location a été généré et téléchargé avec succès.',
     })
+    } else if (language === 'ar') {
+      generateRentalContractAr(contractData)
+      //toast en arabe Contrat téléchargé'
+      toast({
+      title: 'تم تنزيل العقد.',
+      description:
+        'تم إنشاء اتفاقية الإيجار وتنزيلها بنجاح.',
+    })
+    } else {
+      generateRentalContractFr(contractData)
+      toast({
+        title: 'Contract downloaded',
+        description:
+          'The rental agreement was successfully generated and downloaded.',
+      })
+    }
+
+    
   }
   const handleDetailClick = (toolId: string) => {
     navigate(`/tool/${toolId}`)

@@ -124,7 +124,7 @@ const Login = () => {
                     id="email" 
                     name="email"
                     type="email" 
-                    placeholder="votre@email.com"
+                    placeholder="your@email.com"
                     value={formData.email}
                     onChange={handleInputChange}
                     className={errors.email ? 'border-red-500' : ''}
