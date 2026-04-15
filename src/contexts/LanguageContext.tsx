@@ -259,7 +259,7 @@ const translations = {
     'ownersGuide.step5.title': 'Organisez la livraison et la restitution',
     'ownersGuide.step5.description':
       'Mettez-vous d’accord avec le locataire sur le mode et le lieu de remise de l’outil pour que tout se passe facilement.',
-    'ownersGuide.step6.title': 'Recevez vos paiements',
+    'ownersGuide.step6.title': 'Recevez vos gains',
     'ownersGuide.step6.description':
       'Une fois la location terminée, le montant dû sera versé. Vous pourrez retirer l’argent dès que vous atteindrez le seuil minimum.',
     'ownersGuide.step7.title': 'Conseils',
@@ -390,6 +390,142 @@ const translations = {
     'notifications.tool_returned': 'Outil retourné',
     'notifications.booking_started': 'Réservation commencée',
     'notifications.booking_accepted': 'Réservation acceptée',
+    'notifications.view_all': 'Voir toutes les notifications',
+    'notifications.content.booking_created_renter.title': 'Réservation créée',
+    'notifications.content.booking_created_renter.message':
+      'Votre demande de réservation pour "{toolName}" a été soumise et est en attente de confirmation.',
+    'notifications.content.booking_created_owner.title':
+      'Nouvelle demande de réservation',
+    'notifications.content.booking_created_owner.message':
+      '{userName} souhaite réserver votre outil "{toolName}" du {startDate} au {endDate}.',
+    'notifications.content.booking_confirmed_renter.title':
+      'Réservation confirmée',
+    'notifications.content.booking_confirmed_renter.message':
+      'Votre réservation pour "{toolName}" a été confirmée. Vous pouvez récupérer l’outil le {startDate}.',
+    'notifications.content.booking_confirmed_owner.title':
+      'Réservation confirmée',
+    'notifications.content.booking_confirmed_owner.message':
+      'Vous avez confirmé la réservation de "{toolName}" pour {userName}.',
+    'notifications.content.booking_accepted_renter.title':
+      'Réservation acceptée',
+    'notifications.content.booking_accepted_renter.message':
+      'Votre réservation pour "{toolName}" a été acceptée. Code de validation: {validationCode}.',
+    'notifications.content.booking_accepted_owner.title':
+      'Réservation acceptée',
+    'notifications.content.booking_accepted_owner.message':
+      'Vous avez accepté la réservation de "{toolName}" pour {userName}. Code de validation: {validationCode}.',
+    'notifications.content.booking_cancelled_renter.title':
+      'Réservation annulée',
+    'notifications.content.booking_cancelled_renter.message':
+      'Votre réservation pour "{toolName}" a été annulée par le propriétaire. {reason}',
+    'notifications.content.booking_cancelled_owner.title':
+      'Réservation annulée',
+    'notifications.content.booking_cancelled_owner.message':
+      '{userName} a annulé sa réservation pour "{toolName}". {reason}',
+    'notifications.content.booking_rejected_renter.title':
+      'Demande de réservation refusée',
+    'notifications.content.booking_rejected_renter.message':
+      'Votre demande de réservation pour "{toolName}" a été refusée. {reason}',
+    'notifications.content.booking_rejected_owner.title':
+      'Demande de réservation refusée',
+    'notifications.content.booking_rejected_owner.message':
+      'Vous avez refusé la demande de réservation de "{toolName}" par {userName}.',
+    'notifications.content.booking_started_renter.title':
+      'Réservation commencée',
+    'notifications.content.booking_started_renter.message':
+      'Votre réservation pour "{toolName}" a commencé. Profitez bien de votre location.',
+    'notifications.content.booking_started_owner.title':
+      'Réservation commencée',
+    'notifications.content.booking_started_owner.message':
+      'La réservation de "{toolName}" par {userName} a commencé.',
+    'notifications.content.booking_completed_renter.title':
+      'Réservation terminée',
+    'notifications.content.booking_completed_renter.message':
+      'Votre réservation pour "{toolName}" est maintenant terminée. N’oubliez pas de laisser un avis.',
+    'notifications.content.booking_completed_owner.title':
+      'Réservation terminée',
+    'notifications.content.booking_completed_owner.message':
+      'La réservation de "{toolName}" par {userName} est maintenant terminée.',
+    'notifications.content.booking_pickup_reminder.title':
+      'Rappel de récupération',
+    'notifications.content.booking_pickup_reminder.message':
+      'N’oubliez pas de récupérer "{toolName}" demain ({startDate}).',
+    'notifications.content.booking_handover_reminder.title':
+      'Rappel de remise',
+    'notifications.content.booking_handover_reminder.message':
+      'Rappel: {userName} doit récupérer "{toolName}" demain.',
+    'notifications.content.booking_return_reminder.title':
+      'Rappel de retour',
+    'notifications.content.booking_return_reminder_renter.message':
+      'N’oubliez pas de retourner "{toolName}" demain ({endDate}).',
+    'notifications.content.booking_return_reminder_owner.message':
+      'Rappel: {userName} doit retourner "{toolName}" demain.',
+    'notifications.content.booking_overdue_renter.title': 'Retour en retard',
+    'notifications.content.booking_overdue_renter.message':
+      'Votre réservation pour "{toolName}" est en retard. Veuillez retourner l’outil dès que possible.',
+    'notifications.content.booking_overdue_owner.title': 'Retour en retard',
+    'notifications.content.booking_overdue_owner.message':
+      'La réservation de "{toolName}" par {userName} est en retard.',
+    'notifications.content.payment_confirmed_renter.title':
+      'Paiement confirmé',
+    'notifications.content.payment_confirmed_renter.message':
+      'Votre paiement pour la réservation de "{toolName}" a été confirmé.',
+    'notifications.content.payment_received_owner.title': 'Paiement reçu',
+    'notifications.content.payment_received_owner.message':
+      'Le paiement pour la réservation de "{toolName}" par {userName} a été reçu.',
+    'notifications.content.payment_failed.title': 'Échec du paiement',
+    'notifications.content.payment_failed.message':
+      'Le paiement pour votre réservation de "{toolName}" a échoué. Veuillez réessayer.',
+    'notifications.content.tool_returned_owner.title': 'Outil retourné',
+    'notifications.content.tool_returned_owner.message':
+      '{userName} a confirmé le retour de "{toolName}". {notes}',
+    'notifications.content.return_confirmed_renter.title':
+      'Retour confirmé',
+    'notifications.content.return_confirmed_renter.message':
+      'Vous avez confirmé le retour de "{toolName}". Merci pour votre location.',
+    'notifications.content.deposit_required.title':
+      'Paiement d’acompte requis',
+    'notifications.content.deposit_required.message':
+      'Votre réservation pour "{toolName}" nécessite un paiement d’acompte. Veuillez effectuer le paiement pour confirmer votre réservation.',
+    'notifications.content.deposit_overdue_cancelled.title':
+      'Réservation annulée - acompte impayé',
+    'notifications.content.deposit_overdue_cancelled_renter.message':
+      'Votre réservation pour "{toolName}" a été automatiquement annulée car l’acompte n’a pas été payé dans les délais.',
+    'notifications.content.deposit_overdue_cancelled_owner.message':
+      'La réservation de {userName} pour "{toolName}" a été automatiquement annulée car l’acompte n’a pas été payé.',
+    'notifications.content.deposit_paid_renter.title':
+      'Acompte payé avec succès',
+    'notifications.content.deposit_paid_renter.message':
+      'Votre acompte pour la réservation de "{toolName}" a été payé avec succès. Votre réservation est maintenant confirmée.',
+    'notifications.content.deposit_received_owner.title': 'Acompte reçu',
+    'notifications.content.deposit_received_owner.message':
+      'L’acompte pour la réservation de {userName} pour "{toolName}" a été reçu. La réservation est confirmée.',
+    'notifications.content.dispute_created.title': 'Nouvelle réclamation',
+    'notifications.content.dispute_created.message':
+      '{userName} a créé une réclamation concernant "{toolName}". Motif: {reason}',
+    'notifications.content.tool_rejected.title': 'Outil rejeté',
+    'notifications.content.tool_rejected.message':
+      'Votre outil "{toolName}" a été rejeté. Raison: {reason}.',
+    'notifications.content.tool_approved.title': 'Outil approuvé',
+    'notifications.content.withdrawal_completed.title': 'Retrait terminé',
+    'notifications.content.withdrawal_completed.message':
+      'Votre retrait de {amount} a été effectué avec succès.',
+    'notifications.content.account_deletion_request.title':
+      'Demande de suppression reçue',
+    'notifications.content.account_deletion_request.message':
+      'Votre demande de suppression de compte a été reçue.',
+    'notifications.content.account_deletion_pending.title':
+      'Demande en attente',
+    'notifications.content.account_deletion_pending.message':
+      'Votre demande est en attente d’approbation.',
+    'notifications.content.account_deletion_approved.title':
+      'Demande approuvée',
+    'notifications.content.account_deletion_approved.message':
+      'Votre demande a été approuvée.',
+    'notifications.content.account_deletion_cancelled.title':
+      'Demande annulée',
+    'notifications.content.account_deletion_cancelled.message':
+      'Votre demande a été annulée.',
 
     'refundPolicy.lateReturns.rule':
       'Tout retard dans la restitution de l`objet peut entraîner la déduction par le bailleur d`une partie du dépôt de garantie, calculée sur une base horaire ou journalière.',
@@ -812,6 +948,56 @@ const translations = {
     'ads.owner_instructions': 'Consignes du propriétaire',
     'ads.owner_instructions_placeholder':
       'Prévoir une rallonge électrique, nettoyer après usage...',
+    'ads.edit.title_tooltip': 'Donnez un titre clair et descriptif à votre outil',
+    'ads.edit.description_tooltip':
+      'Décrivez votre outil en détail pour attirer les locataires',
+    'ads.edit.price_tooltip': 'Prix de location par jour',
+    'ads.edit.validation_error_title': 'Erreur de validation',
+    'ads.edit.validation_error_description':
+      'Veuillez corriger les erreurs dans le formulaire',
+    'ads.edit.current_photos': 'Photos actuelles',
+    'ads.edit.new_photos': 'Nouvelles photos',
+    'ads.edit.primary_photo': 'Principale',
+    'ads.edit.set_primary_photo': 'Définir comme principale',
+    'ads.edit.deleting_photo': 'Suppression...',
+    'ads.edit.uploading_photo': 'Upload...',
+    'ads.edit.add_photos': 'Ajouter des photos',
+    'ads.edit.click_to_upload': 'Cliquez pour uploader',
+    'ads.edit.drag_and_drop': 'ou glissez-déposez',
+    'ads.edit.photo_format': 'PNG, JPG, JPEG (MAX. 10MB par fichier)',
+    'ads.edit.renter_instructions_title': 'Instructions pour le locataire',
+    'ads.edit.special_instructions': 'Instructions spéciales (optionnel)',
+    'ads.edit.instructions_tooltip':
+      "Instructions particulières pour l'utilisation ou la récupération de l'outil",
+    'ads.edit.instructions_placeholder':
+      'Ex: Récupération possible uniquement le week-end, clés disponibles chez le voisin, etc.',
+    'ads.edit.cancel': 'Annuler',
+    'ads.edit.saving': 'Sauvegarde...',
+    'ads.edit.save': 'Sauvegarder',
+    'ads.edit.not_defined': 'Non définie',
+    'ads.edit.deposit_placeholder': '100',
+    'ads.edit.photo_ignored_title': 'Attention',
+    'ads.edit.photo_ignored_description':
+      'Certains fichiers ont été ignorés (format non supporté ou taille > 10MB)',
+    'ads.edit.photo_deleted_title': 'Succès',
+    'ads.edit.photo_deleted_description': 'Photo supprimée avec succès',
+    'ads.edit.photo_delete_error': 'Impossible de supprimer la photo',
+    'ads.edit.photo_primary_title': 'Succès',
+    'ads.edit.photo_primary_description':
+      'Photo principale définie avec succès',
+    'ads.edit.photo_primary_error':
+      'Impossible de définir la photo principale',
+    'ads.edit.photo_upload_error': "Impossible d'uploader la photo {name}",
+    'ads.edit.update_success_title': 'Succès',
+    'ads.edit.update_success_description':
+      "L'outil a été mis à jour avec succès",
+    'ads.edit.update_error_title': 'Erreur',
+    'ads.edit.update_error_description':
+      'Une erreur est survenue lors de la mise à jour',
+    'ads.edit.current_location': 'Localisation actuelle',
+    'ads.edit.address': 'Adresse',
+    'ads.edit.latitude': 'Latitude',
+    'ads.edit.longitude': 'Longitude',
 
     'claim.sent': 'Réclamation envoyée',
     'claim.sent_message':
@@ -878,8 +1064,82 @@ const translations = {
     'general.status': 'Statut',
     'general.public': 'Public',
     'general.categories': 'Catégories',
+    'general.unknown_owner': 'Propriétaire inconnu',
+    'general.unknown_renter': 'Locataire inconnu',
+    'general.tool_not_specified': 'Outil non spécifié',
+    'general.location_not_specified': 'Lieu non spécifié',
 
     // bookings
+    'booking.details.title': 'Détails de la réservation',
+    'booking.details.summary': 'Résumé de la réservation',
+    'booking.details.actions': 'Actions disponibles',
+    'booking.details.tool_info': "Informations de l'outil",
+    'booking.details.booking_info': 'Informations de réservation',
+    'booking.details.participants': 'Participants',
+    'booking.details.pricing': 'Montants et paiement',
+    'booking.details.notes': 'Messages et remarques',
+    'booking.details.history': 'Historique de réservation',
+    'booking.details.back_to_profile': 'Retour au profil',
+    'booking.details.open_tool': "Voir l'outil",
+    'booking.details.no_extra_history':
+      "Aucun historique complémentaire pour l'instant.",
+    'booking.details.cancel_dialog': 'Annuler la réservation',
+    'booking.details.reject_dialog': 'Refuser la demande',
+    'booking.details.claim_dialog': 'Signaler un problème',
+    'booking.details.review_dialog': 'Laisser un avis',
+    'booking.details.claim_type': 'Type de problème',
+    'booking.details.claim_description': 'Description du problème',
+    'booking.details.claim_upload': 'Pièces jointes',
+    'booking.details.generated_code': 'Code généré',
+    'booking.details.copy_code': 'Copier le code',
+    'booking.details.pickup_ready':
+      'Le code devient visible à la date de début de réservation.',
+    'booking.details.refund_notice': 'Politique de remboursement',
+    'booking.details.full_refund': 'Remboursement intégral appliqué.',
+    'booking.details.no_refund':
+      "Aucun remboursement selon la fenêtre d'annulation actuelle.",
+    'booking.details.submit': 'Confirmer',
+    'booking.details.selected_files': 'Fichiers sélectionnés',
+    'booking.details.not_found': 'Réservation introuvable.',
+    'booking.details.no_access':
+      "Vous n'avez pas accès à cette réservation.",
+    'booking.details.no_actions':
+      "Aucune action n'est disponible pour ce statut.",
+    'booking.details.image_upload_hint':
+      'Images uniquement, maximum 1MB par fichier',
+    'booking.details.tool_brand_model': 'Marque et modèle',
+    'booking.details.tool_condition': "État de l'outil",
+    'booking.details.tool_category': 'Catégorie',
+    'booking.details.tool_subcategory': 'Sous-catégorie',
+    'booking.details.payment_status': 'Statut du paiement',
+    'booking.details.refund_amount': 'Montant remboursé',
+    'booking.details.contract_downloaded_title': 'Contrat téléchargé',
+    'booking.details.contract_downloaded_message':
+      'Le contrat de location a été généré et téléchargé avec succès.',
+    'booking.details.copy_code_error': 'Impossible de copier le code.',
+    'booking.history.action.CREATED': 'Réservation créée',
+    'booking.history.action.ACCEPTED': 'Demande acceptée',
+    'booking.history.action.VALIDATION_CODE_GENERATED':
+      'Code de validation généré',
+    'booking.history.action.PAYMENT_CAPTURED': 'Paiement capturé',
+    'booking.history.action.DEPOSIT_CAPTURE_SCHEDULED':
+      'Capture de caution planifiée',
+    'booking.history.action.DEPOSIT_NOTIFICATION_SENT':
+      'Notification de caution envoyée',
+    'booking.history.action.DEPOSIT_CAPTURED': 'Caution capturée',
+    'booking.history.action.ONGOING': 'Réservation en cours',
+    'booking.history.action.RETURN_CONFIRMED': 'Retour confirmé par le locataire',
+    'booking.history.action.PICKUP_CONFIRMED':
+      'Récupération confirmée par le propriétaire',
+    'booking.history.action.COMPLETED': 'Réservation terminée',
+    'booking.history.action.CANCELLED': 'Réservation annulée',
+    'booking.history.action.REJECTED': 'Demande refusée',
+    'booking.history.action.CLAIM_OPENED': 'Réclamation ouverte',
+    'booking.history.action.REFUND_PROCESSED': 'Remboursement traité',
+    'booking.history.actor.SYSTEM': 'Système',
+    'booking.history.actor.RENTER': 'Locataire',
+    'booking.history.actor.OWNER': 'Propriétaire',
+    'booking.history.actor.ADMIN': 'Administration',
     'booking.cancelled': 'Réservation annulée',
     'booking.cancelled_message': 'Votre réservation a été annulée avec succès.',
     'booking.wait': 'En attente de confirmation de remise par le propriétaire.',
@@ -1123,7 +1383,7 @@ const translations = {
       'Les locataires vous contactent directement pour réserver vos outils aux dates souhaitées.',
     'rental_process.step4.title': 'Percevez vos revenus en toute sérénité',
     'rental_process.step4.description':
-      'Recevez vos paiements de manière sécurisée et générez des revenus supplémentaires.',
+      'Recevez vos gains de manière sécurisée et générez des revenus supplémentaires.',
 
     // Profile translations (some already added from ProfileInfo)
     'profile.first_name': 'Prénom',
@@ -2403,7 +2663,7 @@ const translations = {
     'ownersGuide.step5.title': 'Delivery and pickup',
     'ownersGuide.step5.description':
       'Coordinate with the renter on the method and location of delivery for a smooth experience.',
-    'ownersGuide.step6.title': 'Receive payments',
+    'ownersGuide.step6.title': 'Receive earnings',
     'ownersGuide.step6.description':
       'After the rental is completed, the due amount will be transferred, and you can withdraw it once you reach the minimum payout.',
     'ownersGuide.step7.title': 'Tips',
@@ -2731,6 +2991,56 @@ const translations = {
     'ads.owner_instructions': 'Owner’s instructions',
     'ads.owner_instructions_placeholder':
       'Provide an extension cord, clean after use...',
+    'ads.edit.title_tooltip': 'Give your tool a clear and descriptive title',
+    'ads.edit.description_tooltip':
+      'Describe your tool in detail to attract renters',
+    'ads.edit.price_tooltip': 'Daily rental price',
+    'ads.edit.validation_error_title': 'Validation error',
+    'ads.edit.validation_error_description':
+      'Please correct the errors in the form',
+    'ads.edit.current_photos': 'Current photos',
+    'ads.edit.new_photos': 'New photos',
+    'ads.edit.primary_photo': 'Primary',
+    'ads.edit.set_primary_photo': 'Set as primary',
+    'ads.edit.deleting_photo': 'Deleting...',
+    'ads.edit.uploading_photo': 'Uploading...',
+    'ads.edit.add_photos': 'Add photos',
+    'ads.edit.click_to_upload': 'Click to upload',
+    'ads.edit.drag_and_drop': 'or drag and drop',
+    'ads.edit.photo_format': 'PNG, JPG, JPEG (MAX. 10MB per file)',
+    'ads.edit.renter_instructions_title': 'Instructions for the renter',
+    'ads.edit.special_instructions': 'Special instructions (optional)',
+    'ads.edit.instructions_tooltip':
+      'Specific instructions for tool usage or pickup',
+    'ads.edit.instructions_placeholder':
+      'Example: Pickup only possible on weekends, keys available with the neighbor, etc.',
+    'ads.edit.cancel': 'Cancel',
+    'ads.edit.saving': 'Saving...',
+    'ads.edit.save': 'Save',
+    'ads.edit.not_defined': 'Not defined',
+    'ads.edit.deposit_placeholder': '100',
+    'ads.edit.photo_ignored_title': 'Warning',
+    'ads.edit.photo_ignored_description':
+      'Some files were ignored (unsupported format or size > 10MB)',
+    'ads.edit.photo_deleted_title': 'Success',
+    'ads.edit.photo_deleted_description': 'Photo deleted successfully',
+    'ads.edit.photo_delete_error': 'Unable to delete the photo',
+    'ads.edit.photo_primary_title': 'Success',
+    'ads.edit.photo_primary_description':
+      'Primary photo set successfully',
+    'ads.edit.photo_primary_error':
+      'Unable to set the primary photo',
+    'ads.edit.photo_upload_error': 'Unable to upload photo {name}',
+    'ads.edit.update_success_title': 'Success',
+    'ads.edit.update_success_description':
+      'The tool has been updated successfully',
+    'ads.edit.update_error_title': 'Error',
+    'ads.edit.update_error_description':
+      'An error occurred while updating the tool',
+    'ads.edit.current_location': 'Current location',
+    'ads.edit.address': 'Address',
+    'ads.edit.latitude': 'Latitude',
+    'ads.edit.longitude': 'Longitude',
 
     'claim.sent': 'Claim Submitted',
     'claim.sent_message':
@@ -2798,8 +3108,79 @@ const translations = {
     'general.confirmed': 'Confirmed',
     'general.rejected': 'Rejected',
     'general.message': 'Message',
+    'general.unknown_owner': 'Unknown owner',
+    'general.unknown_renter': 'Unknown renter',
+    'general.tool_not_specified': 'Tool not specified',
+    'general.location_not_specified': 'Location not specified',
 
     // bookings
+    'booking.details.title': 'Booking details',
+    'booking.details.summary': 'Booking summary',
+    'booking.details.actions': 'Available actions',
+    'booking.details.tool_info': 'Tool information',
+    'booking.details.booking_info': 'Booking information',
+    'booking.details.participants': 'Participants',
+    'booking.details.pricing': 'Pricing and payment',
+    'booking.details.notes': 'Messages and notes',
+    'booking.details.history': 'Booking history',
+    'booking.details.back_to_profile': 'Back to profile',
+    'booking.details.open_tool': 'Open tool',
+    'booking.details.no_extra_history': 'No extra history available yet.',
+    'booking.details.cancel_dialog': 'Cancel booking',
+    'booking.details.reject_dialog': 'Reject request',
+    'booking.details.claim_dialog': 'Report an issue',
+    'booking.details.review_dialog': 'Submit a review',
+    'booking.details.claim_type': 'Issue type',
+    'booking.details.claim_description': 'Issue description',
+    'booking.details.claim_upload': 'Attachments',
+    'booking.details.generated_code': 'Generated code',
+    'booking.details.copy_code': 'Copy code',
+    'booking.details.pickup_ready':
+      'The code becomes visible on the booking start date.',
+    'booking.details.refund_notice': 'Refund policy',
+    'booking.details.full_refund': 'Full refund applies.',
+    'booking.details.no_refund':
+      'No refund applies for the current cancellation window.',
+    'booking.details.submit': 'Confirm',
+    'booking.details.selected_files': 'Selected files',
+    'booking.details.not_found': 'Booking not found.',
+    'booking.details.no_access': 'You do not have access to this booking.',
+    'booking.details.no_actions':
+      'No actions are currently available for this status.',
+    'booking.details.image_upload_hint':
+      'Images only, maximum 1MB per file',
+    'booking.details.tool_brand_model': 'Brand and model',
+    'booking.details.tool_condition': 'Tool condition',
+    'booking.details.tool_category': 'Category',
+    'booking.details.tool_subcategory': 'Subcategory',
+    'booking.details.payment_status': 'Payment status',
+    'booking.details.refund_amount': 'Refund amount',
+    'booking.details.contract_downloaded_title': 'Contract downloaded',
+    'booking.details.contract_downloaded_message':
+      'The rental agreement was successfully generated and downloaded.',
+    'booking.details.copy_code_error': 'Unable to copy the code.',
+    'booking.history.action.CREATED': 'Booking created',
+    'booking.history.action.ACCEPTED': 'Request accepted',
+    'booking.history.action.VALIDATION_CODE_GENERATED':
+      'Validation code generated',
+    'booking.history.action.PAYMENT_CAPTURED': 'Payment captured',
+    'booking.history.action.DEPOSIT_CAPTURE_SCHEDULED':
+      'Deposit capture scheduled',
+    'booking.history.action.DEPOSIT_NOTIFICATION_SENT':
+      'Deposit notification sent',
+    'booking.history.action.DEPOSIT_CAPTURED': 'Deposit captured',
+    'booking.history.action.ONGOING': 'Booking started',
+    'booking.history.action.RETURN_CONFIRMED': 'Return confirmed by renter',
+    'booking.history.action.PICKUP_CONFIRMED': 'Pickup confirmed by owner',
+    'booking.history.action.COMPLETED': 'Booking completed',
+    'booking.history.action.CANCELLED': 'Booking cancelled',
+    'booking.history.action.REJECTED': 'Request rejected',
+    'booking.history.action.CLAIM_OPENED': 'Claim opened',
+    'booking.history.action.REFUND_PROCESSED': 'Refund processed',
+    'booking.history.actor.SYSTEM': 'System',
+    'booking.history.actor.RENTER': 'Renter',
+    'booking.history.actor.OWNER': 'Owner',
+    'booking.history.actor.ADMIN': 'Admin',
     'booking.cancelled': 'Reservation Cancelled',
     'booking.cancelled_message':
       'Your reservation has been successfully cancelled.',
@@ -4164,6 +4545,144 @@ const translations = {
     'notifications.tool_returned': 'Tool Returned',
     'notifications.booking_started': 'Booking Started',
     'notifications.booking_accepted': 'Booking Accepted',
+    'notifications.view_all': 'View all notifications',
+    'notifications.content.booking_created_renter.title': 'Booking created',
+    'notifications.content.booking_created_renter.message':
+      'Your booking request for "{toolName}" has been submitted and is awaiting confirmation.',
+    'notifications.content.booking_created_owner.title':
+      'New booking request',
+    'notifications.content.booking_created_owner.message':
+      '{userName} wants to book your tool "{toolName}" from {startDate} to {endDate}.',
+    'notifications.content.booking_confirmed_renter.title':
+      'Booking confirmed',
+    'notifications.content.booking_confirmed_renter.message':
+      'Your booking for "{toolName}" has been confirmed. You can collect the tool on {startDate}.',
+    'notifications.content.booking_confirmed_owner.title':
+      'Booking confirmed',
+    'notifications.content.booking_confirmed_owner.message':
+      'You confirmed the booking of "{toolName}" for {userName}.',
+    'notifications.content.booking_accepted_renter.title':
+      'Booking accepted',
+    'notifications.content.booking_accepted_renter.message':
+      'Your booking for "{toolName}" has been accepted. Validation code: {validationCode}.',
+    'notifications.content.booking_accepted_owner.title':
+      'Booking accepted',
+    'notifications.content.booking_accepted_owner.message':
+      'You accepted the booking of "{toolName}" for {userName}. Validation code: {validationCode}.',
+    'notifications.content.booking_cancelled_renter.title':
+      'Booking cancelled',
+    'notifications.content.booking_cancelled_renter.message':
+      'Your booking for "{toolName}" was cancelled by the owner. {reason}',
+    'notifications.content.booking_cancelled_owner.title':
+      'Booking cancelled',
+    'notifications.content.booking_cancelled_owner.message':
+      '{userName} cancelled the booking for "{toolName}". {reason}',
+    'notifications.content.booking_rejected_renter.title':
+      'Booking request rejected',
+    'notifications.content.booking_rejected_renter.message':
+      'Your booking request for "{toolName}" was rejected. {reason}',
+    'notifications.content.booking_rejected_owner.title':
+      'Booking request rejected',
+    'notifications.content.booking_rejected_owner.message':
+      'You rejected the booking request for "{toolName}" from {userName}.',
+    'notifications.content.booking_started_renter.title':
+      'Booking started',
+    'notifications.content.booking_started_renter.message':
+      'Your booking for "{toolName}" has started. Enjoy your rental.',
+    'notifications.content.booking_started_owner.title':
+      'Booking started',
+    'notifications.content.booking_started_owner.message':
+      'The booking of "{toolName}" by {userName} has started.',
+    'notifications.content.booking_completed_renter.title':
+      'Booking completed',
+    'notifications.content.booking_completed_renter.message':
+      'Your booking for "{toolName}" is now complete. Don’t forget to leave a review.',
+    'notifications.content.booking_completed_owner.title':
+      'Booking completed',
+    'notifications.content.booking_completed_owner.message':
+      'The booking of "{toolName}" by {userName} is now complete.',
+    'notifications.content.booking_pickup_reminder.title':
+      'Pickup reminder',
+    'notifications.content.booking_pickup_reminder.message':
+      'Don’t forget to pick up "{toolName}" tomorrow ({startDate}).',
+    'notifications.content.booking_handover_reminder.title':
+      'Handover reminder',
+    'notifications.content.booking_handover_reminder.message':
+      'Reminder: {userName} must pick up "{toolName}" tomorrow.',
+    'notifications.content.booking_return_reminder.title':
+      'Return reminder',
+    'notifications.content.booking_return_reminder_renter.message':
+      'Don’t forget to return "{toolName}" tomorrow ({endDate}).',
+    'notifications.content.booking_return_reminder_owner.message':
+      'Reminder: {userName} must return "{toolName}" tomorrow.',
+    'notifications.content.booking_overdue_renter.title': 'Return overdue',
+    'notifications.content.booking_overdue_renter.message':
+      'Your booking for "{toolName}" is overdue. Please return the tool as soon as possible.',
+    'notifications.content.booking_overdue_owner.title': 'Return overdue',
+    'notifications.content.booking_overdue_owner.message':
+      'The booking of "{toolName}" by {userName} is overdue.',
+    'notifications.content.payment_confirmed_renter.title':
+      'Payment confirmed',
+    'notifications.content.payment_confirmed_renter.message':
+      'Your payment for the booking of "{toolName}" has been confirmed.',
+    'notifications.content.payment_received_owner.title':
+      'Payment received',
+    'notifications.content.payment_received_owner.message':
+      'Payment for the booking of "{toolName}" by {userName} has been received.',
+    'notifications.content.payment_failed.title': 'Payment failed',
+    'notifications.content.payment_failed.message':
+      'The payment for your booking of "{toolName}" failed. Please try again.',
+    'notifications.content.tool_returned_owner.title': 'Tool returned',
+    'notifications.content.tool_returned_owner.message':
+      '{userName} confirmed the return of "{toolName}". {notes}',
+    'notifications.content.return_confirmed_renter.title':
+      'Return confirmed',
+    'notifications.content.return_confirmed_renter.message':
+      'You confirmed the return of "{toolName}". Thank you for your rental.',
+    'notifications.content.deposit_required.title':
+      'Deposit payment required',
+    'notifications.content.deposit_required.message':
+      'Your booking for "{toolName}" requires a deposit payment. Please complete the payment to confirm your booking.',
+    'notifications.content.deposit_overdue_cancelled.title':
+      'Booking cancelled - unpaid deposit',
+    'notifications.content.deposit_overdue_cancelled_renter.message':
+      'Your booking for "{toolName}" was automatically cancelled because the deposit was not paid on time.',
+    'notifications.content.deposit_overdue_cancelled_owner.message':
+      'The booking of {userName} for "{toolName}" was automatically cancelled because the deposit was not paid.',
+    'notifications.content.deposit_paid_renter.title':
+      'Deposit paid successfully',
+    'notifications.content.deposit_paid_renter.message':
+      'Your deposit for the booking of "{toolName}" has been paid successfully. Your booking is now confirmed.',
+    'notifications.content.deposit_received_owner.title': 'Deposit received',
+    'notifications.content.deposit_received_owner.message':
+      'The deposit for the booking of {userName} for "{toolName}" has been received. The booking is confirmed.',
+    'notifications.content.dispute_created.title': 'New dispute',
+    'notifications.content.dispute_created.message':
+      '{userName} created a dispute about "{toolName}". Reason: {reason}',
+    'notifications.content.tool_rejected.title': 'Tool rejected',
+    'notifications.content.tool_rejected.message':
+      'Your tool "{toolName}" was rejected. Reason: {reason}.',
+    'notifications.content.tool_approved.title': 'Tool approved',
+    'notifications.content.withdrawal_completed.title':
+      'Withdrawal completed',
+    'notifications.content.withdrawal_completed.message':
+      'Your withdrawal of {amount} was completed successfully.',
+    'notifications.content.account_deletion_request.title':
+      'Deletion request received',
+    'notifications.content.account_deletion_request.message':
+      'Your account deletion request has been received.',
+    'notifications.content.account_deletion_pending.title':
+      'Request pending',
+    'notifications.content.account_deletion_pending.message':
+      'Your request is pending approval.',
+    'notifications.content.account_deletion_approved.title':
+      'Request approved',
+    'notifications.content.account_deletion_approved.message':
+      'Your request has been approved.',
+    'notifications.content.account_deletion_cancelled.title':
+      'Request cancelled',
+    'notifications.content.account_deletion_cancelled.message':
+      'Your request has been cancelled.',
     // New translations
     'hero.search_in_country': 'Search in your country ({country})',
     'common.your_region': 'your region',
@@ -4358,6 +4877,148 @@ const translations = {
     'notifications.tool_returned': 'تم إرجاع الأداة',
     'notifications.booking_started': 'بدأ الحجز',
     'notifications.booking_accepted': 'تم قبول الحجز',
+    'notifications.view_all': 'عرض جميع الإشعارات',
+    'notifications.content.booking_created_renter.title': 'تم إنشاء الحجز',
+    'notifications.content.booking_created_renter.message':
+      'تم إرسال طلب الحجز الخاص بك للأداة "{toolName}" وهو الآن بانتظار التأكيد.',
+    'notifications.content.booking_created_owner.title':
+      'طلب حجز جديد',
+    'notifications.content.booking_created_owner.message':
+      '{userName} يريد حجز أداتك "{toolName}" من {startDate} إلى {endDate}.',
+    'notifications.content.booking_confirmed_renter.title':
+      'تم تأكيد الحجز',
+    'notifications.content.booking_confirmed_renter.message':
+      'تم تأكيد حجزك للأداة "{toolName}". يمكنك استلام الأداة في {startDate}.',
+    'notifications.content.booking_confirmed_owner.title':
+      'تم تأكيد الحجز',
+    'notifications.content.booking_confirmed_owner.message':
+      'لقد أكدت حجز "{toolName}" لصالح {userName}.',
+    'notifications.content.booking_accepted_renter.title':
+      'تم قبول الحجز',
+    'notifications.content.booking_accepted_renter.message':
+      'تم قبول حجزك للأداة "{toolName}". رمز التحقق: {validationCode}.',
+    'notifications.content.booking_accepted_owner.title':
+      'تم قبول الحجز',
+    'notifications.content.booking_accepted_owner.message':
+      'لقد قبلت حجز "{toolName}" لصالح {userName}. رمز التحقق: {validationCode}.',
+    'notifications.content.booking_cancelled_renter.title':
+      'تم إلغاء الحجز',
+    'notifications.content.booking_cancelled_renter.message':
+      'تم إلغاء حجزك للأداة "{toolName}" من قبل المالك. {reason}',
+    'notifications.content.booking_cancelled_owner.title':
+      'تم إلغاء الحجز',
+    'notifications.content.booking_cancelled_owner.message':
+      'قام {userName} بإلغاء حجز "{toolName}". {reason}',
+    'notifications.content.booking_rejected_renter.title':
+      'تم رفض طلب الحجز',
+    'notifications.content.booking_rejected_renter.message':
+      'تم رفض طلب الحجز الخاص بك للأداة "{toolName}". {reason}',
+    'notifications.content.booking_rejected_owner.title':
+      'تم رفض طلب الحجز',
+    'notifications.content.booking_rejected_owner.message':
+      'لقد رفضت طلب حجز "{toolName}" من {userName}.',
+    'notifications.content.booking_started_renter.title':
+      'بدأ الحجز',
+    'notifications.content.booking_started_renter.message':
+      'بدأ حجزك للأداة "{toolName}". نتمنى لك تجربة إيجار موفقة.',
+    'notifications.content.booking_started_owner.title':
+      'بدأ الحجز',
+    'notifications.content.booking_started_owner.message':
+      'بدأ حجز "{toolName}" بواسطة {userName}.',
+    'notifications.content.booking_completed_renter.title':
+      'اكتمل الحجز',
+    'notifications.content.booking_completed_renter.message':
+      'اكتمل حجزك للأداة "{toolName}". لا تنسَ ترك تقييم.',
+    'notifications.content.booking_completed_owner.title':
+      'اكتمل الحجز',
+    'notifications.content.booking_completed_owner.message':
+      'اكتمل حجز "{toolName}" بواسطة {userName}.',
+    'notifications.content.booking_pickup_reminder.title':
+      'تذكير بالاستلام',
+    'notifications.content.booking_pickup_reminder.message':
+      'لا تنسَ استلام "{toolName}" غداً ({startDate}).',
+    'notifications.content.booking_handover_reminder.title':
+      'تذكير بالتسليم',
+    'notifications.content.booking_handover_reminder.message':
+      'تذكير: يجب على {userName} استلام "{toolName}" غداً.',
+    'notifications.content.booking_return_reminder.title':
+      'تذكير بالإرجاع',
+    'notifications.content.booking_return_reminder_renter.message':
+      'لا تنسَ إعادة "{toolName}" غداً ({endDate}).',
+    'notifications.content.booking_return_reminder_owner.message':
+      'تذكير: يجب على {userName} إعادة "{toolName}" غداً.',
+    'notifications.content.booking_overdue_renter.title':
+      'تأخر في الإرجاع',
+    'notifications.content.booking_overdue_renter.message':
+      'حجزك للأداة "{toolName}" متأخر. يرجى إعادة الأداة في أقرب وقت ممكن.',
+    'notifications.content.booking_overdue_owner.title':
+      'تأخر في الإرجاع',
+    'notifications.content.booking_overdue_owner.message':
+      'حجز "{toolName}" بواسطة {userName} متأخر.',
+    'notifications.content.payment_confirmed_renter.title':
+      'تم تأكيد الدفع',
+    'notifications.content.payment_confirmed_renter.message':
+      'تم تأكيد دفعتك لحجز "{toolName}".',
+    'notifications.content.payment_received_owner.title':
+      'تم استلام الدفع',
+    'notifications.content.payment_received_owner.message':
+      'تم استلام دفعة حجز "{toolName}" بواسطة {userName}.',
+    'notifications.content.payment_failed.title': 'فشل الدفع',
+    'notifications.content.payment_failed.message':
+      'فشل الدفع لحجزك للأداة "{toolName}". يرجى المحاولة مرة أخرى.',
+    'notifications.content.tool_returned_owner.title':
+      'تم إرجاع الأداة',
+    'notifications.content.tool_returned_owner.message':
+      'أكد {userName} إرجاع "{toolName}". {notes}',
+    'notifications.content.return_confirmed_renter.title':
+      'تم تأكيد الإرجاع',
+    'notifications.content.return_confirmed_renter.message':
+      'لقد أكدت إرجاع "{toolName}". شكراً لاستخدامك الخدمة.',
+    'notifications.content.deposit_required.title':
+      'مطلوب دفع العربون',
+    'notifications.content.deposit_required.message':
+      'يتطلب حجزك للأداة "{toolName}" دفع عربون. يرجى إتمام الدفع لتأكيد الحجز.',
+    'notifications.content.deposit_overdue_cancelled.title':
+      'تم إلغاء الحجز - عربون غير مدفوع',
+    'notifications.content.deposit_overdue_cancelled_renter.message':
+      'تم إلغاء حجزك للأداة "{toolName}" تلقائياً لأن العربون لم يُدفع في الوقت المحدد.',
+    'notifications.content.deposit_overdue_cancelled_owner.message':
+      'تم إلغاء حجز {userName} للأداة "{toolName}" تلقائياً لأن العربون لم يُدفع.',
+    'notifications.content.deposit_paid_renter.title':
+      'تم دفع العربون بنجاح',
+    'notifications.content.deposit_paid_renter.message':
+      'تم دفع العربون لحجز "{toolName}" بنجاح. أصبح الحجز مؤكداً الآن.',
+    'notifications.content.deposit_received_owner.title':
+      'تم استلام العربون',
+    'notifications.content.deposit_received_owner.message':
+      'تم استلام عربون حجز {userName} للأداة "{toolName}". تم تأكيد الحجز.',
+    'notifications.content.dispute_created.title': 'نزاع جديد',
+    'notifications.content.dispute_created.message':
+      'أنشأ {userName} نزاعاً بخصوص "{toolName}". السبب: {reason}',
+    'notifications.content.tool_rejected.title': 'تم رفض الأداة',
+    'notifications.content.tool_rejected.message':
+      'تم رفض أداتك "{toolName}". السبب: {reason}.',
+    'notifications.content.tool_approved.title': 'تمت الموافقة على الأداة',
+    'notifications.content.withdrawal_completed.title':
+      'اكتمل السحب',
+    'notifications.content.withdrawal_completed.message':
+      'تم تنفيذ سحبك بمبلغ {amount} بنجاح.',
+    'notifications.content.account_deletion_request.title':
+      'تم استلام طلب الحذف',
+    'notifications.content.account_deletion_request.message':
+      'تم استلام طلب حذف الحساب الخاص بك.',
+    'notifications.content.account_deletion_pending.title':
+      'الطلب قيد الانتظار',
+    'notifications.content.account_deletion_pending.message':
+      'طلبك بانتظار الموافقة.',
+    'notifications.content.account_deletion_approved.title':
+      'تمت الموافقة على الطلب',
+    'notifications.content.account_deletion_approved.message':
+      'تمت الموافقة على طلبك.',
+    'notifications.content.account_deletion_cancelled.title':
+      'تم إلغاء الطلب',
+    'notifications.content.account_deletion_cancelled.message':
+      'تم إلغاء طلبك.',
 
     'ageVerification.title': 'التحقق من العمر',
     'ageVerification.description':
@@ -4515,7 +5176,7 @@ const translations = {
     'ownersGuide.step5.title': 'التسليم والاستلام',
     'ownersGuide.step5.description':
       'اتفق مع المستأجر على طريقة ومكان التسليم لضمان تجربة سلسة.',
-    'ownersGuide.step6.title': 'استلام الأموال',
+    'ownersGuide.step6.title': 'استلام المستحقات ',
     'ownersGuide.step6.description':
       'سيتم تحويل المبلغ المستحق بعد إتمام الإيجار، ويمكنك سحبه بعد الوصول للحد الأدنى للسحب.',
     'ownersGuide.step7.title': 'نصائح',
@@ -4847,6 +5508,56 @@ const translations = {
     'ads.owner_instructions': 'تعليمات المالك',
     'ads.owner_instructions_placeholder':
       'يرجى توفير سلك تمديد كهربائي، التنظيف بعد الاستخدام...',
+    'ads.edit.title_tooltip': 'أعطِ أداتك عنواناً واضحاً ووصفياً',
+    'ads.edit.description_tooltip':
+      'صف أداتك بالتفصيل لجذب المستأجرين',
+    'ads.edit.price_tooltip': 'سعر الإيجار اليومي',
+    'ads.edit.validation_error_title': 'خطأ في التحقق',
+    'ads.edit.validation_error_description':
+      'يرجى تصحيح الأخطاء في النموذج',
+    'ads.edit.current_photos': 'الصور الحالية',
+    'ads.edit.new_photos': 'صور جديدة',
+    'ads.edit.primary_photo': 'الرئيسية',
+    'ads.edit.set_primary_photo': 'تعيين كرئيسية',
+    'ads.edit.deleting_photo': 'جارٍ الحذف...',
+    'ads.edit.uploading_photo': 'جارٍ الرفع...',
+    'ads.edit.add_photos': 'إضافة صور',
+    'ads.edit.click_to_upload': 'انقر للرفع',
+    'ads.edit.drag_and_drop': 'أو اسحب وأفلت',
+    'ads.edit.photo_format': 'PNG، JPG، JPEG (الحد الأقصى 10MB لكل ملف)',
+    'ads.edit.renter_instructions_title': 'تعليمات للمستأجر',
+    'ads.edit.special_instructions': 'تعليمات خاصة (اختياري)',
+    'ads.edit.instructions_tooltip':
+      'تعليمات خاصة لاستخدام الأداة أو استلامها',
+    'ads.edit.instructions_placeholder':
+      'مثال: الاستلام ممكن فقط في عطلة نهاية الأسبوع، المفاتيح متوفرة عند الجار، إلخ.',
+    'ads.edit.cancel': 'إلغاء',
+    'ads.edit.saving': 'جارٍ الحفظ...',
+    'ads.edit.save': 'حفظ',
+    'ads.edit.not_defined': 'غير محددة',
+    'ads.edit.deposit_placeholder': '100',
+    'ads.edit.photo_ignored_title': 'تنبيه',
+    'ads.edit.photo_ignored_description':
+      'تم تجاهل بعض الملفات (صيغة غير مدعومة أو حجم أكبر من 10MB)',
+    'ads.edit.photo_deleted_title': 'تم بنجاح',
+    'ads.edit.photo_deleted_description': 'تم حذف الصورة بنجاح',
+    'ads.edit.photo_delete_error': 'تعذر حذف الصورة',
+    'ads.edit.photo_primary_title': 'تم بنجاح',
+    'ads.edit.photo_primary_description':
+      'تم تعيين الصورة الرئيسية بنجاح',
+    'ads.edit.photo_primary_error':
+      'تعذر تعيين الصورة الرئيسية',
+    'ads.edit.photo_upload_error': 'تعذر رفع الصورة {name}',
+    'ads.edit.update_success_title': 'تم بنجاح',
+    'ads.edit.update_success_description':
+      'تم تحديث الأداة بنجاح',
+    'ads.edit.update_error_title': 'خطأ',
+    'ads.edit.update_error_description':
+      'حدث خطأ أثناء تحديث الأداة',
+    'ads.edit.current_location': 'الموقع الحالي',
+    'ads.edit.address': 'العنوان',
+    'ads.edit.latitude': 'خط العرض',
+    'ads.edit.longitude': 'خط الطول',
 
     'claim.sent': 'تم إرسال الشكوى',
     'claim.sent_message':
@@ -4937,8 +5648,81 @@ const translations = {
 
     'code.copied': 'تم نسخ الرمز',
     'code.copied_message': 'تم نسخ رمز التحقق إلى الحافظة.',
+    'general.unknown_owner': 'مالك غير معروف',
+    'general.unknown_renter': 'مستأجر غير معروف',
+    'general.tool_not_specified': 'أداة غير محددة',
+    'general.location_not_specified': 'الموقع غير محدد',
 
     'booking.title': 'حجوزاتي',
+    'booking.details.title': 'تفاصيل الحجز',
+    'booking.details.summary': 'ملخص الحجز',
+    'booking.details.actions': 'الإجراءات المتاحة',
+    'booking.details.tool_info': 'معلومات الأداة',
+    'booking.details.booking_info': 'معلومات الحجز',
+    'booking.details.participants': 'الأطراف المعنية',
+    'booking.details.pricing': 'المبالغ والدفع',
+    'booking.details.notes': 'الرسائل والملاحظات',
+    'booking.details.history': 'سجل الحجز',
+    'booking.details.back_to_profile': 'الرجوع إلى الملف الشخصي',
+    'booking.details.open_tool': 'عرض الأداة',
+    'booking.details.no_extra_history': 'لا يوجد سجل إضافي حالياً.',
+    'booking.details.cancel_dialog': 'إلغاء الحجز',
+    'booking.details.reject_dialog': 'رفض الطلب',
+    'booking.details.claim_dialog': 'إرسال بلاغ',
+    'booking.details.review_dialog': 'إرسال تقييم',
+    'booking.details.claim_type': 'نوع المشكلة',
+    'booking.details.claim_description': 'وصف المشكلة',
+    'booking.details.claim_upload': 'المرفقات',
+    'booking.details.generated_code': 'الرمز المولد',
+    'booking.details.copy_code': 'نسخ الرمز',
+    'booking.details.pickup_ready':
+      'يصبح الرمز متاحاً في يوم بداية الحجز.',
+    'booking.details.refund_notice': 'سياسة الاسترجاع',
+    'booking.details.full_refund': 'استرجاع كامل متاح.',
+    'booking.details.no_refund':
+      'لا يوجد استرجاع وفق مهلة الإلغاء الحالية.',
+    'booking.details.submit': 'تأكيد',
+    'booking.details.selected_files': 'الملفات المحددة',
+    'booking.details.not_found': 'الحجز غير موجود.',
+    'booking.details.no_access': 'ليس لديك صلاحية الوصول إلى هذا الحجز.',
+    'booking.details.no_actions':
+      'لا توجد إجراءات متاحة حالياً لهذه الحالة.',
+    'booking.details.image_upload_hint':
+      'صور فقط، بحد أقصى 1MB لكل ملف',
+    'booking.details.tool_brand_model': 'العلامة التجارية والطراز',
+    'booking.details.tool_condition': 'حالة الأداة',
+    'booking.details.tool_category': 'الفئة',
+    'booking.details.tool_subcategory': 'الفئة الفرعية',
+    'booking.details.payment_status': 'حالة الدفع',
+    'booking.details.refund_amount': 'مبلغ الاسترجاع',
+    'booking.details.contract_downloaded_title': 'تم تنزيل العقد',
+    'booking.details.contract_downloaded_message':
+      'تم إنشاء اتفاقية الإيجار وتنزيلها بنجاح.',
+    'booking.details.copy_code_error': 'تعذر نسخ الرمز.',
+    'booking.history.action.CREATED': 'تم إنشاء الحجز',
+    'booking.history.action.ACCEPTED': 'تم قبول الطلب',
+    'booking.history.action.VALIDATION_CODE_GENERATED':
+      'تم إنشاء رمز التحقق',
+    'booking.history.action.PAYMENT_CAPTURED': 'تم تحصيل الدفع',
+    'booking.history.action.DEPOSIT_CAPTURE_SCHEDULED':
+      'تمت جدولة سحب التأمين',
+    'booking.history.action.DEPOSIT_NOTIFICATION_SENT':
+      'تم إرسال إشعار التأمين',
+    'booking.history.action.DEPOSIT_CAPTURED': 'تم سحب التأمين',
+    'booking.history.action.ONGOING': 'بدأ الحجز',
+    'booking.history.action.RETURN_CONFIRMED':
+      'تم تأكيد الإرجاع من المستأجر',
+    'booking.history.action.PICKUP_CONFIRMED':
+      'تم تأكيد الاستلام من المالك',
+    'booking.history.action.COMPLETED': 'اكتمل الحجز',
+    'booking.history.action.CANCELLED': 'تم إلغاء الحجز',
+    'booking.history.action.REJECTED': 'تم رفض الطلب',
+    'booking.history.action.CLAIM_OPENED': 'تم فتح شكوى',
+    'booking.history.action.REFUND_PROCESSED': 'تمت معالجة الاسترجاع',
+    'booking.history.actor.SYSTEM': 'النظام',
+    'booking.history.actor.RENTER': 'المستأجر',
+    'booking.history.actor.OWNER': 'المالك',
+    'booking.history.actor.ADMIN': 'الإدارة',
     'booking.tool_returned': 'تم إرجاع الأداة',
     'booking.search': 'ابحث بواسطة عنوان الإعلان...',
     'booking.verification_code': 'رمز التحقق',

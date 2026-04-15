@@ -22,6 +22,7 @@ import ResetPassword from "./pages/ResetPassword";
 import AddTool from "./pages/AddTool";
 import Search from "./pages/Search";
 import ToolDetails from "./pages/ToolDetails";
+import BookingDetails from "./pages/BookingDetails";
 import Rent from "./pages/Rent";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
@@ -96,6 +97,14 @@ const App = () => (
                   } />
                   <Route path="/search" element={<Search />} />
                   <Route path="/tool/:id" element={<ToolDetails />} />
+                  <Route
+                    path="/bookings/:id"
+                    element={
+                      <ProtectedRoute>
+                        <BookingDetails />
+                      </ProtectedRoute>
+                    }
+                  />
                   <Route path="/rent/:id" element={ 
                     <ProtectedRoute>
                       <Rent />

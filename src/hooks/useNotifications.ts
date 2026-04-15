@@ -43,13 +43,13 @@ export const useNotifications = (): UseNotificationsReturn => {
       const finalNotifications = Array.isArray(notificationsArray) ? notificationsArray : [];
       setNotifications(finalNotifications);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Erreur lors du chargement des notifications';
+      const errorMessage = t('notifications.error');
       setError(errorMessage);
 
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, t]);
 
   const markAsRead = useCallback(async (id: string) => {
     try {
@@ -63,11 +63,11 @@ export const useNotifications = (): UseNotificationsReturn => {
         )
       );
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Erreur lors de la mise à jour';
+      const errorMessage = t('notifications.error');
       toast.error(errorMessage);
 
     }
-  }, []);
+  }, [t]);
 
   const markAllAsRead = useCallback(async () => {
     try {
@@ -77,39 +77,39 @@ export const useNotifications = (): UseNotificationsReturn => {
         prev.map(notification => ({ ...notification, isRead: true }))
       );
       
-      toast.success('Toutes les notifications ont été marquées comme lues');
+      toast.success(t('notifications.all_marked_read_success'));
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Erreur lors de la mise à jour';
+      const errorMessage = t('notifications.error');
       toast.error(errorMessage);
 
     }
-  }, []);
+  }, [t]);
 
   const deleteNotification = useCallback(async (id: string) => {
     try {
       await apiClient.delete(`/notifications/${id}`);
       
       setNotifications(prev => prev.filter(notification => notification.id !== id));
-      toast.success('Notification supprimée');
+      toast.success(t('notifications.deleted_success'));
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Erreur lors de la suppression';
+      const errorMessage = t('notifications.error');
       toast.error(errorMessage);
 
     }
-  }, []);
+  }, [t]);
 
   const clearAllNotifications = useCallback(async () => {
     try {
       await apiClient.delete('/notifications/my');
       
       setNotifications([]);
-      toast.success('Toutes les notifications ont été supprimées');
+      toast.success(t('notifications.all_cleared_success'));
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Erreur lors de la suppression';
+      const errorMessage = t('notifications.error');
       toast.error(errorMessage);
 
     }
-  }, []);
+  }, [t]);
 
   // Auto-fetch notifications on mount and clear when logged out
   useEffect(() => {
@@ -176,7 +176,7 @@ export const useNotifications = (): UseNotificationsReturn => {
         
         // Handle specific notification types that require a toast
         if (notification.type === 'withdrawal_completed') {
-          toast.success(t('wallet.withdrawal_success_toast') || 'Opération bien effectuée. Le montant a été déduit.');
+          toast.success(t('wallet.withdrawal_success_toast'));
         }
       });
 
@@ -208,7 +208,7 @@ export const useNotifications = (): UseNotificationsReturn => {
       }
       socketRef.current = null;
     };
-  }, [isAuthenticated, fetchNotifications]);
+  }, [isAuthenticated, fetchNotifications, t]);
 
   const unreadCount = (notifications || []).filter(n => !n.isRead).length;
 

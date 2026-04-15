@@ -8,17 +8,21 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { resolveNotificationTarget } from '@/utils/notificationNavigation';
+import { formatNotificationContent } from '@/utils/notificationFormatter';
 
 export interface Notification {
   id: string;
   title: string;
   message: string;
-  type: 'booking_created' | 'booking_confirmed' | 'booking_cancelled' | 'booking_completed' | 'booking_reminder' | 'payment_received' | 'payment_failed' | 'system';
+  type: string;
   isRead: boolean;
   createdAt: string;
   relatedId?: string;
   relatedType?: string;
   link?: string;
+  bookingId?: string;
+  toolId?: string;
 }
 
 interface NotificationCenterProps {
@@ -85,14 +89,14 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     const now = new Date();
     const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
     
-    if (diffInMinutes < 1) return t('notifications.just_now');
-    if (diffInMinutes < 60) return t('notifications.minutes_ago').replace('{minutes}', diffInMinutes.toString());
+    if (diffInMinutes < 1) return t('notifications.time_now');
+    if (diffInMinutes < 60) return `${diffInMinutes} ${t('notifications.time_minutes_ago')}`;
     
     const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return t('notifications.hours_ago').replace('{hours}', diffInHours.toString());
+    if (diffInHours < 24) return `${diffInHours} ${t('notifications.time_hours_ago')}`;
     
     const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) return t('notifications.days_ago').replace('{days}', diffInDays.toString());
+    if (diffInDays < 7) return `${diffInDays} ${t('notifications.time_days_ago')}`;
     
     const locale = language === 'fr' ? 'fr-FR' : language === 'en' ? 'en-US' : 'ar-SA';
     return date.toLocaleDateString(locale);
@@ -106,7 +110,9 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     }
     onNotificationClick(notification);
     setIsOpen(false);
-    navigate('/notifications');
+
+    const target = resolveNotificationTarget(notification);
+    navigate(target || '/notifications');
   };
 
   const handleMarkAllAsRead = () => {
@@ -159,7 +165,8 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
           ) : (
             <div className="divide-y">
               {notifications.map((notification) => {
-              
+                const content = formatNotificationContent(notification, t)
+
                 return (
                   <div
                     key={notification.id}
@@ -180,14 +187,14 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                             'text-sm font-medium truncate',
                             !notification.isRead && 'font-semibold'
                           )}>
-                            {notification.title}
+                            {content.title}
                           </p>
                           {!notification.isRead && (
                             <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 ml-2" />
                           )}
                         </div>
                         <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                          {notification.message}
+                          {content.message}
                         </p>
                         <p className="text-xs text-muted-foreground mt-2">
                           {formatTimeAgo(notification.createdAt)}
@@ -211,7 +218,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                 className="w-full text-xs"
                 onClick={handleViewAllNotifications}
               >
-                Voir toutes les notifications
+                {t('notifications.view_all')}
               </Button>
             </div>
           </>

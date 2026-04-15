@@ -150,10 +150,7 @@ export const generateRentalContract = (data: ContractData): void => {
   )
   yPosition += 6
   doc.text(`End Date: ${data.endDate} at ${data.pickupHour}`, margin, yPosition)
-  yPosition += 6
-  doc.text(`Handover Location: ${data.handoverLocation}`, margin, yPosition)
-  yPosition += 6
-  doc.text(`Return Location: ${data.returnLocation}`, margin, yPosition)
+
   yPosition += 15
 
   // Article 3 - Price and Payment Terms
@@ -428,10 +425,6 @@ export const generateRentalContractFr = (data: ContractData): void => {
     margin,
     yPosition,
   )
-  yPosition += 6
-  doc.text(`Lieu de remise: ${data.handoverLocation}`, margin, yPosition)
-  yPosition += 6
-  doc.text(`Lieu de restitution: ${data.returnLocation}`, margin, yPosition)
   yPosition += 15
 
   // Article 3 - Price and Payment Terms
@@ -746,14 +739,6 @@ export const generateRentalContractAr = (data: ContractData): void => {
       align: 'right',
     },
   )
-  yPosition += 6
-  doc.text(`مكان التسليم: ${data.handoverLocation}`, margin, yPosition, {
-    align: 'right',
-  })
-  yPosition += 6
-  doc.text(`مكان الإرجاع: ${data.returnLocation}`, margin, yPosition, {
-    align: 'right',
-  })
   yPosition += 15
 
   // Article 3 - Price and Payment Terms

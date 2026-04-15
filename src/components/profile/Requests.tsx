@@ -746,7 +746,10 @@ const Requests = () => {
                   <div className='flex gap-4'>
                     {/* Tool image */}
                     <div className='w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0'>
-                      <Link to={`/tool/${req.toolId}`}>
+                      <Link
+                        to={`/bookings/${req.id}`}
+                        state={{ sourceTab: 'requests' }}
+                      >
                         <img
                           src={req.toolImage}
                           alt={req.toolName}
@@ -756,7 +759,8 @@ const Requests = () => {
                     </div>
                     <div className='space-y-1'>
                       <Link
-                        to={`/tool/${req.toolId}`}
+                        to={`/bookings/${req.id}`}
+                        state={{ sourceTab: 'requests' }}
                         className='font-semibold cursor-pointer hover:text-primary transition-colors'
                       >
                         {req.toolName}

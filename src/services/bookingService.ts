@@ -38,6 +38,24 @@ export class BookingService {
     }
   }
 
+  // Get booking history
+  async getBookingHistory(
+    id: string
+  ): Promise<{ action: string; timestamp: string; user: string; notes?: string }[]> {
+    try {
+      const response = await api.get<
+        ApiResponse<
+          { action: string; timestamp: string; user: string; notes?: string }[]
+        >
+      >(`/bookings/${id}/history`)
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || 'Failed to fetch booking history'
+      )
+    }
+  }
+
   // Get user's bookings (as renter)
   async getUserBookings(userId: string, filters?: BookingFilters): Promise<Booking[]> {
     try {

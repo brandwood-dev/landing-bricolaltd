@@ -250,7 +250,7 @@ const ToolDetails = () => {
   const primaryPhotoUrl = getPrimaryPhotoUrl(tool)
   const allPhotoUrls = getAllPhotoUrls(tool)
   const feeAmount = (tool.basePrice || 0) * 0.06
-
+const toolStatus = tool.moderationStatus || 'Unknown Status'
   // Debug logs for price values
   console.log(`🔍 [ToolDetails] Tool price debugging:`, {
     toolId: tool.id,
@@ -323,9 +323,7 @@ const ToolDetails = () => {
                   </div>
                   <Avatar className='h-16 w-16'>
                     <AvatarImage
-                      src={
-                        tool.owner?.profilePicture || '/placeholder.svg'
-                      }
+                      src={tool.owner?.profilePicture || '/placeholder.svg'}
                       alt={ownerName}
                     />
                     <AvatarFallback>
@@ -337,9 +335,7 @@ const ToolDetails = () => {
                 <div className='flex items-center gap-4'>
                   <Avatar className='h-16 w-16'>
                     <AvatarImage
-                      src={
-                        tool.owner?.profilePicture || '/placeholder.svg'
-                      }
+                      src={tool.owner?.profilePicture || '/placeholder.svg'}
                       alt={ownerName}
                     />
                     <AvatarFallback>
@@ -376,7 +372,7 @@ const ToolDetails = () => {
                   alt={`${tool.title} ${currentImageIndex + 1}`}
                   className='w-full h-96 object-cover rounded-lg'
                 />
-                
+
                 {/* Navigation Buttons */}
                 {allPhotoUrls.length > 1 && (
                   <>
@@ -398,13 +394,13 @@ const ToolDetails = () => {
                     </Button>
                   </>
                 )}
-                
+
                 {/* Image Counter */}
                 <div className='absolute bottom-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-sm'>
                   {currentImageIndex + 1} / {allPhotoUrls.length}
                 </div>
               </div>
-              
+
               {/* Thumbnails */}
               {allPhotoUrls.length > 1 && (
                 <div className='grid grid-cols-4 gap-2'>
@@ -423,7 +419,7 @@ const ToolDetails = () => {
                   ))}
                 </div>
               )}
-              
+
               {/* Dots Indicator */}
               {allPhotoUrls.length > 4 && (
                 <div className='flex justify-center mt-4 space-x-2'>
@@ -460,6 +456,9 @@ const ToolDetails = () => {
                   {tool.condition === 5 && t('tools.condition_poor')}
                   {tool.condition === '' && t('tools.condition_unknown')}
                 </Badge>
+                {isAuthenticated && user?.id === tool.ownerId && (
+                  <Badge variant='outline'>{toolStatus}</Badge>
+                )}
               </div>
 
               <h1 className='text-3xl font-bold mb-4'>{tool.title}</h1>
@@ -528,27 +527,26 @@ const ToolDetails = () => {
 
               <div className='bg-accent/5 rounded-lg p-6 mb-6'>
                 <div className='text-3xl font-bold text-accent mb-2'>
-                  <PriceDisplay 
-                    price={displayPrice} 
-                    baseCurrency={tool.baseCurrencyCode || 'GBP'} 
-                    size="lg"
+                  <PriceDisplay
+                    price={displayPrice}
+                    baseCurrency={tool.baseCurrencyCode || 'GBP'}
+                    size='lg'
                     cible='basePrice'
                   />
-                 
                 </div>
                 <div className='text-sm text-gray-600 mb-4'>
-                  <PriceDisplay 
-                    price={feeAmount || 0} 
-                    baseCurrency={tool.baseCurrencyCode || 'GBP'} 
-                    size="sm"
+                  <PriceDisplay
+                    price={feeAmount || 0}
+                    baseCurrency={tool.baseCurrencyCode || 'GBP'}
+                    size='sm'
                     cible='fees'
                   />
                   {shouldShowBasePrice && (
                     <>
-                       <PriceDisplay 
-                        price={safeBasePrice} 
-                        baseCurrency={tool.baseCurrencyCode || 'GBP'} 
-                        size="sm"
+                      <PriceDisplay
+                        price={safeBasePrice}
+                        baseCurrency={tool.baseCurrencyCode || 'GBP'}
+                        size='sm'
                         cible='feesInc'
                       />
                     </>
@@ -556,29 +554,25 @@ const ToolDetails = () => {
                 </div>
                 {shouldShowDepositAmount && (
                   <div className='text-sm text-gray-600 mb-4'>
-                    <PriceDisplay 
-                      price={safeDepositAmount} 
-                      baseCurrency={tool.baseCurrencyCode || 'GBP'} 
-                      size="sm"
+                    <PriceDisplay
+                      price={safeDepositAmount}
+                      baseCurrency={tool.baseCurrencyCode || 'GBP'}
+                      size='sm'
                       cible='deposit'
-                    /> 
+                    />
                   </div>
                 )}
                 <div className='space-y-2'>
                   {!isAuthenticated ? (
-                    <Button 
-                      className='w-full' 
+                    <Button
+                      className='w-full'
                       size='lg'
                       onClick={() => navigate('/login')}
                     >
                       {t('tools.rent_now')}
                     </Button>
                   ) : user?.id === tool.owner.id ? (
-                    <Button 
-                      className='w-full' 
-                      size='lg'
-                      disabled
-                    >
+                    <Button className='w-full' size='lg' disabled>
                       Votre outil
                     </Button>
                   ) : (
@@ -676,16 +670,19 @@ const ToolDetails = () => {
                                   />
                                 ) : (
                                   <div className='w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-medium text-sm border-2 border-gray-200'>
-                                    {review.reviewer?.firstName?.charAt(0)?.toUpperCase() || 'U'}
+                                    {review.reviewer?.firstName
+                                      ?.charAt(0)
+                                      ?.toUpperCase() || 'U'}
                                   </div>
                                 )}
                               </div>
-                              
+
                               {/* Contenu de l'avis */}
                               <div className='flex-1'>
                                 <div className='flex items-center gap-2 mb-1'>
                                   <span className='font-medium text-gray-900'>
-                                    {review.reviewer.firstName} {review.reviewer.lastName}
+                                    {review.reviewer.firstName}{' '}
+                                    {review.reviewer.lastName}
                                   </span>
                                   <span className='text-sm text-gray-500'>
                                     {format(
@@ -696,13 +693,13 @@ const ToolDetails = () => {
                                           language === 'fr'
                                             ? fr
                                             : language === 'ar'
-                                            ? arSA
-                                            : enUS,
-                                      }
+                                              ? arSA
+                                              : enUS,
+                                      },
                                     )}
                                   </span>
                                 </div>
-                                
+
                                 {/* Étoiles de notation */}
                                 <div className='flex items-center mb-2'>
                                   {[1, 2, 3, 4, 5].map((star) => (
@@ -738,7 +735,7 @@ const ToolDetails = () => {
                           <PaginationPrevious
                             onClick={() =>
                               handleReviewPageChange(
-                                Math.max(1, currentReviewPage - 1)
+                                Math.max(1, currentReviewPage - 1),
                               )
                             }
                             className={
@@ -767,8 +764,8 @@ const ToolDetails = () => {
                               handleReviewPageChange(
                                 Math.min(
                                   totalReviewPages,
-                                  currentReviewPage + 1
-                                )
+                                  currentReviewPage + 1,
+                                ),
                               )
                             }
                             className={

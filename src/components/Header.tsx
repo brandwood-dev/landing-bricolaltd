@@ -198,11 +198,7 @@ const Header = () => {
                 notifications={notifications}
                 onMarkAsRead={markAsRead}
                 onMarkAllAsRead={markAllAsRead}
-                onNotificationClick={(notification) => {
-                  if (notification.link) {
-                    navigate(notification.link)
-                  }
-                }}
+                onNotificationClick={() => {}}
               />
             )}
 

@@ -1047,7 +1047,8 @@ const Reservations = () => {
                     <div className='flex items-center justify-start gap-2'>
                       <div className='w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0'>
                         <Link
-                          to={`/tool/${reservation.toolId}`}
+                          to={`/bookings/${reservation.id}`}
+                          state={{ sourceTab: 'reservations' }}
                           className='block w-full h-full'
                         >
                           <img
@@ -1068,7 +1069,8 @@ const Reservations = () => {
                           {/* espace entre les deux div */}
                           <div className='pr-2 pl-2'>
                             <Link
-                              to={`/tool/${reservation.toolId}`}
+                              to={`/bookings/${reservation.id}`}
+                              state={{ sourceTab: 'reservations' }}
                               className='hover:text-blue-600 transition-colors'
                             >
                               <h3 className='text-lg font-semibold text-gray-900 cursor-pointer'>

@@ -172,8 +172,8 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
         setCategories(categories || [])
       } catch (error) {
         toast({
-          title: 'Erreur',
-          description: 'Impossible de charger les catégories',
+          title: t('general.error'),
+          description: t('error.load_categories'),
           variant: 'destructive',
         })
       } finally {
@@ -309,9 +309,8 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
 
     if (validFiles.length !== files.length) {
       toast({
-        title: 'Attention',
-        description:
-          'Certains fichiers ont été ignorés (format non supporté ou taille > 10MB)',
+        title: t('ads.edit.photo_ignored_title'),
+        description: t('ads.edit.photo_ignored_description'),
         variant: 'destructive',
       })
     }
@@ -358,14 +357,14 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
       }
 
       toast({
-        title: 'Succès',
-        description: 'Photo supprimée avec succès',
+        title: t('ads.edit.photo_deleted_title'),
+        description: t('ads.edit.photo_deleted_description'),
       })
     } catch (error) {
       console.error('Error deleting photo:', error)
       toast({
-        title: 'Erreur',
-        description: 'Impossible de supprimer la photo',
+        title: t('general.error'),
+        description: t('ads.edit.photo_delete_error'),
         variant: 'destructive',
       })
     } finally {
@@ -398,14 +397,14 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
       setNewPhotoPrimaryIndex(null)
 
       toast({
-        title: 'Succès',
-        description: 'Photo principale définie avec succès',
+        title: t('ads.edit.photo_primary_title'),
+        description: t('ads.edit.photo_primary_description'),
       })
     } catch (error) {
       console.error('Error setting primary photo:', error)
       toast({
-        title: 'Erreur',
-        description: 'Impossible de définir la photo principale',
+        title: t('general.error'),
+        description: t('ads.edit.photo_primary_error'),
         variant: 'destructive',
       })
     } finally {
@@ -421,8 +420,8 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
   const handleSave = async () => {
     if (!validateForm()) {
       toast({
-        title: 'Erreur de validation',
-        description: 'Veuillez corriger les erreurs dans le formulaire',
+        title: t('ads.edit.validation_error_title'),
+        description: t('ads.edit.validation_error_description'),
         variant: 'destructive',
       })
       return
@@ -481,8 +480,11 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
         } catch (error) {
           console.error('Error uploading photo:', error)
           toast({
-            title: 'Erreur',
-            description: `Impossible d'uploader la photo ${photo.name}`,
+            title: t('general.error'),
+            description: t('ads.edit.photo_upload_error').replace(
+              '{name}',
+              photo.name
+            ),
             variant: 'destructive',
           })
         } finally {
@@ -521,8 +523,8 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
       })
 
       toast({
-        title: 'Succès',
-        description: "L'outil a été mis à jour avec succès",
+        title: t('ads.edit.update_success_title'),
+        description: t('ads.edit.update_success_description'),
       })
 
       onSave()
@@ -530,8 +532,8 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
     } catch (error) {
       console.error('Error updating tool:', error)
       toast({
-        title: 'Erreur',
-        description: 'Une erreur est survenue lors de la mise à jour',
+        title: t('ads.edit.update_error_title'),
+        description: t('ads.edit.update_error_description'),
         variant: 'destructive',
       })
     } finally {
@@ -578,7 +580,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                         <Info className='h-4 w-4 ml-1 inline text-gray-400' />
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Donnez un titre clair et descriptif à votre outil</p>
+                        <p>{t('ads.edit.title_tooltip')}</p>
                       </TooltipContent>
                     </Tooltip>
                   </Label>
@@ -659,10 +661,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                       <Info className='h-4 w-4 ml-1 inline text-gray-400' />
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>
-                        Décrivez votre outil en détail pour attirer les
-                        locataires
-                      </p>
+                      <p>{t('ads.edit.description_tooltip')}</p>
                     </TooltipContent>
                   </Tooltip>
                 </Label>
@@ -717,8 +716,8 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                       <SelectValue
                         placeholder={
                           loadingCategories
-                            ? 'Chargement...'
-                            : 'Sélectionner une catégorie'
+                            ? t('general.loading')
+                            : t('add_tool.choose_category')
                         }
                       />
                     </SelectTrigger>
@@ -751,7 +750,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                       <SelectValue
                         placeholder={
                           loadingSubcategories
-                            ? 'Chargement...'
+                            ? t('general.loading')
                             : t('ads.sub_category_placeholder')
                         }
                       />
@@ -825,7 +824,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                         <Info className='h-4 w-4 ml-1 inline text-gray-400' />
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Prix de location par jour</p>
+                        <p>{t('ads.edit.price_tooltip')}</p>
                       </TooltipContent>
                     </Tooltip>
                   </Label>
@@ -895,7 +894,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                         }
                         handleInputChange('deposit', numValue)
                       }}
-                      placeholder='100'
+                      placeholder={t('ads.edit.deposit_placeholder')}
                       className={`h-12 text-base ${
                         errors.deposit ? 'border-red-500' : ''
                       }`}
@@ -931,20 +930,20 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
               <div className='bg-gray-50 p-4 rounded-lg border'>
                 <h4 className='text-sm font-medium text-gray-700 mb-3 flex items-center'>
                   <Info className='h-4 w-4 mr-2' />
-                  {t('add_tool.current_location')}
+                  {t('ads.edit.current_location')}
                 </h4>
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-3 text-sm'>
                   <div>
                     <span className='font-medium text-gray-600'>
-                      {t('add_tool.address')}:
+                      {t('ads.edit.address')}:
                     </span>
                     <p className='text-gray-800 mt-1'>
-                      {formData.location || 'Non définie'}
+                      {formData.location || t('ads.edit.not_defined')}
                     </p>
                   </div>
                   <div>
                     <span className='font-medium text-gray-600'>
-                      {t('add_tool.latitude')}:
+                      {t('ads.edit.latitude')}:
                     </span>
                     <p className='text-gray-800 mt-1'>
                       {formData.latitude
@@ -953,12 +952,12 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                           : !isNaN(parseFloat(formData.latitude))
                           ? parseFloat(formData.latitude).toFixed(6)
                           : formData.latitude
-                        : 'Non définie'}
+                        : t('ads.edit.not_defined')}
                     </p>
                   </div>
                   <div>
                     <span className='font-medium text-gray-600'>
-                      {t('add_tool.longitude')}:
+                      {t('ads.edit.longitude')}:
                     </span>
                     <p className='text-gray-800 mt-1'>
                       {formData.longitude
@@ -967,7 +966,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                           : !isNaN(parseFloat(formData.longitude))
                           ? parseFloat(formData.longitude).toFixed(6)
                           : formData.longitude
-                        : 'Non définie'}
+                        : t('ads.edit.not_defined')}
                     </p>
                   </div>
                 </div>
@@ -1022,7 +1021,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
               {existingPhotos.length > 0 && (
                 <div className='space-y-3'>
                   <Label className='text-sm font-medium text-foreground'>
-                    Photos actuelles
+                    {t('ads.edit.current_photos')}
                   </Label>
                   <div className='grid grid-cols-2 md:grid-cols-3 gap-4'>
                     {existingPhotos.map((photo) => (
@@ -1051,7 +1050,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                         {primaryPhotoId === photo.id && (
                           <div className='absolute bottom-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded flex items-center'>
                             <CheckCircle className='h-3 w-3 mr-1' />
-                            Principal
+                            {t('ads.edit.primary_photo')}
                           </div>
                         )}
 
@@ -1070,7 +1069,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                             {photoOperations.settingPrimary === photo.id ? (
                               <Loader2 className='h-3 w-3 animate-spin mr-1' />
                             ) : null}
-                            Définir comme principale
+                            {t('ads.edit.set_primary_photo')}
                           </button>
                         )}
 
@@ -1079,7 +1078,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                           <div className='absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center'>
                             <div className='text-white text-sm flex items-center'>
                               <Loader2 className='h-4 w-4 animate-spin mr-2' />
-                              Suppression...
+                              {t('ads.edit.deleting_photo')}
                             </div>
                           </div>
                         )}
@@ -1093,7 +1092,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
               {newPhotos.length > 0 && (
                 <div className='space-y-3'>
                   <Label className='text-sm font-medium text-foreground'>
-                    Nouvelles photos
+                    {t('ads.edit.new_photos')}
                   </Label>
                   <div className='grid grid-cols-2 md:grid-cols-3 gap-4'>
                     {newPhotos.map((photo, index) => (
@@ -1117,7 +1116,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                         {newPhotoPrimaryIndex === index && (
                           <div className='absolute bottom-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded flex items-center'>
                             <CheckCircle className='h-3 w-3 mr-1' />
-                            Principal
+                            {t('ads.edit.primary_photo')}
                           </div>
                         )}
 
@@ -1128,7 +1127,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                             onClick={() => handleSetNewPhotoPrimary(index)}
                             className='absolute bottom-2 right-2 bg-green-500 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity'
                           >
-                            Définir comme principale
+                            {t('ads.edit.set_primary_photo')}
                           </button>
                         )}
 
@@ -1137,7 +1136,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                           <div className='absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center'>
                             <div className='text-white text-sm flex items-center'>
                               <Loader2 className='h-4 w-4 animate-spin mr-2' />
-                              Upload...
+                              {t('ads.edit.uploading_photo')}
                             </div>
                           </div>
                         )}
@@ -1150,7 +1149,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
               {/* Photo Upload Button */}
               <div className='space-y-3'>
                 <Label className='text-sm font-medium text-foreground'>
-                  Ajouter des photos
+                  {t('ads.edit.add_photos')}
                 </Label>
                 <div className='flex items-center justify-center w-full'>
                   <label
@@ -1161,12 +1160,12 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                       <Upload className='w-8 h-8 mb-4 text-gray-500' />
                       <p className='mb-2 text-sm text-gray-500'>
                         <span className='font-semibold'>
-                          Cliquez pour uploader
+                          {t('ads.edit.click_to_upload')}
                         </span>{' '}
-                        ou glissez-déposez
+                        {t('ads.edit.drag_and_drop')}
                       </p>
                       <p className='text-xs text-gray-500'>
-                        PNG, JPG, JPEG (MAX. 10MB par fichier)
+                        {t('ads.edit.photo_format')}
                       </p>
                     </div>
                     <input
@@ -1198,7 +1197,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                 }`}
               >
                 <FileText className='h-5 w-5 mr-2 text-accent' />
-                Instructions pour le locataire
+                {t('ads.edit.renter_instructions_title')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -1207,16 +1206,13 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                   htmlFor='instructions'
                   className='text-sm font-medium text-foreground'
                 >
-                  Instructions spéciales (optionnel)
+                  {t('ads.edit.special_instructions')}
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Info className='h-4 w-4 ml-1 inline text-gray-400' />
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>
-                        Instructions particulières pour l'utilisation ou la
-                        récupération de l'outil
-                      </p>
+                      <p>{t('ads.edit.instructions_tooltip')}</p>
                     </TooltipContent>
                   </Tooltip>
                 </Label>
@@ -1226,7 +1222,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                   onChange={(e) =>
                     handleInputChange('instructions', e.target.value)
                   }
-                  placeholder='Ex: Récupération possible uniquement le week-end, clés disponibles chez le voisin, etc.'
+                  placeholder={t('ads.edit.instructions_placeholder')}
                   className='min-h-[100px] text-base'
                 />
               </div>
@@ -1237,18 +1233,18 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
         {/* Action Buttons */}
         <div className='flex justify-end space-x-4 pt-6 border-t'>
           <Button variant='outline' onClick={onClose} disabled={isSaving}>
-            Annuler
+            {t('ads.edit.cancel')}
           </Button>
           <Button onClick={handleSave} disabled={isSaving}>
             {isSaving ? (
               <>
                 <Loader2 className='h-4 w-4 mr-2 animate-spin' />
-                Sauvegarde...
+                {t('ads.edit.saving')}
               </>
             ) : (
               <>
                 <Save className='h-4 w-4 mr-2' />
-                Sauvegarder
+                {t('ads.edit.save')}
               </>
             )}
           </Button>

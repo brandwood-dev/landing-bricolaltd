@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Bell,
   Trash2,
@@ -39,6 +40,8 @@ import { fr, enUS, ar } from 'date-fns/locale'
 import { toast } from 'sonner'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { resolveNotificationTarget } from '@/utils/notificationNavigation'
+import { formatNotificationContent } from '@/utils/notificationFormatter'
 
 type FilterType = 'all' | 'unread' | 'read'
 
@@ -49,10 +52,16 @@ interface Notification {
   type: string
   isRead: boolean
   createdAt: string
+  relatedId?: string
+  relatedType?: string
+  link?: string
+  bookingId?: string
+  toolId?: string
 }
 
 const NotificationsPage: React.FC = () => {
   const { t } = useLanguage()
+  const navigate = useNavigate()
   const {
     notifications,
     loading,
@@ -133,6 +142,18 @@ const NotificationsPage: React.FC = () => {
       toast.success(t('notifications.marked_read_success'))
     } catch (error) {
       toast.error(t('notifications.error'))
+    }
+  }
+
+  const handleNotificationNavigation = async (notification: Notification) => {
+    const target = resolveNotificationTarget(notification)
+
+    if (!notification.isRead) {
+      await handleMarkAsRead(notification.id)
+    }
+
+    if (target) {
+      navigate(target)
     }
   }
 
@@ -343,78 +364,83 @@ const NotificationsPage: React.FC = () => {
                   key={notification.id}
                   className={`bg-white rounded-lg shadow-sm p-6 border-l-4 ${
                     notification.isRead ? 'border-gray-300' : 'border-blue-600'
+                  } ${
+                    resolveNotificationTarget(notification)
+                      ? 'cursor-pointer hover:bg-gray-50 transition-colors'
+                      : ''
                   }`}
+                  onClick={() => void handleNotificationNavigation(notification)}
                 >
-                  <div className='flex items-start justify-between'>
-                    <div className='flex-1'>
-                      <div className='flex items-center space-x-2 mb-2'>
-                        <h3
-                          className={`font-semibold ${
-                            notification.isRead
-                              ? 'text-gray-700'
-                              : 'text-gray-900'
-                          }`}
-                        >
-                          {notification.title === 'Réservation terminée'
-                            ? t('notifications.booking_completed')
-                            : notification.title === 'Réservation créée'
-                            ? t('notifications.booking_created')
-                            : notification.title === 'Outil retourné'
-                            ? t('notifications.tool_returned')
-                            : notification.title === 'Réservation commencée'
-                            ? t('notifications.booking_started')
-                            : notification.title === 'Réservation acceptée'
-                            ? t('notifications.booking_accepted')
-                            : notification.title}
-                        </h3>
-                        {!notification.isRead && (
-                          <span className='inline-block w-2 h-2 bg-blue-600 rounded-full'></span>
-                        )}
-                      </div>
-                      <p
-                        className={`mb-3 ${
-                          notification.isRead
-                            ? 'text-gray-500'
-                            : 'text-gray-700'
-                        }`}
-                      >
-                        {notification.message}
-                      </p>
-                      <p className='text-sm text-gray-400'>
-                        {formatTimeAgo(notification.createdAt)}
-                      </p>
-                    </div>
+                  {(() => {
+                    const content = formatNotificationContent(notification, t)
 
-                    <div className='flex items-center space-x-2 ml-4'>
-                      <button
-                        onClick={() => handleMarkAsRead(notification.id)}
-                        className={`p-2 rounded-lg transition-colors ${
-                          notification.isRead
-                            ? 'text-gray-400 hover:text-blue-600 hover:bg-blue-50'
-                            : 'text-blue-600 hover:bg-blue-50'
-                        }`}
-                        title={
-                          notification.isRead
-                            ? t('notifications.mark_as_unread')
-                            : t('notifications.mark_as_read')
-                        }
-                      >
-                        <Check className='h-4 w-4' />
-                      </button>
-                      <button
-                        onClick={() =>
-                          setShowConfirmDialog({
-                            type: 'delete',
-                            notificationId: notification.id,
-                          })
-                        }
-                        className='p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors'
-                        title={t('notifications.delete')}
-                      >
-                        <Trash2 className='h-4 w-4' />
-                      </button>
-                    </div>
-                  </div>
+                    return (
+                      <div className='flex items-start justify-between'>
+                        <div className='flex-1'>
+                          <div className='flex items-center space-x-2 mb-2'>
+                            <h3
+                              className={`font-semibold ${
+                                notification.isRead
+                                  ? 'text-gray-700'
+                                  : 'text-gray-900'
+                              }`}
+                            >
+                              {content.title}
+                            </h3>
+                            {!notification.isRead && (
+                              <span className='inline-block w-2 h-2 bg-blue-600 rounded-full'></span>
+                            )}
+                          </div>
+                          <p
+                            className={`mb-3 ${
+                              notification.isRead
+                                ? 'text-gray-500'
+                                : 'text-gray-700'
+                            }`}
+                          >
+                            {content.message}
+                          </p>
+                          <p className='text-sm text-gray-400'>
+                            {formatTimeAgo(notification.createdAt)}
+                          </p>
+                        </div>
+
+                        <div className='flex items-center space-x-2 ml-4'>
+                          <button
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              void handleMarkAsRead(notification.id)
+                            }}
+                            className={`p-2 rounded-lg transition-colors ${
+                              notification.isRead
+                                ? 'text-gray-400 hover:text-blue-600 hover:bg-blue-50'
+                                : 'text-blue-600 hover:bg-blue-50'
+                            }`}
+                            title={
+                              notification.isRead
+                                ? t('notifications.mark_as_unread')
+                                : t('notifications.mark_as_read')
+                            }
+                          >
+                            <Check className='h-4 w-4' />
+                          </button>
+                          <button
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              setShowConfirmDialog({
+                                type: 'delete',
+                                notificationId: notification.id,
+                              })
+                            }}
+                            className='p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors'
+                            title={t('notifications.delete')}
+                          >
+                            <Trash2 className='h-4 w-4' />
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  })()}
                 </div>
               ))
             )}
