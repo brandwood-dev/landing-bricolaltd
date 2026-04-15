@@ -74,11 +74,11 @@ const Wallet = () => {
           walletService.getUserStats(user.id),
         ])
 
-        const finalBalance = balanceData?.balance || 0
+        const finalBalance = balanceData?.balance 
         const finalTransactions = Array.isArray(transactionsData?.data)
           ? transactionsData.data
           : []
-        const finalTotal = transactionsData?.total || 0
+        const finalTotal = transactionsData?.total 
         const finalStats = statsData || {
           cumulativeBalance: 0,
           availableBalance: 0,
@@ -139,11 +139,12 @@ const Wallet = () => {
     ? transactions.filter((t) => t.status === 'COMPLETED')
     : []
   const successfulTransactionsCount = successfulTransactions.length
-  const cumulativeBalance = balance // For now, same as available balance
+console.log('balance : ', stats.availableBalance)
+  let canWithdraw = false
+  if (stats.availableBalance >= 50) {
+    canWithdraw = true
+  }
 
-  // canWithdraw = true if cumulativeBalance >= 50
-
-  const canWithdraw = availableBalance >= 50
 
   const handleResetFilters = () => {
     setDateRange(undefined)

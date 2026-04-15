@@ -238,10 +238,17 @@ const ToolDetails = () => {
     )
   }
 
-  
-  const categoryName = tool.category?.displayName || 'Unknown Category'
+  const categoryKey = tool.category?.name || ''
+  const subcategoryKey = tool.subcategory?.name || ''
+  const categoryName =
+    (categoryKey && t(`categories.${categoryKey}`)) !== `categories.${categoryKey}`
+      ? t(`categories.${categoryKey}`)
+      : tool.category?.displayName || t('category.unknown')
   const subcategoryName =
-    tool.subcategory?.displayName || 'Unknown Subcategory'
+    (subcategoryKey && t(`subcategories.${subcategoryKey}`)) !==
+    `subcategories.${subcategoryKey}`
+      ? t(`subcategories.${subcategoryKey}`)
+      : tool.subcategory?.displayName || t('category.unknown')
   const ownerName =
     `${tool.owner?.firstName || ''} ${
       tool.owner?.lastName || ''
@@ -250,7 +257,15 @@ const ToolDetails = () => {
   const primaryPhotoUrl = getPrimaryPhotoUrl(tool)
   const allPhotoUrls = getAllPhotoUrls(tool)
   const feeAmount = (tool.basePrice || 0) * 0.06
-const toolStatus = tool.moderationStatus || 'Unknown Status'
+  const toolStatusMap: Record<string, string> = {
+    Confirmed: t('general.confirmed'),
+    Pending: t('general.pending'),
+    Rejected: t('general.rejected'),
+  }
+  const toolStatus =
+    toolStatusMap[tool.moderationStatus || ''] ||
+    tool.moderationStatus ||
+    t('general.unknown')
   // Debug logs for price values
   console.log(`🔍 [ToolDetails] Tool price debugging:`, {
     toolId: tool.id,

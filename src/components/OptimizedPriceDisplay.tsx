@@ -186,7 +186,7 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
       case 'totalPrice':
         return formattedPrice
       case 'minPrice':
-        return `${t('wallet.withdrawal_note')}`
+        return `${t('wallet.withdrawal_note')} : (${formattedPrice})`
       default:
         return formattedPrice
     }
