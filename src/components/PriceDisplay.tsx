@@ -213,7 +213,7 @@ export const PriceDisplay: React.FC<PriceDisplayProps> = ({
       case 'fees':
         return `${t('tools.fees_and_taxes')} : ${formattedPrice}`
       case 'feesInc':
-        return `6% ${t('tools.of')} ${formattedPrice} ${t('tools.charged')}`
+        return `5.25% + 0.25£ ${t('tools.of')} ${formattedPrice} ${t('tools.charged')}`
       case 'deposit':
         return `${t('tools.deposit')} : ${formattedPrice} ${t(
           'tools.refunded'

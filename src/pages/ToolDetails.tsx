@@ -133,12 +133,15 @@ const ToolDetails = () => {
     return [getPrimaryPhotoUrl(tool)]
   }
 
-  // Calculate prices with 6% fees
+  // Calculate prices with 5.25% + 0.25£ fees
   const calculateDisplayPrice = (basePrice: number): number => {
     // Convert basePrice to number if it's a string and calculate fees
-    const basePriceNumber = typeof basePrice === 'string' ? parseFloat(basePrice) : basePrice
-    const feeAmount = (basePriceNumber || 0) * 0.06
-    return basePriceNumber + feeAmount
+    const basePriceNumber =
+      typeof basePrice === 'string' ? parseFloat(basePrice) : basePrice
+    const feeRate = 0.0525
+    const fee = Number(basePriceNumber * feeRate + 0.25).toFixed(2)
+    // Convert feeAmount back to a number before adding
+    return basePriceNumber + Number(fee)
   }
 
   // Initial data fetch
@@ -195,7 +198,9 @@ const ToolDetails = () => {
   const prevImage = () => {
     if (!tool) return
     const allPhotos = getAllPhotoUrls(tool)
-    setCurrentImageIndex((prev) => (prev - 1 + allPhotos.length) % allPhotos.length)
+    setCurrentImageIndex(
+      (prev) => (prev - 1 + allPhotos.length) % allPhotos.length,
+    )
   }
 
   const goToImage = (index: number) => {
@@ -241,7 +246,8 @@ const ToolDetails = () => {
   const categoryKey = tool.category?.name || ''
   const subcategoryKey = tool.subcategory?.name || ''
   const categoryName =
-    (categoryKey && t(`categories.${categoryKey}`)) !== `categories.${categoryKey}`
+    (categoryKey && t(`categories.${categoryKey}`)) !==
+    `categories.${categoryKey}`
       ? t(`categories.${categoryKey}`)
       : tool.category?.displayName || t('category.unknown')
   const subcategoryName =
@@ -250,13 +256,12 @@ const ToolDetails = () => {
       ? t(`subcategories.${subcategoryKey}`)
       : tool.subcategory?.displayName || t('category.unknown')
   const ownerName =
-    `${tool.owner?.firstName || ''} ${
-      tool.owner?.lastName || ''
-    }`.trim() || 'Unknown Owner'
+    `${tool.owner?.firstName || ''} ${tool.owner?.lastName || ''}`.trim() ||
+    'Unknown Owner'
   const displayPrice = calculateDisplayPrice(tool.basePrice)
   const primaryPhotoUrl = getPrimaryPhotoUrl(tool)
   const allPhotoUrls = getAllPhotoUrls(tool)
-  const feeAmount = (tool.basePrice || 0) * 0.06
+  const feeAmount = (tool.basePrice || 0) * 0.0525 + 0.25
   const toolStatusMap: Record<string, string> = {
     Confirmed: t('general.confirmed'),
     Pending: t('general.pending'),
@@ -277,13 +282,19 @@ const ToolDetails = () => {
     baseCurrencyCode: tool.baseCurrencyCode,
     displayPrice,
     feeAmount,
-    fullTool: tool
-  });
+    fullTool: tool,
+  })
 
   // Fix for null/undefined prices - use fallback values and ensure they are numbers
-  const safeBasePrice = typeof tool.basePrice === 'string' ? parseFloat(tool.basePrice) : (tool.basePrice || 0);
-  const safeDepositAmount = typeof tool.depositAmount === 'string' ? parseFloat(tool.depositAmount) : (tool.depositAmount || 0);
-  
+  const safeBasePrice =
+    typeof tool.basePrice === 'string'
+      ? parseFloat(tool.basePrice)
+      : tool.basePrice || 0
+  const safeDepositAmount =
+    typeof tool.depositAmount === 'string'
+      ? parseFloat(tool.depositAmount)
+      : tool.depositAmount || 0
+
   console.log(`🔧 [ToolDetails] Safe price values:`, {
     originalBasePrice: tool.basePrice,
     basePriceType: typeof tool.basePrice,
@@ -292,12 +303,14 @@ const ToolDetails = () => {
     originalDepositAmount: tool.depositAmount,
     depositAmountType: typeof tool.depositAmount,
     safeDepositAmount,
-    safeDepositAmountType: typeof safeDepositAmount
-  });
+    safeDepositAmountType: typeof safeDepositAmount,
+  })
 
   // Only show price components if the original values are not null/undefined
-  const shouldShowBasePrice = tool.basePrice !== null && tool.basePrice !== undefined;
-  const shouldShowDepositAmount = tool.depositAmount !== null && tool.depositAmount !== undefined;
+  const shouldShowBasePrice =
+    tool.basePrice !== null && tool.basePrice !== undefined
+  const shouldShowDepositAmount =
+    tool.depositAmount !== null && tool.depositAmount !== undefined
 
   return (
     <div className='min-h-screen bg-background'>

@@ -18,6 +18,7 @@ export interface User extends BaseEntity {
   role: UserRole
   isActive: boolean
   lastLoginAt?: string
+  isVerified: boolean
 
   // Location fields
   address?: string
@@ -62,6 +63,7 @@ export interface UserProfile {
   isIdentityVerified?: boolean
   isEmailVerified?: boolean
   memberSince: string
+  isVerified: boolean
 }
 
 // User contact information

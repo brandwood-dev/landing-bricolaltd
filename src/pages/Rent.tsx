@@ -253,8 +253,8 @@ const Rent: React.FC = () => {
         setCountries(countriesData)
       } catch (error) {
         toast({
-          title: 'Error',
-          description: 'Failed to load countries. Please refresh the page.',
+          title: t('rent.toast.countries_load_failed.title'),
+          description: t('rent.toast.countries_load_failed.description'),
           variant: 'destructive',
         })
       } finally {
@@ -309,13 +309,13 @@ const Rent: React.FC = () => {
 
       const result = await response.json()
       console.table(result.data)
-      //bookings are in result.data filtred by status without CANCELED or REJECTED 
-      const bookings = result.data
-        ?.filter(
+      //bookings are in result.data filtred by status without CANCELED or REJECTED
+      const bookings =
+        result.data?.filter(
           (booking: any) =>
-            booking.status !== 'CANCELLED' && booking.status !== 'REJECTED'
+            booking.status !== 'CANCELLED' && booking.status !== 'REJECTED',
         ) || []
-console.table(bookings)
+      console.table(bookings)
       setExistingBookings(bookings)
 
       // Organiser les dates par statut
@@ -334,10 +334,7 @@ console.table(bookings)
           const dateToAdd = new Date(currentDate)
           allUnavailableDates.push(dateToAdd)
 
-          if (
-            booking.status === 'ACCEPTED' ||
-            booking.status === 'ONGOING'
-          ) {
+          if (booking.status === 'ACCEPTED' || booking.status === 'ONGOING') {
             confirmedDates.push(new Date(dateToAdd))
           } else if (
             booking.status === 'PENDING' ||
@@ -402,26 +399,26 @@ console.table(bookings)
 
   const isDateUnavailable = (date: Date) => {
     return unavailableDates.some(
-      (unavailable) => date.toDateString() === unavailable.toDateString()
+      (unavailable) => date.toDateString() === unavailable.toDateString(),
     )
   }
 
   // Fonctions pour vérifier les différents types de dates
   const isDateConfirmed = (date: Date) => {
     return bookingDates.confirmed.some(
-      (confirmedDate) => date.toDateString() === confirmedDate.toDateString()
+      (confirmedDate) => date.toDateString() === confirmedDate.toDateString(),
     )
   }
 
   const isDatePending = (date: Date) => {
     return bookingDates.pending.some(
-      (pendingDate) => date.toDateString() === pendingDate.toDateString()
+      (pendingDate) => date.toDateString() === pendingDate.toDateString(),
     )
   }
 
   const isDateInProgress = (date: Date) => {
     return bookingDates.inProgress.some(
-      (inProgressDate) => date.toDateString() === inProgressDate.toDateString()
+      (inProgressDate) => date.toDateString() === inProgressDate.toDateString(),
     )
   }
 
@@ -475,8 +472,8 @@ console.table(bookings)
     if (date && endDate && date.toDateString() === endDate.toDateString()) {
       setEndDate(undefined)
       toast({
-        title: 'Dates identiques non autorisées',
-        description: 'La date de fin doit être différente de la date de début.',
+        title: t('rent.toast.same_dates.title'),
+        description: t('rent.toast.same_dates.description'),
         variant: 'destructive',
       })
     }
@@ -488,9 +485,8 @@ console.table(bookings)
     ) {
       setFormData({ ...formData, pickupHour: '' })
       toast({
-        title: 'Heure de récupération réinitialisée',
-        description:
-          "L'heure sélectionnée n'est plus disponible pour cette date. Veuillez en choisir une autre.",
+        title: t('rent.toast.pickup_reset.title'),
+        description: t('rent.toast.pickup_reset.description'),
         variant: 'default',
       })
     }
@@ -502,9 +498,8 @@ console.table(bookings)
       // Vérifier si les dates sont identiques
       if (date.toDateString() === startDate.toDateString()) {
         toast({
-          title: 'Dates identiques non autorisées',
-          description:
-            'La date de fin doit être différente de la date de début.',
+          title: t('rent.toast.same_dates.title'),
+          description: t('rent.toast.same_dates.description'),
           variant: 'destructive',
         })
         return
@@ -523,9 +518,8 @@ console.table(bookings)
       // Vérifier si la période contient des dates indisponibles
       if (isPeriodUnavailable(startDate, date)) {
         toast({
-          title: 'Période non disponible',
-          description:
-            'La période sélectionnée contient des dates déjà réservées. Veuillez choisir une autre période.',
+          title: t('rent.toast.period_unavailable.title'),
+          description: t('rent.toast.period_unavailable.description'),
           variant: 'destructive',
         })
         return
@@ -553,7 +547,7 @@ console.table(bookings)
       const pricingData = await bookingService.calculateBookingPricing(
         tool.id,
         startDate.toISOString().split('T')[0],
-        endDate.toISOString().split('T')[0]
+        endDate.toISOString().split('T')[0],
       )
       setPricing(pricingData)
     } catch (err: any) {
@@ -561,28 +555,29 @@ console.table(bookings)
       const days = calculateDays()
       const basePrice = tool.basePrice
       const subtotal = Number(basePrice) * Number(days)
-      const fees = Number(subtotal) * 0.06 // 6% fees
+      const feeRate = 0.0525
+      const fees = Number((subtotal * feeRate) + 0.25).toFixed(2) // 5.25% fees
       const deposit = tool.depositAmount
       setPricing({
         toolId: tool.id,
         basePrice,
         totalDays: days,
         subtotal,
-        taxes: fees,
+        taxes: Number(fees),
         deposit,
         totalAmount: Number(subtotal) + Number(fees), // Exclure la caution du montant à payer
         startDate: startDate.toISOString().split('T')[0],
         endDate: endDate.toISOString().split('T')[0],
-        serviceFee: fees,
+        serviceFee: Number(fees),
         currency: 'EUR',
         breakdown: {
           dailyRate: Number(basePrice),
           numberOfDays: days,
           subtotal: Number(subtotal),
-          serviceFeePercentage: 17,
+          serviceFeePercentage: 15,
           serviceFeeAmount: Number(fees),
-          taxPercentage: 6,
-          taxAmount: Number(basePrice) * 0.06,
+          taxPercentage: 5.25,
+          taxAmount: Number(Number(basePrice) * 0.0525 + 0.25),
           depositAmount: Number(deposit),
         },
       })
@@ -598,7 +593,7 @@ console.table(bookings)
   // Pricing values with fallbacks and validation
   const basePrice = Math.max(
     Number(pricing?.basePrice || tool?.basePrice) || 25,
-    0
+    0,
   )
 
   // 🔍 LOGS DE DÉBOGAGE POUR LE CALCUL DES JOURS
@@ -610,17 +605,12 @@ console.table(bookings)
 
   // FORCER l'utilisation de calculateDays() au lieu de pricing?.totalDays
   const days = Math.max(calculateDays() || 1, 1)
-  const totalPrice = Math.max(Number(pricing?.subtotal) || basePrice * days, 0)
-  const totalFees = Math.max(Number(pricing?.taxes) || totalPrice * 0.06, 0)
-  const deposit = Math.max(
-    Number(pricing?.deposit) || tool?.depositAmount || 0,
-    0
-  )
+  const totalPrice = Number(pricing?.subtotal) || basePrice * days
+  const totalFees =
+    Number(pricing?.taxes) || (Number(totalPrice * 0.0525) + 0.25).toFixed(2)
+  const deposit = Number(pricing?.deposit) || tool?.depositAmount || 0
   const displayPrice = basePrice
-  const totalToPay = Math.max(
-    Number(pricing?.totalAmount) || totalPrice + totalFees, // Exclure la caution du montant à payer
-    0
-  )
+  const totalToPay = Number((Number(totalPrice) + Number(totalFees)).toFixed(2))
 
   // 🔍 LOGS DE DÉBOGAGE POUR TRACER LE CALCUL DU MONTANT TOTAL
   console.log('🔍 [Rent.tsx] Calcul du montant total:')
@@ -639,8 +629,7 @@ console.table(bookings)
     if (!startDate || !endDate) {
       toast({
         title: t('errors.validation_error'),
-        description:
-          'Veuillez sélectionner les dates de début et de fin de location',
+        description: t('rent.toast.validation.dates_required'),
         variant: 'destructive',
       })
       return
@@ -649,8 +638,7 @@ console.table(bookings)
     if (startDate > endDate) {
       toast({
         title: t('errors.validation_error'),
-        description:
-          'La date de début ne peut pas être postérieure à la date de fin',
+        description: t('rent.toast.validation.start_after_end'),
         variant: 'destructive',
       })
       return
@@ -660,7 +648,7 @@ console.table(bookings)
     if (startDate.toDateString() === endDate.toDateString()) {
       toast({
         title: t('errors.validation_error'),
-        description: 'La date de fin doit être différente de la date de début',
+        description: t('rent.toast.validation.same_dates'),
         variant: 'destructive',
       })
       return
@@ -684,8 +672,7 @@ console.table(bookings)
       if (isDateUnavailable(currentDate)) {
         toast({
           title: t('errors.validation_error'),
-          description:
-            'Une ou plusieurs dates de la période sélectionnée sont indisponibles',
+          description: t('rent.toast.validation.date_unavailable'),
           variant: 'destructive',
         })
         return
@@ -693,8 +680,7 @@ console.table(bookings)
       if (isDateConfirmed(currentDate)) {
         toast({
           title: t('errors.validation_error'),
-          description:
-            'Une ou plusieurs dates de la période sélectionnée sont déjà confirmées',
+          description: t('rent.toast.validation.date_confirmed'),
           variant: 'destructive',
         })
         return
@@ -702,8 +688,7 @@ console.table(bookings)
       if (isDatePending(currentDate)) {
         toast({
           title: t('errors.validation_error'),
-          description:
-            'Une ou plusieurs dates de la période sélectionnée sont en attente de confirmation',
+          description: t('rent.toast.validation.date_pending'),
           variant: 'destructive',
         })
         return
@@ -711,8 +696,7 @@ console.table(bookings)
       if (isDateInProgress(currentDate)) {
         toast({
           title: t('errors.validation_error'),
-          description:
-            'Une ou plusieurs dates de la période sélectionnée sont actuellement en cours de location',
+          description: t('rent.toast.validation.date_in_progress'),
           variant: 'destructive',
         })
         return
@@ -724,8 +708,7 @@ console.table(bookings)
     if (isPeriodUnavailable(startDate, endDate)) {
       toast({
         title: t('errors.validation_error'),
-        description:
-          "La période sélectionnée contient des dates non disponibles. Veuillez choisir d'autres dates.",
+        description: t('rent.toast.validation.period_unavailable'),
         variant: 'destructive',
       })
       return
@@ -744,8 +727,7 @@ console.table(bookings)
     if (!formData.pickupHour) {
       toast({
         title: t('errors.validation_error'),
-        description:
-          "Veuillez choisir l'heure de récupération avant de procéder au paiement",
+        description: t('rent.toast.validation.pickup_required'),
         variant: 'destructive',
       })
       return
@@ -758,7 +740,7 @@ console.table(bookings)
       if (!totalToPay || isNaN(totalToPay) || totalToPay <= 0) {
         toast({
           title: t('errors.validation_error'),
-          description: 'Le prix total est invalide. Veuillez réessayer.',
+          description: t('rent.toast.validation.invalid_total'),
           variant: 'destructive',
         })
         return
@@ -768,8 +750,7 @@ console.table(bookings)
       if (totalToPay < 0.5) {
         toast({
           title: t('errors.validation_error'),
-          description:
-            'Le montant total doit être supérieur à 0,5 £ pour procéder au paiement.',
+          description: t('rent.toast.validation.minimum_amount'),
           variant: 'destructive',
         })
         return
@@ -777,7 +758,7 @@ console.table(bookings)
 
       // 🔍 SÉCURITÉ: Toujours utiliser les données actuelles du formulaire
       console.log(
-        '🔍 [Rent.tsx] Création des données de réservation avec les valeurs actuelles:'
+        '🔍 [Rent.tsx] Création des données de réservation avec les valeurs actuelles:',
       )
       console.log('🔍 [Rent.tsx] - startDate:', startDate)
       console.log('🔍 [Rent.tsx] - endDate:', endDate)
@@ -796,8 +777,8 @@ console.table(bookings)
           formData.paymentMethod === 'card'
             ? PaymentMethod.CARD
             : formData.paymentMethod === 'google_pay'
-            ? PaymentMethod.GOOGLE_PAY
-            : PaymentMethod.APPLE_PAY,
+              ? PaymentMethod.GOOGLE_PAY
+              : PaymentMethod.APPLE_PAY,
         message: formData.message || undefined,
         renterId: user?.id!,
         ownerId: tool.ownerId,
@@ -809,9 +790,8 @@ console.table(bookings)
       console.log('🔍 Booking data prepared:', bookingData)
 
       toast({
-        title: 'Données validées!',
-        description:
-          'Veuillez procéder au paiement pour confirmer votre réservation.',
+        title: t('rent.toast.validated.title'),
+        description: t('rent.toast.validated.description'),
         duration: 3000,
         className: 'bg-blue-50 border-blue-200 text-blue-800',
       })
@@ -835,13 +815,12 @@ console.table(bookings)
         // Check for specific error types
         if (
           errorMessage.includes(
-            'Tool is already booked for the requested dates'
+            'Tool is already booked for the requested dates',
           )
         ) {
           return {
-            title: 'Outil non disponible',
-            description:
-              "Cet outil est déjà réservé pour les dates sélectionnées. Veuillez choisir d'autres dates.",
+            title: t('rent.toast.error.tool_unavailable.title'),
+            description: t('rent.toast.error.tool_unavailable.description'),
           }
         }
 
@@ -850,9 +829,8 @@ console.table(bookings)
           errorMessage.includes('Invalid')
         ) {
           return {
-            title: 'Erreur de validation',
-            description:
-              'Les informations saisies ne sont pas valides. Veuillez vérifier vos données.',
+            title: t('rent.toast.error.invalid_input.title'),
+            description: t('rent.toast.error.invalid_input.description'),
           }
         }
 
@@ -861,9 +839,8 @@ console.table(bookings)
           errorMessage.includes('Payment')
         ) {
           return {
-            title: 'Erreur de paiement',
-            description:
-              'Un problème est survenu lors du traitement du paiement. Veuillez réessayer.',
+            title: t('rent.toast.error.payment.title'),
+            description: t('rent.toast.error.payment.description'),
           }
         }
 
@@ -872,9 +849,8 @@ console.table(bookings)
           errorMessage.includes('Unauthorized')
         ) {
           return {
-            title: 'Accès non autorisé',
-            description:
-              'Vous devez être connecté pour effectuer cette action.',
+            title: t('rent.toast.error.unauthorized.title'),
+            description: t('rent.toast.error.unauthorized.description'),
           }
         }
 
@@ -883,17 +859,15 @@ console.table(bookings)
           errorMessage.includes('Not found')
         ) {
           return {
-            title: 'Outil introuvable',
-            description:
-              "L'outil sélectionné n'existe plus ou n'est plus disponible.",
+            title: t('rent.toast.error.tool_not_found.title'),
+            description: t('rent.toast.error.tool_not_found.description'),
           }
         }
 
         // Default error message
         return {
-          title: 'Erreur lors de la réservation',
-          description:
-            "Une erreur inattendue s'est produite. Veuillez réessayer dans quelques instants.",
+          title: t('rent.toast.error.booking.title'),
+          description: t('rent.toast.error.booking.description'),
         }
       }
 
@@ -1010,7 +984,7 @@ console.table(bookings)
                                   variant='outline'
                                   className={cn(
                                     'w-full justify-start text-left font-normal',
-                                    !startDate && 'text-muted-foreground'
+                                    !startDate && 'text-muted-foreground',
                                   )}
                                 >
                                   <CalendarIcon className='mr-2 h-4 w-4' />
@@ -1083,15 +1057,15 @@ console.table(bookings)
                                     'w-full justify-start text-left font-normal',
                                     !endDate && 'text-muted-foreground',
                                     !startDate &&
-                                      'opacity-50 cursor-not-allowed'
+                                      'opacity-50 cursor-not-allowed',
                                   )}
                                 >
                                   <CalendarIcon className='mr-2 h-4 w-4' />
                                   {endDate
                                     ? format(endDate, 'PPP', { locale: fr })
                                     : startDate
-                                    ? t('reservation.select_date')
-                                    : "Sélectionnez d'abord une date de début"}
+                                      ? t('reservation.select_date')
+                                      : "Sélectionnez d'abord une date de début"}
                                 </Button>
                               </PopoverTrigger>
                               <PopoverContent className='w-auto p-0'>
@@ -1284,7 +1258,7 @@ console.table(bookings)
                               'flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors',
                               formData.paymentMethod === 'card'
                                 ? 'bg-blue-50 border-blue-200'
-                                : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                                : 'bg-gray-50 border-gray-200 hover:bg-gray-100',
                             )}
                             onClick={() =>
                               setFormData((prev) => ({
@@ -1323,7 +1297,7 @@ console.table(bookings)
                               'flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors',
                               formData.paymentMethod === 'google_pay'
                                 ? 'bg-green-50 border-green-200'
-                                : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                                : 'bg-gray-50 border-gray-200 hover:bg-gray-100',
                             )}
                             onClick={() => {
                               setFormData((prev) => ({
@@ -1366,7 +1340,7 @@ console.table(bookings)
                               'flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors',
                               formData.paymentMethod === 'apple_pay'
                                 ? 'bg-gray-900 border-gray-700 text-white'
-                                : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                                : 'bg-gray-50 border-gray-200 hover:bg-gray-100',
                             )}
                             onClick={() => {
                               setFormData((prev) => ({
@@ -1400,7 +1374,7 @@ console.table(bookings)
                                 'font-medium',
                                 formData.paymentMethod === 'apple_pay'
                                   ? 'text-white'
-                                  : 'text-gray-800'
+                                  : 'text-gray-800',
                               )}
                             >
                               Apple Pay
@@ -1462,26 +1436,27 @@ console.table(bookings)
                             // 🔍 LOG AVANT CRÉATION DE LA RÉSERVATION
                             console.log(
                               '🔍 [Rent.tsx] Paiement réussi, création de la réservation avec totalToPay:',
-                              totalToPay
+                              totalToPay,
                             )
                             console.log(
                               '🔍 [Rent.tsx] PaymentIntentId reçu:',
-                              paymentIntentId
+                              paymentIntentId,
                             )
                             console.log(
                               '🔍 [Rent.tsx] PendingBookingData:',
-                              pendingBookingData
+                              pendingBookingData,
                             )
 
                             // 🔍 SÉCURITÉ: Vérifier que nous avons des données de réservation
                             if (!pendingBookingData) {
                               console.error(
-                                '❌ [Rent.tsx] Aucune donnée de réservation disponible après paiement réussi'
+                                '❌ [Rent.tsx] Aucune donnée de réservation disponible après paiement réussi',
                               )
                               toast({
-                                title: 'Erreur système',
-                                description:
-                                  'Les données de réservation sont manquantes. ',
+                                title: t('rent.toast.system_error.title'),
+                                description: t(
+                                  'rent.toast.system_error.description',
+                                ),
                                 variant: 'destructive',
                               })
                               // Revenir au formulaire pour permettre à l'utilisateur de réessayer
@@ -1497,7 +1472,7 @@ console.table(bookings)
                                 'Prix enregistré:',
                                 pendingBookingData.totalPrice,
                                 'Prix actuel:',
-                                totalToPay
+                                totalToPay,
                               )
                               // Mettre à jour avec le prix actuel pour être sûr
                               pendingBookingData.totalPrice = totalToPay
@@ -1505,69 +1480,69 @@ console.table(bookings)
 
                             // 🔍 LOGS ULTRA-DÉTAILLÉS POUR LES DATES
                             console.log(
-                              '🔍 [Rent.tsx] === ANALYSE DÉTAILLÉE DES DATES ==='
+                              '🔍 [Rent.tsx] === ANALYSE DÉTAILLÉE DES DATES ===',
                             )
                             console.log(
                               '🔍 [Rent.tsx] startDate (string):',
-                              pendingBookingData.startDate
+                              pendingBookingData.startDate,
                             )
                             console.log(
                               '🔍 [Rent.tsx] endDate (string):',
-                              pendingBookingData.endDate
+                              pendingBookingData.endDate,
                             )
                             console.log(
                               '🔍 [Rent.tsx] Type de startDate:',
-                              typeof pendingBookingData.startDate
+                              typeof pendingBookingData.startDate,
                             )
                             console.log(
                               '🔍 [Rent.tsx] Type de endDate:',
-                              typeof pendingBookingData.endDate
+                              typeof pendingBookingData.endDate,
                             )
 
                             // Conversion en Date pour vérification
                             const startDateObj = new Date(
-                              pendingBookingData.startDate
+                              pendingBookingData.startDate,
                             )
                             const endDateObj = new Date(
-                              pendingBookingData.endDate
+                              pendingBookingData.endDate,
                             )
                             console.log(
                               '🔍 [Rent.tsx] startDate converti en Date:',
-                              startDateObj
+                              startDateObj,
                             )
                             console.log(
                               '🔍 [Rent.tsx] endDate converti en Date:',
-                              endDateObj
+                              endDateObj,
                             )
                             console.log(
                               '🔍 [Rent.tsx] startDate.getTime():',
-                              startDateObj.getTime()
+                              startDateObj.getTime(),
                             )
                             console.log(
                               '🔍 [Rent.tsx] endDate.getTime():',
-                              endDateObj.getTime()
+                              endDateObj.getTime(),
                             )
                             console.log(
                               '🔍 [Rent.tsx] Comparaison startDate < endDate:',
-                              startDateObj < endDateObj
+                              startDateObj < endDateObj,
                             )
                             console.log(
                               '🔍 [Rent.tsx] Différence en millisecondes:',
-                              endDateObj.getTime() - startDateObj.getTime()
+                              endDateObj.getTime() - startDateObj.getTime(),
                             )
                             console.log(
                               '🔍 [Rent.tsx] Différence en jours:',
                               (endDateObj.getTime() - startDateObj.getTime()) /
-                                (1000 * 60 * 60 * 24)
+                                (1000 * 60 * 60 * 24),
                             )
                             console.log(
-                              '🔍 [Rent.tsx] === FIN ANALYSE DES DATES ==='
+                              '🔍 [Rent.tsx] === FIN ANALYSE DES DATES ===',
                             )
 
                             try {
                               // Créer la réservation après paiement réussi avec statut de paiement "authorized"
                               console.log(
-                                '🔍 [Rent.tsx] Appel de bookingService.createBooking...'
+                                '🔍 [Rent.tsx] Appel de bookingService.createBooking...',
                               )
                               const bookingDataWithPaymentStatus = {
                                 ...pendingBookingData,
@@ -1576,71 +1551,78 @@ console.table(bookings)
                               }
                               console.log(
                                 '🔍 [Rent.tsx] Booking data with payment status:',
-                                bookingDataWithPaymentStatus
+                                bookingDataWithPaymentStatus,
                               )
                               const booking =
                                 await bookingService.createBooking(
-                                  bookingDataWithPaymentStatus
+                                  bookingDataWithPaymentStatus,
                                 )
                               console.log(
                                 '🔍 [Rent.tsx] Booking created after payment:',
-                                booking
+                                booking,
                               )
 
                               // Nettoyer les données
                               console.log(
-                                '🔍 [Rent.tsx] Nettoyage des données...'
+                                '🔍 [Rent.tsx] Nettoyage des données...',
                               )
                               setPendingBookingData(null)
                               setShowPayment(false)
                               clearSavedFormData()
 
                               console.log(
-                                '🔍 [Rent.tsx] Affichage du toast de succès...'
+                                '🔍 [Rent.tsx] Affichage du toast de succès...',
                               )
                               toast({
-                                title: 'Paiement effectué avec succès!',
-                                description:
-                                  'Votre réservation a été confirmée.',
+                                title: t('rent.toast.payment_success.title'),
+                                description: t(
+                                  'rent.toast.payment_success.description',
+                                ),
                                 className:
                                   'bg-green-50 border-green-200 text-green-800',
                               })
 
                               console.log(
-                                '🔍 [Rent.tsx] Navigation vers /profile?tab=reservations...'
+                                '🔍 [Rent.tsx] Navigation vers /profile?tab=reservations...',
                               )
                               navigate('/profile?tab=reservations')
                             } catch (error: any) {
                               console.error(
                                 '❌ [Rent.tsx] Erreur lors de la création de la réservation:',
-                                error
+                                error,
                               )
                               console.error(
                                 '❌ [Rent.tsx] Stack trace:',
-                                error.stack
+                                error.stack,
                               )
                               console.error(
                                 '❌ [Rent.tsx] Response data:',
-                                error.response?.data
+                                error.response?.data,
                               )
                               toast({
-                                title:
-                                  'Erreur lors de la création de la réservation',
-                                description:
-                                  "Le paiement a été effectué mais la réservation n'a pas pu être créée. Contactez le support.",
+                                title: t(
+                                  'rent.toast.booking_creation_failed.title',
+                                ),
+                                description: t(
+                                  'rent.toast.booking_creation_failed.description',
+                                ),
                                 variant: 'destructive',
                               })
                             }
                           }}
-                          onPaymentError={(error) => {
+                          onPaymentError={(_error) => {
                             toast({
-                              title: 'Erreur lors du paiement',
-                              description: error,
+                              title: t(
+                                'rent.toast.payment_failed_callback.title',
+                              ),
+                              description: t(
+                                'rent.toast.payment_failed_callback.description',
+                              ),
                               variant: 'destructive',
                             })
                             // 🔍 RÉINITIALISATION APRÈS ÉCHEC DE PAIEMENT
                             console.log(
-                              '🔍 [Rent.tsx] Réinitialisation après échec de paiement'
+                              '🔍 [Rent.tsx] Réinitialisation après échec de paiement',
                             )
                             // Revenir au formulaire et réinitialiser les données
                             setShowPayment(false)

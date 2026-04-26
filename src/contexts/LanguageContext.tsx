@@ -74,7 +74,7 @@ const translations = {
     'search.tools': 'Rechercher des outils sur la carte...',
     'chargemento.outils': 'Chargement des outils...',
     'reservation.deposit.desc':
-      'La caution sera gelé 24h avant le début de la location et remboursée après celle-ci si aucun dommage n`est constaté.',
+      'Le montant de la caution est convenu directement entre le loueur et le locataire en dehors de la plateforme.',
     'requests.refund_notice': 'Politique de remboursement',
     'requests.owner_cancel_refund_policy':
       "En cas d'annulation par le propriétaire, le locataire sera intégralement remboursé.",
@@ -450,12 +450,10 @@ const translations = {
       'Rappel de récupération',
     'notifications.content.booking_pickup_reminder.message':
       'N’oubliez pas de récupérer "{toolName}" demain ({startDate}).',
-    'notifications.content.booking_handover_reminder.title':
-      'Rappel de remise',
+    'notifications.content.booking_handover_reminder.title': 'Rappel de remise',
     'notifications.content.booking_handover_reminder.message':
       'Rappel: {userName} doit récupérer "{toolName}" demain.',
-    'notifications.content.booking_return_reminder.title':
-      'Rappel de retour',
+    'notifications.content.booking_return_reminder.title': 'Rappel de retour',
     'notifications.content.booking_return_reminder_renter.message':
       'N’oubliez pas de retourner "{toolName}" demain ({endDate}).',
     'notifications.content.booking_return_reminder_owner.message':
@@ -466,8 +464,7 @@ const translations = {
     'notifications.content.booking_overdue_owner.title': 'Retour en retard',
     'notifications.content.booking_overdue_owner.message':
       'La réservation de "{toolName}" par {userName} est en retard.',
-    'notifications.content.payment_confirmed_renter.title':
-      'Paiement confirmé',
+    'notifications.content.payment_confirmed_renter.title': 'Paiement confirmé',
     'notifications.content.payment_confirmed_renter.message':
       'Votre paiement pour la réservation de "{toolName}" a été confirmé.',
     'notifications.content.payment_received_owner.title': 'Paiement reçu',
@@ -479,12 +476,10 @@ const translations = {
     'notifications.content.tool_returned_owner.title': 'Outil retourné',
     'notifications.content.tool_returned_owner.message':
       '{userName} a confirmé le retour de "{toolName}". {notes}',
-    'notifications.content.return_confirmed_renter.title':
-      'Retour confirmé',
+    'notifications.content.return_confirmed_renter.title': 'Retour confirmé',
     'notifications.content.return_confirmed_renter.message':
       'Vous avez confirmé le retour de "{toolName}". Merci pour votre location.',
-    'notifications.content.deposit_required.title':
-      'Paiement d’acompte requis',
+    'notifications.content.deposit_required.title': 'Paiement d’acompte requis',
     'notifications.content.deposit_required.message':
       'Votre réservation pour "{toolName}" nécessite un paiement d’acompte. Veuillez effectuer le paiement pour confirmer votre réservation.',
     'notifications.content.deposit_overdue_cancelled.title':
@@ -522,8 +517,7 @@ const translations = {
       'Demande approuvée',
     'notifications.content.account_deletion_approved.message':
       'Votre demande a été approuvée.',
-    'notifications.content.account_deletion_cancelled.title':
-      'Demande annulée',
+    'notifications.content.account_deletion_cancelled.title': 'Demande annulée',
     'notifications.content.account_deletion_cancelled.message':
       'Votre demande a été annulée.',
 
@@ -834,6 +828,74 @@ const translations = {
     'reservation.no_reservations': 'Aucune réservation',
     'reservation.no_reservations_message':
       "Vous n'avez aucune réservation pour le moment. Explorez notre catalogue pour trouver des outils à louer.",
+    'rent.toast.countries_load_failed.title': 'Erreur',
+    'rent.toast.countries_load_failed.description':
+      'Impossible de charger les pays. Veuillez actualiser la page.',
+    'rent.toast.same_dates.title': 'Dates identiques non autorisées',
+    'rent.toast.same_dates.description':
+      'La date de fin doit être différente de la date de début.',
+    'rent.toast.pickup_reset.title': 'Heure de récupération réinitialisée',
+    'rent.toast.pickup_reset.description':
+      "L'heure sélectionnée n'est plus disponible pour cette date. Veuillez en choisir une autre.",
+    'rent.toast.period_unavailable.title': 'Période non disponible',
+    'rent.toast.period_unavailable.description':
+      'La période sélectionnée contient des dates déjà réservées. Veuillez choisir une autre période.',
+    'rent.toast.validation.dates_required':
+      'Veuillez sélectionner les dates de début et de fin de location',
+    'rent.toast.validation.start_after_end':
+      'La date de début ne peut pas être postérieure à la date de fin',
+    'rent.toast.validation.same_dates':
+      'La date de fin doit être différente de la date de début',
+    'rent.toast.validation.date_unavailable':
+      'Une ou plusieurs dates de la période sélectionnée sont indisponibles',
+    'rent.toast.validation.date_confirmed':
+      'Une ou plusieurs dates de la période sélectionnée sont déjà confirmées',
+    'rent.toast.validation.date_pending':
+      'Une ou plusieurs dates de la période sélectionnée sont en attente de confirmation',
+    'rent.toast.validation.date_in_progress':
+      'Une ou plusieurs dates de la période sélectionnée sont actuellement en cours de location',
+    'rent.toast.validation.period_unavailable':
+      "La période sélectionnée contient des dates non disponibles. Veuillez choisir d'autres dates.",
+    'rent.toast.validation.pickup_required':
+      "Veuillez choisir l'heure de récupération avant de procéder au paiement",
+    'rent.toast.validation.invalid_total':
+      'Le prix total est invalide. Veuillez réessayer.',
+    'rent.toast.validation.minimum_amount':
+      'Le montant total doit être supérieur à 0,5 £ pour procéder au paiement.',
+    'rent.toast.validated.title': 'Données validées !',
+    'rent.toast.validated.description':
+      'Veuillez procéder au paiement pour confirmer votre réservation.',
+    'rent.toast.error.tool_unavailable.title': 'Outil non disponible',
+    'rent.toast.error.tool_unavailable.description':
+      "Cet outil est déjà réservé pour les dates sélectionnées. Veuillez choisir d'autres dates.",
+    'rent.toast.error.invalid_input.title': 'Erreur de validation',
+    'rent.toast.error.invalid_input.description':
+      'Les informations saisies ne sont pas valides. Veuillez vérifier vos données.',
+    'rent.toast.error.payment.title': 'Erreur de paiement',
+    'rent.toast.error.payment.description':
+      'Un problème est survenu lors du traitement du paiement. Veuillez réessayer.',
+    'rent.toast.error.unauthorized.title': 'Accès non autorisé',
+    'rent.toast.error.unauthorized.description':
+      'Vous devez être connecté pour effectuer cette action.',
+    'rent.toast.error.tool_not_found.title': 'Outil introuvable',
+    'rent.toast.error.tool_not_found.description':
+      "L'outil sélectionné n'existe plus ou n'est plus disponible.",
+    'rent.toast.error.booking.title': 'Erreur lors de la réservation',
+    'rent.toast.error.booking.description':
+      "Une erreur inattendue s'est produite. Veuillez réessayer dans quelques instants.",
+    'rent.toast.system_error.title': 'Erreur système',
+    'rent.toast.system_error.description':
+      'Les données de réservation sont manquantes.',
+    'rent.toast.payment_success.title': 'Paiement effectué avec succès !',
+    'rent.toast.payment_success.description':
+      'Votre réservation a été confirmée.',
+    'rent.toast.booking_creation_failed.title':
+      'Erreur lors de la création de la réservation',
+    'rent.toast.booking_creation_failed.description':
+      "Le paiement a été effectué mais la réservation n'a pas pu être créée. Contactez le support.",
+    'rent.toast.payment_failed_callback.title': 'Erreur lors du paiement',
+    'rent.toast.payment_failed_callback.description':
+      'Le paiement a échoué. Veuillez réessayer.',
 
     // Calendar legend
     'calendar.legend': 'Légende du calendrier',
@@ -948,7 +1010,8 @@ const translations = {
     'ads.owner_instructions': 'Consignes du propriétaire',
     'ads.owner_instructions_placeholder':
       'Prévoir une rallonge électrique, nettoyer après usage...',
-    'ads.edit.title_tooltip': 'Donnez un titre clair et descriptif à votre outil',
+    'ads.edit.title_tooltip':
+      'Donnez un titre clair et descriptif à votre outil',
     'ads.edit.description_tooltip':
       'Décrivez votre outil en détail pour attirer les locataires',
     'ads.edit.price_tooltip': 'Prix de location par jour',
@@ -985,8 +1048,7 @@ const translations = {
     'ads.edit.photo_primary_title': 'Succès',
     'ads.edit.photo_primary_description':
       'Photo principale définie avec succès',
-    'ads.edit.photo_primary_error':
-      'Impossible de définir la photo principale',
+    'ads.edit.photo_primary_error': 'Impossible de définir la photo principale',
     'ads.edit.photo_upload_error': "Impossible d'uploader la photo {name}",
     'ads.edit.update_success_title': 'Succès',
     'ads.edit.update_success_description':
@@ -1101,8 +1163,7 @@ const translations = {
     'booking.details.submit': 'Confirmer',
     'booking.details.selected_files': 'Fichiers sélectionnés',
     'booking.details.not_found': 'Réservation introuvable.',
-    'booking.details.no_access':
-      "Vous n'avez pas accès à cette réservation.",
+    'booking.details.no_access': "Vous n'avez pas accès à cette réservation.",
     'booking.details.no_actions':
       "Aucune action n'est disponible pour ce statut.",
     'booking.details.image_upload_hint':
@@ -1128,7 +1189,8 @@ const translations = {
       'Notification de caution envoyée',
     'booking.history.action.DEPOSIT_CAPTURED': 'Caution capturée',
     'booking.history.action.ONGOING': 'Réservation en cours',
-    'booking.history.action.RETURN_CONFIRMED': 'Retour confirmé par le locataire',
+    'booking.history.action.RETURN_CONFIRMED':
+      'Retour confirmé par le locataire',
     'booking.history.action.PICKUP_CONFIRMED':
       'Récupération confirmée par le propriétaire',
     'booking.history.action.COMPLETED': 'Réservation terminée',
@@ -1960,6 +2022,29 @@ const translations = {
     'add_tool.year_placeholder': "Année d'achat",
     'add_tool.description_placeholder':
       'Décrivez votre outil, son état, les accessoires inclus...',
+    'add_tool.selected_files': 'Fichiers sélectionnés ({count}/10):',
+    'add_tool.select_primary_photo':
+      'Cliquez sur une image pour la définir comme photo principale',
+    'add_tool.primary_photo': 'Principale',
+    'add_tool.toast.file_too_large.title': 'Fichier trop volumineux',
+    'add_tool.toast.file_too_large.description_1mb':
+      'Les images ne doivent pas dépasser 1MB. {count} fichier(s) ignoré(s).',
+    'add_tool.toast.file_too_large.description_5mb':
+      'Les images ne doivent pas dépasser 5MB. {count} fichier(s) ignoré(s).',
+    'add_tool.toast.limit_reached.title': 'Limite atteinte',
+    'add_tool.toast.required_field.title': 'Champ requis',
+    'add_tool.toast.invalid_price.title': 'Prix invalide',
+    'add_tool.toast.address_required.title': 'Adresse requise',
+    'add_tool.toast.invalid_deposit.title': 'Dépôt invalide',
+    'add_tool.toast.invalid_year.title': 'Année invalide',
+    'add_tool.toast.photos_required.title': 'Photos requises',
+    'add_tool.toast.invalid_deposit.description':
+      'Le montant du dépôt ne peut pas être négatif',
+    'add_tool.toast.invalid_year.description':
+      "L'année doit être comprise entre 1900 et 2030",
+    'add_tool.toast.success.title': 'Outil créé avec succès',
+    'add_tool.toast.success.description':
+      'Votre outil est en attente de modération. Il sera visible une fois approuvé par notre équipe.',
 
     // Categories and subcategories
     'category.gardening': 'Jardinage',
@@ -2442,7 +2527,7 @@ const translations = {
     'search.tools': 'Search for tools on the map...',
     'chargemento.outils': 'Loading tools...',
     'reservation.deposit.desc':
-      'The security deposit will be charged 24 hours before the rental starts and refunded after the rental if no damage is found.',
+      'The deposit amount is agreed directly between the owner and the renter outside the platform.',
     'login.signing': 'Signing in...',
     'blog.category.general': 'General',
     'general.loading': 'loading...',
@@ -2698,7 +2783,7 @@ const translations = {
     'refundPolicy.payments.rule1':
       'All payments are secured and processed via Stripe.',
     'refundPolicy.payments.rule2':
-      'A 15% commission is deducted from each successful transaction, and renters pay a 6% fee at payment (processing and platform maintenance costs).',
+      'A 15% commission is deducted from each successful transaction, and renters pay a 5.25% + 0.25£ fee at payment (processing and platform maintenance costs).',
 
     // cancellationPolicy
     'cancellationPolicy.title': 'Cancellation Policy',
@@ -2878,6 +2963,72 @@ const translations = {
     'reservation.refused_reason_other': 'Other',
     'reservation.refused_message_placeholder': 'Optional Message',
     'reservation.refused_confirm': 'Confirm Rejection',
+    'rent.toast.countries_load_failed.title': 'Error',
+    'rent.toast.countries_load_failed.description':
+      'Failed to load countries. Please refresh the page.',
+    'rent.toast.same_dates.title': 'Identical dates are not allowed',
+    'rent.toast.same_dates.description':
+      'The end date must be different from the start date.',
+    'rent.toast.pickup_reset.title': 'Pick-up time reset',
+    'rent.toast.pickup_reset.description':
+      'The selected time is no longer available for this date. Please choose another one.',
+    'rent.toast.period_unavailable.title': 'Period unavailable',
+    'rent.toast.period_unavailable.description':
+      'The selected period contains dates that are already booked. Please choose another period.',
+    'rent.toast.validation.dates_required':
+      'Please select the rental start and end dates',
+    'rent.toast.validation.start_after_end':
+      'The start date cannot be later than the end date',
+    'rent.toast.validation.same_dates':
+      'The end date must be different from the start date',
+    'rent.toast.validation.date_unavailable':
+      'One or more dates in the selected period are unavailable',
+    'rent.toast.validation.date_confirmed':
+      'One or more dates in the selected period are already confirmed',
+    'rent.toast.validation.date_pending':
+      'One or more dates in the selected period are pending confirmation',
+    'rent.toast.validation.date_in_progress':
+      'One or more dates in the selected period are currently in progress',
+    'rent.toast.validation.period_unavailable':
+      'The selected period contains unavailable dates. Please choose different dates.',
+    'rent.toast.validation.pickup_required':
+      'Please choose the pick-up time before proceeding to payment',
+    'rent.toast.validation.invalid_total':
+      'The total price is invalid. Please try again.',
+    'rent.toast.validation.minimum_amount':
+      'The total amount must be greater than 0.5 GBP to proceed with payment.',
+    'rent.toast.validated.title': 'Details validated!',
+    'rent.toast.validated.description':
+      'Please proceed to payment to confirm your booking.',
+    'rent.toast.error.tool_unavailable.title': 'Tool unavailable',
+    'rent.toast.error.tool_unavailable.description':
+      'This tool is already booked for the selected dates. Please choose different dates.',
+    'rent.toast.error.invalid_input.title': 'Validation error',
+    'rent.toast.error.invalid_input.description':
+      'The entered information is not valid. Please check your details.',
+    'rent.toast.error.payment.title': 'Payment error',
+    'rent.toast.error.payment.description':
+      'A problem occurred while processing the payment. Please try again.',
+    'rent.toast.error.unauthorized.title': 'Unauthorized access',
+    'rent.toast.error.unauthorized.description':
+      'You must be logged in to perform this action.',
+    'rent.toast.error.tool_not_found.title': 'Tool not found',
+    'rent.toast.error.tool_not_found.description':
+      'The selected tool no longer exists or is no longer available.',
+    'rent.toast.error.booking.title': 'Booking error',
+    'rent.toast.error.booking.description':
+      'An unexpected error occurred. Please try again in a few moments.',
+    'rent.toast.system_error.title': 'System error',
+    'rent.toast.system_error.description': 'Booking data is missing.',
+    'rent.toast.payment_success.title': 'Payment completed successfully!',
+    'rent.toast.payment_success.description':
+      'Your booking has been confirmed.',
+    'rent.toast.booking_creation_failed.title': 'Error creating the booking',
+    'rent.toast.booking_creation_failed.description':
+      'The payment was completed but the booking could not be created. Please contact support.',
+    'rent.toast.payment_failed_callback.title': 'Payment failed',
+    'rent.toast.payment_failed_callback.description':
+      'The payment failed. Please try again.',
 
     // Calendar legend
     'calendar.legend': 'Calendar Legend',
@@ -3026,10 +3177,8 @@ const translations = {
     'ads.edit.photo_deleted_description': 'Photo deleted successfully',
     'ads.edit.photo_delete_error': 'Unable to delete the photo',
     'ads.edit.photo_primary_title': 'Success',
-    'ads.edit.photo_primary_description':
-      'Primary photo set successfully',
-    'ads.edit.photo_primary_error':
-      'Unable to set the primary photo',
+    'ads.edit.photo_primary_description': 'Primary photo set successfully',
+    'ads.edit.photo_primary_error': 'Unable to set the primary photo',
     'ads.edit.photo_upload_error': 'Unable to upload photo {name}',
     'ads.edit.update_success_title': 'Success',
     'ads.edit.update_success_description':
@@ -3147,8 +3296,7 @@ const translations = {
     'booking.details.no_access': 'You do not have access to this booking.',
     'booking.details.no_actions':
       'No actions are currently available for this status.',
-    'booking.details.image_upload_hint':
-      'Images only, maximum 1MB per file',
+    'booking.details.image_upload_hint': 'Images only, maximum 1MB per file',
     'booking.details.tool_brand_model': 'Brand and model',
     'booking.details.tool_condition': 'Tool condition',
     'booking.details.tool_category': 'Category',
@@ -4066,11 +4214,34 @@ const translations = {
     'add_tool.instructions_title': 'Usage instructions',
     'add_tool.instructions_placeholder':
       'Ex: Provide an extension cord, clean after use, delicate handling...',
+    'add_tool.selected_files': 'Selected files ({count}/10):',
+    'add_tool.select_primary_photo':
+      'Click an image to set it as the primary photo',
+    'add_tool.primary_photo': 'Primary',
     'add_tool.photo_required':
       'At least one photo is required to create the ad',
     'add_tool.owner_instructions': 'Owner instructions',
     'add_tool.publish': 'Publish ad',
     'add_tool.choose_category': 'Choose a category',
+    'add_tool.toast.file_too_large.title': 'File too large',
+    'add_tool.toast.file_too_large.description_1mb':
+      'Images must not exceed 1MB. {count} file(s) ignored.',
+    'add_tool.toast.file_too_large.description_5mb':
+      'Images must not exceed 5MB. {count} file(s) ignored.',
+    'add_tool.toast.limit_reached.title': 'Limit reached',
+    'add_tool.toast.required_field.title': 'Required field',
+    'add_tool.toast.invalid_price.title': 'Invalid price',
+    'add_tool.toast.address_required.title': 'Address required',
+    'add_tool.toast.invalid_deposit.title': 'Invalid deposit',
+    'add_tool.toast.invalid_year.title': 'Invalid year',
+    'add_tool.toast.photos_required.title': 'Photos required',
+    'add_tool.toast.invalid_deposit.description':
+      'The deposit amount cannot be negative',
+    'add_tool.toast.invalid_year.description':
+      'The year must be between 1900 and 2030',
+    'add_tool.toast.success.title': 'Tool created successfully',
+    'add_tool.toast.success.description':
+      'Your tool is pending moderation. It will be visible once approved by our team.',
     'add_tool.choose_subcategory': 'Choose a subcategory',
     'add_tool.condition_new': 'New',
     'add_tool.condition_excellent': 'Excellent',
@@ -4202,7 +4373,7 @@ const translations = {
       'All payments are processed via Stripe, in accordance with local financial regulations.',
 
     'cgu.section5.li2':
-      'A 6% service fee is applied to the renter at checkout. This covers Stripe processing fees and a portion of the platform’s technical costs (hosting, maintenance, updates).',
+      'A 5.25% + 0.25£ service fee is applied to the renter at checkout. This covers Stripe processing fees and a portion of the platform’s technical costs (hosting, maintenance, updates).',
 
     'cgu.section5.li3':
       'A 15% commission is automatically deducted from each successful transaction.',
@@ -4549,32 +4720,25 @@ const translations = {
     'notifications.content.booking_created_renter.title': 'Booking created',
     'notifications.content.booking_created_renter.message':
       'Your booking request for "{toolName}" has been submitted and is awaiting confirmation.',
-    'notifications.content.booking_created_owner.title':
-      'New booking request',
+    'notifications.content.booking_created_owner.title': 'New booking request',
     'notifications.content.booking_created_owner.message':
       '{userName} wants to book your tool "{toolName}" from {startDate} to {endDate}.',
-    'notifications.content.booking_confirmed_renter.title':
-      'Booking confirmed',
+    'notifications.content.booking_confirmed_renter.title': 'Booking confirmed',
     'notifications.content.booking_confirmed_renter.message':
       'Your booking for "{toolName}" has been confirmed. You can collect the tool on {startDate}.',
-    'notifications.content.booking_confirmed_owner.title':
-      'Booking confirmed',
+    'notifications.content.booking_confirmed_owner.title': 'Booking confirmed',
     'notifications.content.booking_confirmed_owner.message':
       'You confirmed the booking of "{toolName}" for {userName}.',
-    'notifications.content.booking_accepted_renter.title':
-      'Booking accepted',
+    'notifications.content.booking_accepted_renter.title': 'Booking accepted',
     'notifications.content.booking_accepted_renter.message':
       'Your booking for "{toolName}" has been accepted. Validation code: {validationCode}.',
-    'notifications.content.booking_accepted_owner.title':
-      'Booking accepted',
+    'notifications.content.booking_accepted_owner.title': 'Booking accepted',
     'notifications.content.booking_accepted_owner.message':
       'You accepted the booking of "{toolName}" for {userName}. Validation code: {validationCode}.',
-    'notifications.content.booking_cancelled_renter.title':
-      'Booking cancelled',
+    'notifications.content.booking_cancelled_renter.title': 'Booking cancelled',
     'notifications.content.booking_cancelled_renter.message':
       'Your booking for "{toolName}" was cancelled by the owner. {reason}',
-    'notifications.content.booking_cancelled_owner.title':
-      'Booking cancelled',
+    'notifications.content.booking_cancelled_owner.title': 'Booking cancelled',
     'notifications.content.booking_cancelled_owner.message':
       '{userName} cancelled the booking for "{toolName}". {reason}',
     'notifications.content.booking_rejected_renter.title':
@@ -4585,32 +4749,26 @@ const translations = {
       'Booking request rejected',
     'notifications.content.booking_rejected_owner.message':
       'You rejected the booking request for "{toolName}" from {userName}.',
-    'notifications.content.booking_started_renter.title':
-      'Booking started',
+    'notifications.content.booking_started_renter.title': 'Booking started',
     'notifications.content.booking_started_renter.message':
       'Your booking for "{toolName}" has started. Enjoy your rental.',
-    'notifications.content.booking_started_owner.title':
-      'Booking started',
+    'notifications.content.booking_started_owner.title': 'Booking started',
     'notifications.content.booking_started_owner.message':
       'The booking of "{toolName}" by {userName} has started.',
-    'notifications.content.booking_completed_renter.title':
-      'Booking completed',
+    'notifications.content.booking_completed_renter.title': 'Booking completed',
     'notifications.content.booking_completed_renter.message':
       'Your booking for "{toolName}" is now complete. Don’t forget to leave a review.',
-    'notifications.content.booking_completed_owner.title':
-      'Booking completed',
+    'notifications.content.booking_completed_owner.title': 'Booking completed',
     'notifications.content.booking_completed_owner.message':
       'The booking of "{toolName}" by {userName} is now complete.',
-    'notifications.content.booking_pickup_reminder.title':
-      'Pickup reminder',
+    'notifications.content.booking_pickup_reminder.title': 'Pickup reminder',
     'notifications.content.booking_pickup_reminder.message':
       'Don’t forget to pick up "{toolName}" tomorrow ({startDate}).',
     'notifications.content.booking_handover_reminder.title':
       'Handover reminder',
     'notifications.content.booking_handover_reminder.message':
       'Reminder: {userName} must pick up "{toolName}" tomorrow.',
-    'notifications.content.booking_return_reminder.title':
-      'Return reminder',
+    'notifications.content.booking_return_reminder.title': 'Return reminder',
     'notifications.content.booking_return_reminder_renter.message':
       'Don’t forget to return "{toolName}" tomorrow ({endDate}).',
     'notifications.content.booking_return_reminder_owner.message':
@@ -4621,12 +4779,10 @@ const translations = {
     'notifications.content.booking_overdue_owner.title': 'Return overdue',
     'notifications.content.booking_overdue_owner.message':
       'The booking of "{toolName}" by {userName} is overdue.',
-    'notifications.content.payment_confirmed_renter.title':
-      'Payment confirmed',
+    'notifications.content.payment_confirmed_renter.title': 'Payment confirmed',
     'notifications.content.payment_confirmed_renter.message':
       'Your payment for the booking of "{toolName}" has been confirmed.',
-    'notifications.content.payment_received_owner.title':
-      'Payment received',
+    'notifications.content.payment_received_owner.title': 'Payment received',
     'notifications.content.payment_received_owner.message':
       'Payment for the booking of "{toolName}" by {userName} has been received.',
     'notifications.content.payment_failed.title': 'Payment failed',
@@ -4635,12 +4791,10 @@ const translations = {
     'notifications.content.tool_returned_owner.title': 'Tool returned',
     'notifications.content.tool_returned_owner.message':
       '{userName} confirmed the return of "{toolName}". {notes}',
-    'notifications.content.return_confirmed_renter.title':
-      'Return confirmed',
+    'notifications.content.return_confirmed_renter.title': 'Return confirmed',
     'notifications.content.return_confirmed_renter.message':
       'You confirmed the return of "{toolName}". Thank you for your rental.',
-    'notifications.content.deposit_required.title':
-      'Deposit payment required',
+    'notifications.content.deposit_required.title': 'Deposit payment required',
     'notifications.content.deposit_required.message':
       'Your booking for "{toolName}" requires a deposit payment. Please complete the payment to confirm your booking.',
     'notifications.content.deposit_overdue_cancelled.title':
@@ -4663,20 +4817,17 @@ const translations = {
     'notifications.content.tool_rejected.message':
       'Your tool "{toolName}" was rejected. Reason: {reason}.',
     'notifications.content.tool_approved.title': 'Tool approved',
-    'notifications.content.withdrawal_completed.title':
-      'Withdrawal completed',
+    'notifications.content.withdrawal_completed.title': 'Withdrawal completed',
     'notifications.content.withdrawal_completed.message':
       'Your withdrawal of {amount} was completed successfully.',
     'notifications.content.account_deletion_request.title':
       'Deletion request received',
     'notifications.content.account_deletion_request.message':
       'Your account deletion request has been received.',
-    'notifications.content.account_deletion_pending.title':
-      'Request pending',
+    'notifications.content.account_deletion_pending.title': 'Request pending',
     'notifications.content.account_deletion_pending.message':
       'Your request is pending approval.',
-    'notifications.content.account_deletion_approved.title':
-      'Request approved',
+    'notifications.content.account_deletion_approved.title': 'Request approved',
     'notifications.content.account_deletion_approved.message':
       'Your request has been approved.',
     'notifications.content.account_deletion_cancelled.title':
@@ -4756,7 +4907,7 @@ const translations = {
     'search.tools': 'بحث عن أدوات على الخريطة...',
     'chargemento.outils': 'تحميل الأدوات',
     'reservation.deposit.desc':
-      ' سيتم تجميد مبلغ الضمان قبل 24 ساعة من بداية الإيجار، ويُعاد بعد انتهاء الإيجار في حال عدم وجود أي تلف بالأداة المستأجرة.',
+      'يتم الاتفاق عليه مباشرة بين المؤجّر والمستأجر خارج المنصّة.',
     'login.signing': 'تسجيل الدخول...',
     'blog.category.general': 'عام',
     'general.loading': 'جاري التحميل...',
@@ -4881,101 +5032,78 @@ const translations = {
     'notifications.content.booking_created_renter.title': 'تم إنشاء الحجز',
     'notifications.content.booking_created_renter.message':
       'تم إرسال طلب الحجز الخاص بك للأداة "{toolName}" وهو الآن بانتظار التأكيد.',
-    'notifications.content.booking_created_owner.title':
-      'طلب حجز جديد',
+    'notifications.content.booking_created_owner.title': 'طلب حجز جديد',
     'notifications.content.booking_created_owner.message':
       '{userName} يريد حجز أداتك "{toolName}" من {startDate} إلى {endDate}.',
-    'notifications.content.booking_confirmed_renter.title':
-      'تم تأكيد الحجز',
+    'notifications.content.booking_confirmed_renter.title': 'تم تأكيد الحجز',
     'notifications.content.booking_confirmed_renter.message':
       'تم تأكيد حجزك للأداة "{toolName}". يمكنك استلام الأداة في {startDate}.',
-    'notifications.content.booking_confirmed_owner.title':
-      'تم تأكيد الحجز',
+    'notifications.content.booking_confirmed_owner.title': 'تم تأكيد الحجز',
     'notifications.content.booking_confirmed_owner.message':
       'لقد أكدت حجز "{toolName}" لصالح {userName}.',
-    'notifications.content.booking_accepted_renter.title':
-      'تم قبول الحجز',
+    'notifications.content.booking_accepted_renter.title': 'تم قبول الحجز',
     'notifications.content.booking_accepted_renter.message':
       'تم قبول حجزك للأداة "{toolName}". رمز التحقق: {validationCode}.',
-    'notifications.content.booking_accepted_owner.title':
-      'تم قبول الحجز',
+    'notifications.content.booking_accepted_owner.title': 'تم قبول الحجز',
     'notifications.content.booking_accepted_owner.message':
       'لقد قبلت حجز "{toolName}" لصالح {userName}. رمز التحقق: {validationCode}.',
-    'notifications.content.booking_cancelled_renter.title':
-      'تم إلغاء الحجز',
+    'notifications.content.booking_cancelled_renter.title': 'تم إلغاء الحجز',
     'notifications.content.booking_cancelled_renter.message':
       'تم إلغاء حجزك للأداة "{toolName}" من قبل المالك. {reason}',
-    'notifications.content.booking_cancelled_owner.title':
-      'تم إلغاء الحجز',
+    'notifications.content.booking_cancelled_owner.title': 'تم إلغاء الحجز',
     'notifications.content.booking_cancelled_owner.message':
       'قام {userName} بإلغاء حجز "{toolName}". {reason}',
-    'notifications.content.booking_rejected_renter.title':
-      'تم رفض طلب الحجز',
+    'notifications.content.booking_rejected_renter.title': 'تم رفض طلب الحجز',
     'notifications.content.booking_rejected_renter.message':
       'تم رفض طلب الحجز الخاص بك للأداة "{toolName}". {reason}',
-    'notifications.content.booking_rejected_owner.title':
-      'تم رفض طلب الحجز',
+    'notifications.content.booking_rejected_owner.title': 'تم رفض طلب الحجز',
     'notifications.content.booking_rejected_owner.message':
       'لقد رفضت طلب حجز "{toolName}" من {userName}.',
-    'notifications.content.booking_started_renter.title':
-      'بدأ الحجز',
+    'notifications.content.booking_started_renter.title': 'بدأ الحجز',
     'notifications.content.booking_started_renter.message':
       'بدأ حجزك للأداة "{toolName}". نتمنى لك تجربة إيجار موفقة.',
-    'notifications.content.booking_started_owner.title':
-      'بدأ الحجز',
+    'notifications.content.booking_started_owner.title': 'بدأ الحجز',
     'notifications.content.booking_started_owner.message':
       'بدأ حجز "{toolName}" بواسطة {userName}.',
-    'notifications.content.booking_completed_renter.title':
-      'اكتمل الحجز',
+    'notifications.content.booking_completed_renter.title': 'اكتمل الحجز',
     'notifications.content.booking_completed_renter.message':
       'اكتمل حجزك للأداة "{toolName}". لا تنسَ ترك تقييم.',
-    'notifications.content.booking_completed_owner.title':
-      'اكتمل الحجز',
+    'notifications.content.booking_completed_owner.title': 'اكتمل الحجز',
     'notifications.content.booking_completed_owner.message':
       'اكتمل حجز "{toolName}" بواسطة {userName}.',
-    'notifications.content.booking_pickup_reminder.title':
-      'تذكير بالاستلام',
+    'notifications.content.booking_pickup_reminder.title': 'تذكير بالاستلام',
     'notifications.content.booking_pickup_reminder.message':
       'لا تنسَ استلام "{toolName}" غداً ({startDate}).',
-    'notifications.content.booking_handover_reminder.title':
-      'تذكير بالتسليم',
+    'notifications.content.booking_handover_reminder.title': 'تذكير بالتسليم',
     'notifications.content.booking_handover_reminder.message':
       'تذكير: يجب على {userName} استلام "{toolName}" غداً.',
-    'notifications.content.booking_return_reminder.title':
-      'تذكير بالإرجاع',
+    'notifications.content.booking_return_reminder.title': 'تذكير بالإرجاع',
     'notifications.content.booking_return_reminder_renter.message':
       'لا تنسَ إعادة "{toolName}" غداً ({endDate}).',
     'notifications.content.booking_return_reminder_owner.message':
       'تذكير: يجب على {userName} إعادة "{toolName}" غداً.',
-    'notifications.content.booking_overdue_renter.title':
-      'تأخر في الإرجاع',
+    'notifications.content.booking_overdue_renter.title': 'تأخر في الإرجاع',
     'notifications.content.booking_overdue_renter.message':
       'حجزك للأداة "{toolName}" متأخر. يرجى إعادة الأداة في أقرب وقت ممكن.',
-    'notifications.content.booking_overdue_owner.title':
-      'تأخر في الإرجاع',
+    'notifications.content.booking_overdue_owner.title': 'تأخر في الإرجاع',
     'notifications.content.booking_overdue_owner.message':
       'حجز "{toolName}" بواسطة {userName} متأخر.',
-    'notifications.content.payment_confirmed_renter.title':
-      'تم تأكيد الدفع',
+    'notifications.content.payment_confirmed_renter.title': 'تم تأكيد الدفع',
     'notifications.content.payment_confirmed_renter.message':
       'تم تأكيد دفعتك لحجز "{toolName}".',
-    'notifications.content.payment_received_owner.title':
-      'تم استلام الدفع',
+    'notifications.content.payment_received_owner.title': 'تم استلام الدفع',
     'notifications.content.payment_received_owner.message':
       'تم استلام دفعة حجز "{toolName}" بواسطة {userName}.',
     'notifications.content.payment_failed.title': 'فشل الدفع',
     'notifications.content.payment_failed.message':
       'فشل الدفع لحجزك للأداة "{toolName}". يرجى المحاولة مرة أخرى.',
-    'notifications.content.tool_returned_owner.title':
-      'تم إرجاع الأداة',
+    'notifications.content.tool_returned_owner.title': 'تم إرجاع الأداة',
     'notifications.content.tool_returned_owner.message':
       'أكد {userName} إرجاع "{toolName}". {notes}',
-    'notifications.content.return_confirmed_renter.title':
-      'تم تأكيد الإرجاع',
+    'notifications.content.return_confirmed_renter.title': 'تم تأكيد الإرجاع',
     'notifications.content.return_confirmed_renter.message':
       'لقد أكدت إرجاع "{toolName}". شكراً لاستخدامك الخدمة.',
-    'notifications.content.deposit_required.title':
-      'مطلوب دفع العربون',
+    'notifications.content.deposit_required.title': 'مطلوب دفع العربون',
     'notifications.content.deposit_required.message':
       'يتطلب حجزك للأداة "{toolName}" دفع عربون. يرجى إتمام الدفع لتأكيد الحجز.',
     'notifications.content.deposit_overdue_cancelled.title':
@@ -4984,12 +5112,10 @@ const translations = {
       'تم إلغاء حجزك للأداة "{toolName}" تلقائياً لأن العربون لم يُدفع في الوقت المحدد.',
     'notifications.content.deposit_overdue_cancelled_owner.message':
       'تم إلغاء حجز {userName} للأداة "{toolName}" تلقائياً لأن العربون لم يُدفع.',
-    'notifications.content.deposit_paid_renter.title':
-      'تم دفع العربون بنجاح',
+    'notifications.content.deposit_paid_renter.title': 'تم دفع العربون بنجاح',
     'notifications.content.deposit_paid_renter.message':
       'تم دفع العربون لحجز "{toolName}" بنجاح. أصبح الحجز مؤكداً الآن.',
-    'notifications.content.deposit_received_owner.title':
-      'تم استلام العربون',
+    'notifications.content.deposit_received_owner.title': 'تم استلام العربون',
     'notifications.content.deposit_received_owner.message':
       'تم استلام عربون حجز {userName} للأداة "{toolName}". تم تأكيد الحجز.',
     'notifications.content.dispute_created.title': 'نزاع جديد',
@@ -4999,8 +5125,7 @@ const translations = {
     'notifications.content.tool_rejected.message':
       'تم رفض أداتك "{toolName}". السبب: {reason}.',
     'notifications.content.tool_approved.title': 'تمت الموافقة على الأداة',
-    'notifications.content.withdrawal_completed.title':
-      'اكتمل السحب',
+    'notifications.content.withdrawal_completed.title': 'اكتمل السحب',
     'notifications.content.withdrawal_completed.message':
       'تم تنفيذ سحبك بمبلغ {amount} بنجاح.',
     'notifications.content.account_deletion_request.title':
@@ -5015,8 +5140,7 @@ const translations = {
       'تمت الموافقة على الطلب',
     'notifications.content.account_deletion_approved.message':
       'تمت الموافقة على طلبك.',
-    'notifications.content.account_deletion_cancelled.title':
-      'تم إلغاء الطلب',
+    'notifications.content.account_deletion_cancelled.title': 'تم إلغاء الطلب',
     'notifications.content.account_deletion_cancelled.message':
       'تم إلغاء طلبك.',
 
@@ -5383,6 +5507,70 @@ const translations = {
     'reservation.refused_reason_other': 'آخر',
     'reservation.refused_message_placeholder': 'رسالة اختيارية (إن وُجدت)',
     'reservation.refused_confirm': 'تأكيد الرفض',
+    'rent.toast.countries_load_failed.title': 'خطأ',
+    'rent.toast.countries_load_failed.description':
+      'تعذر تحميل قائمة الدول. يرجى تحديث الصفحة.',
+    'rent.toast.same_dates.title': 'لا يُسمح بتاريخين متطابقين',
+    'rent.toast.same_dates.description':
+      'يجب أن يكون تاريخ الانتهاء مختلفاً عن تاريخ البداية.',
+    'rent.toast.pickup_reset.title': 'تمت إعادة تعيين وقت الاستلام',
+    'rent.toast.pickup_reset.description':
+      'الوقت المحدد لم يعد متاحاً لهذا التاريخ. يرجى اختيار وقت آخر.',
+    'rent.toast.period_unavailable.title': 'الفترة غير متاحة',
+    'rent.toast.period_unavailable.description':
+      'الفترة المحددة تحتوي على تواريخ محجوزة بالفعل. يرجى اختيار فترة أخرى.',
+    'rent.toast.validation.dates_required':
+      'يرجى تحديد تاريخي بداية ونهاية الإيجار',
+    'rent.toast.validation.start_after_end':
+      'لا يمكن أن يكون تاريخ البداية بعد تاريخ النهاية',
+    'rent.toast.validation.same_dates':
+      'يجب أن يكون تاريخ الانتهاء مختلفاً عن تاريخ البداية',
+    'rent.toast.validation.date_unavailable':
+      'يوجد تاريخ واحد أو أكثر غير متاح ضمن الفترة المحددة',
+    'rent.toast.validation.date_confirmed':
+      'يوجد تاريخ واحد أو أكثر مؤكد بالفعل ضمن الفترة المحددة',
+    'rent.toast.validation.date_pending':
+      'يوجد تاريخ واحد أو أكثر قيد التأكيد ضمن الفترة المحددة',
+    'rent.toast.validation.date_in_progress':
+      'يوجد تاريخ واحد أو أكثر قيد الإيجار حالياً ضمن الفترة المحددة',
+    'rent.toast.validation.period_unavailable':
+      'الفترة المحددة تحتوي على تواريخ غير متاحة. يرجى اختيار تواريخ أخرى.',
+    'rent.toast.validation.pickup_required':
+      'يرجى اختيار وقت الاستلام قبل المتابعة إلى الدفع',
+    'rent.toast.validation.invalid_total':
+      'السعر الإجمالي غير صالح. يرجى المحاولة مرة أخرى.',
+    'rent.toast.validation.minimum_amount':
+      'يجب أن يكون المبلغ الإجمالي أكبر من 0.5 جنيه إسترليني للمتابعة إلى الدفع.',
+    'rent.toast.validated.title': 'تم التحقق من البيانات!',
+    'rent.toast.validated.description': 'يرجى المتابعة إلى الدفع لتأكيد حجزك.',
+    'rent.toast.error.tool_unavailable.title': 'الأداة غير متاحة',
+    'rent.toast.error.tool_unavailable.description':
+      'هذه الأداة محجوزة بالفعل للتواريخ المحددة. يرجى اختيار تواريخ أخرى.',
+    'rent.toast.error.invalid_input.title': 'خطأ في التحقق',
+    'rent.toast.error.invalid_input.description':
+      'المعلومات المدخلة غير صالحة. يرجى مراجعة بياناتك.',
+    'rent.toast.error.payment.title': 'خطأ في الدفع',
+    'rent.toast.error.payment.description':
+      'حدثت مشكلة أثناء معالجة الدفع. يرجى المحاولة مرة أخرى.',
+    'rent.toast.error.unauthorized.title': 'وصول غير مصرح به',
+    'rent.toast.error.unauthorized.description':
+      'يجب عليك تسجيل الدخول لتنفيذ هذا الإجراء.',
+    'rent.toast.error.tool_not_found.title': 'الأداة غير موجودة',
+    'rent.toast.error.tool_not_found.description':
+      'الأداة المحددة لم تعد موجودة أو لم تعد متاحة.',
+    'rent.toast.error.booking.title': 'خطأ أثناء الحجز',
+    'rent.toast.error.booking.description':
+      'حدث خطأ غير متوقع. يرجى إعادة المحاولة بعد قليل.',
+    'rent.toast.system_error.title': 'خطأ في النظام',
+    'rent.toast.system_error.description': 'بيانات الحجز مفقودة.',
+    'rent.toast.payment_success.title': 'تم الدفع بنجاح!',
+    'rent.toast.payment_success.description': 'تم تأكيد حجزك.',
+    'rent.toast.booking_creation_failed.title': 'خطأ أثناء إنشاء الحجز',
+    'rent.toast.booking_creation_failed.description':
+      'تم الدفع ولكن تعذر إنشاء الحجز. يرجى التواصل مع الدعم.',
+    'rent.toast.payment_failed_callback.title': 'خطأ أثناء الدفع',
+    'rent.toast.payment_failed_callback.description':
+      'فشلت عملية الدفع. يرجى المحاولة مرة أخرى.',
 
     // Calendar legend
     'calendar.legend': 'مفتاح التقويم',
@@ -5509,12 +5697,10 @@ const translations = {
     'ads.owner_instructions_placeholder':
       'يرجى توفير سلك تمديد كهربائي، التنظيف بعد الاستخدام...',
     'ads.edit.title_tooltip': 'أعطِ أداتك عنواناً واضحاً ووصفياً',
-    'ads.edit.description_tooltip':
-      'صف أداتك بالتفصيل لجذب المستأجرين',
+    'ads.edit.description_tooltip': 'صف أداتك بالتفصيل لجذب المستأجرين',
     'ads.edit.price_tooltip': 'سعر الإيجار اليومي',
     'ads.edit.validation_error_title': 'خطأ في التحقق',
-    'ads.edit.validation_error_description':
-      'يرجى تصحيح الأخطاء في النموذج',
+    'ads.edit.validation_error_description': 'يرجى تصحيح الأخطاء في النموذج',
     'ads.edit.current_photos': 'الصور الحالية',
     'ads.edit.new_photos': 'صور جديدة',
     'ads.edit.primary_photo': 'الرئيسية',
@@ -5527,8 +5713,7 @@ const translations = {
     'ads.edit.photo_format': 'PNG، JPG، JPEG (الحد الأقصى 10MB لكل ملف)',
     'ads.edit.renter_instructions_title': 'تعليمات للمستأجر',
     'ads.edit.special_instructions': 'تعليمات خاصة (اختياري)',
-    'ads.edit.instructions_tooltip':
-      'تعليمات خاصة لاستخدام الأداة أو استلامها',
+    'ads.edit.instructions_tooltip': 'تعليمات خاصة لاستخدام الأداة أو استلامها',
     'ads.edit.instructions_placeholder':
       'مثال: الاستلام ممكن فقط في عطلة نهاية الأسبوع، المفاتيح متوفرة عند الجار، إلخ.',
     'ads.edit.cancel': 'إلغاء',
@@ -5543,17 +5728,13 @@ const translations = {
     'ads.edit.photo_deleted_description': 'تم حذف الصورة بنجاح',
     'ads.edit.photo_delete_error': 'تعذر حذف الصورة',
     'ads.edit.photo_primary_title': 'تم بنجاح',
-    'ads.edit.photo_primary_description':
-      'تم تعيين الصورة الرئيسية بنجاح',
-    'ads.edit.photo_primary_error':
-      'تعذر تعيين الصورة الرئيسية',
+    'ads.edit.photo_primary_description': 'تم تعيين الصورة الرئيسية بنجاح',
+    'ads.edit.photo_primary_error': 'تعذر تعيين الصورة الرئيسية',
     'ads.edit.photo_upload_error': 'تعذر رفع الصورة {name}',
     'ads.edit.update_success_title': 'تم بنجاح',
-    'ads.edit.update_success_description':
-      'تم تحديث الأداة بنجاح',
+    'ads.edit.update_success_description': 'تم تحديث الأداة بنجاح',
     'ads.edit.update_error_title': 'خطأ',
-    'ads.edit.update_error_description':
-      'حدث خطأ أثناء تحديث الأداة',
+    'ads.edit.update_error_description': 'حدث خطأ أثناء تحديث الأداة',
     'ads.edit.current_location': 'الموقع الحالي',
     'ads.edit.address': 'العنوان',
     'ads.edit.latitude': 'خط العرض',
@@ -5675,20 +5856,16 @@ const translations = {
     'booking.details.claim_upload': 'المرفقات',
     'booking.details.generated_code': 'الرمز المولد',
     'booking.details.copy_code': 'نسخ الرمز',
-    'booking.details.pickup_ready':
-      'يصبح الرمز متاحاً في يوم بداية الحجز.',
+    'booking.details.pickup_ready': 'يصبح الرمز متاحاً في يوم بداية الحجز.',
     'booking.details.refund_notice': 'سياسة الاسترجاع',
     'booking.details.full_refund': 'استرجاع كامل متاح.',
-    'booking.details.no_refund':
-      'لا يوجد استرجاع وفق مهلة الإلغاء الحالية.',
+    'booking.details.no_refund': 'لا يوجد استرجاع وفق مهلة الإلغاء الحالية.',
     'booking.details.submit': 'تأكيد',
     'booking.details.selected_files': 'الملفات المحددة',
     'booking.details.not_found': 'الحجز غير موجود.',
     'booking.details.no_access': 'ليس لديك صلاحية الوصول إلى هذا الحجز.',
-    'booking.details.no_actions':
-      'لا توجد إجراءات متاحة حالياً لهذه الحالة.',
-    'booking.details.image_upload_hint':
-      'صور فقط، بحد أقصى 1MB لكل ملف',
+    'booking.details.no_actions': 'لا توجد إجراءات متاحة حالياً لهذه الحالة.',
+    'booking.details.image_upload_hint': 'صور فقط، بحد أقصى 1MB لكل ملف',
     'booking.details.tool_brand_model': 'العلامة التجارية والطراز',
     'booking.details.tool_condition': 'حالة الأداة',
     'booking.details.tool_category': 'الفئة',
@@ -5701,19 +5878,15 @@ const translations = {
     'booking.details.copy_code_error': 'تعذر نسخ الرمز.',
     'booking.history.action.CREATED': 'تم إنشاء الحجز',
     'booking.history.action.ACCEPTED': 'تم قبول الطلب',
-    'booking.history.action.VALIDATION_CODE_GENERATED':
-      'تم إنشاء رمز التحقق',
+    'booking.history.action.VALIDATION_CODE_GENERATED': 'تم إنشاء رمز التحقق',
     'booking.history.action.PAYMENT_CAPTURED': 'تم تحصيل الدفع',
-    'booking.history.action.DEPOSIT_CAPTURE_SCHEDULED':
-      'تمت جدولة سحب التأمين',
+    'booking.history.action.DEPOSIT_CAPTURE_SCHEDULED': 'تمت جدولة سحب التأمين',
     'booking.history.action.DEPOSIT_NOTIFICATION_SENT':
       'تم إرسال إشعار التأمين',
     'booking.history.action.DEPOSIT_CAPTURED': 'تم سحب التأمين',
     'booking.history.action.ONGOING': 'بدأ الحجز',
-    'booking.history.action.RETURN_CONFIRMED':
-      'تم تأكيد الإرجاع من المستأجر',
-    'booking.history.action.PICKUP_CONFIRMED':
-      'تم تأكيد الاستلام من المالك',
+    'booking.history.action.RETURN_CONFIRMED': 'تم تأكيد الإرجاع من المستأجر',
+    'booking.history.action.PICKUP_CONFIRMED': 'تم تأكيد الاستلام من المالك',
     'booking.history.action.COMPLETED': 'اكتمل الحجز',
     'booking.history.action.CANCELLED': 'تم إلغاء الحجز',
     'booking.history.action.REJECTED': 'تم رفض الطلب',
@@ -5940,7 +6113,7 @@ const translations = {
     'wallet.successful': 'ناجحة',
     'wallet.withdraw_money': 'طلب تحويل المستحقّات',
     'wallet.withdrawal_note':
-      'يمكنك طلب تحويل مستحقّاتك عندما يبلغ إجمالي مستحقّاتك 50 جنيهًا إسترلينيًا',
+      'يمكنك طلب تحويل مستحقّاتك عندما يبلغ الإجمالي 50 جنيهًا إسترلينيًا',
     'wallet.conversion_rate': '50£ = {minWithdrawalEUR} €',
     'wallet.dynamic_conversion':
       'يتم تحديث سعر الصرف تلقائيًا حسب العملة المختارة في الحساب.',
@@ -6469,6 +6642,25 @@ const translations = {
     'add_tool.publish': 'نشر الإعلان',
     'add_tool.choose_category': 'اختر فئة',
     'add_tool.choose_subcategory': 'اختر فئة فرعية',
+    'add_tool.toast.file_too_large.title': 'الملف كبير جداً',
+    'add_tool.toast.file_too_large.description_1mb':
+      'يجب ألا تتجاوز الصور 1MB. تم تجاهل {count} ملف/ملفات.',
+    'add_tool.toast.file_too_large.description_5mb':
+      'يجب ألا تتجاوز الصور 5MB. تم تجاهل {count} ملف/ملفات.',
+    'add_tool.toast.limit_reached.title': 'تم بلوغ الحد',
+    'add_tool.toast.required_field.title': 'حقل مطلوب',
+    'add_tool.toast.invalid_price.title': 'سعر غير صالح',
+    'add_tool.toast.address_required.title': 'العنوان مطلوب',
+    'add_tool.toast.invalid_deposit.title': 'ضمان غير صالح',
+    'add_tool.toast.invalid_year.title': 'سنة غير صالحة',
+    'add_tool.toast.photos_required.title': 'الصور مطلوبة',
+    'add_tool.toast.invalid_deposit.description':
+      'لا يمكن أن يكون مبلغ الضمان سالباً',
+    'add_tool.toast.invalid_year.description':
+      'يجب أن تكون السنة بين 1900 و2030',
+    'add_tool.toast.success.title': 'تم إنشاء الأداة بنجاح',
+    'add_tool.toast.success.description':
+      'أداتك بانتظار المراجعة. ستصبح مرئية بعد موافقة فريقنا.',
     'add_tool.condition_new': 'جديد',
     'add_tool.condition_excellent': 'ممتاز',
     'add_tool.condition_good': 'جيد',
@@ -6479,6 +6671,9 @@ const translations = {
     'add_tool.model_placeholder': 'طراز الأداة',
     'add_tool.year_placeholder': 'سنة الشراء',
     'add_tool.description_placeholder': 'صف أداتك وحالتها والملحقات المرفقة...',
+    'add_tool.selected_files': 'الملفات المحددة ({count}/10):',
+    'add_tool.select_primary_photo': 'انقر على صورة لتعيينها كصورة رئيسية',
+    'add_tool.primary_photo': 'الرئيسية',
 
     // Categories and subcategories
     'category.gardening': 'البستنة',
@@ -6587,7 +6782,7 @@ const translations = {
     'cgu.section5.li1':
       'تُدار عمليات الدفع عبر Stripe، وتخضع للوائح المالية المحلية.',
     'cgu.section5.li2':
-      'تُحمّل نسبة 6% من كل عملية كراء على المستأجر عند الدفع، وهي تغطي مصاريف الدفع الإلكتروني عبر Stripe إضافة إلى جزء من تكاليف تطوير وتشغيل المنصة (صيانة، استضافة، تحسينات تقنية).',
+      'تُحمّل نسبة 5.25% + 0.25£ من كل عملية كراء على المستأجر عند الدفع، وهي تغطي مصاريف الدفع الإلكتروني عبر Stripe إضافة إلى جزء من تكاليف تطوير وتشغيل المنصة (صيانة، استضافة، تحسينات تقنية).',
     'cgu.section5.li3': 'تُقتطع عمولة بنسبة 15% من كل عملية كراء ناجحة.',
     'cgu.section5.li4':
       'تُودع أرباح المؤجر في محفظة رقمية داخلية ويمكن سحبها عبر Wise.',

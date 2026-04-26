@@ -82,9 +82,10 @@ const FeaturedToolsSection = () => {
       typeof originalPrice === 'number'
         ? originalPrice
         : parseFloat(originalPrice) || 0
-    const feeRate = 0.06
-    const feeAmount = price * feeRate
-    return price + feeAmount
+    const feeRate = 0.0525
+    const fee = Number(price * feeRate + 0.25).toFixed(2)
+    // Convert fee back to a number before adding
+    return price + Number(fee)
   }
 
   // Get primary photo URL

@@ -112,7 +112,7 @@ const AddTool = () => {
       convertedAmount = currencyContext.convertInstantly(
         formData.basePrice,
         currency.code,
-        'GBP'
+        'GBP',
       )
       setPriceInGBP(convertedAmount)
     }
@@ -149,7 +149,7 @@ const AddTool = () => {
       convertedAmount = currencyContext.convertInstantly(
         formData.depositAmount,
         currency.code,
-        'GBP'
+        'GBP',
       )
       setDepositInGBP(convertedAmount)
     }
@@ -312,8 +312,8 @@ const AddTool = () => {
         // Debug: Log user country for Mapbox configuration
       } catch (error) {
         toast({
-          title: 'Erreur',
-          description: 'Impossible de charger les catégories',
+          title: t('general.error'),
+          description: t('error.load_categories'),
           variant: 'destructive',
         })
       } finally {
@@ -327,9 +327,8 @@ const AddTool = () => {
   // Load subcategories when category changes
   const loadSubcategories = async (categoryId: string) => {
     try {
-      const subcategoriesData = await toolsService.getSubcategoriesByCategory(
-        categoryId
-      )
+      const subcategoriesData =
+        await toolsService.getSubcategoriesByCategory(categoryId)
       setSubcategories(subcategoriesData || [])
     } catch (error) {
       setSubcategories([])
@@ -340,14 +339,17 @@ const AddTool = () => {
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
 
-    // Vérifier la taille de chaque fichier (1MB maximum)
-    const maxSize = 1048576 // 1MB en bytes
+    // Vérifier la taille de chaque fichier (5MB maximum)
+    const maxSize = 50485760 // 5MB en bytes
     const oversizedFiles = files.filter((file) => file.size > maxSize)
 
     if (oversizedFiles.length > 0) {
       toast({
-        title: 'Fichier trop volumineux',
-        description: `Les images ne doivent pas dépasser 1MB. ${oversizedFiles.length} fichier(s) ignoré(s).`,
+        title: t('add_tool.toast.file_too_large.title'),
+        description: t('add_tool.toast.file_too_large.description_5mb').replace(
+          '{count}',
+          oversizedFiles.length.toString(),
+        ),
         variant: 'destructive',
       })
       // Filtrer les fichiers qui respectent la limite de taille
@@ -357,8 +359,8 @@ const AddTool = () => {
       // Continuer avec les fichiers valides
       if (validFiles.length + selectedFiles.length > 10) {
         toast({
-          title: 'Limite atteinte',
-          description: 'Vous ne pouvez ajouter que 10 photos maximum',
+          title: t('add_tool.toast.limit_reached.title'),
+          description: t('validation.limit_reached'),
           variant: 'destructive',
         })
         return
@@ -369,8 +371,8 @@ const AddTool = () => {
 
     if (files.length + selectedFiles.length > 10) {
       toast({
-        title: 'Limite atteinte',
-        description: 'Vous ne pouvez ajouter que 10 photos maximum',
+        title: t('add_tool.toast.limit_reached.title'),
+        description: t('validation.limit_reached'),
         variant: 'destructive',
       })
       return
@@ -415,8 +417,8 @@ const AddTool = () => {
   const validateForm = () => {
     if (!formData.title?.trim()) {
       toast({
-        title: 'Champ requis',
-        description: 'Le titre est obligatoire',
+        title: t('add_tool.toast.required_field.title'),
+        description: t('validation.title_required'),
         variant: 'destructive',
       })
       return false
@@ -424,8 +426,8 @@ const AddTool = () => {
 
     if (!formData.categoryId) {
       toast({
-        title: 'Champ requis',
-        description: 'La catégorie est obligatoire',
+        title: t('add_tool.toast.required_field.title'),
+        description: t('validation.category_required'),
         variant: 'destructive',
       })
       return false
@@ -433,8 +435,8 @@ const AddTool = () => {
 
     if (!formData.condition) {
       toast({
-        title: 'Champ requis',
-        description: "L'état de l'outil est obligatoire",
+        title: t('add_tool.toast.required_field.title'),
+        description: t('validation.condition_required'),
         variant: 'destructive',
       })
       return false
@@ -442,8 +444,8 @@ const AddTool = () => {
 
     if (!formData.basePrice || formData.basePrice <= 0) {
       toast({
-        title: 'Prix invalide',
-        description: 'Le prix par jour doit être supérieur à 0',
+        title: t('add_tool.toast.invalid_price.title'),
+        description: t('validation.price_invalid'),
         variant: 'destructive',
       })
       return false
@@ -451,9 +453,8 @@ const AddTool = () => {
 
     if (!isAddressSelected || !formData.latitude || !formData.longitude) {
       toast({
-        title: 'Adresse requise',
-        description:
-          'Veuillez sélectionner une adresse en cliquant sur la carte',
+        title: t('add_tool.toast.address_required.title'),
+        description: t('validation.address_required'),
         variant: 'destructive',
       })
       return false
@@ -461,8 +462,8 @@ const AddTool = () => {
 
     if (formData.depositAmount !== undefined && formData.depositAmount < 0) {
       toast({
-        title: 'Dépôt invalide',
-        description: 'Le montant du dépôt ne peut pas être négatif',
+        title: t('add_tool.toast.invalid_deposit.title'),
+        description: t('add_tool.toast.invalid_deposit.description'),
         variant: 'destructive',
       })
       return false
@@ -473,8 +474,8 @@ const AddTool = () => {
       (formData.year < 1900 || formData.year > 2030)
     ) {
       toast({
-        title: 'Année invalide',
-        description: "L'année doit être comprise entre 1900 et 2030",
+        title: t('add_tool.toast.invalid_year.title'),
+        description: t('add_tool.toast.invalid_year.description'),
         variant: 'destructive',
       })
       return false
@@ -482,8 +483,8 @@ const AddTool = () => {
 
     if (selectedFiles.length === 0) {
       toast({
-        title: 'Photos requises',
-        description: 'Au moins une photo est obligatoire pour créer l\'annonce',
+        title: t('add_tool.toast.photos_required.title'),
+        description: t('validation.photos_required'),
         variant: 'destructive',
       })
       return false
@@ -544,17 +545,16 @@ const AddTool = () => {
       localStorage.setItem('toolAdded', 'true')
 
       toast({
-        title: 'Outil créé avec succès',
-        description:
-          'Votre outil est en attente de modération. Il sera visible une fois approuvé par notre équipe.',
+        title: t('add_tool.toast.success.title'),
+        description: t('add_tool.toast.success.description'),
       })
 
       // Navigate to profile with my-ads tab
       navigate('/profile?tab=my-ads')
     } catch (error: any) {
       toast({
-        title: 'Erreur',
-        description: error.message || "Impossible de créer l'outil",
+        title: t('general.error'),
+        description: error.message || t('error.create_tool'),
         variant: 'destructive',
       })
     } finally {
@@ -630,14 +630,17 @@ const AddTool = () => {
 
     const files = Array.from(e.dataTransfer.files)
 
-    // Vérifier la taille de chaque fichier (1MB maximum)
-    const maxSize = 1048576 // 1MB en bytes
+    // Vérifier la taille de chaque fichier (5MB maximum)
+    const maxSize = 5242880 // 5MB en bytes
     const oversizedFiles = files.filter((file) => file.size > maxSize)
 
     if (oversizedFiles.length > 0) {
       toast({
-        title: 'Fichier trop volumineux',
-        description: `Les images ne doivent pas dépasser 1MB. ${oversizedFiles.length} fichier(s) ignoré(s).`,
+        title: t('add_tool.toast.file_too_large.title'),
+        description: t('add_tool.toast.file_too_large.description_5mb').replace(
+          '{count}',
+          oversizedFiles.length.toString(),
+        ),
         variant: 'destructive',
       })
       // Filtrer les fichiers qui respectent la limite de taille
@@ -647,8 +650,8 @@ const AddTool = () => {
       // Continuer avec les fichiers valides
       if (validFiles.length + selectedFiles.length > 10) {
         toast({
-          title: 'Limite atteinte',
-          description: 'Vous ne pouvez ajouter que 10 photos maximum',
+          title: t('add_tool.toast.limit_reached.title'),
+          description: t('validation.limit_reached'),
           variant: 'destructive',
         })
         return
@@ -659,8 +662,8 @@ const AddTool = () => {
 
     if (files.length + selectedFiles.length > 10) {
       toast({
-        title: 'Limite atteinte',
-        description: 'Vous ne pouvez ajouter que 10 photos maximum',
+        title: t('add_tool.toast.limit_reached.title'),
+        description: t('validation.limit_reached'),
         variant: 'destructive',
       })
       return
@@ -782,7 +785,7 @@ const AddTool = () => {
                             'year',
                             e.target.value
                               ? parseInt(e.target.value)
-                              : undefined
+                              : undefined,
                           )
                         }
                         placeholder={t('add_tool.year_placeholder')}
@@ -982,7 +985,7 @@ const AddTool = () => {
                                 : currencyContext.convertInstantly(
                                     numValue,
                                     currency.code,
-                                    'GBP'
+                                    'GBP',
                                   )
                             if (numValue && gbpValue > 500) {
                               return
@@ -1047,7 +1050,7 @@ const AddTool = () => {
                                 : currencyContext.convertInstantly(
                                     numValue,
                                     currency.code,
-                                    'GBP'
+                                    'GBP',
                                   )
                             if (numValue && gbpValue > 500) {
                               return
@@ -1102,7 +1105,8 @@ const AddTool = () => {
                     {/* Map for location selection */}
                     <div className='space-y-3'>
                       <Label className='text-sm font-medium text-foreground'>
-                        {t('add_tool.address')} * - {t('add_tool.select_on_map')}
+                        {t('add_tool.address')} * -{' '}
+                        {t('add_tool.select_on_map')}
                       </Label>
                       <MapboxLocationPicker
                         coordinates={
@@ -1139,7 +1143,8 @@ const AddTool = () => {
                         )}
                         {formData.latitude && formData.longitude && (
                           <div className='text-xs text-muted-foreground'>
-                            🌍 <strong>{t('add_tool.coordinates_label')}</strong>{' '}
+                            🌍{' '}
+                            <strong>{t('add_tool.coordinates_label')}</strong>{' '}
                             {typeof formData.latitude === 'number'
                               ? formData.latitude.toFixed(6)
                               : formData.latitude}
@@ -1174,8 +1179,8 @@ const AddTool = () => {
                       dragActive
                         ? 'border-accent bg-accent/10 scale-[1.02]'
                         : selectedFiles.length === 0
-                        ? 'border-destructive hover:border-destructive/70'
-                        : 'border-border hover:border-accent hover:bg-accent/5'
+                          ? 'border-destructive hover:border-destructive/70'
+                          : 'border-border hover:border-accent hover:bg-accent/5'
                     }`}
                     onDragEnter={handleDrag}
                     onDragLeave={handleDrag}
@@ -1226,11 +1231,13 @@ const AddTool = () => {
                   {selectedFiles.length > 0 && (
                     <div className='mt-4'>
                       <p className='text-sm font-medium text-foreground mb-2'>
-                        Fichiers sélectionnés ({selectedFiles.length}/10):
+                        {t('add_tool.selected_files').replace(
+                          '{count}',
+                          selectedFiles.length.toString(),
+                        )}
                       </p>
                       <p className='text-xs text-muted-foreground mb-3'>
-                        Cliquez sur une image pour la définir comme photo
-                        principale
+                        {t('add_tool.select_primary_photo')}
                       </p>
                       <div className='grid grid-cols-2 md:grid-cols-4 gap-3'>
                         {selectedFiles.map((file, index) => (
@@ -1250,7 +1257,7 @@ const AddTool = () => {
                               />
                               {index === primaryPhotoIndex && (
                                 <div className='absolute top-2 left-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full font-medium'>
-                                  Principale
+                                  {t('add_tool.primary_photo')}
                                 </div>
                               )}
                             </div>
