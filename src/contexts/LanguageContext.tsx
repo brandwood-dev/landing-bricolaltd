@@ -520,6 +520,9 @@ const translations = {
     'notifications.content.withdrawal_completed.title': 'Retrait terminé',
     'notifications.content.withdrawal_completed.message':
       'Votre retrait de {amount} a été effectué avec succès.',
+    'notifications.content.withdrawal_failed.title': 'Retrait échoué',
+    'notifications.content.withdrawal_failed.message':
+      'Votre retrait n’a pas pu être finalisé. Statut Wise : {status}.',
     'notifications.content.account_deletion_request.title':
       'Demande de suppression reçue',
     'notifications.content.account_deletion_request.message':
@@ -1614,6 +1617,8 @@ const translations = {
       'Votre demande de retrait a été soumise avec succès. Elle sera traitée sous 24-48h.',
     'wallet.withdrawal_success_toast':
       'Opération bien effectuée. Le montant a été déduit.',
+    'wallet.withdrawal_failed_toast':
+      'Le retrait a échoué. Veuillez vérifier la notification reçue.',
     'wallet.dialog.error.title': 'Erreur',
 
     // New FAQ translations
@@ -3767,6 +3772,8 @@ const translations = {
       'Your withdrawal request has been successfully submitted. It will be processed within 24-48h.',
     'wallet.withdrawal_success_toast':
       'Operation completed successfully. The amount has been deducted.',
+    'wallet.withdrawal_failed_toast':
+      'Withdrawal failed. Please check the received notification.',
     'wallet.dialog.error.title': 'Error',
 
     // New FAQ translations
@@ -4902,6 +4909,9 @@ const translations = {
     'notifications.content.withdrawal_completed.title': 'Withdrawal completed',
     'notifications.content.withdrawal_completed.message':
       'Your withdrawal of {amount} was completed successfully.',
+    'notifications.content.withdrawal_failed.title': 'Withdrawal failed',
+    'notifications.content.withdrawal_failed.message':
+      'Your withdrawal could not be completed. Wise status: {status}.',
     'notifications.content.account_deletion_request.title':
       'Deletion request received',
     'notifications.content.account_deletion_request.message':
@@ -5224,6 +5234,9 @@ const translations = {
     'notifications.content.withdrawal_completed.title': 'اكتمل السحب',
     'notifications.content.withdrawal_completed.message':
       'تم تنفيذ سحبك بمبلغ {amount} بنجاح.',
+    'notifications.content.withdrawal_failed.title': 'فشل السحب',
+    'notifications.content.withdrawal_failed.message':
+      'تعذر إتمام السحب. حالة Wise: {status}.',
     'notifications.content.account_deletion_request.title':
       'تم استلام طلب الحذف',
     'notifications.content.account_deletion_request.message':
@@ -6287,6 +6300,8 @@ const translations = {
     'wallet.dialog.success.desc':
       'تم تقديم طلب السحب الخاص بك بنجاح. ستتم معالجته خلال 24-48 ساعة.',
     'wallet.withdrawal_success_toast': 'تمت العملية بنجاح. تم خصم المبلغ.',
+    'wallet.withdrawal_failed_toast':
+      'فشل السحب. يُرجى التحقق من الإشعار المستلم.',
     'wallet.dialog.error.title': 'خطأ',
 
     // Navigation

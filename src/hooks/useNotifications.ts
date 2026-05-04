@@ -185,6 +185,8 @@ export const useNotifications = (): UseNotificationsReturn => {
         // Handle specific notification types that require a toast
         if (notification.type === 'withdrawal_completed') {
           toast.success(t('wallet.withdrawal_success_toast'));
+        } else if (notification.type === 'withdrawal_failed') {
+          toast.error(t('wallet.withdrawal_failed_toast'));
         }
       });
 

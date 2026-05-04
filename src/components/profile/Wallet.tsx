@@ -52,6 +52,7 @@ const Wallet = () => {
   const [balance, setBalance] = useState(0)
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [totalTransactions, setTotalTransactions] = useState(0)
+  const [hasActiveWithdrawal, setHasActiveWithdrawal] = useState(false)
   const [stats, setStats] = useState<UserStats>({
     cumulativeBalance: 0,
     availableBalance: 0,
@@ -75,9 +76,17 @@ const Wallet = () => {
         walletService.getUserStats(user.id),
       ])
 
+      const withdrawalsData = await walletService.getWithdrawalHistory(user.id, {
+        page: 1,
+        limit: 10,
+      })
+
       const finalBalance = balanceData?.balance
       const finalTransactions = Array.isArray(transactionsData?.data)
         ? transactionsData.data
+        : []
+      const withdrawalHistory = Array.isArray(withdrawalsData?.data)
+        ? withdrawalsData.data
         : []
       const finalTotal = transactionsData?.total
       const finalStats = statsData || {
@@ -85,11 +94,18 @@ const Wallet = () => {
         availableBalance: 0,
         successfulTransactionsCount: 0,
       }
+      const pendingWithdrawalExists = withdrawalHistory.some(
+        (transaction) =>
+          transaction.status === 'PENDING' ||
+          transaction.status === 'PROCESSING',
+      )
 
       setBalance(finalBalance)
       setTransactions(finalTransactions)
       setTotalTransactions(finalTotal)
       setStats(finalStats)
+      setHasActiveWithdrawal(pendingWithdrawalExists)
+      setWithdrawalPending(pendingWithdrawalExists)
     } catch (error) {
       setTransactions([])
       setTotalTransactions(0)
@@ -143,6 +159,18 @@ const Wallet = () => {
     }
   }, [fetchWalletData, notifications])
 
+  useEffect(() => {
+    if (!withdrawalPending) {
+      return
+    }
+
+    const interval = window.setInterval(() => {
+      fetchWalletData()
+    }, 5000)
+
+    return () => window.clearInterval(interval)
+  }, [fetchWalletData, withdrawalPending])
+
   // Filter transactions by date range (type filtering is handled by API)
   const filteredTransactions = useMemo(() => {
     if (!Array.isArray(transactions)) return []
@@ -178,7 +206,7 @@ const Wallet = () => {
     : []
   const successfulTransactionsCount = successfulTransactions.length
   let canWithdraw = false
-  if (stats.availableBalance >= 50) {
+  if (stats.availableBalance >= 50 && !hasActiveWithdrawal) {
     canWithdraw = true
   }
 

@@ -64,6 +64,8 @@ const TITLE_KEYS_BY_RAW_TITLE: Record<string, string> = {
   'nouvelle réclamation': 'notifications.content.dispute_created.title',
   'outil rejeté': 'notifications.content.tool_rejected.title',
   'retrait terminé': 'notifications.content.withdrawal_completed.title',
+  'retrait termine': 'notifications.content.withdrawal_completed.title',
+  'retrait echoue': 'notifications.content.withdrawal_failed.title',
   'account deletion request':
     'notifications.content.account_deletion_request.title',
   'demande de suppression reçue':
@@ -91,6 +93,7 @@ const TITLE_KEYS_BY_TYPE: Record<string, string> = {
   tool_rejected: 'notifications.content.tool_rejected.title',
   tool_approved: 'notifications.content.tool_approved.title',
   withdrawal_completed: 'notifications.content.withdrawal_completed.title',
+  withdrawal_failed: 'notifications.content.withdrawal_failed.title',
   account_deletion_request:
     'notifications.content.account_deletion_request.title',
   account_deletion_request_pending:
@@ -335,6 +338,16 @@ const MESSAGE_TRANSLATORS: MessageTranslator[] = [
     key: 'notifications.content.withdrawal_completed.message',
     getParams: ([, amount]) => ({ amount }),
   },
+  {
+    match: /^Votre retrait de (.+) a ete effectue avec succes\.$/,
+    key: 'notifications.content.withdrawal_completed.message',
+    getParams: ([, amount]) => ({ amount }),
+  },
+  {
+    match: /^Votre retrait n'a pas pu etre finalise\. Statut Wise: (.+)\.$/,
+    key: 'notifications.content.withdrawal_failed.message',
+    getParams: ([, status]) => ({ status }),
+  },
 ]
 
 const getLocalizedTitle = (notification: NotificationContentData, t: TranslationFn) => {
@@ -380,4 +393,3 @@ export const formatNotificationContent = (
     message: getLocalizedMessage(notification, t),
   }
 }
-
