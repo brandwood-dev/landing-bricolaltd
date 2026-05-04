@@ -1388,8 +1388,7 @@ const Rent: React.FC = () => {
 
                           {formData.paymentMethod === 'card' && (
                             <p className='text-sm text-gray-600'>
-                              Le formulaire de paiement apparaîtra après
-                              validation de vos informations.
+                              {t('payment_form.appears_after_validation')}
                             </p>
                           )}
                         </div>
@@ -1402,7 +1401,7 @@ const Rent: React.FC = () => {
                 {showPayment && (
                   <div className='mt-6 flex items-center justify-between'>
                     <div className='text-sm text-gray-600'>
-                      Formulaire de paiement prêt
+                      {t('payment_form.ready')}
                     </div>
                     <Button
                       type='button'
@@ -1413,7 +1412,7 @@ const Rent: React.FC = () => {
                         setPendingBookingData(null)
                       }}
                     >
-                      Modifier les informations
+                      {t('payment_form.edit_information')}
                     </Button>
                   </div>
                 )}
@@ -1424,7 +1423,7 @@ const Rent: React.FC = () => {
                       <CardHeader>
                         <CardTitle className='flex items-center gap-2'>
                           <CreditCard className='h-5 w-5' />
-                          Paiement de la réservation
+                          {t('payment_form.booking_payment_title')}
                         </CardTitle>
                       </CardHeader>
                       <CardContent>

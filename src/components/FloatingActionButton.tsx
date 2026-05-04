@@ -1,17 +1,20 @@
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Plus, MessageSquare, Edit, Search, X } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuth } from '@/contexts/AuthContext'
 
 const FloatingActionButton = () => {
   const { t } = useLanguage()
   const { isAuthenticated } = useAuth()
+  const location = useLocation()
   const [isOpen, setIsOpen] = useState(false)
 
-  // Ne pas afficher le bouton si l'utilisateur n'est pas connecté
-  if (!isAuthenticated) {
+  const isBookingDetailsPage = /^\/bookings\/[^/]+$/.test(location.pathname)
+
+  // Hide the FAB when the user is not authenticated or is viewing booking details.
+  if (!isAuthenticated || isBookingDetailsPage) {
     return null
   }
 

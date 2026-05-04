@@ -16,6 +16,22 @@ interface LanguageContextType {
 
 const translations = {
   fr: {
+    'report.describe_problem': 'Description du problème',
+    'report.justification_documents': 'Pièces justificatives (optionnel)',
+    'report.justification_documents_description':
+      'Glissez vos images ici ou cliquez pour sélectionner',
+    'report.justification_documents_size':
+      'Images uniquement (max 1MB par fichier)',
+    'report.justification_documents_selected': 'Fichiers sélectionnés',
+
+    'report.problem_type': 'Type de problème',
+    'general.previous': 'Précédent',
+    'general.next': 'Suivant',
+    // 'general.copy': 'Copié',
+    'general.call': 'Appeler',
+    'general.contact_owner': 'Contactez le propriétaire',
+    'request.no_requests': 'Aucune demande trouvée.',
+    'request.loading': 'Chargement des demandes...',
     'rental_process.title': 'Comment ça marche ?',
     'rental_process.description':
       'Louez ou mettez en location des outils en quelques étapes simples.',
@@ -382,7 +398,6 @@ const translations = {
     'contact.support_phone_label': 'Téléphone support',
     'report.title': 'Signaler un problème',
     'report.select_problem_type': 'Sélectionnez le type de problème',
-    'report.describe_problem': 'Décrivez le problème rencontré...',
     'general.other': 'Autre',
     'map.loading': 'Chargement de la carte...',
     'notifications.booking_completed': 'Réservation terminée',
@@ -1178,6 +1193,14 @@ const translations = {
     'booking.details.contract_downloaded_message':
       'Le contrat de location a été généré et téléchargé avec succès.',
     'booking.details.copy_code_error': 'Impossible de copier le code.',
+    'booking.details.contact_visible_after_acceptance':
+      'Les coordonnées deviennent visibles après acceptation de la réservation.',
+    'booking.details.payment_daily_price': 'Prix par jour',
+    'booking.details.payment_days': 'Nombre de jours',
+    'booking.details.payment_booking_amount': 'Montant de réservation',
+    'booking.details.code_owner_hint':
+      'Saisissez le code présenté par le locataire pour lancer la réservation.',
+    'booking.details.launch_booking': 'Lancer la réservation',
     'booking.history.action.CREATED': 'Réservation créée',
     'booking.history.action.ACCEPTED': 'Demande acceptée',
     'booking.history.action.VALIDATION_CODE_GENERATED':
@@ -1560,6 +1583,22 @@ const translations = {
     'wallet.dialog.buttons.next': 'Suivant',
     'wallet.dialog.buttons.confirm': 'Confirmer le retrait',
     'wallet.dialog.buttons.processing': 'Traitement...',
+    'payment_form.amount_to_pay': 'Montant à payer:',
+    'payment_form.equivalent_gbp': '(Équivalent: £{amount} GBP)',
+    'payment_form.processed_in_gbp': '(Traitement en GBP: £{amount})',
+    'payment_form.google_pay_unavailable':
+      "Google Pay n'est pas disponible sur ce navigateur ou appareil.",
+    'payment_form.apple_pay_unavailable':
+      "Apple Pay n'est pas disponible sur ce navigateur ou appareil.",
+    'payment_form.processing_payment': 'Traitement du paiement...',
+    'payment_form.secure_payment': 'Paiement sécurisé',
+    'payment_form.processing': 'Traitement...',
+    'payment_form.pay_now': 'Payer maintenant',
+    'payment_form.ready': 'Formulaire de paiement prêt',
+    'payment_form.edit_information': 'Modifier les informations',
+    'payment_form.booking_payment_title': 'Paiement de la réservation',
+    'payment_form.appears_after_validation':
+      'Le formulaire de paiement apparaîtra après validation de vos informations.',
     'wallet.dialog.errors.invalid_amount': 'Veuillez saisir un montant valide',
     'wallet.dialog.errors.iban_required': 'IBAN requis',
     'wallet.verify_min_amount_required':
@@ -1690,6 +1729,8 @@ const translations = {
     'hero.available_tools': 'Outils disponibles',
     'hero.active_users': 'Utilisateurs actifs',
     'hero.cities_covered': 'Villes couvertes',
+    'hero.free_signup_message':
+      'L`inscription sur la plateforme est gratuite, sans besoin d`abonnement.',
 
     // Categories
     'categories.title': 'Nos catégories',
@@ -2477,6 +2518,20 @@ const translations = {
     'resetpwd.check_error': 'Une erreur est survenue lors de la vérification',
   },
   en: {
+    'report.describe_problem': 'Describe the problem',
+    'report.justification_documents': 'Justification Documents (optional)',
+    'report.justification_documents_description':
+      'Drag and drop your images here or click to select',
+    'report.justification_documents_size': 'Images only (max 1MB per file)',
+    'report.justification_documents_selected': 'Selected files',
+    'report.problem_type': 'Problem Type',
+    'general.previous': 'Previous',
+    'general.next': 'Next',
+    'general.copy': 'Copy',
+    'general.call': 'Call',
+    'general.contact_owner': 'Contact the owner',
+    'request.no_requests': 'No requests found.',
+    'request.loading': 'Loading requests...',
     'rental_process.title': 'How it works?',
     'rental_process.description': 'Rent or list tools in a few simple steps.',
     'rental_process.renter.title': 'For Renters',
@@ -2582,7 +2637,7 @@ const translations = {
     'contact.support_phone_label': 'Support phone',
     'report.title': 'Report a problem',
     'report.select_problem_type': 'Select problem type',
-    'report.describe_problem': 'Describe the issue...',
+   
     'general.other': 'Other',
     'map.loading': 'Loading map...',
     // AgeVerificationDialog
@@ -3251,7 +3306,6 @@ const translations = {
     'general.report': 'Report',
     'general.download_contract': 'Download Contract',
     'general.hide': 'Hide',
-    'general.copy': 'Copy',
     'general.reference': 'Reference',
     'general.contact': 'Contact',
     'general.confirmed': 'Confirmed',
@@ -3307,6 +3361,14 @@ const translations = {
     'booking.details.contract_downloaded_message':
       'The rental agreement was successfully generated and downloaded.',
     'booking.details.copy_code_error': 'Unable to copy the code.',
+    'booking.details.contact_visible_after_acceptance':
+      'Contact details become visible after the booking is accepted.',
+    'booking.details.payment_daily_price': 'Price per day',
+    'booking.details.payment_days': 'Number of days',
+    'booking.details.payment_booking_amount': 'Booking amount',
+    'booking.details.code_owner_hint':
+      'Enter the code shown by the renter to start the booking.',
+    'booking.details.launch_booking': 'Start booking',
     'booking.history.action.CREATED': 'Booking created',
     'booking.history.action.ACCEPTED': 'Request accepted',
     'booking.history.action.VALIDATION_CODE_GENERATED':
@@ -3814,6 +3876,8 @@ const translations = {
     'hero.available_tools': 'Tools Available',
     'hero.active_users': 'Active Users',
     'hero.cities_covered': 'Cities Covered',
+    'hero.free_signup_message':
+      'Registration on the platform is free, with no subscription required.',
 
     // Categories
     'categories.title': 'Our Categories',
@@ -3928,6 +3992,22 @@ const translations = {
     'currency.QAR': 'Qatari Riyal',
     'currency.AED': 'United Arab Emirates Dirham',
     'currency.label': 'Currency',
+    'payment_form.amount_to_pay': 'Amount to pay:',
+    'payment_form.equivalent_gbp': '(Equivalent: £{amount} GBP)',
+    'payment_form.processed_in_gbp': '(Processed in GBP: £{amount})',
+    'payment_form.google_pay_unavailable':
+      'Google Pay is not available on this browser or device.',
+    'payment_form.apple_pay_unavailable':
+      'Apple Pay is not available on this browser or device.',
+    'payment_form.processing_payment': 'Processing payment...',
+    'payment_form.secure_payment': 'Secure payment',
+    'payment_form.processing': 'Processing...',
+    'payment_form.pay_now': 'Pay now',
+    'payment_form.ready': 'Payment form ready',
+    'payment_form.edit_information': 'Edit information',
+    'payment_form.booking_payment_title': 'Booking payment',
+    'payment_form.appears_after_validation':
+      'The payment form will appear after your information is validated.',
 
     'validation.first_name_required': 'First name is required',
     'validation.last_name_required': 'Last name is required',
@@ -4856,6 +4936,21 @@ const translations = {
     'mobile_app.google_play': 'Get it from Google Play',
   },
   ar: {
+    'report.describe_problem': 'وصف المشكلة',
+    'report.justification_documents': 'الملفات الاصلاحية',
+    'report.justification_documents_description':
+      'اسحب الصور هنا أو انقر لتحديدها',
+    'report.justification_documents_size':
+      'الصور فقط (بحد أقصى 1 ميجابايت لكل ملف)',
+    'report.justification_documents_selected': 'الملفات المحددة',
+    'report.problem_type': 'نوع المشكلة',
+    'general.copy': 'نسخ',
+    'general.previous': 'السابق',
+    'general.next': 'التالي',
+    'general.call': 'اتصل',
+    'general.contact_owner': 'تواصل مع المؤجر',
+    'request.no_requests': 'لا يوجد طلبات.',
+    'request.loading': 'تحميل الطلبات...',
     'rental_process.title': 'كيف يعمل النظام؟',
     'rental_process.description': 'استأجر أو اعرض الأدوات في بضع خطوات بسيطة.',
     'rental_process.renter.title': 'للمستأجرين',
@@ -4962,7 +5057,6 @@ const translations = {
     'contact.support_phone_label': 'هاتف الدعم',
     'report.title': 'الإبلاغ عن مشكلة',
     'report.select_problem_type': 'اختر نوع المشكلة',
-    'report.describe_problem': 'صف المشكلة...',
     'general.other': 'أخرى',
     'map.loading': 'جارٍ تحميل الخريطة...',
     // AgeVerificationDialog
@@ -5800,7 +5894,6 @@ const translations = {
     'general.report': 'الإبلاغ',
     'general.download_contract': 'تحميل العقد',
     'general.hide': 'إخفاء',
-    'general.copy': 'نسخ',
     'general.reference': 'رقم المرجع',
     'general.contact': 'اتصل',
     'general.confirmed': 'تم التأكيد',
@@ -5876,6 +5969,14 @@ const translations = {
     'booking.details.contract_downloaded_message':
       'تم إنشاء اتفاقية الإيجار وتنزيلها بنجاح.',
     'booking.details.copy_code_error': 'تعذر نسخ الرمز.',
+    'booking.details.contact_visible_after_acceptance':
+      'تظهر معلومات الاتصال بعد قبول الحجز.',
+    'booking.details.payment_daily_price': 'السعر لكل يوم',
+    'booking.details.payment_days': 'عدد الأيام',
+    'booking.details.payment_booking_amount': 'مبلغ الحجز',
+    'booking.details.code_owner_hint':
+      'أدخل الرمز الذي يقدمه المستأجر لبدء الحجز.',
+    'booking.details.launch_booking': 'بدء الحجز',
     'booking.history.action.CREATED': 'تم إنشاء الحجز',
     'booking.history.action.ACCEPTED': 'تم قبول الطلب',
     'booking.history.action.VALIDATION_CODE_GENERATED': 'تم إنشاء رمز التحقق',
@@ -6216,6 +6317,8 @@ const translations = {
     'hero.available_tools': 'أداة متاحة',
     'hero.active_users': 'مستخدم نشط',
     'hero.cities_covered': 'مدينة مشمولة',
+    'hero.free_signup_message':
+      'التسجيل في المنصة مجاني، دون الحاجة لأي اشتراك.',
 
     // New FAQ translations
     'faq.hero.title': 'الأسئلة الشائعة',
@@ -6296,6 +6399,23 @@ const translations = {
     'faq.payment.q6': 'ما هي تدابير السلامة المطبقة؟',
     'faq.payment.a6':
       'التحقق من الهوية، تقييمات المستخدمين، المدفوعات الآمنة، ومتابعة مستمرة من فريق الدعم لضمان بيئة موثوقة وآمنة.',
+    'payment_form.amount_to_pay': 'المبلغ الواجب دفعه:',
+    'payment_form.equivalent_gbp': '(المعادِل: £{amount} GBP)',
+    'payment_form.processed_in_gbp':
+      '(تتم المعالجة بالجنيه الإسترليني: £{amount})',
+    'payment_form.google_pay_unavailable':
+      'Google Pay غير متاح على هذا المتصفح أو الجهاز.',
+    'payment_form.apple_pay_unavailable':
+      'Apple Pay غير متاح على هذا المتصفح أو الجهاز.',
+    'payment_form.processing_payment': 'جارٍ معالجة الدفع...',
+    'payment_form.secure_payment': 'دفع آمن',
+    'payment_form.processing': 'جارٍ المعالجة...',
+    'payment_form.pay_now': 'ادفع الآن',
+    'payment_form.ready': 'نموذج الدفع جاهز',
+    'payment_form.edit_information': 'تعديل المعلومات',
+    'payment_form.booking_payment_title': 'دفع الحجز',
+    'payment_form.appears_after_validation':
+      'سيظهر نموذج الدفع بعد التحقق من معلوماتك.',
     // Categories
     'categories.title': 'الفئات المتوفرة',
     'categories.description': 'ابحث عن الأداة المناسبة حسب احتياجك',

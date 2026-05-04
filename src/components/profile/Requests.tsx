@@ -49,13 +49,14 @@ import ReviewDialog from './requests/ReviewDialog'
 import ClaimDialog from './requests/ClaimDialog'
 import CancellationDetailsDialog from './requests/CancellationDetailsDialog'
 import { useLanguage } from '@/contexts/LanguageContext'
-import { generateRentalContract } from '@/utils/contractGenerator'
+import { generateRentalContract, generateRentalContractAr, generateRentalContractFr } from '@/utils/contractGenerator'
 import { disputeService } from '@/services/disputeService'
 import { notificationService } from '@/services/notificationService'
 import { reviewsService } from '@/services/reviewsService'
 import { toolsService, Tool } from '@/services/toolsService'
 import AdViewDialog from './AdViewDialog'
 import { Dialog } from '@/components/ui/dialog'
+
 
 const Requests = () => {
   const { user } = useAuth()
@@ -699,19 +700,36 @@ const Requests = () => {
       deposit: request.deposit || 0,
     }
 
-    generateRentalContract(contractData)
-
-    toast({
+    // selon la langue 
+    if (language === 'fr') {
+      generateRentalContractFr(contractData)
+      toast({
       title: 'Contrat téléchargé',
       description:
         'Le contrat de location a été généré et téléchargé avec succès.',
     })
+    } else if (language === 'ar') {
+      generateRentalContractAr(contractData)
+      //toast en arabe Contrat téléchargé'
+      toast({
+      title: 'تم تنزيل العقد.',
+      description:
+        'تم إنشاء اتفاقية الإيجار وتنزيلها بنجاح.',
+    })
+    } else {
+      generateRentalContractFr(contractData)
+      toast({
+        title: 'Contract downloaded',
+        description:
+          'The rental agreement was successfully generated and downloaded.',
+      })
+    }
   }
   if (loading) {
     return (
       <div className='flex items-center justify-center h-96'>
         <Loader2 className='h-8 w-8 animate-spin' />
-        <span className='ml-2'>Chargement des demandes...</span>
+        <span className='ml-2'>{t('request.loading')}</span>
       </div>
     )
   }
@@ -737,7 +755,7 @@ const Requests = () => {
         <div className='space-y-4'>
           {dataToDisplay.length === 0 ? (
             <div className='text-center py-12 text-muted-foreground'>
-              Aucune demande trouvée.
+              {t('request.no_requests')}
             </div>
           ) : (
             paginatedRequests.map((req) => (
@@ -1023,7 +1041,7 @@ const Requests = () => {
                     className='gap-1 pl-2.5'
                   >
                     <ChevronLeft className='h-4 w-4' />
-                    <span>Précédent</span>
+                    <span>{t('general.previous')}</span>
                   </Button>
 
                   {/* Boutons numérotés */}
@@ -1055,7 +1073,7 @@ const Requests = () => {
                     disabled={currentPage >= totalPages}
                     className='gap-1 pr-2.5'
                   >
-                    <span>Suivant</span>
+                    <span>{t('general.next')}</span>
                     <ChevronRight className='h-4 w-4' />
                   </Button>
                 </div>
@@ -1088,7 +1106,7 @@ const Requests = () => {
                     className='gap-1 pl-2.5'
                   >
                     <ChevronLeft className='h-4 w-4' />
-                    <span>Précédent</span>
+                    <span>{t('general.previous')}</span>
                   </Button>
 
                   {/* Bouton Suivant */}
@@ -1102,7 +1120,7 @@ const Requests = () => {
                     disabled={currentPage >= totalPages}
                     className='gap-1 pr-2.5'
                   >
-                    <span>Suivant</span>
+                    <span>{t('general.next')}</span>
                     <ChevronRight className='h-4 w-4' />
                   </Button>
                 </div>

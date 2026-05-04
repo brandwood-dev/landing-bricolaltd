@@ -35,8 +35,7 @@ const MapView = ({
   } | null>(null)
   const [selectedTool, setSelectedTool] = useState<any>(null)
   const mapboxToken =
-    import.meta.env.VITE_MAPBOX_API_KEY ||
-    'pk.eyJ1IjoiYnJhbmR3b29kIiwiYSI6ImNtZm56dWdrbzAwcDYybHNmcXF0Mnoya2oifQ.lFWmwCmjUa_GdkOVZjROSQ'
+    import.meta.env.VITE_MAPBOX_API_KEY
   const [tools, setTools] = useState<Tool[]>([])
   const [loading, setLoading] = useState(true)
   // Local search query for input (doesn't trigger API calls)
@@ -57,6 +56,17 @@ const MapView = ({
 
   // Default countries for non-authenticated users (Gulf countries)
   const defaultCountries = ['KW', 'BH', 'SA', 'AE', 'QA', 'OM']
+
+  const calculateDisplayPrice = (originalPrice: number | string) => {
+    const price =
+      typeof originalPrice === 'number'
+        ? originalPrice
+        : parseFloat(originalPrice) || 0
+    const feeRate = 0.0525
+    const feeAmount = Number(price * feeRate + 0.25).toFixed(2)
+    // Convert feeAmount back to a number before adding
+    return price + Number(feeAmount)
+  }
 
   // Add coordinates to tools (in real app, these would come from the database)
   // Process tools to use real coordinates from database
@@ -464,7 +474,7 @@ const MapView = ({
                         <div className='flex items-center justify-between mt-1'>
                           <span className='font-semibold text-sm'>
                             <OptimizedPriceDisplay
-                              price={tool.basePrice}
+                              price={calculateDisplayPrice(tool.basePrice)}
                               baseCurrency={tool.baseCurrencyCode || 'GBP'}
                               size='md'
                               cible='basePrice'

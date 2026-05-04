@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useMemo, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -55,55 +55,73 @@ const Wallet = () => {
     successfulTransactionsCount: 0,
   })
   const itemsPerPage = 5
-  // Fetch wallet data from backend
-  useEffect(() => {
-    const fetchWalletData = async () => {
-      if (!user) {
-        return
+  const fetchWalletData = useCallback(async () => {
+    if (!user) {
+      return
+    }
+
+    try {
+      setLoading(true)
+      const [balanceData, transactionsData, statsData] = await Promise.all([
+        walletService.getUserBalance(user.id),
+        walletService.getUserTransactions(user.id, {
+          page: currentPage,
+          limit: itemsPerPage,
+          type: transactionType === 'withdrawals' ? 'WITHDRAWAL' : undefined,
+        }),
+        walletService.getUserStats(user.id),
+      ])
+
+      const finalBalance = balanceData?.balance
+      const finalTransactions = Array.isArray(transactionsData?.data)
+        ? transactionsData.data
+        : []
+      const finalTotal = transactionsData?.total
+      const finalStats = statsData || {
+        cumulativeBalance: 0,
+        availableBalance: 0,
+        successfulTransactionsCount: 0,
       }
 
-      try {
-        setLoading(true)
-        const [balanceData, transactionsData, statsData] = await Promise.all([
-          walletService.getUserBalance(user.id),
-          walletService.getUserTransactions(user.id, {
-            page: currentPage,
-            limit: itemsPerPage,
-            type: transactionType === 'withdrawals' ? 'WITHDRAWAL' : undefined,
-          }),
-          walletService.getUserStats(user.id),
-        ])
+      setBalance(finalBalance)
+      setTransactions(finalTransactions)
+      setTotalTransactions(finalTotal)
+      setStats(finalStats)
+    } catch (error) {
+      setTransactions([])
+      setTotalTransactions(0)
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de charger les données du portefeuille',
+        variant: 'destructive',
+      })
+    } finally {
+      setLoading(false)
+    }
+  }, [currentPage, toast, transactionType, user])
 
-        const finalBalance = balanceData?.balance 
-        const finalTransactions = Array.isArray(transactionsData?.data)
-          ? transactionsData.data
-          : []
-        const finalTotal = transactionsData?.total 
-        const finalStats = statsData || {
-          cumulativeBalance: 0,
-          availableBalance: 0,
-          successfulTransactionsCount: 0,
-        }
+  // Fetch wallet data from backend
+  useEffect(() => {
+    fetchWalletData()
+  }, [fetchWalletData])
 
-        setBalance(finalBalance)
-        setTransactions(finalTransactions)
-        setTotalTransactions(finalTotal)
-        setStats(finalStats)
-      } catch (error) {
-        setTransactions([])
-        setTotalTransactions(0)
-        toast({
-          title: 'Erreur',
-          description: 'Impossible de charger les données du portefeuille',
-          variant: 'destructive',
-        })
-      } finally {
-        setLoading(false)
+  useEffect(() => {
+    const handleWalletNotification = (event: Event) => {
+      const notification = (event as CustomEvent)?.detail
+      if (notification?.type === 'withdrawal_completed') {
+        fetchWalletData()
       }
     }
 
-    fetchWalletData()
-  }, [user, currentPage, transactionType])
+    window.addEventListener('bricola:notification', handleWalletNotification)
+
+    return () => {
+      window.removeEventListener(
+        'bricola:notification',
+        handleWalletNotification,
+      )
+    }
+  }, [fetchWalletData])
 
   // Filter transactions by date range (type filtering is handled by API)
   const filteredTransactions = useMemo(() => {
@@ -139,7 +157,6 @@ const Wallet = () => {
     ? transactions.filter((t) => t.status === 'COMPLETED')
     : []
   const successfulTransactionsCount = successfulTransactions.length
-console.log('balance : ', stats.availableBalance)
   let canWithdraw = false
   if (stats.availableBalance >= 50) {
     canWithdraw = true

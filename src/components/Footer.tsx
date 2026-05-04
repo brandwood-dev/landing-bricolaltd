@@ -227,7 +227,7 @@ const Footer = () => {
             <ul className='space-y-2 text-gray-400  '>
               <li
                 className={
-                  'flex items-center inline-flex items-center gap-2 bg-[#22d6d6] text-white text-bold px-3 py-1.5 rounded-md hover:bg-[#128C7E] transition-colors text-sm font-medium' +
+                  'flex items-center inline-flex items-center gap-2 bg-[#5d5f5f] text-white text-bold px-3 py-1.5 rounded-md hover:bg-[#128C7E] transition-colors text-sm font-medium' +
                   (language === 'ar' ? '[direction:ltr]' : '')
                 }
               >

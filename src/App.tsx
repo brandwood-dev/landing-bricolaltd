@@ -1,5 +1,3 @@
-
-import React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
 import { CurrencyProvider } from '@/contexts/CurrencyContext';
-import { AgeVerificationProvider } from '@/contexts/AgeVerificationContext';
+
 import { AuthProvider } from '@/contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Index from "./pages/Index";
@@ -37,8 +35,7 @@ import FAQ from "./pages/FAQ";
 import CGU from "./pages/CGU";
 import ContratLocation from "./pages/ContratLocation";
 import PolitiqueConfidentialite from "./pages/PolitiqueConfidentialite";
-import UnderAge from "./pages/UnderAge";
-import AgeVerificationDialog from "./components/AgeVerificationDialog";
+
 import FloatingActionButton from "./components/FloatingActionButton";
 import ScrollToTop from "./components/ScrollToTop";
 import PolitiqueAnnulation from "./pages/PolitiqueAnnulation";
@@ -54,12 +51,12 @@ const App = () => (
       <LanguageProvider>
         <AuthProvider>
           <CurrencyProvider>
-            <AgeVerificationProvider>
+           
               <BrowserRouter>
                 <ScrollToTop />
                 <Toaster />
                 <Sonner />
-                <AgeVerificationDialog />
+               
                 <FloatingActionButton />
                 <Routes>
                   <Route path="/" element={<Index />} />
@@ -150,13 +147,13 @@ const App = () => (
                   <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
                   <Route path="/politique-annulation" element={<PolitiqueAnnulation />} />
                   <Route path="/politique-remboursement" element={<PolitiqueRemboursement />} />
-                  <Route path="/under-age" element={<UnderAge />} />
+                
                   <Route path="/category-selector-example" element={<CategorySelectorExample />} />
 
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>
-            </AgeVerificationProvider>
+            
           </CurrencyProvider>
         </AuthProvider>
       </LanguageProvider>

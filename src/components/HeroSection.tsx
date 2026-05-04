@@ -76,6 +76,18 @@ const HeroSection = () => {
         <p className="text-xl text-white/90 mb-10 max-w-2xl mx-auto">
           {t('hero.subtitle')}
         </p>
+        {isAuthenticated ? (
+          <p className="mb-8 max-w-3xl mx-auto rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm md:text-base text-white/95 backdrop-blur-sm">
+            {t('hero.free_signup_message')}
+          </p>
+        ) : (
+          <Link
+            to="/register"
+            className="mb-8 block max-w-3xl mx-auto rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm md:text-base text-white/95 backdrop-blur-sm transition hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/60"
+          >
+            {t('hero.free_signup_message')}
+          </Link>
+        )}
 
         {/* Search bar - Title only */}
         <div className="bg-white rounded-2xl p-4 shadow-xl max-w-2xl mx-auto">

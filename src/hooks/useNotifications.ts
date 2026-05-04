@@ -173,6 +173,14 @@ export const useNotifications = (): UseNotificationsReturn => {
       socket.on('new_notification', (notification: Notification) => {
         // Prepend new notification to the list
         setNotifications(prev => [notification, ...prev]);
+
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(
+            new CustomEvent('bricola:notification', {
+              detail: notification,
+            }),
+          );
+        }
         
         // Handle specific notification types that require a toast
         if (notification.type === 'withdrawal_completed') {

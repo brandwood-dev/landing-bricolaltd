@@ -406,17 +406,20 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           {/* Affichage du montant dans la devise sélectionnée avec conversion GBP */}
           <div className='text-center space-y-2'>
             <div className='text-lg font-semibold'>
-              Montant à payer:{' '}
+              {t('payment_form.amount_to_pay')}{' '}
               <OptimizedPriceDisplay
-                                price={displayAmount}
-                                baseCurrency={'GBP'}
-                                size='lg'
-                                cible='totalPrice'
-                              />
+                price={displayAmount}
+                baseCurrency={'GBP'}
+                size='lg'
+                cible='totalPrice'
+              />
             </div>
             {currency.code !== 'GBP' && (
               <div className='text-sm text-gray-600'>
-                (Équivalent: £{amountInGBP.toFixed(2)} GBP)
+                {t('payment_form.equivalent_gbp').replace(
+                  '{amount}',
+                  amountInGBP.toFixed(2)
+                )}
               </div>
             )}
           </div>
@@ -440,8 +443,8 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               <AlertCircle className='h-4 w-4' />
               <AlertDescription>
                 {paymentMethod === 'google_pay'
-                  ? "Google Pay n'est pas disponible sur ce navigateur ou appareil."
-                  : "Apple Pay n'est pas disponible sur ce navigateur ou appareil."}
+                  ? t('payment_form.google_pay_unavailable')
+                  : t('payment_form.apple_pay_unavailable')}
               </AlertDescription>
             </Alert>
           )}
@@ -449,7 +452,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           {processing && (
             <div className='flex items-center justify-center p-4'>
               <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-              Traitement du paiement...
+              {t('payment_form.processing_payment')}
             </div>
           )}
         </CardContent>
@@ -463,14 +466,14 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       <CardHeader>
         <CardTitle className='flex items-center gap-2'>
           <CreditCard className='h-5 w-5' />
-          Paiement sécurisé
+          {t('payment_form.secure_payment')}
         </CardTitle>
       </CardHeader>
       <CardContent className='space-y-4'>
         {/* Affichage du montant dans la devise sélectionnée avec conversion GBP */}
         <div className='text-center space-y-2'>
           <div className='text-lg font-semibold'>
-            Montant à payer:{' '}
+            {t('payment_form.amount_to_pay')}{' '}
             <OptimizedPriceDisplay
               price={amount}
               baseCurrency='GBP'
@@ -479,7 +482,10 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           </div>
           {currency.code !== 'GBP' && (
             <div className='text-sm text-gray-600'>
-              (Traitement en GBP: £{amountInGBP.toFixed(2)})
+              {t('payment_form.processed_in_gbp').replace(
+                '{amount}',
+                amountInGBP.toFixed(2)
+              )}
             </div>
           )}
         </div>
@@ -516,12 +522,12 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             {processing ? (
               <>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                Traitement...
+                {t('payment_form.processing')}
               </>
             ) : (
               <>
                 <CheckCircle className='mr-2 h-4 w-4' />
-                Payer maintenant{' '}
+                {t('payment_form.pay_now')}{' '}
                 <OptimizedPriceDisplay
                   price={amount}
                   baseCurrency='GBP'

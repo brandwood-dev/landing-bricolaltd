@@ -1676,7 +1676,7 @@ const Reservations = () => {
                               <DialogContent>
                                 <DialogHeader>
                                   <DialogTitle>
-                                    Informations du propriétaire
+                                    {t('general.contact_owner')}
                                   </DialogTitle>
                                 </DialogHeader>
                                 <div className='space-y-4'>
@@ -1711,7 +1711,7 @@ const Reservations = () => {
                                       className='flex-1 flex items-center gap-2'
                                     >
                                       <Phone className='h-4 w-4' />
-                                      Appeler
+                                      {t('general.call')}
                                     </Button>
                                     <Button
                                       variant='outline'
@@ -1838,7 +1838,7 @@ const Reservations = () => {
                                     {copiedCode[reservation.id] ? (
                                       <>
                                         <Check className='h-4 w-4 mr-1' />
-                                        Copié
+                                        {t('general.copy')}
                                       </>
                                     ) : (
                                       <>
@@ -2057,7 +2057,7 @@ const Reservations = () => {
             <div className='space-y-4'>
               <div>
                 <label className='block text-sm font-medium mb-2'>
-                  Type de problème
+                  {t('report.problem_type')}
                 </label>
                 <Select value={reportReason} onValueChange={setReportReason}>
                   <SelectTrigger>
@@ -2162,7 +2162,7 @@ const Reservations = () => {
               </div>
               <div>
                 <label className='block text-sm font-medium mb-2'>
-                  Description du problème
+                  {t('report.describe_problem')}
                 </label>
                 <Textarea
                   placeholder={t('report.describe_problem')}
@@ -2172,7 +2172,7 @@ const Reservations = () => {
               </div>
               <div>
                 <label className='block text-sm font-medium mb-2'>
-                  Pièces justificatives (optionnel)
+                  {t('report.justification_documents')}
                 </label>
                 <div
                   className='border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-gray-400 transition-colors cursor-pointer'
@@ -2184,10 +2184,10 @@ const Reservations = () => {
                 >
                   <Upload className='h-8 w-8 mx-auto mb-2 text-gray-400' />
                   <p className='text-sm text-gray-500'>
-                    Glissez vos images ici ou cliquez pour sélectionner
+                    {t('report.justification_documents_description')}
                   </p>
                   <p className='text-xs text-gray-400 mt-1'>
-                    Images uniquement (max 1MB par fichier)
+                    {t('report.justification_documents_size')}
                   </p>
                   <input
                     id='file-input'
@@ -2203,7 +2203,7 @@ const Reservations = () => {
                 {uploadedFiles.length > 0 && (
                   <div className='mt-3 space-y-2'>
                     <p className='text-sm font-medium'>
-                      Fichiers sélectionnés :
+                      {t('report.justification_documents_selected')} :
                     </p>
                     {uploadedFiles.map((file, index) => (
                       <div

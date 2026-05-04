@@ -1,4 +1,6 @@
 import { jsPDF } from 'jspdf'
+import arabicFontBoldUrl from '@/assets/fonts/arial-unicode-bold.ttf?url'
+import arabicFontRegularUrl from '@/assets/fonts/arial-unicode.ttf?url'
 
 interface ContractData {
   referenceId: string
@@ -23,6 +25,49 @@ interface ContractData {
   totalPrice: number
   rentalDuration: string
   deposit: number
+}
+
+let cachedArabicFontRegular: string | null = null
+let cachedArabicFontBold: string | null = null
+
+const arrayBufferToBinaryString = (buffer: ArrayBuffer): string => {
+  const bytes = new Uint8Array(buffer)
+  const chunkSize = 0x8000
+  let binary = ''
+
+  for (let index = 0; index < bytes.length; index += chunkSize) {
+    const chunk = bytes.subarray(index, index + chunkSize)
+    binary += String.fromCharCode(...chunk)
+  }
+
+  return binary
+}
+
+const loadFontBinary = async (fontUrl: string): Promise<string> => {
+  const response = await fetch(fontUrl)
+
+  if (!response.ok) {
+    throw new Error(`Unable to load font: ${fontUrl}`)
+  }
+
+  const buffer = await response.arrayBuffer()
+  return arrayBufferToBinaryString(buffer)
+}
+
+const ensureArabicFont = async (doc: jsPDF): Promise<void> => {
+  if (!cachedArabicFontRegular) {
+    cachedArabicFontRegular = await loadFontBinary(arabicFontRegularUrl)
+  }
+
+  if (!cachedArabicFontBold) {
+    cachedArabicFontBold = await loadFontBinary(arabicFontBoldUrl)
+  }
+
+  doc.addFileToVFS('ArialUnicode.ttf', cachedArabicFontRegular)
+  doc.addFont('ArialUnicode.ttf', 'ArialUnicode', 'normal')
+  doc.addFileToVFS('ArialUnicode-Bold.ttf', cachedArabicFontBold)
+  doc.addFont('ArialUnicode-Bold.ttf', 'ArialUnicode', 'bold')
+  doc.setFont('ArialUnicode', 'normal')
 }
 
 export const generateRentalContract = (data: ContractData): void => {
@@ -236,8 +281,8 @@ export const generateRentalContract = (data: ContractData): void => {
   // Add page number in footer
   doc.setPage(2)
   doc.setFontSize(10)
-  doc.setFont(undefined, 'normal')
-  doc.text(`Page 2 of ${totalPages}`, pageWidth / 2, pageHeight - 10, {
+  doc.setFont('ArialUnicode', 'normal')
+  doc.text(rtlText(`صفحة 1 من ${totalPages}`), pageWidth / 2, pageHeight - 10, {
     align: 'center',
   })
   // Check if we need a new page
@@ -570,12 +615,24 @@ export const generateRentalContractFr = (data: ContractData): void => {
   doc.save(`contrat-location-${data.referenceId}.pdf`)
 }
 
-export const generateRentalContractAr = (data: ContractData): void => {
+export const generateRentalContractAr = async (
+  data: ContractData,
+): Promise<void> => {
   const doc = new jsPDF()
   const pageWidth = doc.internal.pageSize.width
   const pageHeight = doc.internal.pageSize.height
   const margin = 25
+  const rtlX = pageWidth - margin
   let yPosition = 40
+
+  await ensureArabicFont(doc)
+
+  const LRM = ' '
+  const rtlText = (text: string) => doc.processArabic(text)
+  const rtlLines = (text: string) =>
+    doc.splitTextToSize(rtlText(text), pageWidth - 2 * margin)
+  const rtlField = (label: string, value: string | number) =>
+    rtlText(`${label}: ${LRM}${String(value)}${LRM}`)
 
   // Helper function to add separator line
   const addSeparatorLine = (y: number) => {
@@ -593,104 +650,111 @@ export const generateRentalContractAr = (data: ContractData): void => {
 
   // Reference at the top
   doc.setFontSize(10)
-  doc.setFont(undefined, 'bold')
-  doc.text(`المرجع: ${data.referenceId}`, margin, yPosition)
+  doc.setFont('ArialUnicode', 'bold')
+  doc.text(rtlField(data.referenceId, 'المرجع'), rtlX, yPosition, {
+    align: 'right',
+  })
   yPosition += 20
 
   // Title
   doc.setFontSize(16)
-  doc.setFont(undefined, 'bold')
-  doc.text('عقد إيجار أداة', pageWidth / 2, yPosition, {
+  doc.setFont('ArialUnicode', 'bold')
+  doc.text(rtlText('عقد إيجار أداة'), pageWidth / 2, yPosition, {
     align: 'center',
   })
   yPosition += 20
 
   // Header - Between the undersigned
   doc.setFontSize(12)
-  doc.setFont(undefined, 'bold')
-  doc.text('بين الموقعين أدناه', margin, yPosition, {
+  doc.setFont('ArialUnicode', 'bold')
+  doc.text(rtlText('بين الموقعين أدناه'), rtlX, yPosition, {
     align: 'right',
   })
   yPosition += 15
 
   // Owner details
-  doc.setFont(undefined, 'bold')
-  doc.text('المالك:', margin, yPosition, {
+  doc.setFont('ArialUnicode', 'bold')
+  doc.text(rtlText(': المالك'), rtlX, yPosition, {
     align: 'right',
   })
   yPosition += 8
-  doc.setFont(undefined, 'normal')
-  doc.text(`${data.ownerName}`, margin, yPosition, {
+  doc.setFont('ArialUnicode', 'normal')
+  doc.text(`${data.ownerName}`, rtlX, yPosition, {
     align: 'right',
   })
   yPosition += 6
-  doc.text(`العنوان: ${data.ownerAddress}`, margin, yPosition, {
+  doc.text(rtlField(data.ownerAddress, 'العنوان'), rtlX, yPosition, {
     align: 'right',
   })
   yPosition += 6
-  doc.text(`الهاتف: ${data.ownerPhone}`, margin, yPosition, {
+  doc.text(rtlField(data.ownerPhone, 'الهاتف'), rtlX, yPosition, {
     align: 'right',
   })
   yPosition += 6
-  doc.text(`البريد الإلكتروني: ${data.ownerEmail}`, margin, yPosition, {
+  doc.text(rtlField(data.ownerEmail, 'البريد الإلكتروني'), rtlX, yPosition, {
     align: 'right',
   })
   yPosition += 15
 
-  doc.setFont(undefined, 'bold')
-  doc.text('و', margin, yPosition, {
+  doc.setFont('ArialUnicode', 'bold')
+  doc.text(rtlText('و'), rtlX, yPosition, {
     align: 'right',
   })
   yPosition += 15
 
   // Renter details
-  doc.setFont(undefined, 'bold')
-  doc.text('المستأجر:', margin, yPosition, {
+  doc.setFont('ArialUnicode', 'bold')
+  doc.text(rtlText(': المستأجر'), rtlX, yPosition, {
     align: 'right',
   })
   yPosition += 8
-  doc.setFont(undefined, 'normal')
-  doc.text(`${data.renterName}`, margin, yPosition, {
+  doc.setFont('ArialUnicode', 'normal')
+  doc.text(`${data.renterName}`, rtlX, yPosition, {
     align: 'right',
   })
   yPosition += 6
-  doc.text(`العنوان: ${data.renterAddress}`, margin, yPosition, {
+  doc.text(rtlField(data.renterAddress, 'العنوان'), rtlX, yPosition, {
     align: 'right',
   })
   yPosition += 6
-  doc.text(`الهاتف: ${data.renterPhone}`, margin, yPosition, {
+  doc.text(rtlField(data.renterPhone, 'الهاتف'), rtlX, yPosition, {
     align: 'right',
   })
   yPosition += 6
-  doc.text(`البريد الإلكتروني: ${data.renterEmail}`, margin, yPosition, {
+  doc.text(rtlField(data.renterEmail, 'البريد الإلكتروني'), rtlX, yPosition, {
     align: 'right',
   })
   yPosition += 20
 
   // Article 1 - Purpose of the Contract
-  doc.setFont(undefined, 'bold')
-  doc.text('المادة 1 - الغرض من العقد', margin, yPosition, {
+  doc.setFont('ArialUnicode', 'bold')
+  doc.text(rtlText('المادة 1 - الغرض من العقد'), rtlX, yPosition, {
     align: 'right',
   })
   yPosition += 8
-  doc.setFont(undefined, 'normal')
-  doc.text('الغرض من هذا العقد هو تأجير الأداة التالية:', margin, yPosition, {
-    align: 'right',
-  })
+  doc.setFont('ArialUnicode', 'normal')
+  doc.text(
+    rtlText('الغرض من هذا العقد هو تأجير الأداة التالية'),
+    rtlX,
+    yPosition,
+    {
+      align: 'right',
+    },
+  )
   yPosition += 10
-  doc.text(`التسمية : ${data.toolName}`, margin, yPosition, {
+  doc.text(rtlField(data.toolName, 'التسمية'), rtlX, yPosition, {
     align: 'right',
   })
   yPosition += 6
-  doc.text(`العلامة التجارية : ${data.toolBrand}`, margin, yPosition, {
+  doc.text(rtlField(data.toolBrand, 'العلامة التجارية'), rtlX, yPosition, {
     align: 'right',
   })
   yPosition += 6
-  doc.text(`الموديل : ${data.toolModel}`, margin, yPosition, {
+  doc.text(rtlField(data.toolModel, 'الموديل'), rtlX, yPosition, {
     align: 'right',
   })
   yPosition += 6
-  doc.text(`الحالة : ${data.condition}`, margin, yPosition, {
+  doc.text(rtlField(data.condition, 'الحالة'), rtlX, yPosition, {
     align: 'right',
   })
   yPosition += 6
@@ -716,15 +780,17 @@ export const generateRentalContractAr = (data: ContractData): void => {
     startNewPage()
   }
   // Article 2 - Rental Duration
-  doc.setFont(undefined, 'bold')
-  doc.text('المادة 2 - مدة الإيجار', margin, yPosition, {
+  doc.setFont('ArialUnicode', 'bold')
+  doc.text(rtlText('المادة 2 - مدة الإيجار'), rtlX, yPosition, {
     align: 'right',
   })
   yPosition += 8
-  doc.setFont(undefined, 'normal')
+  doc.setFont('ArialUnicode', 'normal')
   doc.text(
-    `تاريخ البدء: ${data.startDate} في ${data.pickupHour}`,
-    margin,
+    rtlText(
+      ` ${LRM}${data.startDate}${LRM}  ${LRM}تاريخ البدء`,
+    ),
+    rtlX,
     yPosition,
     {
       align: 'right',
@@ -732,8 +798,10 @@ export const generateRentalContractAr = (data: ContractData): void => {
   )
   yPosition += 6
   doc.text(
-    `تاريخ الانتهاء: ${data.endDate} في ${data.pickupHour}`,
-    margin,
+    rtlText(
+      ` ${LRM}${data.endDate}${LRM}  ${LRM}تاريخ الانتهاء`,
+    ),
+    rtlX,
     yPosition,
     {
       align: 'right',
@@ -742,37 +810,55 @@ export const generateRentalContractAr = (data: ContractData): void => {
   yPosition += 15
 
   // Article 3 - Price and Payment Terms
-  doc.setFont(undefined, 'bold')
-  doc.text('المادة 3 - السعر وشروط الدفع', margin, yPosition, {
+  doc.setFont('ArialUnicode', 'bold')
+  doc.text(rtlText('المادة 3 - السعر وشروط الدفع'), rtlX, yPosition, {
     align: 'right',
   })
   yPosition += 8
-  doc.setFont(undefined, 'normal')
+  doc.setFont('ArialUnicode', 'normal')
   doc.text(
-    `سعر الإيجار: ${data.totalPrice}€ لمدة ${data.rentalDuration}`,
-    margin,
+    rtlText(
+      ` ${LRM}${data.totalPrice}£${LRM} : ${LRM}سعر الإيجار`,
+    ),
+    rtlX,
     yPosition,
     {
       align: 'right',
     },
   )
   yPosition += 6
-  doc.text(`التأمين: ${data.deposit}€`, margin, yPosition, {
-    align: 'right',
-  })
+  doc.text(
+    rtlText(
+      `${LRM}${data.rentalDuration}${LRM} : ${LRM}مدة الإيجار`,
+    ),
+    rtlX,
+    yPosition,
+    {
+      align: 'right',
+    },
+  )
   yPosition += 6
-  doc.text('طريقة الدفع: عبر منصة Bricola', margin, yPosition, {
+  doc.text(
+    rtlText(` ${LRM}${data.deposit}£${LRM} : ${LRM}الضمان`),
+    rtlX,
+    yPosition,
+    {
+      align: 'right',
+    },
+  )
+  yPosition += 6
+  doc.text(rtlText('طريقة الدفع: عبر منصة بريكولا'), rtlX, yPosition, {
     align: 'right',
   })
   yPosition += 15
 
   // Article 4 - Renter's Obligations
-  doc.setFont(undefined, 'bold')
-  doc.text('المادة 4 - التزامات المستأجر', margin, yPosition, {
+  doc.setFont('ArialUnicode', 'bold')
+  doc.text(rtlText('المادة 4 - التزامات المستأجر'), rtlX, yPosition, {
     align: 'right',
   })
   yPosition += 8
-  doc.setFont(undefined, 'normal')
+  doc.setFont('ArialUnicode', 'normal')
   const renterObligations = [
     'استخدام الأداة وفقًا للغرض المقصود منها',
     'اتخاذ جميع الاحتياطات اللازمة للحفاظ عليها',
@@ -782,7 +868,7 @@ export const generateRentalContractAr = (data: ContractData): void => {
     'احترام أوقات الإرجاع المتفق عليها',
   ]
   renterObligations.forEach((obligation) => {
-    doc.text(`• ${obligation}`, margin, yPosition, {
+    doc.text(rtlText(`${obligation} • `), rtlX, yPosition, {
       align: 'right',
     })
     yPosition += 6
@@ -790,12 +876,12 @@ export const generateRentalContractAr = (data: ContractData): void => {
   yPosition += 10
 
   // Article 5 - Owner's Obligations
-  doc.setFont(undefined, 'bold')
-  doc.text('المادة 5 - التزامات المالك', margin, yPosition, {
+  doc.setFont('ArialUnicode', 'bold')
+  doc.text(rtlText('المادة 5 - التزامات المالك'), rtlX, yPosition, {
     align: 'right',
   })
   yPosition += 8
-  doc.setFont(undefined, 'normal')
+  doc.setFont('ArialUnicode', 'normal')
   const ownerObligations = [
     'تسليم الأداة في حالة عمل ممتازة',
     'توفير تعليمات الاستخدام إذا لزم الأمر',
@@ -803,7 +889,7 @@ export const generateRentalContractAr = (data: ContractData): void => {
     'التواجد وقت التسليم والإرجاع',
   ]
   ownerObligations.forEach((obligation) => {
-    doc.text(`• ${obligation}`, margin, yPosition, {
+    doc.text(rtlText(`${obligation} • `), rtlX, yPosition, {
       align: 'right',
     })
     yPosition += 6
@@ -811,15 +897,15 @@ export const generateRentalContractAr = (data: ContractData): void => {
   yPosition += 10
 
   // Article 6 - Insurance and Liability
-  doc.setFont(undefined, 'bold')
-  doc.text('المادة 6 - التأمين والمسؤولية', margin, yPosition, {
+  doc.setFont('ArialUnicode', 'bold')
+  doc.text(rtlText('المادة 6 - الضمان والمسؤولية'), rtlX, yPosition, {
     align: 'right',
   })
   yPosition += 8
-  doc.setFont(undefined, 'normal')
+  doc.setFont('ArialUnicode', 'normal')
   doc.text(
-    'الأداة مشمولة بتأمين Bricola خلال فترة الإيجار من أجل:',
-    margin,
+    rtlText('الأداة مشمولة بضمان خلال فترة الإيجار من أجل'),
+    rtlX,
     yPosition,
     {
       align: 'right',
@@ -828,21 +914,20 @@ export const generateRentalContractAr = (data: ContractData): void => {
   yPosition += 8
   const insuranceCoverage = [
     'الأضرار العرضية',
-    'السرقة (تحت ظروف معينة)',
+    'السرقة تحت ظروف معينة',
     'الأضرار الناتجة عن عيب في الأداة',
   ]
   insuranceCoverage.forEach((coverage) => {
-    doc.text(`• ${coverage}`, margin, yPosition, {
+    doc.text(rtlText(`${coverage} • `), rtlX, yPosition, {
       align: 'right',
     })
     yPosition += 6
   })
   yPosition += 6
-  const liabilityText = doc.splitTextToSize(
-    'يظل المستأجر مسؤولاً عن الأضرار الناتجة عن الاستخدام غير السليم أو الإهمال الجسيم.',
-    pageWidth - 2 * margin,
+  const liabilityText = rtlLines(
+    'يظل المستأجر مسؤولاً عن الأضرار الناتجة عن الاستخدام غير السليم أو الإهمال الجسيم',
   )
-  doc.text(liabilityText, margin, yPosition, {
+  doc.text(liabilityText, rtlX, yPosition, {
     align: 'right',
   })
   yPosition += liabilityText.length * 6 + 10
@@ -850,8 +935,8 @@ export const generateRentalContractAr = (data: ContractData): void => {
   // Add page number in footer
   doc.setPage(2)
   doc.setFontSize(10)
-  doc.setFont(undefined, 'normal')
-  doc.text(`صفحة 2 من ${totalPages}`, pageWidth / 2, pageHeight - 10, {
+  doc.setFont('ArialUnicode', 'normal')
+  doc.text(rtlText(`صفحة 2 من ${totalPages}`), pageWidth / 2, pageHeight - 10, {
     align: 'center',
   })
   // Check if we need a new page
@@ -860,66 +945,63 @@ export const generateRentalContractAr = (data: ContractData): void => {
   }
 
   // Article 7 - Dispute Resolution
-  doc.setFont(undefined, 'bold')
-  doc.text('المادة 7 - حل النزاعات', margin, yPosition, {
+  doc.setFont('ArialUnicode', 'bold')
+  doc.text(rtlText('المادة 7 - حل النزاعات'), rtlX, yPosition, {
     align: 'right',
   })
   yPosition += 8
-  doc.setFont(undefined, 'normal')
-  const disputeText = doc.splitTextToSize(
-    'في حالة حدوث نزاع، يوافق الطرفان على البحث عن حل ودي. إذا فشل ذلك، ستتدخل خدمة عملاء Bricola في الوساطة. النزاعات التي لم يتم حلها ستحال إلى المحاكم المختصة.',
-    pageWidth - 2 * margin,
+  doc.setFont('ArialUnicode', 'normal')
+  const disputeText = rtlLines(
+    'في حالة حدوث نزاع ، يوافق الطرفان على البحث عن حل ودي. إذا فشل ذلك، ستتدخل خدمة عملاء بريكولا في الوساطة. النزاعات التي لم يتم حلها ستحال إلى المحاكم المختصة.',
   )
-  doc.text(disputeText, margin, yPosition, {
+  doc.text(disputeText, rtlX, yPosition, {
     align: 'right',
   })
   yPosition += disputeText.length * 6 + 20
 
   // Signatures
-  doc.setFont(undefined, 'bold')
-  doc.text('توقيع المالك', margin, yPosition, {
+  doc.setFont('ArialUnicode', 'bold')
+  doc.text(rtlText('توقيع المالك'), rtlX, yPosition, {
     align: 'right',
   })
-  doc.text('توقيع المستأجر', pageWidth - margin - 80, yPosition, {
+  doc.text(rtlText('توقيع المستأجر'), pageWidth - margin - 80, yPosition, {
     align: 'right',
   })
   yPosition += 8
-  doc.setFont(undefined, 'normal')
-  doc.text('[التوقيع والتاريخ]', margin, yPosition, {
+  doc.setFont('ArialUnicode', 'normal')
+  doc.text(rtlText('[التوقيع والتاريخ]'), rtlX, yPosition, {
     align: 'right',
   })
-  doc.text('[التوقيع والتاريخ]', pageWidth - margin - 80, yPosition, {
+  doc.text(rtlText('[التوقيع والتاريخ]'), pageWidth - margin - 80, yPosition, {
     align: 'right',
   })
   yPosition += 20
 
   // Usage Instructions
-  doc.setFont(undefined, 'bold')
-  doc.text('تعليمات الاستخدام', margin, yPosition, {
+  doc.setFont('ArialUnicode', 'bold')
+  doc.text(rtlText('تعليمات الاستخدام'), rtlX, yPosition, {
     align: 'right',
   })
   yPosition += 8
-  doc.setFont(undefined, 'normal')
+  doc.setFont('ArialUnicode', 'normal')
   const instructions = [
-    '1. أكمل جميع الأقسام المحددة بين أقواس بالمعلومات المناسبة.',
-    '2. تأكد من أن جميع الأطراف قد قرأوا وفهموا العقد قبل التوقيع.',
-    '3. احتفظ بنسخة موقعة من العقد طوال فترة الإيجار.',
-    '4. إذا كان لديك أي أسئلة، اتصل بخدمة عملاء Bricola.',
+    'أكمل جميع الأقسام المحددة بين أقواس بالمعلومات المناسبة- ',
+    'تأكد من أن جميع الأطراف قد قرأوا وفهموا العقد قبل التوقيع-',
+    'احتفظ بنسخة موقعة من العقد طوال فترة الإيجار-',
+    'إذا كان لديك أي أسئلة، اتصل بخدمة العملاء-',
   ]
-  instructions.forEach((instruction) => {
-    const splitInstruction = doc.splitTextToSize(
-      instruction,
-      pageWidth - 2 * margin,
-    )
-    doc.text(splitInstruction, margin, yPosition, {
+  instructions.forEach((instruction, index) => {
+    const splitInstruction = rtlLines(instruction)
+    // instruction + index
+    doc.text(splitInstruction, rtlX, yPosition, {
       align: 'right',
     })
     yPosition += splitInstruction.length * 6 + 2
   })
   doc.setPage(3)
   doc.setFontSize(10)
-  doc.setFont(undefined, 'normal')
-  doc.text(`صفحة 3 من ${totalPages}`, pageWidth / 2, pageHeight - 10, {
+  doc.setFont('ArialUnicode', 'normal')
+  doc.text(rtlText(`صفحة 3 من ${totalPages}`), pageWidth / 2, pageHeight - 10, {
     align: 'center',
   })
   // Download the PDF
