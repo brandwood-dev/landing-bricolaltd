@@ -19,7 +19,7 @@ interface WithdrawalDialogProps {
   onOpenChange: (open: boolean) => void;
   userBalance: UserBalance;
   userId: string;
-  onWithdrawalCreated?: () => void;
+  onWithdrawalCreated?: (tx: any) => void;
 }
 
 const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
@@ -147,13 +147,13 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
         currency: 'GBP'
       };
       console.log('[WithdrawalDialog] Submitting withdrawal', { selectedCurrency: currency.code, enteredAmount: withdrawalData.amount, amountGBP, method: withdrawalData.paymentMethod, bankDetails: withdrawalData.bankDetails })
-      await walletService.createWithdrawal(userId, payload as any);
+      const createdTx = await walletService.createWithdrawal(userId, payload as any);
       console.log('[WithdrawalDialog] Withdrawal created successfully')
       toast({
         title: t('wallet.dialog.success.title'),
         description: t('wallet.dialog.success.desc'),
       });
-      onWithdrawalCreated?.();
+      onWithdrawalCreated?.(createdTx);
       onOpenChange(false);
       // Reset form
       setStep('amount');

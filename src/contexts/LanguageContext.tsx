@@ -1522,6 +1522,7 @@ const translations = {
     'wallet.pending_balance': 'Revenus en attente',
     'wallet.successful': 'Réussies',
     'wallet.withdraw_money': 'Demander un virement',
+    'wallet.withdraw_pending': 'Retrait en cours de traitement...',
     'wallet.withdrawal_note':
       'Vous pouvez demander le paiement dès que vos revenus cumulés atteignent 50 GBP.',
     'wallet.conversion_rate': '50 GBP = {minWithdrawalEUR} EUR',
@@ -2637,7 +2638,7 @@ const translations = {
     'contact.support_phone_label': 'Support phone',
     'report.title': 'Report a problem',
     'report.select_problem_type': 'Select problem type',
-   
+
     'general.other': 'Other',
     'map.loading': 'Loading map...',
     // AgeVerificationDialog
@@ -3692,6 +3693,7 @@ const translations = {
     'wallet.pending_balance': 'Pending earnings',
     'wallet.successful': 'Successful',
     'wallet.withdraw_money': 'Request payout',
+    'wallet.withdraw_pending': 'Withdrawal is being processed...',
     'wallet.withdrawal_note':
       'You can request a payout once your total earnings reach 50 GBP.',
     'wallet.conversion_rate': '50 GBP = {minWithdrawalEUR} EUR',
@@ -6213,6 +6215,7 @@ const translations = {
     'wallet.pending_balance': 'مستحقّات قيد الانتظار',
     'wallet.successful': 'ناجحة',
     'wallet.withdraw_money': 'طلب تحويل المستحقّات',
+    'wallet.withdraw_pending': 'جارٍ معالجة طلب التحويل...',
     'wallet.withdrawal_note':
       'يمكنك طلب تحويل مستحقّاتك عندما يبلغ الإجمالي 50 جنيهًا إسترلينيًا',
     'wallet.conversion_rate': '50£ = {minWithdrawalEUR} €',

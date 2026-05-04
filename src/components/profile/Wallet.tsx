@@ -36,12 +36,15 @@ import { walletService, Transaction, UserStats } from '@/services/walletService'
 import { useToast } from '@/hooks/use-toast'
 import { OptimizedPriceDisplay } from '@/components/OptimizedPriceDisplay'
 import WithdrawalDialog from './WithdrawalDialog'
+import useNotifications from '@/hooks/useNotifications'
 
 const Wallet = () => {
   const { t, language } = useLanguage()
   const { user } = useAuth()
   const { toast } = useToast()
+  const { notifications } = useNotifications()
   const [showWithdrawDialog, setShowWithdrawDialog] = useState(false)
+  const [withdrawalPending, setWithdrawalPending] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [dateRange, setDateRange] = useState<DateRange | undefined>()
   const [transactionType, setTransactionType] = useState('all')
@@ -108,7 +111,11 @@ const Wallet = () => {
   useEffect(() => {
     const handleWalletNotification = (event: Event) => {
       const notification = (event as CustomEvent)?.detail
-      if (notification?.type === 'withdrawal_completed') {
+      if (
+        notification?.type === 'withdrawal_completed' ||
+        notification?.type === 'withdrawal_failed'
+      ) {
+        setWithdrawalPending(false)
         fetchWalletData()
       }
     }
@@ -122,6 +129,19 @@ const Wallet = () => {
       )
     }
   }, [fetchWalletData])
+
+  useEffect(() => {
+    const latestWithdrawalNotification = notifications.find(
+      (notification) =>
+        notification.type === 'withdrawal_completed' ||
+        notification.type === 'withdrawal_failed',
+    )
+
+    if (latestWithdrawalNotification) {
+      setWithdrawalPending(false)
+      fetchWalletData()
+    }
+  }, [fetchWalletData, notifications])
 
   // Filter transactions by date range (type filtering is handled by API)
   const filteredTransactions = useMemo(() => {
@@ -356,11 +376,13 @@ const Wallet = () => {
                       ? 'bg-primary hover:bg-primary/90'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
-                  disabled={!canWithdraw}
+                  disabled={!canWithdraw || withdrawalPending}
                   onClick={() => setShowWithdrawDialog(true)}
                 >
                   <Banknote className='h-5 w-5 mr-2' />
-                  {t('wallet.withdraw_money')}
+                  {withdrawalPending
+                    ? t('wallet.withdraw_pending')
+                    : t('wallet.withdraw_money')}
                 </Button>
               )}
             </div>
@@ -375,6 +397,7 @@ const Wallet = () => {
               }}
               userId={user?.id}
               onWithdrawalCreated={() => {
+                setWithdrawalPending(true)
                 setShowWithdrawDialog(false)
               }}
             />
