@@ -39,7 +39,8 @@ const BlogSection = () => {
 
   // Format date
   const formatDate = (dateString: string) => {
-    const locale = language === 'fr' ? 'fr-FR' : language === 'en' ? 'en-US' : 'ar-SA'
+    const locale =
+      language === 'fr' ? 'fr-FR' : language === 'en' ? 'en-US' : 'en-US'
     return new Date(dateString).toLocaleDateString(locale, {
       year: 'numeric',
       month: 'long',

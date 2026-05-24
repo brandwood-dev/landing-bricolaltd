@@ -821,6 +821,7 @@ const translations = {
       "Précisez l'usage prévu, vos questions...",
     'reservation.contact_information': 'Informations de contact',
     'reservation.confirm': 'Confirmer la réservation',
+    'reservation.payconfirm': 'Données validées - Procédez au paiement',
     'reservation.payment_method': 'Méthode de paiement',
     'reservation.price_per_day': 'Prix par jour',
     'reservation.number_of_days': 'Nombre de jours',
@@ -846,6 +847,13 @@ const translations = {
     'reservation.no_reservations': 'Aucune réservation',
     'reservation.no_reservations_message':
       "Vous n'avez aucune réservation pour le moment. Explorez notre catalogue pour trouver des outils à louer.",
+    'reservation.refresh_success': 'Actualisation réussie',
+    'reservation.refresh_description':
+      'Les outils ont été rechargés depuis la base de données.',
+    'reservation.refresh_error': "Erreur d'actualisation",
+    'reservation.refresh_error_description':
+      "Une erreur s' produite lors de l'actualisation des données. Veuillez réessayer.",
+    // rent toast messages
     'rent.toast.countries_load_failed.title': 'Erreur',
     'rent.toast.countries_load_failed.description':
       'Impossible de charger les pays. Veuillez actualiser la page.',
@@ -1590,6 +1598,12 @@ const translations = {
     'payment_form.amount_to_pay': 'Montant à payer:',
     'payment_form.equivalent_gbp': '(Équivalent: £{amount} GBP)',
     'payment_form.processed_in_gbp': '(Traitement en GBP: £{amount})',
+    'payment_form.payment_request_label': 'Réservation Bricola',
+    'payment_form.secure_context_required':
+      'Google Pay et Apple Pay nécessitent une connexion sécurisée (HTTPS).',
+    'payment_form.selected': 'Sélectionné',
+    'payment_form.google_pay': 'Google Pay',
+    'payment_form.apple_pay': 'Apple Pay',
     'payment_form.google_pay_unavailable':
       "Google Pay n'est pas disponible sur ce navigateur ou appareil.",
     'payment_form.apple_pay_unavailable':
@@ -2987,7 +3001,12 @@ const translations = {
     'reservation.no_reservations': 'No reservations',
     'reservation.no_reservations_message':
       'You have no reservations at the moment. Explore our catalog to find tools to rent.',
-
+    'reservation.refresh_success': 'Refresh successful',
+    'reservation.refresh_description':
+      'The tools have been reloaded from the database.',
+    'reservation.refresh_error': 'Refresh error',
+    'reservation.refresh_error_description':
+      'An error occurred while refreshing the data. Please try again.',
     'reservation.recap': 'Recap',
     'reservation.card': 'Credit Card',
     'reservation.back_to_details': 'Back to details',
@@ -3002,6 +3021,7 @@ const translations = {
       'Specify intended use, your questions...',
     'reservation.contact_information': 'Contact information',
     'reservation.confirm': 'Confirm reservation',
+    'reservation.payconfirm': 'Data validated - Proceed to payment',
     'reservation.payment_method': 'Payment method',
     'reservation.price_per_day': 'Price per day',
     'reservation.number_of_days': 'Number of days',
@@ -4004,6 +4024,12 @@ const translations = {
     'payment_form.amount_to_pay': 'Amount to pay:',
     'payment_form.equivalent_gbp': '(Equivalent: £{amount} GBP)',
     'payment_form.processed_in_gbp': '(Processed in GBP: £{amount})',
+    'payment_form.payment_request_label': 'Bricola booking',
+    'payment_form.secure_context_required':
+      'Google Pay and Apple Pay require a secure (HTTPS) connection.',
+    'payment_form.selected': 'Selected',
+    'payment_form.google_pay': 'Google Pay',
+    'payment_form.apple_pay': 'Apple Pay',
     'payment_form.google_pay_unavailable':
       'Google Pay is not available on this browser or device.',
     'payment_form.apple_pay_unavailable':
@@ -4964,14 +4990,14 @@ const translations = {
     'request.no_requests': 'لا يوجد طلبات.',
     'request.loading': 'تحميل الطلبات...',
     'rental_process.title': 'كيف يعمل النظام؟',
-    'rental_process.description': 'استأجر أو اعرض الأدوات في بضع خطوات بسيطة.',
+    'rental_process.description': 'إستأجر أو اعرض الأدوات في بضع خطوات بسيطة.',
     'rental_process.renter.title': 'للمستأجرين',
     'rental_process.renter.step1.title': 'بحث',
     'rental_process.renter.step1.description':
-      'اعثر على الأداة التي تحتاجها بالقرب منك.',
+      'أعثر على الأداة التي تحتاجها بالقرب منك.',
     'rental_process.renter.step2.title': 'حجز',
     'rental_process.renter.step2.description': 'حدد التواريخ وأرسل طلبًا.',
-    'rental_process.renter.step3.title': 'استخدام',
+    'rental_process.renter.step3.title': 'إستخدام',
     'rental_process.renter.step3.description': 'استلم الأداة وأنجز عملك.',
     'rental_process.renter.step4.title': 'إرجاع',
     'rental_process.renter.step4.description': 'أعد الأداة واترك تقييمًا.',
@@ -5316,7 +5342,7 @@ const translations = {
     'rentalContract.article3.fields.paymentMethod':
       'طريقة الدفع: عبر منصة Bricola',
     'rentalContract.article4.title': 'المادة 4 - التزامات المستأجر',
-    'rentalContract.article4.list.1': 'استخدام الأداة وفقاً لغرضها الطبيعي',
+    'rentalContract.article4.list.1': 'إستخدام الأداة وفقاً لغرضها الطبيعي',
     'rentalContract.article4.list.2':
       'اتخاذ جميع الاحتياطات اللازمة للحفاظ عليها',
     'rentalContract.article4.list.3': 'عدم إقراض أو تأجير الأداة لطرف ثالث',
@@ -5581,6 +5607,12 @@ const translations = {
     'reservation.no_reservations_message':
       'ليس لديك أي حجوزات في الوقت الحالي. استكشف كتالوجنا للعثور على أدوات للإيجار.',
 
+    'reservation.refresh_success': 'تم التحديث بنجاح',
+    'reservation.refresh_description': 'تم تحديث البيانات من قاعدة البيانات.',
+    'reservation.refresh_error': 'حدث خطأ أثناء التحديث',
+    'reservation.refresh_error_description':
+      'حدث خطأ أثناء التحديث. يرجى المحاولة مرة أخرى.',
+    // rent toast messages
     'reservation.recap': 'ملخص',
     'reservation.card': 'بطاقة ائتمان',
     'reservation.back_to_details': 'العودة إلى التفاصيل',
@@ -5593,8 +5625,9 @@ const translations = {
     'reservation.message_to_owner': 'رسالة إلى المالك (اختياري)',
     'reservation.message_placeholder':
       'حدد الغرض من الاستخدام أو اطرح أسئلتك...',
-    'reservation.contact_information': 'معلومات الاتصال',
+    'reservation.contact_information': 'معلومات الإتصال',
     'reservation.confirm': 'تأكيد الحجز',
+    'reservation.payconfirm': 'تم التحقق من صحة البيانات - تابع عملية الدفع',
     'reservation.payment_method': 'طريقة الدفع',
     'reservation.price_per_day': 'سعر اليوم',
     'reservation.number_of_days': 'عدد الأيام',
@@ -5690,10 +5723,10 @@ const translations = {
     // blog
     'blog.title': 'مدونة Bricola',
     'blog.description':
-      'اكتشف نصائحنا، وأدلّتنا، وآخر الأخبار في عالم الأدوات والأعمال اليدوية',
+      'إكتشف نصائحنا، وأدلّتنا، وآخر الأخبار في عالم الأدوات والأعمال اليدوية',
     'blog.popular_categories': 'الفئات الشائعة',
     'blog.popular_categories.subtitle':
-      'اكتشف مقالاتنا المنظمة حسب الموضوعات للعثور بالضبط على ما تبحث عنه',
+      'إكتشف مقالاتنا المنظمة حسب الموضوعات للعثور بالضبط على ما تبحث عنه',
     // blog categories
     'blog.subcategory.tools': 'الأدوات',
     'blog.category.safety': 'السلامة',
@@ -5985,7 +6018,7 @@ const translations = {
       'تم إنشاء اتفاقية الإيجار وتنزيلها بنجاح.',
     'booking.details.copy_code_error': 'تعذر نسخ الرمز.',
     'booking.details.contact_visible_after_acceptance':
-      'تظهر معلومات الاتصال بعد قبول الحجز.',
+      'تظهر معلومات الإتصال بعد قبول الحجز.',
     'booking.details.payment_daily_price': 'السعر لكل يوم',
     'booking.details.payment_days': 'عدد الأيام',
     'booking.details.payment_booking_amount': 'مبلغ الحجز',
@@ -6194,7 +6227,7 @@ const translations = {
     // blog section
     'blog_section.title': 'أحدث مقالات المدونة',
     'blog_section.description':
-      'اكتشف نصائحنا وأدلتنا وآخر الأخبار لإنجاح جميع مشاريعك في الأشغال اليدوية',
+      'إكتشف نصائحنا وأدلتنا وآخر الأخبار لإنجاح جميع مشاريعك في الأشغال اليدوية',
     'blog_section.author_team': 'فريق Bricola',
     'blog_section.min': 'دقيقة',
     'blog_section.read_article': 'قراءة المقال',
@@ -6202,7 +6235,7 @@ const translations = {
 
     // customer reviews
     'customer_reviews.title': 'آراء عملائنا',
-    'customer_reviews.description': 'اكتشف آراء مستخدمينا حول المنصة',
+    'customer_reviews.description': 'إكتشف آراء مستخدمينا حول المنصة',
     'customer_reviews.no_reviews': 'لا توجد آراء متاحة في الوقت الحالي.',
 
     // rental process
@@ -6324,9 +6357,9 @@ const translations = {
     'nav.logout': 'تسجيل الخروج',
 
     // Hero section
-    'hero.title': 'استأجر وشارك أدواتك بسهولة',
+    'hero.title': 'إستأجر وشارك أدواتك بسهولة',
     'hero.subtitle':
-      'المنصة التي تربط أصحاب الأدوات مع من يحتاجونها. أفراد ومحترفون، اعثر على الأداة المثالية بالقرب منك.',
+      'المنصة التي تربط أصحاب الأدوات مع من يحتاجونها. أفراد ومحترفون، أعثر على الأداة المثالية بالقرب منك.',
     'hero.search.placeholder': 'البحث عن أداة...',
     'hero.search.location': 'الموقع',
     'hero.search.button': 'بحث',
@@ -6336,11 +6369,11 @@ const translations = {
     'hero.active_users': 'مستخدم نشط',
     'hero.cities_covered': 'مدينة مشمولة',
     'hero.free_signup_message':
-      'التسجيل في المنصة مجاني، دون الحاجة لأي اشتراك.',
+      'التسجيل في المنصة مجاني، دون الحاجة لأي إشتراك.',
 
     // New FAQ translations
     'faq.hero.title': 'الأسئلة الشائعة',
-    'faq.hero.subtitle': 'اعثر على إجابات سريعة لأسئلتك الأكثر شيوعًا',
+    'faq.hero.subtitle': 'أعثر على إجابات سريعة لأسئلتك الأكثر شيوعًا',
     'faq.title': 'أسئلة عامة',
     'faq.general.q1': 'ما هي Bricola وكيف تعمل؟',
     'faq.general.a1':
@@ -6351,7 +6384,7 @@ const translations = {
     'faq.general.q3': 'هل يوجد تطبيق مخصص لـ Bricola؟',
     'faq.general.a3':
       'نعم، Bricola متاحة على كل من أنظمة iOS وAndroid، بالإضافة إلى منصة ويب شاملة.',
-    'faq.general.q4': 'هل يمكنني استخدام Bricola من أي دولة؟',
+    'faq.general.q4': 'هل يمكنني إستخدام Bricola من أي دولة؟',
     'faq.general.a4':
       'حاليًا، تقتصر خدمات Bricola على منطقة الخليج، مع وجود خطط للتوسع إلى مناطق أخرى مستقبلًا.',
     'faq.general.q5': 'هل يمكن للشركات عرض أدواتها؟',
@@ -6365,7 +6398,7 @@ const translations = {
       'نعم، نرحب بجميع الاقتراحات. يمكنك التواصل مع الدعم الفني بمقترحك، وسنقوم بدراسته للتحديثات المستقبلية.',
     'faq.general.q8': 'كيف يمكنني التواصل مع خدمة العملاء؟',
     'faq.general.a8':
-      'يمكنك استخدام دردشة WhatsApp، أو مراسلتنا عبر البريد الإلكتروني: support@bricolaltd.com. فريقنا متاح طوال أيام الأسبوع.',
+      'يمكنك إستخدام دردشة WhatsApp، أو مراسلتنا عبر البريد الإلكتروني: support@bricolaltd.com. فريقنا متاح طوال أيام الأسبوع.',
     'faq.renters.title': 'للمستأجرين',
     'faq.renters.q1': 'كيف أنشئ حسابًا؟',
     'faq.renters.a1':
@@ -6410,7 +6443,7 @@ const translations = {
       'يمكنك طلب تحويل أرباحك إلى حسابك البنكي من خلال خدمة Wise.',
     'faq.payment.q4': 'ما هي الرسوم التي تفرضها Bricola؟',
     'faq.payment.a4':
-      'تتقاضى Bricola عمولة بنسبة 15% على كل عملية تأجير ناجحة. لا توجد رسوم على الإدراج أو اشتراكات شهرية.',
+      'تتقاضى Bricola عمولة بنسبة 15% على كل عملية تأجير ناجحة. لا توجد رسوم على الإدراج أو إشتراكات شهرية.',
     'faq.payment.q5': 'كيف يتم التعامل مع النزاعات؟',
     'faq.payment.a5':
       'يتم حل جميع النزاعات من خلال فريق الدعم الداخلي خلال 72 ساعة. القرار الصادر يعتبر نهائيًا.',
@@ -6421,6 +6454,12 @@ const translations = {
     'payment_form.equivalent_gbp': '(المعادِل: £{amount} GBP)',
     'payment_form.processed_in_gbp':
       '(تتم المعالجة بالجنيه الإسترليني: £{amount})',
+    'payment_form.payment_request_label': 'حجز Bricola',
+    'payment_form.secure_context_required':
+      'يتطلب Google Pay و Apple Pay اتصالًا آمنًا (HTTPS).',
+    'payment_form.selected': 'محدد',
+    'payment_form.google_pay': 'Google Pay',
+    'payment_form.apple_pay': 'Apple Pay',
     'payment_form.google_pay_unavailable':
       'Google Pay غير متاح على هذا المتصفح أو الجهاز.',
     'payment_form.apple_pay_unavailable':
@@ -6492,7 +6531,7 @@ const translations = {
     'tools.display_all': 'عرض جميع الأدوات',
     'tools.day': 'يوم',
     'tools.available': 'متاح',
-    'tools.rent': 'استئجار',
+    'tools.rent': 'إستئجار',
     'tools.details': 'عرض التفاصيل',
     'tools.new_ad': 'إعلان جديد',
     'tools.my_ads': 'إعلاناتي',
@@ -6515,7 +6554,7 @@ const translations = {
     'tools.charged': 'التي يحددها المؤجر',
     'tools.deposit': 'مبلغ الضمان',
     'tools.refunded': '(يُسترد عند نهاية الإيجار)',
-    'tools.rent_now': 'استأجر الآن',
+    'tools.rent_now': 'إستأجر الآن',
     'tools.add_to_favorites': 'أضف إلى قائمة المفضّلات',
     'tools.remove_from_favorites': 'إزالة من قائمة المفضّلات',
     'tools.desc': 'الوصف',
@@ -6591,7 +6630,7 @@ const translations = {
     'action.delete': 'حذف',
     'action.edit': 'تعديل',
     'action.view': 'عرض',
-    'action.contact': 'اتصال',
+    'action.contact': 'إتصال',
     'action.close': 'إغلاق',
     'action.back': 'رجوع',
     'action.next': 'التالي',
@@ -6613,8 +6652,8 @@ const translations = {
     'footer.about': 'حول',
     'footer.help': 'مساعدة',
     'footer.catalog': 'كتالوج',
-    'footer.discover': 'اكتشف بريكولا',
-    'footer.contact': 'اتصال',
+    'footer.discover': 'إكتشف بريكولا',
+    'footer.contact': 'إتصال',
     'footer.legal': 'قانوني',
     'footer.rights': 'جميع الحقوق محفوظة',
     'footer.cgu': 'الشروط',
@@ -6887,7 +6926,7 @@ const translations = {
 
     'cgu.section2.title': '2. الوصول إلى المنصة',
     'cgu.section2.p1':
-      'يمكن استخدام المنصة عبر الموقع الإلكتروني أو التطبيقات.',
+      'يمكن إستخدام المنصة عبر الموقع الإلكتروني أو التطبيقات.',
     'cgu.section2.p2':
       'يُشترط أن يكون المستخدم راشدًا (18 سنة أو أكثر) ويتمتع بالأهلية القانونية.',
     'cgu.section2.p3':
@@ -6914,7 +6953,7 @@ const translations = {
     'cgu.section4.li5':
       'لا يمكن أن تتجاوز مدة الكراء 5 أيام في العملية الواحدة. في حال رغبة المستأجر في تمديد المدة، يجب أولًا التحقق من توفر الأداة لدى المؤجر، ثم إعادة إجراء عملية حجز جديدة عبر المنصة.',
     'cgu.section4.li6': 'فقدان الأداة يؤدي إلى خسارة الضمان بالكامل.',
-    'cgu.section4.li7': 'سوء استخدام الأدوات قد يؤدي إلى تعليق الحساب.',
+    'cgu.section4.li7': 'سوء إستخدام الأدوات قد يؤدي إلى تعليق الحساب.',
 
     'cgu.section5.title': '5. الدفع والعمولة والمحفظة',
     'cgu.section5.li1':
@@ -6934,7 +6973,7 @@ const translations = {
     'cgu.section6.li2':
       'يُفرج عن المبلغ بعد مرور 24 ساعة من الإرجاع والتحقق من الحالة.',
     'cgu.section6.li3': 'في حال وجود ضرر، يتم إعلام المستخدم قبل خصم أي مبلغ.',
-    'cgu.section6.li4': 'يمكن استخدام الضمان كليًا أو جزئيًا لتعويض المؤجر.',
+    'cgu.section6.li4': 'يمكن إستخدام الضمان كليًا أو جزئيًا لتعويض المؤجر.',
 
     'cgu.section7.title': '7. معالجة النزاعات',
     'cgu.section7.li1':
@@ -6977,7 +7016,7 @@ const translations = {
     'cgu.section12.li2':
       'في حال عدم التوصل لحل داخلي، يتم عرض النزاع أمام محاكم لندن المختصة.',
     'cgu.section12.li3':
-      'يُعتبر استمرار استخدام المنصة موافقة تلقائية على الشروط الجديدة.',
+      'يُعتبر استمرار إستخدام المنصة موافقة تلقائية على الشروط الجديدة.',
 
     'cgu.section13.title': '13. التأكيد التلقائي في حال عدم التفاعل',
     'cgu.section13.p':
@@ -6988,9 +7027,9 @@ const translations = {
       'قد يتم تحديث شروط الاستخدام من وقت لآخر لتعكس التغيرات التقنية أو القانونية أو التشغيلية.',
     'cgu.section14.p2': 'سيتم إعلام المستخدمين بالتحديثات الجوهرية عبر المنصة.',
     'cgu.section14.p3':
-      'يُعتبر استمرار استخدام الخدمة بعد هذه التعديلات موافقة ضمنية على الشروط الجديدة.',
+      'يُعتبر استمرار إستخدام الخدمة بعد هذه التعديلات موافقة ضمنية على الشروط الجديدة.',
 
-    'cgu.section15.title': '15. الاتصال والتواصل',
+    'cgu.section15.title': '15. الإتصال والتواصل',
     'cgu.section15.p1':
       'لأي استفسارات أو ملاحظات أو مراسلات قانونية بخصوص شروط الاستخدام، يمكن للمستخدمين التواصل مع Bricola LTD عبر البريد الإلكتروني: contact@bricolaltd.com.',
     'cgu.section15.p2':
@@ -7009,7 +7048,7 @@ const translations = {
 
     'privacy.section2.title': '2. البيانات التي نجمعها',
     'privacy.section2.p1':
-      'كجزء من استخدام منصتنا، نقوم بجمع البيانات التالية:',
+      'كجزء من إستخدام منصتنا، نقوم بجمع البيانات التالية:',
     'privacy.section2.identification': 'معلومات الهوية:',
     'privacy.section2.identification.li1':
       'الاسم، رقم الهاتف، البريد الإلكتروني',
@@ -7096,7 +7135,7 @@ const translations = {
     'privacy.section10.p2':
       'سيتم إعلام المستخدمين بأي تعديل جوهري عبر البريد الإلكتروني أو الإشعار عبر التطبيق.',
     'privacy.section10.p3':
-      'استمرار استخدام المنصة بعد التعديل يعني القبول الضمني للنسخة الجديدة.',
+      'استمرار إستخدام المنصة بعد التعديل يعني القبول الضمني للنسخة الجديدة.',
 
     // validation
     'validation.checking': 'جاري التحقق...',

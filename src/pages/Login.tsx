@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
@@ -25,6 +25,7 @@ const Login = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [apiError, setApiError] = useState('');
   const [isButtonLoading, setIsButtonLoading] = useState(false); // Local loading state for button only
+  const [showPassword, setShowPassword] = useState(false);
   
   // Get the intended destination from location state
   const from = location.state?.from?.pathname || '/profile';
@@ -136,15 +137,29 @@ const Login = () => {
                 
                 <div className="space-y-2">
                   <Label htmlFor="password">{t('login.password')}</Label>
-                  <Input 
-                    id="password" 
-                    name="password"
-                    type="password" 
-                    placeholder="••••••••"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    className={errors.password ? 'border-red-500' : ''}
-                  />
+                  <div className="relative">
+                    <Input 
+                      id="password" 
+                      name="password"
+                      type={showPassword ? 'text' : 'password'} 
+                      placeholder="••••••••"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      className={`${errors.password ? 'border-red-500' : ''} pr-10`}
+                    />
+                    <button
+                      type="button"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
                   {errors.password && (
                     <p className="text-sm text-red-500">{errors.password}</p>
                   )}

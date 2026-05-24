@@ -317,8 +317,7 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
           </div>
         </div>
       )}
-
-      {withdrawalData.paymentMethod === 'stripe_connect' && (
+ {withdrawalData.paymentMethod === 'stripe_connect' && (
         <div>
           <Label htmlFor="stripeAccountId">{t('wallet.dialog.details_step.stripe_account')}</Label>
           <Input

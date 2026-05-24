@@ -556,7 +556,7 @@ const Rent: React.FC = () => {
       const basePrice = tool.basePrice
       const subtotal = Number(basePrice) * Number(days)
       const feeRate = 0.0525
-      const fees = Number((subtotal * feeRate) + 0.25).toFixed(2) // 5.25% fees
+      const fees = Number(subtotal * feeRate + 0.25).toFixed(2) // 5.25% fees
       const deposit = tool.depositAmount
       setPricing({
         toolId: tool.id,
@@ -1286,7 +1286,7 @@ const Rent: React.FC = () => {
                             </span>
                             {formData.paymentMethod === 'card' && (
                               <span className='ml-auto text-sm text-blue-600'>
-                                Sélectionné
+                                {t('payment_form.selected')}
                               </span>
                             )}
                           </div>
@@ -1325,11 +1325,11 @@ const Rent: React.FC = () => {
                               className='h-5 w-auto'
                             />
                             <span className='font-medium text-green-800'>
-                              Google Pay
+                              {t('payment_form.google_pay')}
                             </span>
                             {formData.paymentMethod === 'google_pay' && (
                               <span className='ml-auto text-sm text-green-600'>
-                                Sélectionné
+                                {t('payment_form.selected')}
                               </span>
                             )}
                           </div>
@@ -1377,11 +1377,11 @@ const Rent: React.FC = () => {
                                   : 'text-gray-800',
                               )}
                             >
-                              Apple Pay
+                              {t('payment_form.apple_pay')}
                             </span>
                             {formData.paymentMethod === 'apple_pay' && (
                               <span className='ml-auto text-sm text-gray-300'>
-                                Sélectionné
+                                {t('payment_form.selected')}
                               </span>
                             )}
                           </div>
@@ -1822,7 +1822,7 @@ const Rent: React.FC = () => {
                       ) : showPayment ? (
                         <>
                           <Check className='h-5 w-5 mr-2' />
-                          Données validées - Procédez au paiement
+                          {t('reservation.payconfirm')}
                         </>
                       ) : (
                         <>

@@ -5,15 +5,18 @@ import {
   CardElement,
   PaymentRequestButtonElement,
 } from '@stripe/react-stripe-js'
+import type {
+  CanMakePaymentResult,
+  PaymentRequest as StripePaymentRequest,
+  PaymentRequestPaymentMethodEvent,
+} from '@stripe/stripe-js'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, CreditCard, AlertCircle, CheckCircle, Shield } from 'lucide-react'
+import { Loader2, CreditCard, AlertCircle, CheckCircle } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useCurrency } from '@/contexts/CurrencyContext'
 import { OptimizedPriceDisplay } from '@/components/OptimizedPriceDisplay'
-import { useThreeDSecure } from '@/hooks/useThreeDSecure'
-import ThreeDSChallengeModal from './ThreeDSChallengeModal'
 
 const API_BASE_URL = import.meta.env.VITE_BASE_URL
   ? `${import.meta.env.VITE_BASE_URL}`
@@ -55,19 +58,13 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [cardComplete, setCardComplete] = useState(false)
-  const [paymentRequest, setPaymentRequest] = useState<any>(null)
+  const [paymentRequest, setPaymentRequest] = useState<StripePaymentRequest | null>(
+    null
+  )
   const [canMakePayment, setCanMakePayment] = useState(false)
-  const [cardholderName, setCardholderName] = useState('')
-  const [cardholderEmail, setCardholderEmail] = useState('')
-  const [billingAddress, setBillingAddress] = useState({
-    line1: '',
-    city: '',
-    postalCode: '',
-    country: 'GB',
-  })
-  const [showBillingForm, setShowBillingForm] = useState(false)
-  const [requires3DS, setRequires3DS] = useState(false)
-  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null)
+  const [_walletSupport, setWalletSupport] = useState<CanMakePaymentResult | null>(
+    null
+  )
 
   // Calculer le montant affiché dans la devise sélectionnée
   const displayAmount = calculatePrice(amount, 'GBP', currency.code)
@@ -85,10 +82,25 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
 
   // Initialize Payment Request for Google Pay and Apple Pay
   useEffect(() => {
-    if (
-      stripe &&
-      (paymentMethod === 'google_pay' || paymentMethod === 'apple_pay')
-    ) {
+    if (!stripe) {
+      return
+    }
+
+    if (paymentMethod !== 'google_pay' && paymentMethod !== 'apple_pay') {
+      setPaymentRequest(null)
+      setCanMakePayment(false)
+      setWalletSupport(null)
+      return
+    }
+
+    if (!window.isSecureContext && window.location.hostname !== 'localhost') {
+      setPaymentRequest(null)
+      setCanMakePayment(false)
+      setWalletSupport(null)
+      setError(t('payment_form.secure_context_required'))
+      return
+    }
+
       // 🔍 LOG AVANT CONVERSION EN CENTIMES
       const amountInCents = Math.round(amountInGBP * 100)
       console.log('🔍 [PaymentForm] === GOOGLE/APPLE PAY SETUP ===')
@@ -96,27 +108,39 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       console.log('🔍 [PaymentForm] amountInGBP * 100:', amountInGBP * 100)
       console.log('🔍 [PaymentForm] Math.round(amountInGBP * 100):', amountInCents)
       console.log('🔍 [PaymentForm] Type de amountInCents:', typeof amountInCents)
-      
+
       const pr = stripe.paymentRequest({
         country: 'GB', // Changé de FR à GB car on traite en GBP
         currency: 'gbp', // Changé de eur à gbp
         total: {
-          label: 'Réservation Bricola',
+          label: t('payment_form.payment_request_label'),
           amount: amountInCents, // Utiliser le montant en centimes
         },
         requestPayerName: true,
         requestPayerEmail: true,
+        disableWallets:
+          paymentMethod === 'google_pay' ? ['applePay'] : ['googlePay'],
       })
 
       // Check if the browser supports the payment request
       pr.canMakePayment().then((result) => {
-        if (result) {
+        setWalletSupport(result)
+        const supportsSelectedWallet =
+          paymentMethod === 'google_pay' ? !!result?.googlePay : !!result?.applePay
+
+        if (supportsSelectedWallet) {
           setPaymentRequest(pr)
           setCanMakePayment(true)
+          setError(null)
+        } else {
+          setPaymentRequest(null)
+          setCanMakePayment(false)
         }
       })
 
-      pr.on('paymentmethod', async (ev) => {
+      const handlePaymentMethod = async (
+        ev: PaymentRequestPaymentMethodEvent
+      ) => {
         setProcessing(true)
         setError(null)
 
@@ -198,31 +222,55 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           } else {
             console.log('🔍 [PaymentForm] Paiement confirmé:', paymentIntent)
             ev.complete('success')
-            // 🔧 CORRECTION: Vérifier le statut et appeler onPaymentSuccess avec le bon ID
-            console.log('🔍 [PaymentForm] PaymentIntent status:', paymentIntent?.status)
-            console.log('🔍 [PaymentForm] PaymentIntentId à envoyer:', paymentIntentId)
-            
-            if (paymentIntent && (paymentIntent.status === 'succeeded' || paymentIntent.status === 'requires_capture')) {
-              console.log('🔍 [PaymentForm] Appel de onPaymentSuccess avec ID:', paymentIntentId)
-              onPaymentSuccess(paymentIntentId)
+
+            let finalPaymentIntent = paymentIntent
+
+            if (finalPaymentIntent?.status === 'requires_action') {
+              const actionResult = await stripe.confirmCardPayment(clientSecret)
+
+              if (actionResult.error) {
+                setError(actionResult.error.message || 'Payment failed')
+                onPaymentError(actionResult.error.message || 'Payment failed')
+                return
+              }
+
+              finalPaymentIntent = actionResult.paymentIntent
+            }
+
+            const finalStatus = finalPaymentIntent?.status
+            const finalId = finalPaymentIntent?.id || paymentIntentId
+
+            console.log('🔍 [PaymentForm] PaymentIntent status:', finalStatus)
+            console.log('🔍 [PaymentForm] PaymentIntentId à envoyer:', finalId)
+
+            if (
+              finalPaymentIntent &&
+              (finalStatus === 'succeeded' || finalStatus === 'requires_capture')
+            ) {
+              onPaymentSuccess(finalId)
             } else {
-              console.log('🔍 [PaymentForm] Statut de paiement inattendu:', paymentIntent?.status)
               ev.complete('fail')
               setError('Payment status is not valid')
               onPaymentError('Payment status is not valid')
             }
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.log('🔍 [PaymentForm] Erreur générale:', error)
           ev.complete('fail')
-          const errorMessage = error.message || 'Payment failed'
+          const errorMessage =
+            error instanceof Error ? error.message : 'Payment failed'
           setError(errorMessage)
           onPaymentError(errorMessage)
         } finally {
           setProcessing(false)
         }
-      })
-    }
+      }
+
+      pr.on('paymentmethod', handlePaymentMethod)
+
+      return () => {
+        pr.off?.('paymentmethod', handlePaymentMethod)
+      }
   }, [
     stripe,
     amountInGBP,
@@ -387,7 +435,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   // Render different UI based on payment method
   if (paymentMethod === 'google_pay' || paymentMethod === 'apple_pay') {
     return (
-      <Card className='w-full max-w-md mx-auto'>
+      <Card className='w-full'>
         <CardHeader>
           <CardTitle className='flex items-center gap-2'>
             {paymentMethod === 'google_pay' ? (
@@ -399,7 +447,9 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                 <path d='M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z' />
               </svg>
             )}
-            {paymentMethod === 'google_pay' ? 'Google Pay' : 'Apple Pay'}
+            {paymentMethod === 'google_pay'
+              ? t('payment_form.google_pay')
+              : t('payment_form.apple_pay')}
           </CardTitle>
         </CardHeader>
         <CardContent className='space-y-4'>
@@ -434,8 +484,15 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           {paymentRequest && canMakePayment ? (
             <div className='w-full'>
               <PaymentRequestButtonElement
-                options={{ paymentRequest }}
-                className='w-full'
+                options={{
+                  paymentRequest,
+                  style: {
+                    paymentRequestButton: {
+                      theme: 'dark',
+                      height: '48px',
+                    },
+                  },
+                }}
               />
             </div>
           ) : (

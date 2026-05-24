@@ -50,12 +50,20 @@ const Register = () => {
   const [apiError, setApiError] = useState('')
   const [emailError, setEmailError] = useState('')
   const countries = [
-    { value: 'KW', label: 'kuwait', flag: '<span className="fi fi-kw"></span>' },
-  { value: 'SA', label: 'ksa', flag: '<span className="fi fi-sa"></span>' },
-  { value: 'BH', label: 'bahrain', flag: '<span className="fi fi-bh"></span>' },
-  { value: 'OM', label: 'oman', flag: '<span className="fi fi-om"></span>' },
-  { value: 'QA', label: 'qatar', flag: '<span className="fi fi-qa"></span>' },
-  { value: 'AE', label: 'uae', flag: '<span className="fi fi-ae"></span>' },
+    {
+      value: 'KW',
+      label: 'kuwait',
+      flag: '<span className="fi fi-kw"></span>',
+    },
+    { value: 'SA', label: 'ksa', flag: '<span className="fi fi-sa"></span>' },
+    {
+      value: 'BH',
+      label: 'bahrain',
+      flag: '<span className="fi fi-bh"></span>',
+    },
+    { value: 'OM', label: 'oman', flag: '<span className="fi fi-om"></span>' },
+    { value: 'QA', label: 'qatar', flag: '<span className="fi fi-qa"></span>' },
+    { value: 'AE', label: 'uae', flag: '<span className="fi fi-ae"></span>' },
   ]
 
   const ValidationIndicator = ({
@@ -172,7 +180,7 @@ const Register = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ email: formData.email }),
-        }
+        },
       )
 
       if (!emailCheckResponse.ok) {
@@ -185,7 +193,7 @@ const Register = () => {
       // For testing: always show error for test@example.com
       if (formData.email === 'test@example.com') {
         setEmailError(
-          'This email is already registered. Please use a different email or try logging in.'
+          'This email is already registered. Please use a different email or try logging in.',
         )
         return
       }
@@ -196,7 +204,7 @@ const Register = () => {
         emailCheckData.data.exists
       ) {
         setEmailError(
-          'This email is already registered. Please use a different email or try logging in.'
+          'This email is already registered. Please use a different email or try logging in.',
         )
       } else {
         setEmailError('')
@@ -245,7 +253,7 @@ const Register = () => {
       // Handle specific error cases
       if (error.message && error.message.includes('Email already exists')) {
         setEmailError(
-          'This email is already registered. Please use a different email or try logging in.'
+          'This email is already registered. Please use a different email or try logging in.',
         )
         setApiError('')
       } else {
@@ -288,7 +296,7 @@ const Register = () => {
                     </Label>
                     <Input
                       id='firstName'
-                      placeholder='Jean'
+                      placeholder={language === 'ar' ? 'أحمد' : 'John'}
                       value={formData.firstName}
                       onChange={(e) =>
                         handleInputChange('firstName', e.target.value)
@@ -303,7 +311,7 @@ const Register = () => {
                     <Label htmlFor='lastName'>{t('register.last_name')}</Label>
                     <Input
                       id='lastName'
-                      placeholder='Dupont'
+                      placeholder={language === 'ar' ? 'خالدي' : 'Dupont'}
                       value={formData.lastName}
                       onChange={(e) =>
                         handleInputChange('lastName', e.target.value)
@@ -324,7 +332,7 @@ const Register = () => {
                   <Input
                     id='email'
                     type='email'
-                    placeholder='votre@email.com'
+                    placeholder='your@email.com'
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
                     onBlur={handleEmailBlur}
@@ -438,16 +446,16 @@ const Register = () => {
                           formData.country === 'KW'
                             ? 'Koweït'
                             : formData.country === 'SA'
-                            ? 'Arabie Saoudite'
-                            : formData.country === 'BH'
-                            ? 'Bahreïn'
-                            : formData.country === 'OM'
-                            ? 'Oman'
-                            : formData.country === 'QA'
-                            ? 'Qatar'
-                            : formData.country === 'AE'
-                            ? 'Émirats Arabes Unis'
-                            : 'Ville, Pays'
+                              ? 'Arabie Saoudite'
+                              : formData.country === 'BH'
+                                ? 'Bahreïn'
+                                : formData.country === 'OM'
+                                  ? 'Oman'
+                                  : formData.country === 'QA'
+                                    ? 'Qatar'
+                                    : formData.country === 'AE'
+                                      ? 'Émirats Arabes Unis'
+                                      : 'Ville, Pays'
                         }`}
                       />
                       {errors.address && (
@@ -467,8 +475,7 @@ const Register = () => {
                       </Label>
                       <div className='p-3 border border-dashed border-muted-foreground/30 rounded-md bg-muted/20'>
                         <p className='text-sm text-muted-foreground text-center'>
-                          Veuillez d'abord sélectionner un pays pour saisir
-                          votre adresse
+                          {t('signup.address.select_country_first')}
                         </p>
                       </div>
                     </div>

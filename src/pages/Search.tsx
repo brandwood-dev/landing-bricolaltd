@@ -391,13 +391,7 @@ const Search = () => {
 
   // Handle rent button click
   const handleRentClick = (toolId: string) => {
-    // if (!isAuthenticated) {
-    //   // Redirect to login with the current page as return destination
-    //   navigate('/login', { state: { from: location } });
-    // } else {
-    //   // Navigate to tool details page
-    navigate(`/tool/${toolId}`)
-    // }
+     navigate(`/tool/${toolId}`)
   }
 
   // Handle refresh
@@ -407,13 +401,13 @@ const Search = () => {
       await fetchCategories()
       await fetchTools()
       toast({
-        title: 'Actualisation réussie',
-        description: 'Les outils ont été rechargés depuis la base de données.',
+        title: t('reservation.refresh_success'),
+        description: t('reservation.refresh_description'),
       })
     } catch (error) {
       toast({
-        title: 'Erreur',
-        description: "Impossible d'actualiser les données.",
+        title: t('reservation.refresh_error'),
+        description: t('reservation.refresh_error_description'),
         variant: 'destructive',
       })
     }
