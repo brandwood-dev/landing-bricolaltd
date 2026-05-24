@@ -116,8 +116,8 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           label: t('payment_form.payment_request_label'),
           amount: amountInCents, // Utiliser le montant en centimes
         },
-        requestPayerName: true,
-        requestPayerEmail: true,
+        requestPayerName: false,
+        requestPayerEmail: false,
         disableWallets:
           paymentMethod === 'google_pay' ? ['applePay'] : ['googlePay'],
       })
