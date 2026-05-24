@@ -101,176 +101,176 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       return
     }
 
-      // 🔍 LOG AVANT CONVERSION EN CENTIMES
-      const amountInCents = Math.round(amountInGBP * 100)
-      console.log('🔍 [PaymentForm] === GOOGLE/APPLE PAY SETUP ===')
-      console.log('🔍 [PaymentForm] amountInGBP:', amountInGBP)
-      console.log('🔍 [PaymentForm] amountInGBP * 100:', amountInGBP * 100)
-      console.log('🔍 [PaymentForm] Math.round(amountInGBP * 100):', amountInCents)
-      console.log('🔍 [PaymentForm] Type de amountInCents:', typeof amountInCents)
+    // 🔍 LOG AVANT CONVERSION EN CENTIMES
+    const amountInCents = Math.round(amountInGBP * 100)
+    console.log('🔍 [PaymentForm] === GOOGLE/APPLE PAY SETUP ===')
+    console.log('🔍 [PaymentForm] amountInGBP:', amountInGBP)
+    console.log('🔍 [PaymentForm] amountInGBP * 100:', amountInGBP * 100)
+    console.log('🔍 [PaymentForm] Math.round(amountInGBP * 100):', amountInCents)
+    console.log('🔍 [PaymentForm] Type de amountInCents:', typeof amountInCents)
 
-      const pr = stripe.paymentRequest({
-        country: 'GB', // Changé de FR à GB car on traite en GBP
-        currency: 'gbp', // Changé de eur à gbp
-        total: {
-          label: t('payment_form.payment_request_label'),
-          amount: amountInCents, // Utiliser le montant en centimes
-        },
-        requestPayerName: false,
-        requestPayerEmail: false,
-        disableWallets:
-          paymentMethod === 'google_pay' ? ['applePay'] : ['googlePay'],
-      })
+    const pr = stripe.paymentRequest({
+      country: 'GB', // Changé de FR à GB car on traite en GBP
+      currency: 'gbp', // Changé de eur à gbp
+      total: {
+        label: t('payment_form.payment_request_label'),
+        amount: amountInCents, // Utiliser le montant en centimes
+      },
+      requestPayerName: true,
+      requestPayerEmail: true,
+      disableWallets:
+        paymentMethod === 'google_pay' ? ['applePay'] : ['googlePay'],
+    })
 
-      // Check if the browser supports the payment request
-      pr.canMakePayment().then((result) => {
-        setWalletSupport(result)
-        const supportsSelectedWallet =
-          paymentMethod === 'google_pay' ? !!result?.googlePay : !!result?.applePay
+    // Check if the browser supports the payment request
+    pr.canMakePayment().then((result) => {
+      setWalletSupport(result)
+      const supportsSelectedWallet =
+        paymentMethod === 'google_pay' ? !!result?.googlePay : !!result?.applePay
 
-        if (supportsSelectedWallet) {
-          setPaymentRequest(pr)
-          setCanMakePayment(true)
-          setError(null)
-        } else {
-          setPaymentRequest(null)
-          setCanMakePayment(false)
-        }
-      })
-
-      const handlePaymentMethod = async (
-        ev: PaymentRequestPaymentMethodEvent
-      ) => {
-        setProcessing(true)
+      if (supportsSelectedWallet) {
+        setPaymentRequest(pr)
+        setCanMakePayment(true)
         setError(null)
+      } else {
+        setPaymentRequest(null)
+        setCanMakePayment(false)
+      }
+    })
 
-        try {
-          // 🔍 LOGS ULTRA-DÉTAILLÉS AVANT ENVOI À L'API
-          const apiAmountInCents = Math.round(amountInGBP * 100)
-          console.log('🔍 [PaymentForm] === ENVOI API GOOGLE/APPLE PAY ===')
-          console.log('🔍 [PaymentForm] amountInGBP original:', amountInGBP)
-          console.log('🔍 [PaymentForm] Calcul: amountInGBP * 100 =', amountInGBP * 100)
-          console.log('🔍 [PaymentForm] Math.round(amountInGBP * 100) =', apiAmountInCents)
-          console.log('🔍 [PaymentForm] Type de apiAmountInCents:', typeof apiAmountInCents)
+    const handlePaymentMethod = async (
+      ev: PaymentRequestPaymentMethodEvent
+    ) => {
+      setProcessing(true)
+      setError(null)
 
-          // Create Payment Intent
-          const requestBody = {
-            amount: amountInGBP,
-            currency: 'gbp',
-            bookingId: bookingId,
-            metadata: {
-              bookingId: bookingId || '',
-              source: 'booking_payment',
-              paymentMethod: paymentMethod,
-              displayCurrency: currency.code,
-              displayAmount: displayAmount,
-            },
-          }
+      try {
+        // 🔍 LOGS ULTRA-DÉTAILLÉS AVANT ENVOI À L'API
+        const apiAmountInCents = Math.round(amountInGBP * 100)
+        console.log('🔍 [PaymentForm] === ENVOI API GOOGLE/APPLE PAY ===')
+        console.log('🔍 [PaymentForm] amountInGBP original:', amountInGBP)
+        console.log('🔍 [PaymentForm] Calcul: amountInGBP * 100 =', amountInGBP * 100)
+        console.log('🔍 [PaymentForm] Math.round(amountInGBP * 100) =', apiAmountInCents)
+        console.log('🔍 [PaymentForm] Type de apiAmountInCents:', typeof apiAmountInCents)
 
-          console.log('🔍 [PaymentForm] Body complet à envoyer:', JSON.stringify(requestBody, null, 2))
-
-          const response = await fetch(`${API_BASE_URL}/payments/intent`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-            },
-            body: JSON.stringify(requestBody),
-          })
-
-          console.log('🔍 [PaymentForm] Réponse HTTP status:', response.status)
-          console.log('🔍 [PaymentForm] Réponse HTTP ok:', response.ok)
-
-          if (!response.ok) {
-            const errorData = await response.json()
-            console.log('🔍 [PaymentForm] Erreur API:', errorData)
-            throw new Error(
-              errorData.message || 'Failed to create payment intent'
-            )
-          }
-
-          const responseData = await response.json()
-          console.log('🔍 [PaymentForm] Réponse API complète:', JSON.stringify(responseData, null, 2))
-
-          const { data } = responseData
-          console.log('🔍 [PaymentForm] Data extraite:', data)
-
-          const {
-            client_secret: clientSecret,
-            payment_intent_id: paymentIntentId,
-          } = data || {}
-          console.log('🔍 [PaymentForm] clientSecret extraite:', clientSecret)
-          console.log('🔍 [PaymentForm] paymentIntentId extraite:', paymentIntentId)
-
-          if (!clientSecret) {
-            throw new Error('Client secret not found in API response')
-          }
-
-          // Confirm the payment
-          const { error: confirmError, paymentIntent } =
-            await stripe.confirmCardPayment(
-              clientSecret,
-              { payment_method: ev.paymentMethod.id },
-              { handleActions: false }
-            )
-
-          if (confirmError) {
-            console.log('🔍 [PaymentForm] Erreur confirmation:', confirmError)
-            ev.complete('fail')
-            setError(confirmError.message || 'Payment failed')
-            onPaymentError(confirmError.message || 'Payment failed')
-          } else {
-            console.log('🔍 [PaymentForm] Paiement confirmé:', paymentIntent)
-            ev.complete('success')
-
-            let finalPaymentIntent = paymentIntent
-
-            if (finalPaymentIntent?.status === 'requires_action') {
-              const actionResult = await stripe.confirmCardPayment(clientSecret)
-
-              if (actionResult.error) {
-                setError(actionResult.error.message || 'Payment failed')
-                onPaymentError(actionResult.error.message || 'Payment failed')
-                return
-              }
-
-              finalPaymentIntent = actionResult.paymentIntent
-            }
-
-            const finalStatus = finalPaymentIntent?.status
-            const finalId = finalPaymentIntent?.id || paymentIntentId
-
-            console.log('🔍 [PaymentForm] PaymentIntent status:', finalStatus)
-            console.log('🔍 [PaymentForm] PaymentIntentId à envoyer:', finalId)
-
-            if (
-              finalPaymentIntent &&
-              (finalStatus === 'succeeded' || finalStatus === 'requires_capture')
-            ) {
-              onPaymentSuccess(finalId)
-            } else {
-              ev.complete('fail')
-              setError('Payment status is not valid')
-              onPaymentError('Payment status is not valid')
-            }
-          }
-        } catch (error: unknown) {
-          console.log('🔍 [PaymentForm] Erreur générale:', error)
-          ev.complete('fail')
-          const errorMessage =
-            error instanceof Error ? error.message : 'Payment failed'
-          setError(errorMessage)
-          onPaymentError(errorMessage)
-        } finally {
-          setProcessing(false)
+        // Create Payment Intent
+        const requestBody = {
+          amount: amountInGBP,
+          currency: 'gbp',
+          bookingId: bookingId,
+          metadata: {
+            bookingId: bookingId || '',
+            source: 'booking_payment',
+            paymentMethod: paymentMethod,
+            displayCurrency: currency.code,
+            displayAmount: displayAmount,
+          },
         }
-      }
 
-      pr.on('paymentmethod', handlePaymentMethod)
+        console.log('🔍 [PaymentForm] Body complet à envoyer:', JSON.stringify(requestBody, null, 2))
 
-      return () => {
-        pr.off?.('paymentmethod', handlePaymentMethod)
+        const response = await fetch(`${API_BASE_URL}/payments/intent`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          },
+          body: JSON.stringify(requestBody),
+        })
+
+        console.log('🔍 [PaymentForm] Réponse HTTP status:', response.status)
+        console.log('🔍 [PaymentForm] Réponse HTTP ok:', response.ok)
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          console.log('🔍 [PaymentForm] Erreur API:', errorData)
+          throw new Error(
+            errorData.message || 'Failed to create payment intent'
+          )
+        }
+
+        const responseData = await response.json()
+        console.log('🔍 [PaymentForm] Réponse API complète:', JSON.stringify(responseData, null, 2))
+
+        const { data } = responseData
+        console.log('🔍 [PaymentForm] Data extraite:', data)
+
+        const {
+          client_secret: clientSecret,
+          payment_intent_id: paymentIntentId,
+        } = data || {}
+        console.log('🔍 [PaymentForm] clientSecret extraite:', clientSecret)
+        console.log('🔍 [PaymentForm] paymentIntentId extraite:', paymentIntentId)
+
+        if (!clientSecret) {
+          throw new Error('Client secret not found in API response')
+        }
+
+        // Confirm the payment
+        const { error: confirmError, paymentIntent } =
+          await stripe.confirmCardPayment(
+            clientSecret,
+            { payment_method: ev.paymentMethod.id },
+            { handleActions: false }
+          )
+
+        if (confirmError) {
+          console.log('🔍 [PaymentForm] Erreur confirmation:', confirmError)
+          ev.complete('fail')
+          setError(confirmError.message || 'Payment failed')
+          onPaymentError(confirmError.message || 'Payment failed')
+        } else {
+          console.log('🔍 [PaymentForm] Paiement confirmé:', paymentIntent)
+          ev.complete('success')
+
+          let finalPaymentIntent = paymentIntent
+
+          if (finalPaymentIntent?.status === 'requires_action') {
+            const actionResult = await stripe.confirmCardPayment(clientSecret)
+
+            if (actionResult.error) {
+              setError(actionResult.error.message || 'Payment failed')
+              onPaymentError(actionResult.error.message || 'Payment failed')
+              return
+            }
+
+            finalPaymentIntent = actionResult.paymentIntent
+          }
+
+          const finalStatus = finalPaymentIntent?.status
+          const finalId = finalPaymentIntent?.id || paymentIntentId
+
+          console.log('🔍 [PaymentForm] PaymentIntent status:', finalStatus)
+          console.log('🔍 [PaymentForm] PaymentIntentId à envoyer:', finalId)
+
+          if (
+            finalPaymentIntent &&
+            (finalStatus === 'succeeded' || finalStatus === 'requires_capture')
+          ) {
+            onPaymentSuccess(finalId)
+          } else {
+            ev.complete('fail')
+            setError('Payment status is not valid')
+            onPaymentError('Payment status is not valid')
+          }
+        }
+      } catch (error: unknown) {
+        console.log('🔍 [PaymentForm] Erreur générale:', error)
+        ev.complete('fail')
+        const errorMessage =
+          error instanceof Error ? error.message : 'Payment failed'
+        setError(errorMessage)
+        onPaymentError(errorMessage)
+      } finally {
+        setProcessing(false)
       }
+    }
+
+    pr.on('paymentmethod', handlePaymentMethod)
+
+    return () => {
+      pr.off?.('paymentmethod', handlePaymentMethod)
+    }
   }, [
     stripe,
     amountInGBP,
@@ -337,7 +337,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       console.log('🔍 [PaymentForm] Calcul: amountInGBP * 100 =', amountInGBP * 100)
       console.log('🔍 [PaymentForm] Math.round(amountInGBP * 100) =', amountInCents)
       console.log('🔍 [PaymentForm] Type de amountInCents:', typeof amountInCents)
-      
+
       // Create Payment Intent
       const requestBody = {
         amount: amountInGBP,
