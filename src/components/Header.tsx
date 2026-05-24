@@ -159,6 +159,7 @@ const Header = () => {
                 <SelectValue placeholder={t('common.language')} />
               </SelectTrigger>
               <SelectContent>
+               
                 <SelectItem value='fr'>
                   <span className='fi fi-fr'></span> Français
                 </SelectItem>
