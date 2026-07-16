@@ -68,10 +68,12 @@ const Footer = () => {
             </p>
             {/* integrer l'adresse de societé : 24-26 Arcadia Avenue, Fin009, London, United Kingdom, N3 2JU */}
 
-            <div className='text-gray-400 mb-4 max-w-md md:mb-10 flex items-center justify-center'>
-              <p>
-                <MapPin className='' />
-                {t('footer.address')}
+            <div
+              className='text-gray-400 mb-4 max-w-md md:mb-10 flex items-start '
+            >
+             
+              <p> <MapPin/>
+              Adress : 24-26 Arcadia Avenue, Fin009, London, United Kingdom, N3 2JU 
               </p>
             </div>
             <div
