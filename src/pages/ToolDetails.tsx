@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/pagination'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import { PriceDisplay } from '@/components/PriceDisplay'
+import { OptimizedPriceDisplay } from '@/components/OptimizedPriceDisplay'
 import { toolsService } from '@/services/toolsService'
 import { reviewsService, ReviewTool } from '@/services/reviewsService'
 import { Tool, Review } from '@/types/bridge/tool.types'
@@ -64,18 +64,7 @@ const ToolDetails = () => {
       setError(null)
       const toolData = await toolsService.getTool(id)
       setTool(toolData)
-      console.log('----------------------------------------------------')
-      console.log('----------------------------------------------------')
-      console.log('----------------------------------------------------')
-      console.log('----------------------------------------------------')
-      console.log('----------------------------------------------------')
-      console.log('----------------------------------------------------')
-      console.log('----------------------------------------------------')
-      console.log('----------------------------------------------------')
-      console.log('----------------------------------------------------')
-      console.log('Tool details:', toolData)
     } catch (err: any) {
-      console.error('Error fetching tool:', err)
       setError(err.message)
       toast({
         title: 'Erreur',
@@ -98,7 +87,6 @@ const ToolDetails = () => {
       setTotalReviewPages(Math.ceil(reviewsData.length / reviewsPerPage))
       setTotalReviews(reviewsData.length)
     } catch (err: any) {
-      console.error('Error fetching reviews:', err)
       toast({
         title: 'Erreur',
         description: 'Impossible de charger les avis.',
@@ -272,18 +260,6 @@ const ToolDetails = () => {
     tool.moderationStatus ||
     t('general.unknown')
   // Debug logs for price values
-  console.log(`🔍 [ToolDetails] Tool price debugging:`, {
-    toolId: tool.id,
-    toolTitle: tool.title,
-    basePrice: tool.basePrice,
-    basePriceType: typeof tool.basePrice,
-    depositAmount: tool.depositAmount,
-    depositAmountType: typeof tool.depositAmount,
-    baseCurrencyCode: tool.baseCurrencyCode,
-    displayPrice,
-    feeAmount,
-    fullTool: tool,
-  })
 
   // Fix for null/undefined prices - use fallback values and ensure they are numbers
   const safeBasePrice =
@@ -295,16 +271,6 @@ const ToolDetails = () => {
       ? parseFloat(tool.depositAmount)
       : tool.depositAmount || 0
 
-  console.log(`🔧 [ToolDetails] Safe price values:`, {
-    originalBasePrice: tool.basePrice,
-    basePriceType: typeof tool.basePrice,
-    safeBasePrice,
-    safBasePriceType: typeof safeBasePrice,
-    originalDepositAmount: tool.depositAmount,
-    depositAmountType: typeof tool.depositAmount,
-    safeDepositAmount,
-    safeDepositAmountType: typeof safeDepositAmount,
-  })
 
   // Only show price components if the original values are not null/undefined
   const shouldShowBasePrice =
@@ -555,7 +521,7 @@ const ToolDetails = () => {
 
               <div className='bg-accent/5 rounded-lg p-6 mb-6'>
                 <div className='text-3xl font-bold text-accent mb-2'>
-                  <PriceDisplay
+                  <OptimizedPriceDisplay
                     price={displayPrice}
                     baseCurrency={tool.baseCurrencyCode || 'GBP'}
                     size='lg'
@@ -563,7 +529,7 @@ const ToolDetails = () => {
                   />
                 </div>
                 <div className='text-sm text-gray-600 mb-4'>
-                  <PriceDisplay
+                  <OptimizedPriceDisplay
                     price={feeAmount || 0}
                     baseCurrency={tool.baseCurrencyCode || 'GBP'}
                     size='sm'
@@ -571,7 +537,7 @@ const ToolDetails = () => {
                   />
                   {shouldShowBasePrice && (
                     <>
-                      <PriceDisplay
+                      <OptimizedPriceDisplay
                         price={safeBasePrice}
                         baseCurrency={tool.baseCurrencyCode || 'GBP'}
                         size='sm'
@@ -582,7 +548,7 @@ const ToolDetails = () => {
                 </div>
                 {shouldShowDepositAmount && (
                   <div className='text-sm text-gray-600 mb-4'>
-                    <PriceDisplay
+                    <OptimizedPriceDisplay
                       price={safeDepositAmount}
                       baseCurrency={tool.baseCurrencyCode || 'GBP'}
                       size='sm'

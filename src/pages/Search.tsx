@@ -24,7 +24,6 @@ import {
 } from '@/components/ui/pagination'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import { PriceDisplay } from '@/components/PriceDisplay'
 import { OptimizedPriceDisplay } from '@/components/OptimizedPriceDisplay'
 import { useCurrencyOptimized } from '@/hooks/useCurrencyOptimized'
 import { RateFetchTrigger } from '@/types/currency'
@@ -92,7 +91,6 @@ const Search = () => {
   const { selectedCurrency, calculatePrice, formatPrice } = useCurrency()
 
   // Debug log pour vérifier la valeur de isAuthenticated
-  console.log('🔍 Search.tsx - isAuthenticated:', isAuthenticated)
 
   const [priceRange, setPriceRange] = useState([0, 500])
   const [selectedCategory, setSelectedCategory] = useState(
@@ -890,12 +888,7 @@ const Search = () => {
                               {t('tools.rent')}
                             </Button>
                             {/* Debug log pour vérifier la condition d'affichage */}
-                            {console.log(
-                              '🔍 Bouton favoris - isAuthenticated:',
-                              isAuthenticated,
-                              'pour outil:',
-                              tool.id
-                            )}
+                            {undefined}
                             {isAuthenticated && (
                               <Button
                                 variant='outline'

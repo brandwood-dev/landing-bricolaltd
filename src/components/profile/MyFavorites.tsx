@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { OptimizedPriceDisplay } from '../OptimizedPriceDisplay'
 const MyFavorites = () => {
   const { favorites, removeFromFavorites, isLoading } = useFavorites();
+  const { t } = useLanguage();
   const { toast } = useToast();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -26,19 +27,17 @@ const MyFavorites = () => {
     try {
       await removeFromFavorites(id);
       toast({
-        title: "Retiré des favoris",
-        description: "L'outil a été retiré de vos favoris.",
+        title: t('favorites.remove_success_title'),
+        description: t('favorites.remove_success_description'),
       });
     } catch (error) {
       toast({
-        title: "Erreur",
-        description: "Une erreur s'est produite lors de la suppression.",
+        title: t('general.error'),
+        description: t('favorites.remove_error'),
         variant: "destructive",
       });
     }
   };
-  
-  const { t } = useLanguage();
   
   // Pagination logic
   const totalPages = Math.ceil(favorites.length / itemsPerPage);
@@ -61,7 +60,7 @@ const MyFavorites = () => {
         {isLoading ? (
           <div className='text-center py-8'>
             <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4'></div>
-            <p className='text-gray-600'>Chargement de vos favoris...</p>
+            <p className='text-gray-600'>{t('favorites.loading')}</p>
           </div>
         ) : favorites.length === 0 ? (
           <div className='text-center py-8'>

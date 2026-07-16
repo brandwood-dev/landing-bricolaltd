@@ -52,19 +52,10 @@ const AddTool = () => {
   } = useValidation()
 
   // Debug logs pour le pays de l'utilisateur
-  console.log('🔍 [AddTool] Debug user country data:', {
-    user: user,
-    'user?.country': user?.country,
-    'user?.countryId': user?.countryId,
-    'user?.country || user?.countryId': user?.country || user?.countryId,
-    'typeof user?.country': typeof user?.country,
-    'typeof user?.countryId': typeof user?.countryId,
-  })
 
   // Déterminer le pays de l'utilisateur avec fallback
   const userCountryCode =
     user?.countryId || user?.country?.code || user?.country || 'BH'
-  console.log('🌍 [AddTool] Final user country code:', userCountryCode)
 
   // Form state
   const [formData, setFormData] = useState<Partial<CreateToolData>>({
@@ -1021,6 +1012,10 @@ const AddTool = () => {
                           )}
                         </div>
                       )}
+
+                        <div className='text-xs text-muted-foreground mt-1'>
+                       {t('change_message_clarification')}
+                        </div>
                     </div>
 
                     <div className='space-y-3'>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { MapboxSearchBox, config } from '@mapbox/search-js-web'
 import { getMapboxCountryCodes, getMapboxBbox, getMapboxProximity } from '@/utils/countryCoordinates'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 // Déclaration des types pour l'élément HTML personnalisé
 declare global {
@@ -35,16 +36,19 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   onChange,
   onAddressSelected,
   onCoordinatesSelected,
-  placeholder = 'Entrez votre adresse...',
+  placeholder,
   className = '',
   selectedCountry = 'FR',
   userCountry
 }) => {
+  const { t, language } = useLanguage()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [useFallback, setUseFallback] = useState(false)
   const [apiKeyValid, setApiKeyValid] = useState<boolean | null>(null)
   const searchBoxRef = useRef<MapboxSearchBox>(null)
+  const resolvedPlaceholder = placeholder || t('address_autocomplete.placeholder')
+  const mapboxLanguage = language === 'ar' ? 'ar' : language === 'en' ? 'en' : 'fr'
 
   // Codes ISO des pays du Golfe (format ISO 3166-1 alpha-2)
   const gulfCountries = ['KW', 'SA', 'BH', 'OM', 'QA', 'AE']
@@ -81,24 +85,17 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
     const initializeMapbox = async () => {
       const apiKey = import.meta.env.VITE_MAPBOX_API_KEY
 
-      console.log('🔧 Initialisation AddressAutocomplete:', {
-        apiKey: apiKey ? `${apiKey.substring(0, 20)}...` : 'MANQUANTE',
-        selectedCountry,
-        userCountry,
-        searchBoxRef: !!searchBoxRef.current,
-      })
 
       if (!apiKey) {
-        const errorMsg =
-          'Clé API Mapbox manquante. Mode saisie manuelle activé.'
-        console.error('❌', errorMsg)
+        const errorMsg = t(
+          'address_autocomplete.mapbox_key_missing_fallback'
+        )
         setUseFallback(true)
         setError(errorMsg)
         return
       }
 
       if (!searchBoxRef.current) {
-        console.warn('⚠️ SearchBox ref non disponible, tentative ultérieure...')
         return
       }
 
@@ -108,7 +105,6 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
       try {
         // Test de validité de la clé API
-        console.log('🔑 Test de la clé API Mapbox...')
 
         // Configurer l'access token globalement
         config.accessToken = apiKey
@@ -126,16 +122,10 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
             ? countryCodeMapping[currentCountry]
             : currentCountry
 
-        console.log('🌍 Configuration pays:', {
-          userCountry,
-          selectedCountry,
-          primaryCountry,
-          correctedCountry
-        })
 
         // Configuration des options de recherche basée sur le pays de l'utilisateur
         const searchOptions = {
-          language: 'fr',
+          language: mapboxLanguage,
           limit: 8,
           country: getMapboxCountryCodes(correctedCountry),
           proximity: getMapboxProximity(correctedCountry),
@@ -143,7 +133,6 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
           types: 'address,poi,place,locality,neighborhood,street',
         }
 
-        console.log('🔍 Options de recherche Mapbox:', searchOptions)
 
         // Configurer les options du SearchBox
         const searchBox = searchBoxRef.current
@@ -156,7 +145,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
         // Configuration optimisée selon la documentation Mapbox
         const mapboxSearchOptions: any = {
-          language: 'en', // Utiliser l'anglais pour de meilleurs résultats
+          language: mapboxLanguage,
           limit: 8,
           types: [
             'address',
@@ -175,13 +164,6 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
         searchBox.options = mapboxSearchOptions
 
-        console.log('⚙️ Configuration Mapbox SearchBox:', {
-          userCountry,
-          selectedCountry,
-          primaryCountry,
-          correctedCountry,
-          options: mapboxSearchOptions,
-        })
 
         // Test de la validité de la clé API avec l'API Search v1
         const testApiKey = async () => {
@@ -192,24 +174,14 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
             if (testResponse.ok) {
               const data = await testResponse.json()
-              console.log('✅ Clé API Mapbox valide (Search v1):', {
-                status: testResponse.status,
-                suggestions_count: data.suggestions?.length || 0,
-              })
               setApiKeyValid(true)
               return true
             } else {
               const errorText = await testResponse.text()
-              console.error('❌ Clé API Mapbox invalide:', {
-                status: testResponse.status,
-                statusText: testResponse.statusText,
-                error: errorText,
-              })
               setApiKeyValid(false)
               return false
             }
           } catch (testErr: any) {
-            console.error('❌ Erreur lors du test de la clé API:', testErr)
             setApiKeyValid(false)
             return false
           }
@@ -218,38 +190,23 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
         // Tester la clé API avant de configurer le SearchBox
         const isApiValid = await testApiKey()
         if (!isApiValid) {
-          console.warn(
-            '⚠️ Basculement vers le mode fallback (input texte simple)'
-          )
           setUseFallback(true)
-          setError('API Mapbox indisponible. Mode saisie manuelle activé.')
+          setError(t('address_autocomplete.api_unavailable_fallback'))
           setIsLoading(false)
           return
         }
 
         // Gérer les erreurs de l'API
         const handleError = (event: any) => {
-          console.error('❌ Erreur Mapbox SearchBox:', {
-            type: event.type,
-            detail: event.detail,
-            error: event.error,
-            message: event.message,
-          })
 
           // Basculer vers le fallback en cas d'erreur persistante
-          console.warn(
-            '⚠️ Basculement vers le mode fallback suite à une erreur API'
-          )
           setUseFallback(true)
-          setError(
-            "Problème avec l'autocomplétion. Mode saisie manuelle activé."
-          )
+          setError(t('address_autocomplete.autocomplete_issue_fallback'))
           setIsLoading(false)
         }
 
         // Gérer la sélection d'une suggestion
         const handleRetrieve = (event: any) => {
-          console.log('✅ Adresse sélectionnée:', event.detail)
           const feature = event.detail.features?.[0]
           if (feature && feature.properties) {
             const address =
@@ -260,7 +217,6 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
             if (feature.geometry && feature.geometry.coordinates) {
               const [lng, lat] = feature.geometry.coordinates
               const coordinates = { lat, lng }
-              console.log('📍 Coordonnées extraites:', coordinates)
               
               if (onCoordinatesSelected) {
                 onCoordinatesSelected(coordinates)
@@ -295,11 +251,6 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
             )
 
             if (!isAllowed) {
-              console.warn('🚫 Suggestion filtrée (pays non autorisé):', {
-                suggestion: suggestion.name,
-                country: countryCode,
-                place_formatted: suggestion.place_formatted,
-              })
             }
 
             return isAllowed
@@ -308,33 +259,11 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
           // Remplacer les suggestions par la version filtrée
           if (filteredSuggestions.length !== suggestions.length) {
             event.detail.suggestions = filteredSuggestions
-            console.log('🔒 Filtrage appliqué:', {
-              original: suggestions.length,
-              filtered: filteredSuggestions.length,
-              removed: suggestions.length - filteredSuggestions.length,
-            })
           }
 
-          console.log('💡 Suggestions reçues (après filtrage):', {
-            count: filteredSuggestions.length,
-            query: query,
-            suggestions: filteredSuggestions.slice(0, 3).map((s) => ({
-              name: s.name,
-              place_formatted: s.place_formatted,
-              feature_type: s.feature_type,
-              country: s.context?.country?.country_code,
-            })),
-            allowedCountries: allowedCountries,
-          })
 
           // Log détaillé si aucune suggestion après filtrage
           if (filteredSuggestions.length === 0 && query.length > 2) {
-            console.warn('⚠️ Aucune suggestion autorisée pour la requête:', {
-              query,
-              country: correctedCountry,
-              options: searchOptions,
-              originalCount: suggestions.length,
-            })
           }
         }
 
@@ -344,7 +273,6 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
         searchBox.addEventListener('suggest', handleSuggest)
 
         setIsLoading(false)
-        console.log('✅ AddressAutocomplete initialisé avec succès')
 
         // Nettoyage
         return () => {
@@ -353,26 +281,14 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
           searchBox.removeEventListener('suggest', handleSuggest)
         }
       } catch (err: any) {
-        console.error(
-          "❌ Erreur lors de l'initialisation de Mapbox SearchBox:",
-          {
-            error: err,
-            message: err?.message,
-            stack: err?.stack,
-            name: err?.name,
-          }
-        )
-        console.warn(
-          "⚠️ Basculement vers le mode fallback suite à une erreur d'initialisation"
-        )
         setUseFallback(true)
-        setError("Erreur d'initialisation. Mode saisie manuelle activé.")
+        setError(t('address_autocomplete.initialization_error_fallback'))
         setIsLoading(false)
       }
     }
 
     initializeMapbox()
-  }, [onChange, selectedCountry])
+  }, [mapboxLanguage, onChange, selectedCountry, t, userCountry])
 
   // Mettre à jour la valeur du SearchBox quand la prop value change
   useEffect(() => {
@@ -389,11 +305,11 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
           type='text'
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
+          placeholder={resolvedPlaceholder}
           className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm pl-10 h-12 border-0 bg-gray-50 focus:bg-white ${className}`}
         />
         <div className='mt-1 text-sm text-amber-600'>
-          ⚠️ Configuration Mapbox requise pour l'autocomplétion
+          {t('address_autocomplete.configuration_required')}
         </div>
       </div>
     )
@@ -407,7 +323,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
           type='text'
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
+          placeholder={resolvedPlaceholder}
           className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm pl-10 h-12 border-0 bg-gray-50 focus:bg-white'
         />
 
@@ -419,7 +335,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
         )}
 
         <div className='mt-1 text-xs text-gray-500'>
-          💡 Saisissez votre adresse manuellement
+          {t('address_autocomplete.manual_entry_hint')}
         </div>
       </div>
     )
@@ -437,7 +353,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       <mapbox-search-box
         ref={searchBoxRef}
         access-token={import.meta.env.VITE_MAPBOX_API_KEY}
-        placeholder={placeholder}
+        placeholder={resolvedPlaceholder}
         className={`pl-10 h-12 border-0 bg-gray-50 focus:bg-white ${
           isLoading ? 'pr-10' : ''
         }`}

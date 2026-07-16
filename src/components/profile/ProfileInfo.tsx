@@ -51,7 +51,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import AddressAutocomplete from '@/components/AddressAutocomplete'
+import AddressAutocomplete from '@/components/ui/AddressAutocomplete'
 import phonePrefixes from '@/data/phonePrefixes'
 const API_BASE_URL = import.meta.env.VITE_BASE_URL
   ? `${import.meta.env.VITE_BASE_URL}`
@@ -168,24 +168,23 @@ const ProfileInfo = () => {
     }
   }, [user])
 
-
-
   // Static countries list (same as Register.tsx)
   const countries = [
-    { value: 'KW', label: 'kuwait', flag: '<span className="fi fi-kw"></span>' },
+    {
+      value: 'KW',
+      label: 'kuwait',
+      flag: '<span className="fi fi-kw"></span>',
+    },
     { value: 'SA', label: 'ksa', flag: '<span className="fi fi-sa"></span>' },
-    { value: 'BH', label: 'bahrain', flag: '<span className="fi fi-bh"></span>' },
+    {
+      value: 'BH',
+      label: 'bahrain',
+      flag: '<span className="fi fi-bh"></span>',
+    },
     { value: 'OM', label: 'oman', flag: '<span className="fi fi-om"></span>' },
     { value: 'QA', label: 'qatar', flag: '<span className="fi fi-qa"></span>' },
     { value: 'AE', label: 'uae', flag: '<span className="fi fi-ae"></span>' },
   ]
-
-  // // Generate countries options from static data (same as Register.tsx)
-  // const countryOptions = countries.map((country) => ({
-  //   value: country.value,
-  //   label: t(`countries.${country.label}`),
-  //   flag: country.flag,
-  // }))
 
   // Generate phone prefixes from phonePrefixes data (same as Register.tsx)
   const phonePrefix = phonePrefixes.map((prefix) => ({
@@ -200,40 +199,33 @@ const ProfileInfo = () => {
       if (data && data.verification && data.verification.url) {
         createVeriffFrame({
           url: data.verification.url,
-          onEvent: async function(msg) {
-            switch(msg) {
+          onEvent: async function (msg) {
+            switch (msg) {
               case 'CANCELED':
-                console.log('Veriff CANCELED');
-                break;
+                break
               case 'FINISHED':
-                console.log('Veriff FINISHED');
                 // Polling the status
-                let attempts = 0;
-                const maxAttempts = 12;
+                let attempts = 0
+                const maxAttempts = 12
                 const pollInterval = setInterval(async () => {
                   try {
-                    attempts++;
-                    const statusData = await userService.checkVeriffStatus();
+                    attempts++
+                    const statusData = await userService.checkVeriffStatus()
                     if (statusData && statusData.isVerified) {
-                      clearInterval(pollInterval);
-                      window.location.reload();
+                      clearInterval(pollInterval)
+                      window.location.reload()
                     } else if (attempts >= maxAttempts) {
-                      clearInterval(pollInterval);
-                      console.log("Polling timed out. Wait for webhook.");
+                      clearInterval(pollInterval)
                     }
-                  } catch (err) {
-                    console.error("Polling error:", err);
-                  }
-                }, 5000);
-                break;
+                  } catch (err) {}
+                }, 5000)
+                break
             }
-          }
-        });
+          },
+        })
       }
-    } catch (err) {
-      console.error('Error starting veriff', err);
-    }
-  };
+    } catch (err) {}
+  }
 
   const handleInputChange = (field: string, value: string) => {
     setUserInfo((prev) => ({ ...prev, [field]: value }))
@@ -327,14 +319,13 @@ const ProfileInfo = () => {
       })
 
       toast({
-        title: 'Photo de profil mise à jour',
-        description: 'Votre photo de profil a été mise à jour avec succès.',
+        title: t('profile.photo_updated_title'),
+        description: t('profile.photo_updated_description'),
       })
     } catch (error: any) {
       toast({
-        title: 'Erreur',
-        description:
-          error.message || 'Échec de la mise à jour de la photo de profil.',
+        title: t('general.error'),
+        description: error.message || t('profile.photo_update_failed'),
         variant: 'destructive',
       })
       throw error // Re-throw to handle in calling function
@@ -383,7 +374,7 @@ const ProfileInfo = () => {
       if (!response.ok) {
         const errorData = await response.json()
         throw new Error(
-          errorData.message || 'Échec de la mise à jour du profil'
+          errorData.message || 'Échec de la mise à jour du profil',
         )
       }
 
@@ -400,16 +391,16 @@ const ProfileInfo = () => {
       })
 
       toast({
-        title: 'Profil mis à jour',
-        description: 'Vos informations ont été mises à jour avec succès.',
+        title: t('profile.updated_title'),
+        description: t('profile.updated_description'),
       })
 
       setIsEditing(false)
     } catch (err: any) {
       setError(err.message || 'Échec de la mise à jour du profil')
       toast({
-        title: 'Erreur',
-        description: err.message || 'Échec de la mise à jour du profil.',
+        title: t('general.error'),
+        description: err.message || t('profile.update_failed'),
         variant: 'destructive',
       })
     } finally {
@@ -427,8 +418,8 @@ const ProfileInfo = () => {
       !userInfo.confirmPassword
     ) {
       toast({
-        title: 'Erreur de validation',
-        description: 'Veuillez remplir tous les champs de mot de passe.',
+        title: t('profile.password_validation_error_title'),
+        description: t('profile.password_fill_all_fields'),
         variant: 'destructive',
       })
       return
@@ -436,8 +427,8 @@ const ProfileInfo = () => {
 
     if (!currentPasswordValid) {
       toast({
-        title: 'Erreur de validation',
-        description: 'Le mot de passe actuel est incorrect.',
+        title: t('profile.password_validation_error_title'),
+        description: t('profile.password_current_incorrect'),
         variant: 'destructive',
       })
       return
@@ -445,9 +436,8 @@ const ProfileInfo = () => {
 
     if (!passwordValidation.isValid) {
       toast({
-        title: 'Erreur de validation',
-        description:
-          'Le nouveau mot de passe ne respecte pas les critères requis.',
+        title: t('profile.password_validation_error_title'),
+        description: t('profile.password_criteria_invalid'),
         variant: 'destructive',
       })
       return
@@ -455,8 +445,8 @@ const ProfileInfo = () => {
 
     if (!confirmPasswordValid) {
       toast({
-        title: 'Erreur de validation',
-        description: 'La confirmation du mot de passe ne correspond pas.',
+        title: t('profile.password_validation_error_title'),
+        description: t('profile.password_confirmation_mismatch'),
         variant: 'destructive',
       })
       return
@@ -472,8 +462,8 @@ const ProfileInfo = () => {
       })
 
       toast({
-        title: 'Mot de passe modifié',
-        description: 'Votre mot de passe a été modifié avec succès.',
+        title: t('profile.password_updated_title'),
+        description: t('profile.password_updated_description'),
       })
 
       // Clear password fields after successful change
@@ -498,9 +488,9 @@ const ProfileInfo = () => {
       setConfirmPasswordValid(false)
     } catch (passwordError: any) {
       toast({
-        title: 'Erreur',
+        title: t('general.error'),
         description:
-          passwordError.message || 'Échec de la modification du mot de passe.',
+          passwordError.message || t('profile.password_update_failed'),
         variant: 'destructive',
       })
     } finally {
@@ -509,7 +499,7 @@ const ProfileInfo = () => {
   }
 
   const handleImageUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = event.target.files?.[0]
     if (!file || !user) return
@@ -518,8 +508,8 @@ const ProfileInfo = () => {
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
     if (!allowedTypes.includes(file.type)) {
       toast({
-        title: 'Erreur',
-        description: 'Seuls les fichiers JPEG, PNG et WebP sont autorisés.',
+        title: t('general.error'),
+        description: t('profile.image_invalid_type'),
         variant: 'destructive',
       })
       return
@@ -528,8 +518,8 @@ const ProfileInfo = () => {
     if (file.size > 5 * 1024 * 1024) {
       // 5MB limit
       toast({
-        title: 'Erreur',
-        description: 'La taille du fichier ne doit pas dépasser 5MB.',
+        title: t('general.error'),
+        description: t('profile.image_too_large'),
         variant: 'destructive',
       })
       return
@@ -542,9 +532,8 @@ const ProfileInfo = () => {
       const previewUrl = URL.createObjectURL(file)
       setImagePreview(previewUrl)
 
-     
       const response = await userService.uploadProfilePicture(user.id, file)
-  
+
       const imageUrl = response.data?.data?.data?.url
 
       if (imageUrl) {
@@ -555,17 +544,18 @@ const ProfileInfo = () => {
         await handleProfileImageUpdate(imageUrl)
 
         toast({
-          title: 'Succès',
-          description: response.data?.data?.message || "Image téléchargée avec succès.",
+          title: t('profile.image_upload_success_title'),
+          description:
+            response.data?.data?.message ||
+            t('profile.image_upload_success_description'),
         })
-        
       } else {
         throw new Error("URL de l'image non reçue du serveur")
       }
     } catch (error: any) {
       toast({
-        title: 'Erreur',
-        description: error.message || "Échec de l'upload de l'image.",
+        title: t('general.error'),
+        description: error.message || t('profile.image_upload_failed'),
         variant: 'destructive',
       })
     } finally {
@@ -632,7 +622,7 @@ const ProfileInfo = () => {
       // Use the api service instead of fetch directly (like admin does)
       const response = await api.post<{ valid: boolean }>(
         '/auth/validate-password',
-        requestPayload
+        requestPayload,
       )
 
       // Access data via response.data.data.valid according to API structure
@@ -643,8 +633,8 @@ const ProfileInfo = () => {
         setCurrentPasswordValid(false)
         setCurrentPasswordChecked(true)
         toast({
-          title: 'Mot de passe incorrect',
-          description: 'Le mot de passe actuel est incorrect.',
+          title: t('profile.password_incorrect_title'),
+          description: t('profile.password_current_incorrect'),
           variant: 'destructive',
         })
       }
@@ -652,8 +642,8 @@ const ProfileInfo = () => {
       setCurrentPasswordValid(false)
       setCurrentPasswordChecked(true)
       toast({
-        title: 'Erreur de validation',
-        description: 'Impossible de vérifier le mot de passe actuel.',
+        title: t('profile.password_validation_error_title'),
+        description: t('profile.password_check_failed'),
         variant: 'destructive',
       })
     }
@@ -694,7 +684,7 @@ const ProfileInfo = () => {
               </Avatar>
               {uploadingImage && (
                 <span className='absolute inset-0 flex items-center justify-center bg-black/50 rounded-full text-white text-xs'>
-                  Upload...
+                  {t('profile.uploading_image')}
                 </span>
               )}
               <div className='absolute -bottom-2 -right-2'>
@@ -727,15 +717,15 @@ const ProfileInfo = () => {
                 {userInfo.firstName} {userInfo.lastName}
               </h3>
               <div className='flex flex-wrap items-center justify-center gap-2 mt-2'>
-                   {userInfo.isVerified && (
-                                    <Badge
-                                      variant='default'
-                                      className='flex items-center gap-1 text-xs'
-                                    >
-                                      <Shield className='h-3 w-3' />
-                                      {t('profile.verified')}
-                                    </Badge>
-                                  )}
+                {userInfo.isVerified && (
+                  <Badge
+                    variant='default'
+                    className='flex items-center gap-1 text-xs'
+                  >
+                    <Shield className='h-3 w-3' />
+                    {t('profile.verified')}
+                  </Badge>
+                )}
               </div>
             </div>
           </div>
@@ -1002,29 +992,29 @@ const ProfileInfo = () => {
                   }`}
                   placeholder={t('profile.current_password_placeholder')}
                 />
-               
-                  <Button
-                    type='button'
-                    variant='ghost'
-                    size='sm'
-                    className='absolute right-3 top-1/2 transform -translate-y-1/2 h-auto p-0 hover:bg-transparent'
-                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                  >
-                    {showCurrentPassword ? (
-                      <EyeOff className='h-4 w-4 text-gray-500' />
-                    ) : (
-                      <Eye className='h-4 w-4 text-gray-500' />
-                    )}
-                  </Button>
-                  {currentPasswordChecked && (
-                    <div>
-                      {currentPasswordValid ? (
-                        <span className='text-green-500'>✓</span>
-                      ) : (
-                        <span className='text-red-500'>✗</span>
-                      )}
-                    </div>
+
+                <Button
+                  type='button'
+                  variant='ghost'
+                  size='sm'
+                  className='absolute right-3 top-1/2 transform -translate-y-1/2 h-auto p-0 hover:bg-transparent'
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                >
+                  {showCurrentPassword ? (
+                    <EyeOff className='h-4 w-4 text-gray-500' />
+                  ) : (
+                    <Eye className='h-4 w-4 text-gray-500' />
                   )}
+                </Button>
+                {currentPasswordChecked && (
+                  <div>
+                    {currentPasswordValid ? (
+                      <span className='text-green-500'>✓</span>
+                    ) : (
+                      <span className='text-red-500'>✗</span>
+                    )}
+                  </div>
+                )}
               </div>
               {currentPasswordChecked && !currentPasswordValid && (
                 <p className='text-sm text-red-500'>

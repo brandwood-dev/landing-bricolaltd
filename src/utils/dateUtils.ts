@@ -20,7 +20,6 @@ export const formatDateLocalized = (
     const locale = language === 'fr' ? 'fr-FR' : language === 'en' ? 'en-US' : 'ar-SA'
     return new Date(dateString).toLocaleDateString(locale, options)
   } catch (error) {
-    console.error('Error formatting date:', error)
     return dateString // Return original string if formatting fails
   }
 }

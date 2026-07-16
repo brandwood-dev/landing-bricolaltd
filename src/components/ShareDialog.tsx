@@ -24,8 +24,6 @@ const WhatsAppIcon = () => (
   </svg>
 );
 
-
-
 interface ShareDialogProps {
   url: string;
   title: string;
@@ -133,7 +131,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
         
         <div className="mt-6 pt-6 border-t border-gray-100">
           <p className="text-sm text-gray-600 text-center">
-            Partagez cet article avec vos amis et votre famille
+            {t('share.share_with_family')}
           </p>
         </div>
       </DialogContent>

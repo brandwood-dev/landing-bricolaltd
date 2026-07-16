@@ -56,8 +56,6 @@ const ProfileHeader = ({ userInfo, stats }: ProfileHeaderProps) => {
   const navigate = useNavigate()
 
   // Debug logs pour les statistiques
-  console.log('ProfileHeader - stats received:', stats)
-  console.log('ProfileHeader - userInfo received:', userInfo)
 
   // State management for deletion process
   const [deletionStep, setDeletionStep] = useState<

@@ -31,7 +31,6 @@ const HeroSection = () => {
     try {
       setShowMap(true);
     } catch (error) {
-      console.error('Erreur lors de la recherche:', error);
     } finally {
       setIsLoading(false);
     }

@@ -55,7 +55,7 @@ export const CurrencySelector: React.FC<CurrencySelectorProps> = ({
     <div className={`relative ${className}`} dir={isRTL ? 'rtl' : 'ltr'}>
       {showLabel && (
         <label className='block text-sm font-medium text-gray-700 mb-1'>
-          {t('currency.label') || 'Currency'}
+          {t('currency.label')}
         </label>
       )}
 

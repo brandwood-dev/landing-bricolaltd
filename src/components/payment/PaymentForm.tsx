@@ -74,14 +74,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   const amountInGBP = amount // Le montant est déjà en GBP
 
   // 🔍 LOGS DE DÉBOGAGE ULTRA-DÉTAILLÉS POUR TRACER LE FLUX DES MONTANTS
-  console.log('🔍 [PaymentForm] === DÉBUT ANALYSE MONTANTS ===')
-  console.log('🔍 [PaymentForm] Montant reçu (amount):', amount, typeof amount)
-  console.log('🔍 [PaymentForm] Montant en GBP (amountInGBP):', amountInGBP, typeof amountInGBP)
-  console.log('🔍 [PaymentForm] Montant affiché (displayAmount):', displayAmount, typeof displayAmount)
-  console.log('🔍 [PaymentForm] Devise actuelle:', currency.code)
-  console.log('🔍 [PaymentForm] Conversion en centimes (amountInGBP * 100):', amountInGBP * 100)
-  console.log('🔍 [PaymentForm] Conversion arrondie Math.round(amountInGBP * 100):', Math.round(amountInGBP * 100))
-  console.log('🔍 [PaymentForm] === FIN ANALYSE MONTANTS ===')
 
   // Initialize Payment Request for Google Pay and Apple Pay
   useEffect(() => {
@@ -91,11 +83,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     ) {
       // 🔍 LOG AVANT CONVERSION EN CENTIMES
       const amountInCents = Math.round(amountInGBP * 100)
-      console.log('🔍 [PaymentForm] === GOOGLE/APPLE PAY SETUP ===')
-      console.log('🔍 [PaymentForm] amountInGBP:', amountInGBP)
-      console.log('🔍 [PaymentForm] amountInGBP * 100:', amountInGBP * 100)
-      console.log('🔍 [PaymentForm] Math.round(amountInGBP * 100):', amountInCents)
-      console.log('🔍 [PaymentForm] Type de amountInCents:', typeof amountInCents)
       
       const pr = stripe.paymentRequest({
         country: 'GB', // Changé de FR à GB car on traite en GBP
@@ -123,11 +110,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
         try {
           // 🔍 LOGS ULTRA-DÉTAILLÉS AVANT ENVOI À L'API
           const apiAmountInCents = Math.round(amountInGBP * 100)
-          console.log('🔍 [PaymentForm] === ENVOI API GOOGLE/APPLE PAY ===')
-          console.log('🔍 [PaymentForm] amountInGBP original:', amountInGBP)
-          console.log('🔍 [PaymentForm] Calcul: amountInGBP * 100 =', amountInGBP * 100)
-          console.log('🔍 [PaymentForm] Math.round(amountInGBP * 100) =', apiAmountInCents)
-          console.log('🔍 [PaymentForm] Type de apiAmountInCents:', typeof apiAmountInCents)
 
           // Create Payment Intent
           const requestBody = {
@@ -143,8 +125,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             },
           }
 
-          console.log('🔍 [PaymentForm] Body complet à envoyer:', JSON.stringify(requestBody, null, 2))
-
           const response = await fetch(`${API_BASE_URL}/payments/intent`, {
             method: 'POST',
             headers: {
@@ -154,29 +134,21 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             body: JSON.stringify(requestBody),
           })
 
-          console.log('🔍 [PaymentForm] Réponse HTTP status:', response.status)
-          console.log('🔍 [PaymentForm] Réponse HTTP ok:', response.ok)
-
           if (!response.ok) {
             const errorData = await response.json()
-            console.log('🔍 [PaymentForm] Erreur API:', errorData)
             throw new Error(
               errorData.message || 'Failed to create payment intent'
             )
           }
 
           const responseData = await response.json()
-          console.log('🔍 [PaymentForm] Réponse API complète:', JSON.stringify(responseData, null, 2))
 
           const { data } = responseData
-          console.log('🔍 [PaymentForm] Data extraite:', data)
 
           const {
             client_secret: clientSecret,
             payment_intent_id: paymentIntentId,
           } = data || {}
-          console.log('🔍 [PaymentForm] clientSecret extraite:', clientSecret)
-          console.log('🔍 [PaymentForm] paymentIntentId extraite:', paymentIntentId)
 
           if (!clientSecret) {
             throw new Error('Client secret not found in API response')
@@ -191,29 +163,22 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             )
 
           if (confirmError) {
-            console.log('🔍 [PaymentForm] Erreur confirmation:', confirmError)
             ev.complete('fail')
             setError(confirmError.message || 'Payment failed')
             onPaymentError(confirmError.message || 'Payment failed')
           } else {
-            console.log('🔍 [PaymentForm] Paiement confirmé:', paymentIntent)
             ev.complete('success')
             // 🔧 CORRECTION: Vérifier le statut et appeler onPaymentSuccess avec le bon ID
-            console.log('🔍 [PaymentForm] PaymentIntent status:', paymentIntent?.status)
-            console.log('🔍 [PaymentForm] PaymentIntentId à envoyer:', paymentIntentId)
             
             if (paymentIntent && (paymentIntent.status === 'succeeded' || paymentIntent.status === 'requires_capture')) {
-              console.log('🔍 [PaymentForm] Appel de onPaymentSuccess avec ID:', paymentIntentId)
               onPaymentSuccess(paymentIntentId)
             } else {
-              console.log('🔍 [PaymentForm] Statut de paiement inattendu:', paymentIntent?.status)
               ev.complete('fail')
               setError('Payment status is not valid')
               onPaymentError('Payment status is not valid')
             }
           }
         } catch (error: any) {
-          console.log('🔍 [PaymentForm] Erreur générale:', error)
           ev.complete('fail')
           const errorMessage = error.message || 'Payment failed'
           setError(errorMessage)
@@ -284,11 +249,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     try {
       // 🔍 LOGS ULTRA-DÉTAILLÉS AVANT CONVERSION EN CENTIMES POUR PAIEMENT PAR CARTE
       const amountInCents = Math.round(amountInGBP * 100)
-      console.log('🔍 [PaymentForm] === PAIEMENT PAR CARTE ===')
-      console.log('🔍 [PaymentForm] amountInGBP original:', amountInGBP)
-      console.log('🔍 [PaymentForm] Calcul: amountInGBP * 100 =', amountInGBP * 100)
-      console.log('🔍 [PaymentForm] Math.round(amountInGBP * 100) =', amountInCents)
-      console.log('🔍 [PaymentForm] Type de amountInCents:', typeof amountInCents)
       
       // Create Payment Intent
       const requestBody = {
@@ -304,8 +264,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
         },
       }
 
-      console.log('🔍 [PaymentForm] Body complet à envoyer (Carte):', JSON.stringify(requestBody, null, 2))
-
       const response = await fetch(`${API_BASE_URL}/payments/intent`, {
         method: 'POST',
         headers: {
@@ -315,27 +273,22 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
         body: JSON.stringify(requestBody),
       })
 
-      console.log('🔍 [PaymentForm] Réponse HTTP status (Carte):', response.status)
-      console.log('🔍 [PaymentForm] Réponse HTTP ok (Carte):', response.ok)
-
       if (!response.ok) {
         const errorData = await response.json()
-        console.log('🔍 [PaymentForm] Erreur API (Carte):', errorData)
+      
         throw new Error(errorData.message || 'Failed to create payment intent')
       }
 
       const responseData = await response.json()
-      console.log('🔍 [PaymentForm] Réponse API complète (Carte):', JSON.stringify(responseData, null, 2))
+     
 
       const { data } = responseData
-      console.log('🔍 [PaymentForm] Data extraite (Carte):', data)
 
       const {
         client_secret: clientSecret,
         payment_intent_id: paymentIntentId,
       } = data || {}
-      console.log('🔍 [PaymentForm] clientSecret extraite (Carte):', clientSecret)
-      console.log('🔍 [PaymentForm] paymentIntentId extraite (Carte):', paymentIntentId)
+     
 
       if (!clientSecret) {
         throw new Error('Client secret not found in API response')
@@ -353,26 +306,18 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
         })
 
       if (confirmError) {
-        console.log('🔍 [PaymentForm] Erreur confirmation (Carte):', confirmError)
         setError(confirmError.message || 'Payment failed')
         onPaymentError(confirmError.message || 'Payment failed')
       } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-        console.log('🔍 [PaymentForm] Paiement confirmé (Carte):', paymentIntent)
         // 🔧 CORRECTION: Vérifier le statut et appeler onPaymentSuccess avec le bon ID
-        console.log('🔍 [PaymentForm] PaymentIntent status (Carte):', paymentIntent?.status)
-        console.log('🔍 [PaymentForm] PaymentIntentId à envoyer (Carte):', paymentIntentId)
         onPaymentSuccess(paymentIntentId)
       } else if (paymentIntent && paymentIntent.status === 'requires_capture') {
-        console.log('🔍 [PaymentForm] Paiement nécessite capture (Carte):', paymentIntent)
-        console.log('🔍 [PaymentForm] PaymentIntentId à envoyer (Carte):', paymentIntentId)
         onPaymentSuccess(paymentIntentId)
       } else {
-        console.log('🔍 [PaymentForm] Statut de paiement inattendu (Carte):', paymentIntent?.status)
         setError('Payment status is not valid')
         onPaymentError('Payment status is not valid')
       }
     } catch (error: any) {
-      console.log('🔍 [PaymentForm] Erreur générale (Carte):', error)
       const errorMessage = error.message || 'Payment failed'
       setError(errorMessage)
       onPaymentError(errorMessage)

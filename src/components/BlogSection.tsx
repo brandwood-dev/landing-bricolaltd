@@ -27,7 +27,6 @@ const BlogSection = () => {
         const posts = await newsService.getLatestNews(3)
         setLatestPosts(posts)
       } catch (error) {
-        console.warn('Failed to load latest blog posts:', error)
         // Fail silently for homepage component
       } finally {
         setLoading(false)

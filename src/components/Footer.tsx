@@ -69,8 +69,10 @@ const Footer = () => {
             {/* integrer l'adresse de societé : 24-26 Arcadia Avenue, Fin009, London, United Kingdom, N3 2JU */}
 
             <div className='text-gray-400 mb-4 max-w-md md:mb-10 flex items-center justify-center'>
-             
-              <p><MapPin className='' />24-26 Arcadia Avenue, Fin009, London, United Kingdom</p>
+              <p>
+                <MapPin className='' />
+                {t('footer.address')}
+              </p>
             </div>
             <div
               className={`flex space-x-4 ${
@@ -321,7 +323,7 @@ const Footer = () => {
           <div className='flex !flex-col items-center text-center text-gray-400 space-y-2'>
             <p>&copy; 2025 Bricola LTD. {t('footer.rights')}.</p>
             <p className='text-sm'>
-              {'Designed By'}{' '}
+              {t('footer.designed_by')}{' '}
               <a
                 href='https://www.brandwoodandco.com/'
                 target='_blank'

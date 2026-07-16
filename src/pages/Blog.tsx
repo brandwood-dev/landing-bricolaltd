@@ -68,7 +68,6 @@ const Blog = () => {
       setTotalPages(response.totalPages || 1)
       setTotalArticles(response.total || 0)
     } catch (error: any) {
-      console.error('Failed to load articles:', error)
       setArticles([])
       setTotalPages(1)
       setTotalArticles(0)
@@ -96,7 +95,6 @@ const Blog = () => {
         setFeaturedArticle(response.data[randomIndex])
       }
     } catch (error: any) {
-      console.warn('Failed to load featured article:', error.message)
     }
   }
 

@@ -53,7 +53,7 @@ const VideoSection = () => {
                     <button
                       onClick={() => setIsExpanded(false)}
                       className='absolute top-4 right-4 z-50 p-2 bg-black/50 hover:bg-black/80 rounded-full text-white transition-colors'
-                      aria-label='Close fullscreen'
+                      aria-label={t('video.close_fullscreen')}
                     >
                       <X className='w-6 h-6' />
                     </button>
@@ -64,7 +64,7 @@ const VideoSection = () => {
                     src={`https://www.youtube.com/embed/ZjkR2Bc-42U?autoplay=1&mute=${isExpanded ? '0' : '1'}&loop=1&playlist=ZjkR2Bc-42U&controls=${isExpanded ? '1' : '0'}&showinfo=0&rel=0&modestbranding=1`}
                     className='w-full h-full'
                     allow='autoplay; encrypted-media'
-                    title='Bricola Promotional Video'
+                    title={t('video.title')}
                   />
                 </div>
               </div>
@@ -83,7 +83,7 @@ const VideoSection = () => {
                   <button
                     onClick={() => setIsPlayingMobile(true)}
                     className='absolute inset-0 flex items-center justify-center group'
-                    aria-label='Play video'
+                    aria-label={t('video.play')}
                   >
                     <div className='w-16 h-16 bg-accent rounded-full flex items-center justify-center shadow-xl transform transition-transform group-hover:scale-110'>
                       <Play
@@ -99,7 +99,7 @@ const VideoSection = () => {
                   className='w-full h-full'
                   allow='autoplay; encrypted-media'
                   allowFullScreen
-                  title='Bricola Promotional Video'
+                  title={t('video.title')}
                 />
               )}
             </div>

@@ -95,14 +95,12 @@ const EnhancedPaymentForm: React.FC<EnhancedPaymentFormProps> = ({
     amount,
     currency: 'gbp',
     onPaymentSuccess: (paymentIntentId) => {
-      console.log('3DS payment successful:', paymentIntentId)
       setShow3DSChallenge(false)
       setChallengeUrl(null)
       setThreeDSSessionId(null)
       onPaymentSuccess(paymentIntentId)
     },
     onPaymentError: (error) => {
-      console.error('3DS payment error:', error)
       setShow3DSChallenge(false)
       setChallengeUrl(null)
       setThreeDSSessionId(null)
@@ -110,7 +108,6 @@ const EnhancedPaymentForm: React.FC<EnhancedPaymentFormProps> = ({
       onPaymentError(error)
     },
     on3DSChallenge: (challengeUrl) => {
-      console.log('3DS challenge required:', challengeUrl)
       setChallengeUrl(challengeUrl)
       setShow3DSChallenge(true)
     },
@@ -257,8 +254,6 @@ const EnhancedPaymentForm: React.FC<EnhancedPaymentFormProps> = ({
         },
       }
 
-      console.log('Creating payment intent with 3DS support:', requestBody)
-
       const response = await fetch(`${API_BASE_URL}/payments/intent`, {
         method: 'POST',
         headers: {
@@ -290,7 +285,6 @@ const EnhancedPaymentForm: React.FC<EnhancedPaymentFormProps> = ({
 
       // Check if 3D Secure is required
       if (requires3DS) {
-        console.log('3D Secure required for payment')
         
         // Initialize 3D Secure authentication
         const billingDetails = showBillingForm ? {
@@ -304,11 +298,9 @@ const EnhancedPaymentForm: React.FC<EnhancedPaymentFormProps> = ({
         if (threeDSResult.success) {
           if (threeDSResult.requiresAction) {
             // 3DS challenge is being handled by the hook
-            console.log('3DS challenge in progress...')
             return // Don't process further, wait for challenge completion
           } else {
             // Frictionless flow completed
-            console.log('3DS frictionless flow completed')
             onPaymentSuccess(paymentIntentId)
             return
           }

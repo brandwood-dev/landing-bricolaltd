@@ -156,34 +156,15 @@ export const countryCoordinatesMap: Record<string, CountryCoordinates> = {
  */
 export const getCountryCoordinates = (countryCode?: string): CountryCoordinates => {
   // Debug logs pour getCountryCoordinates
-  console.log('🔍 [getCountryCoordinates] Input:', {
-    countryCode,
-    'typeof countryCode': typeof countryCode,
-    'countryCode value': countryCode
-  })
 
   // Vérifier si countryCode est une chaîne de caractères valide
   if (!countryCode || typeof countryCode !== 'string') {
-    console.log('⚠️ [getCountryCoordinates] Invalid countryCode, using DEFAULT:', {
-      countryCode,
-      'typeof countryCode': typeof countryCode,
-      defaultCoords: countryCoordinatesMap['DEFAULT']
-    })
     return countryCoordinatesMap['DEFAULT']
   }
 
   const upperCountryCode = countryCode.toUpperCase()
   const coordinates = countryCoordinatesMap[upperCountryCode] || countryCoordinatesMap['DEFAULT']
   
-  console.log('🌍 [getCountryCoordinates] Result:', {
-    originalCode: countryCode,
-    upperCode: upperCountryCode,
-    found: !!countryCoordinatesMap[upperCountryCode],
-    coordinates,
-    'coordinates.lat': coordinates.lat,
-    'coordinates.lng': coordinates.lng,
-    'coordinates.zoom': coordinates.zoom
-  })
 
   return coordinates
 }

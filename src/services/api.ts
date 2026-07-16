@@ -18,13 +18,6 @@ apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('authToken');
     
-    console.log('🔍 API Request Debug:', {
-      url: config.url,
-      method: config.method,
-      baseURL: config.baseURL,
-      hasToken: !!token,
-      tokenPreview: token ? `${token.substring(0, 20)}...` : 'No token'
-    });
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -33,7 +26,6 @@ apiClient.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.error('❌ Request interceptor error:', error);
     return Promise.reject(error);
   }
 );
@@ -41,22 +33,9 @@ apiClient.interceptors.request.use(
 // Response interceptor to handle common errors
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => {
-    console.log('✅ API Response Debug:', {
-      url: response.config.url,
-      status: response.status,
-      statusText: response.statusText,
-      hasData: !!response.data
-    });
     return response;
   },
   (error) => {
-    console.error('❌ API Response Error:', {
-      url: error.config?.url,
-      status: error.response?.status,
-      statusText: error.response?.statusText,
-      message: error.message,
-      responseData: error.response?.data
-    });
     
     // Create a serializable error object to avoid circular references
     const serializableError = {

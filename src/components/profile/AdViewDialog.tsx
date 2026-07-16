@@ -33,8 +33,8 @@ interface AdViewDialogProps {
 
 const AdViewDialog = ({ ad, onClose }: AdViewDialogProps) => {
   const [toolData, setToolData] = useState<Tool | null>(null)
- const [reviews, setReviews] = useState<Review[]>([])
- const [loading, setLoading] = useState(true)
+  const [reviews, setReviews] = useState<Review[]>([])
+  const [loading, setLoading] = useState(true)
   const { t, language } = useLanguage()
 
   // Helper functions to handle both Tool and Ad types
@@ -71,7 +71,7 @@ const AdViewDialog = ({ ad, onClose }: AdViewDialogProps) => {
   }
 
   const getTotalRentals = (obj: Tool | Ad): number => {
-    return isToolType(obj) ? (obj.totalBookings || 0) : obj.totalRentals
+    return isToolType(obj) ? obj.totalBookings || 0 : obj.totalRentals
   }
 
   const getImage = (obj: Tool | Ad): string => {
@@ -82,7 +82,7 @@ const AdViewDialog = ({ ad, onClose }: AdViewDialogProps) => {
   }
 
   const getOwnerInstructions = (obj: Tool | Ad): string => {
-    return isToolType(obj) ? (obj.ownerInstructions || '') : obj.ownerInstruction
+    return isToolType(obj) ? obj.ownerInstructions || '' : obj.ownerInstruction
   }
 
   const getDescription = (obj: Tool | Ad): string => {
@@ -90,13 +90,15 @@ const AdViewDialog = ({ ad, onClose }: AdViewDialogProps) => {
   }
 
   const getCategoryName = (obj: Tool | Ad): string => {
-   if (isToolType(obj)) {
-      return obj.category?.name || obj.category?.displayName || t('category.unknown')
-   }
-   return typeof obj.category === 'object' && obj.category?.name
-     ? obj.category.name
-     : obj.category
- }
+    if (isToolType(obj)) {
+      return (
+        obj.category?.name || obj.category?.displayName || t('category.unknown')
+      )
+    }
+    return typeof obj.category === 'object' && obj.category?.name
+      ? obj.category.name
+      : obj.category
+  }
 
   useEffect(() => {
     const fetchToolData = async () => {
@@ -105,7 +107,7 @@ const AdViewDialog = ({ ad, onClose }: AdViewDialogProps) => {
         // Récupérer les données complètes de l'outil
         const tool = await toolsService.getTool(ad.id)
         setToolData(tool)
-        
+
         // Récupérer les reviews de l'outil
         const toolReviews = await toolsService.getToolReviews(ad.id)
         setReviews(toolReviews.data || [])
@@ -152,7 +154,7 @@ const AdViewDialog = ({ ad, onClose }: AdViewDialogProps) => {
         <div className='flex items-center justify-center h-64'>
           <div className='text-center'>
             <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2'></div>
-            <p className='text-muted-foreground'>Chargement...</p>
+            <p className='text-muted-foreground'>{t('general.loading')}</p>
           </div>
         </div>
       </DialogContent>
@@ -160,7 +162,7 @@ const AdViewDialog = ({ ad, onClose }: AdViewDialogProps) => {
   }
 
   // Préparer les images pour le carousel
-  const images = toolData?.photos?.map(photo => photo.url) || [getImage(ad)]
+  const images = toolData?.photos?.map((photo) => photo.url) || [getImage(ad)]
 
   return (
     <DialogContent className='max-w-4xl max-h-[90vh] overflow-y-auto'>
@@ -177,13 +179,13 @@ const AdViewDialog = ({ ad, onClose }: AdViewDialogProps) => {
           <div className='space-y-4'>
             <div>
               <h2 className='text-2xl font-bold'>{ad.title}</h2>
-              <p className='text-muted-foreground'>
-                {getCategoryName(ad)}
-              </p>
+              <p className='text-muted-foreground'>{getCategoryName(ad)}</p>
             </div>
 
             <div className='flex items-center gap-2'>
-              <Badge className={getValidationStatusColor(getValidationStatus(ad))}>
+              <Badge
+                className={getValidationStatusColor(getValidationStatus(ad))}
+              >
                 {getValidationStatusText(getValidationStatus(ad))}
               </Badge>
               <Badge variant={getPublishedStatus(ad) ? 'default' : 'secondary'}>
@@ -202,7 +204,9 @@ const AdViewDialog = ({ ad, onClose }: AdViewDialogProps) => {
                     {toolData?.rating || getRating(ad)}
                   </span>
                   <span className='text-muted-foreground'>
-                    ({toolData?.reviewCount || 0} avis)
+                    {t('ads.reviews_count', {
+                      count: toolData?.reviewCount || 0,
+                    })}
                   </span>
                 </div>
                 <div>
@@ -212,7 +216,7 @@ const AdViewDialog = ({ ad, onClose }: AdViewDialogProps) => {
             </div>
 
             <div className='text-2xl font-bold text-primary'>
-              {getPrice(ad)}€/{t('general.day')}
+              {getPrice(ad)}/{t('general.day')}
             </div>
           </div>
         </div>
@@ -221,7 +225,9 @@ const AdViewDialog = ({ ad, onClose }: AdViewDialogProps) => {
         <div className='space-y-2'>
           <h3 className='font-semibold'>{t('tools.desc')}</h3>
           <p className='text-muted-foreground'>
-            {toolData?.description || getDescription(ad) || t('ads.no_description')}
+            {toolData?.description ||
+              getDescription(ad) ||
+              t('ads.no_description')}
           </p>
         </div>
 
@@ -241,7 +247,9 @@ const AdViewDialog = ({ ad, onClose }: AdViewDialogProps) => {
         {reviews.length > 0 && (
           <div className='space-y-4'>
             <div className='flex items-center justify-between'>
-              <h3 className='font-semibold text-lg'>Avis des utilisateurs</h3>
+              <h3 className='font-semibold text-lg'>
+                {t('ads.user_reviews_title')}
+              </h3>
               <div className='flex items-center gap-2'>
                 <div className='flex items-center gap-1'>
                   <Star className='h-5 w-5 fill-yellow-400 text-yellow-400' />
@@ -250,7 +258,7 @@ const AdViewDialog = ({ ad, onClose }: AdViewDialogProps) => {
                   </span>
                 </div>
                 <span className='text-muted-foreground'>
-                  ({reviews.length} avis)
+                  {t('ads.reviews_count', { count: reviews.length })}
                 </span>
               </div>
             </div>
@@ -283,16 +291,20 @@ const AdViewDialog = ({ ad, onClose }: AdViewDialogProps) => {
                   </div>
                   {review.comment && (
                     <p className='text-sm text-muted-foreground'>
-                   {review.comment}
-                 </p>
-               )}
-               <p className='text-xs text-muted-foreground'>
-                  {new Date(review.createdAt).toLocaleDateString(
-                    language === 'fr' ? 'fr-FR' : language === 'en' ? 'en-US' : 'ar-SA'
+                      {review.comment}
+                    </p>
                   )}
-               </p>
-             </div>
-           ))}
+                  <p className='text-xs text-muted-foreground'>
+                    {new Date(review.createdAt).toLocaleDateString(
+                      language === 'fr'
+                        ? 'fr-FR'
+                        : language === 'en'
+                          ? 'en-US'
+                          : 'ar-SA',
+                    )}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         )}

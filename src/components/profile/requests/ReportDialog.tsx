@@ -49,13 +49,6 @@ const ReportDialog: React.FC<ReportDialogProps> = ({ requestId, onReportSubmit }
         description: reportMessage,
       })
 
-      // // Marquer la réservation comme ayant une réclamation active
-      // setRequests((prev) =>
-      //   prev.map((res) =>
-      //     res.id === requestId ? { ...res, hasActiveClaim: true } : res
-      //   )
-      // )
-
       toast({
         title: t('success.report.sent.title'),
         description: t('success.report.sent.message'),

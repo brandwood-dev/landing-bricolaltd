@@ -87,50 +87,25 @@ const MapView = ({
         },
       }
 
-      console.log(`📍 Outil "${tool.title}" - Coordonnées DB:`, {
-        lat: tool.latitude,
-        lng: tool.longitude,
-        owner: tool.owner?.firstName,
-        ownerCountry: tool.owner?.country || tool.owner?.countryId,
-      })
       return toolWithCoords
     })
 
-  console.log(
-    '🗺️ Total outils avec coordonnées valides:',
-    toolsWithCoords.length
-  )
-  console.log("🔐 État d'authentification:", {
-    isAuthenticated,
-    userCountryId: user?.countryId,
-  })
 
   // Apply country filtering based on user authentication
   const countryFilteredTools = toolsWithCoords.filter((tool) => {
     const toolCountry = tool.owner?.countryId
 
     // Debug: Log tool details
-    console.log(
-      `🔍 Filtrage outil "${tool.title}" - Pays: ${toolCountry}, Owner: ${tool.owner?.email}`
-    )
 
     // If user is authenticated, show ONLY tools from user's specific country
     if (isAuthenticated && user?.countryId) {
       const isFromUserCountry = toolCountry === user.countryId
-      console.log(
-        `👤 Utilisateur connecté - User country: ${user.countryId}, Tool country: ${toolCountry}, Match: ${isFromUserCountry}`
-      )
       return isFromUserCountry
     }
 
     // If user is not authenticated, show tools from all Gulf countries
     if (!isAuthenticated) {
       const isFromGulfCountry = defaultCountries.includes(toolCountry || '')
-      console.log(
-        `🏖️ Utilisateur non connecté - Tool country: ${toolCountry}, Is Gulf: ${isFromGulfCountry}, DefaultCountries: [${defaultCountries.join(
-          ', '
-        )}]`
-      )
       return isFromGulfCountry
     }
 
@@ -138,12 +113,6 @@ const MapView = ({
     return false
   })
 
-  console.log(
-    `🌍 Filtrage par pays - Utilisateur connecté: ${isAuthenticated}, Pays: ${user?.countryId}`
-  )
-  console.log(
-    `📊 Outils après filtrage par pays: ${countryFilteredTools.length} (était ${toolsWithCoords.length})`
-  )
 
   // No client-side search filtering - handled by server
   const filteredTools = countryFilteredTools
@@ -164,45 +133,18 @@ const MapView = ({
 
         // Location filtering is handled client-side after fetching
 
-        console.log('🔍 Fetching tools with filters:', filters)
         const response = await toolsService.getTools(filters)
-        console.log('📦 Raw API response:', response)
-        console.log('📊 Tools received from API:', response.data?.length || 0)
 
         // Log first few tools to understand structure
         if (response.data && response.data.length > 0) {
-          console.log(
-            '🔍 First tool structure:',
-            JSON.stringify(response.data[0], null, 2)
-          )
-          console.log(
-            '🔍 Owner structure of first tool:',
-            response.data[0].owner
-          )
-          console.log('🔍 Country info in first tool:', {
-            'owner.country': response.data[0].owner?.country,
-            'owner.countryId': response.data[0].owner?.countryId,
-            'owner.country.code': response.data[0].owner?.country?.code,
-            'owner.country.id': response.data[0].owner?.country?.id,
-            'owner.country.name': response.data[0].owner?.country?.name,
-          })
 
           // Log a few more tools to see the pattern
-          console.log('🔍 Sample of tools with country info:')
           response.data.slice(0, 5).forEach((tool, index) => {
-            console.log(`Tool ${index + 1}: ${tool.title}`, {
-              'owner.country': tool.owner?.country,
-              'owner.countryId': tool.owner?.countryId,
-              'owner.country.code': tool.owner?.country?.code,
-              'owner.country.id': tool.owner?.country?.id,
-              'owner.country.name': tool.owner?.country?.name,
-            })
           })
         }
 
         setTools(response.data || [])
       } catch (error) {
-        console.error('❌ Error fetching tools:', error)
         setTools([])
       } finally {
         setLoading(false)
@@ -226,46 +168,28 @@ const MapView = ({
       selectedAddress.geometry.coordinates
     ) {
       const [lng, lat] = selectedAddress.geometry.coordinates
-      console.log('📍 Using selected address coordinates:', { lat, lng })
       setUserLocation({ lat, lng })
     } else if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          console.log('📍 Using geolocation coordinates:', {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          })
           setUserLocation({
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           })
         },
         (error) => {
-          console.log('❌ Geolocation failed, using user country fallback')
           // Use user's country coordinates if authenticated, otherwise Kuwait
           const userCountryCode =
             isAuthenticated && user?.countryId ? user.countryId : 'KW'
           const countryCoords = getCountryCoordinates(userCountryCode)
-          console.log(
-            '🌍 Using country coordinates for geolocation fallback:',
-            {
-              country: userCountryCode,
-              coords: countryCoords,
-            }
-          )
           setUserLocation({ lat: countryCoords.lat, lng: countryCoords.lng })
         }
       )
     } else {
-      console.log('❌ Geolocation not available, using user country fallback')
       // Use user's country coordinates if authenticated, otherwise Kuwait
       const userCountryCode =
         isAuthenticated && user?.countryId ? user.countryId : 'KW'
       const countryCoords = getCountryCoordinates(userCountryCode)
-      console.log('🌍 Using country coordinates for no geolocation:', {
-        country: userCountryCode,
-        coords: countryCoords,
-      })
       setUserLocation({ lat: countryCoords.lat, lng: countryCoords.lng })
     }
   }, [selectedAddress, isAuthenticated, user?.countryId])
@@ -292,10 +216,6 @@ const MapView = ({
         // Center around Saudi Arabia to show all Gulf countries
         mapCenter = [45.0792, 23.8859] // Central Saudi Arabia coordinates
         zoomLevel = 3 // Wide zoom to show all Gulf countries
-        console.log(
-          '🌍 Utilisateur non connecté - Vue élargie des pays du Golfe, zoom:',
-          zoomLevel
-        )
       } else {
         // For authenticated users, center on their specific country with closer zoom
         if (user?.countryId) {
@@ -305,12 +225,6 @@ const MapView = ({
             zoomLevel = 10 // Closer zoom for user's specific country
           }
         }
-        console.log(
-          "👤 Utilisateur connecté - Vue centrée sur le pays de l'utilisateur:",
-          user?.countryId,
-          'zoom:',
-          zoomLevel
-        )
       }
 
       const map = new mapboxgl.default.Map({
@@ -334,14 +248,7 @@ const MapView = ({
       }
 
       // Add tool markers
-      console.log('🎯 Ajout des marqueurs pour', filteredTools.length, 'outils')
       filteredTools.forEach((tool, index) => {
-        console.log(
-          `📌 Ajout marqueur ${index + 1}:`,
-          tool.title,
-          'à',
-          tool.coordinates
-        )
         const marker = new mapboxgl.default.Marker({ color: 'red' })
           .setLngLat([tool.coordinates.lng, tool.coordinates.lat])
           .setPopup(
@@ -365,7 +272,6 @@ const MapView = ({
       })
 
       if (filteredTools.length === 0) {
-        console.log('⚠️ Aucun outil à afficher sur la carte')
       }
 
       // Add navigation control
@@ -373,7 +279,6 @@ const MapView = ({
 
       return () => map.remove()
     } catch (error) {
-      console.error('Error loading map:', error)
     }
   }
 

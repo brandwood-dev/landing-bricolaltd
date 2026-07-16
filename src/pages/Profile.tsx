@@ -66,12 +66,10 @@ const Profile = () => {
         setIsLoading(true);
         setError(null);
         
-        console.log('Profile - Fetching user stats for current user');
         
         // Fetch user statistics from backend
         const userStatsData = await userService.getUserStats();
         
-        console.log('Profile - User stats received:', userStatsData);
         
         setUserStats(userStatsData.data);
         
@@ -84,17 +82,9 @@ const Profile = () => {
           averageRating: (userStatsData as any)?.globalAverageRating ?? userStatsData?.averageRating ?? 0
         };
         
-        console.log('Profile - Transformed stats:', transformedStats);
-        console.log('Profile - UserStatsData details:', {
-          totalEarnings: userStatsData.totalEarnings,
-          activeAds: userStatsData.activeAds,
-          completedRentals: userStatsData.completedRentals,
-          averageRating: userStatsData.averageRating
-        });
         
         setStats(transformedStats);
       } catch (err: any) {
-        console.error('Failed to fetch profile data:', err);
         setError(err.message || 'Failed to load profile data');
         
         // Fallback to basic stats if API fails

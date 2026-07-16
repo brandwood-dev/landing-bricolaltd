@@ -19,7 +19,7 @@ export const PriceDisplay: React.FC<PriceDisplayProps> = ({
   size = 'md',
   cible = 'basePrice',
 }) => {
-  const { currency, convertPrice, isLoading, currencies } = useCurrency()
+  const { currency, legacyConvertPrice, isLoading, currencies } = useCurrency()
   const { t } = useLanguage()
   const [convertedPrice, setConvertedPrice] = useState<string>('')
   const [originalPrice, setOriginalPrice] = useState<string>('')
@@ -35,16 +35,6 @@ export const PriceDisplay: React.FC<PriceDisplayProps> = ({
           typeof price === 'string' ? parseFloat(price) : price
 
         // Validate price input - check for null, undefined, NaN, or 0
-        console.log(`🔍 [PriceDisplay] Debug validation for price:`, {
-          originalPrice: price,
-          originalPriceType: typeof price,
-          numericPrice,
-          numericPriceType: typeof numericPrice,
-          isNumber: typeof numericPrice === 'number',
-          isNaN: isNaN(numericPrice),
-          isGreaterThanZero: numericPrice > 0,
-          priceValue: numericPrice,
-        })
 
         const isValidPrice =
           typeof numericPrice === 'number' &&
@@ -52,9 +42,6 @@ export const PriceDisplay: React.FC<PriceDisplayProps> = ({
           numericPrice > 0
         const validPrice = isValidPrice ? numericPrice : 0
 
-        console.log(
-          `💰 [PriceDisplay] Loading price: ${price} (numeric: ${numericPrice}, valid: ${validPrice}, isValidPrice: ${isValidPrice}) from ${baseCurrency} to ${currency.code}`
-        )
 
         // Get base currency object
         const baseCurrencyObj = currencies.find((c) => c.code === baseCurrency)
@@ -66,112 +53,32 @@ export const PriceDisplay: React.FC<PriceDisplayProps> = ({
         // If price is 0, null, undefined, or invalid, display 0 directly without API call
         if (!isValidPrice) {
           const formattedPrice = `${currency.symbol}0.00`
-          console.log(
-            `⚠️ [PriceDisplay] Invalid price (${price}), displaying zero without conversion: ${formattedPrice}`
-          )
           setConvertedPrice(formattedPrice)
           return
         }
 
         if (baseCurrency === currency.code) {
           const formattedPrice = `${currency.symbol}${validPrice.toFixed(2)}`
-          console.log(
-            `✅ [PriceDisplay] Same currency, no conversion: ${formattedPrice}`
-          )
           setConvertedPrice(formattedPrice)
           return
         }
 
         // Convert price using currency context
-        const result = await convertPrice(
+        const result = await legacyConvertPrice(
           validPrice,
           baseCurrency,
           currency.code
         )
-        console.log(`📊 [PriceDisplay] Conversion result:`, result)
-        console.log(`🔍 [PriceDisplay] Conversion result structure:`, {
-          hasConverted: !!result,
-          convertedKeys: result ? Object.keys(result) : [],
-          convertedAmount: result?.convertedAmount,
-          rate: result?.rate,
-          hasData: !!(result && result.data),
-          dataKeys: result && result.data ? Object.keys(result.data) : [],
-          dataConvertedAmount:
-            result && result.data ? result.data.convertedAmount : undefined,
-          dataRate: result && result.data ? result.data.rate : undefined,
-          fullStructure: JSON.stringify(result, null, 2),
-        })
 
-        // Try to access the converted amount from different possible structures
-        let convertedAmount = 0
-        let conversionRate = 1
-
-        if (result) {
-          // Check if data is directly in result object
-          if (
-            typeof result.convertedAmount === 'number' &&
-            !isNaN(result.convertedAmount)
-          ) {
-            convertedAmount = result.convertedAmount
-            conversionRate = result.rate || 1
-            console.log(
-              `✅ [PriceDisplay] Using direct access: amount=${convertedAmount}, rate=${conversionRate}`
-            )
-          }
-          // Check if data is in result.data
-          else if (
-            result.data &&
-            typeof result.data.convertedAmount === 'number' &&
-            !isNaN(result.data.convertedAmount)
-          ) {
-            convertedAmount = result.data.convertedAmount
-            conversionRate = result.data.rate || 1
-            console.log(
-              `✅ [PriceDisplay] Using data access: amount=${convertedAmount}, rate=${conversionRate}`
-            )
-          }
-          // Fallback: try to find any numeric value that could be the converted amount
-          else {
-            console.warn(
-              `⚠️ [PriceDisplay] Could not find convertedAmount in expected locations, trying fallback`
-            )
-            // Look for any numeric field that could be the converted amount
-            const findNumericValue = (
-              obj: any,
-              path: string = ''
-            ): number | null => {
-              if (typeof obj === 'number' && !isNaN(obj) && obj > 0) {
-                console.log(
-                  `🔍 [PriceDisplay] Found numeric value at ${path}: ${obj}`
-                )
-                return obj
-              }
-              if (typeof obj === 'object' && obj !== null) {
-                for (const [key, value] of Object.entries(obj)) {
-                  const result = findNumericValue(value, `${path}.${key}`)
-                  if (result !== null) return result
-                }
-              }
-              return null
-            }
-
-            const foundAmount = findNumericValue(result, 'result')
-            if (foundAmount !== null) {
-              convertedAmount = foundAmount
-              console.log(
-                `🔄 [PriceDisplay] Using fallback amount: ${convertedAmount}`
-              )
-            }
-          }
-        }
+        const convertedAmount =
+          typeof result.convertedAmount === 'number' &&
+          !isNaN(result.convertedAmount)
+            ? result.convertedAmount
+            : 0
 
         const formattedPrice = `${currency.symbol}${convertedAmount.toFixed(2)}`
-        console.log(
-          `✅ [PriceDisplay] Converted price: ${formattedPrice} (rate: ${conversionRate})`
-        )
         setConvertedPrice(formattedPrice)
       } catch (err) {
-        console.error('❌ [PriceDisplay] Failed to load price:', err)
         setError(true)
         // Fallback to original price with validation
         const numericPrice =
@@ -183,13 +90,12 @@ export const PriceDisplay: React.FC<PriceDisplayProps> = ({
         const baseCurrencyObj = currencies.find((c) => c.code === baseCurrency)
         const baseSymbol = baseCurrencyObj?.symbol || baseCurrency
         const fallbackPrice = `${baseSymbol}${validPrice.toFixed(2)}`
-        console.log(`🔄 [PriceDisplay] Using fallback price: ${fallbackPrice}`)
         setConvertedPrice(fallbackPrice)
       }
     }
 
     loadPrice()
-  }, [price, baseCurrency, currency.code, convertPrice, currencies])
+  }, [price, baseCurrency, currency.code, legacyConvertPrice, currencies])
 
   const getSizeClasses = () => {
     switch (size) {
@@ -236,7 +142,7 @@ export const PriceDisplay: React.FC<PriceDisplayProps> = ({
   if (error && !convertedPrice) {
     return (
       <div className={`${getSizeClasses()} ${className} text-red-500`}>
-        Error loading price
+        {t('pricing.load_error')}
       </div>
     )
   }

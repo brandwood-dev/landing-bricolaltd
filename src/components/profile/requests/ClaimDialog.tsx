@@ -63,8 +63,8 @@ const ClaimDialog: React.FC<ClaimDialogProps> = ({
       if (file.size > 1024 * 1024) {
         // 1MB limit
         toast({
-          title: 'Erreur',
-          description: `L'image ${file.name} dépasse la limite de 1MB.`,
+          title: t('general.error'),
+          description: t('claim.image_too_large', { fileName: file.name }),
           variant: 'destructive',
         })
         return
@@ -72,8 +72,8 @@ const ClaimDialog: React.FC<ClaimDialogProps> = ({
 
       if (!file.type.startsWith('image/')) {
         toast({
-          title: 'Erreur',
-          description: `Le fichier ${file.name} n'est pas une image valide.`,
+          title: t('general.error'),
+          description: t('claim.invalid_image', { fileName: file.name }),
           variant: 'destructive',
         })
         return
@@ -94,13 +94,13 @@ const ClaimDialog: React.FC<ClaimDialogProps> = ({
       toast({
         title: t('error'),
         description: t('validation.fill_all_fields'),
-       variant: 'destructive',
-     })
-     return
-   }
+        variant: 'destructive',
+      })
+      return
+    }
 
-   if (!user) {
-     toast({
+    if (!user) {
+      toast({
         title: t('error'),
         description: t('auth.user_not_connected'),
         variant: 'destructive',
@@ -136,19 +136,6 @@ const ClaimDialog: React.FC<ClaimDialogProps> = ({
       bookingUpdated = true
       setIsUpdatingBooking(false)
 
-      // // Step 3: Send notification
-      // setIsSendingNotification(true);
-      // await notificationService.createNotification({
-      //   type: 'dispute_created',
-      //   title: 'Dispute créée',
-      //   message: `Une dispute a été créée pour la réservation ${bookingId}`,
-      //   relatedId: bookingId,
-      //   relatedType: 'booking'
-      // });
-      // notificationSent = true;
-      // setIsSendingNotification(false);
-      // console.log('Notification sent');
-
       // Success: All operations completed
       toast({
         title: 'Succès',
@@ -170,35 +157,29 @@ const ClaimDialog: React.FC<ClaimDialogProps> = ({
       // onSubmit(disputeData, selectedImages)
     } catch (error: any) {
       // Determine which step failed and show appropriate error message
-      let errorMessage =
-        'Une erreur est survenue lors de la création de la dispute'
+      let errorMessage = t('claim.creation_failed')
 
       if (!disputeCreated) {
-        errorMessage =
-          'Erreur lors de la création de la dispute: ' +
-          (error.message || 'Erreur inconnue')
+        errorMessage = t('claim.create_dispute_error', {
+          message: error.message || t('claim.unknown_error'),
+        })
         setIsCreatingDispute(false)
       } else if (!bookingUpdated) {
-        errorMessage =
-          'Dispute créée mais erreur lors de la mise à jour de la réservation: ' +
-          (error.message || 'Erreur inconnue')
+        errorMessage = t('claim.update_booking_error', {
+          message: error.message || t('claim.unknown_error'),
+        })
         setIsUpdatingBooking(false)
       }
-      // else if (!notificationSent) {
-      //   errorMessage = 'Dispute créée et réservation mise à jour, mais erreur lors de l\'envoi de la notification: ' + (error.message || 'Erreur inconnue');
-      //   setIsSendingNotification(false);
-      // }
-
       // Handle specific error for existing active claim
       if (error?.response?.status === 400 && error?.response?.data?.message) {
         toast({
-          title: 'Erreur',
+          title: t('general.error'),
           description: error.response.data.message,
           variant: 'destructive',
         })
       } else {
         toast({
-          title: 'Erreur',
+          title: t('general.error'),
           description: errorMessage,
           variant: 'destructive',
         })
@@ -236,9 +217,7 @@ const ClaimDialog: React.FC<ClaimDialogProps> = ({
                     <SelectItem value='no-show'>
                       Client did not show up at the appointment
                     </SelectItem>
-                   
-                    
-                    
+
                     <SelectItem value='suspicious'>
                       Suspicious or fraudulent request
                     </SelectItem>
@@ -258,9 +237,7 @@ const ClaimDialog: React.FC<ClaimDialogProps> = ({
                     <SelectItem value='no-show'>
                       Client non présent au rendez-vous
                     </SelectItem>
-                   
-                    
-                    
+
                     <SelectItem value='suspicious'>
                       Demande suspecte ou frauduleuse
                     </SelectItem>
@@ -280,9 +257,6 @@ const ClaimDialog: React.FC<ClaimDialogProps> = ({
                     <SelectItem value='no-show'>
                       العميل لم يحضر في الموعد
                     </SelectItem>
-                   
-                    
-                    
                     <SelectItem value='suspicious'>
                       طلب مشبوه أو احتيالي
                     </SelectItem>
@@ -368,23 +342,17 @@ const ClaimDialog: React.FC<ClaimDialogProps> = ({
             {isCreatingDispute ? (
               <>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                Création de la dispute...
+                {t('claim.creating_progress')}
               </>
             ) : isUpdatingBooking ? (
               <>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                Mise à jour de la réservation...
+                {t('claim.updating_booking_progress')}
               </>
-            ) : // : isSendingNotification ? (
-            //   <>
-            //     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            //     Envoi de la notification...
-            //   </>
-            // )
-            isLoading ? (
+            ) : isLoading ? (
               <>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                Envoi en cours...
+                {t('claim.sending_progress')}
               </>
             ) : (
               t('request.claim.submit')

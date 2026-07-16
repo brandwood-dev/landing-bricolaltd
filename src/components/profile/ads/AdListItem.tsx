@@ -36,8 +36,8 @@ const AdListItem = ({ ad, onPublishToggle, onDeleteAd, onRefresh, getValidationS
       setIsEditDialogOpen(true);
     } catch (error) {
       toast({
-        title: 'Erreur',
-        description: 'Impossible de charger les détails de l\'outil',
+        title: t('general.error'),
+        description: t('ads.load_tool_details_error'),
         variant: 'destructive'
       });
     }

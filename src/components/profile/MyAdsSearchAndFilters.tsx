@@ -50,14 +50,14 @@ const MyAdsSearchAndFilters = ({
         const fetchedCategories = await toolsService.getCategories()
         setCategories(fetchedCategories)
       } catch (error) {
-        setCategoriesError('Failed to load categories')
+        setCategoriesError(t('ads.filters.loading_error'))
       } finally {
         setCategoriesLoading(false)
       }
     }
 
     loadCategories()
-  }, [])
+  }, [t])
   return (
     <div className='space-y-4 mb-6'>
       {/* Barre de recherche */}
@@ -79,7 +79,7 @@ const MyAdsSearchAndFilters = ({
             onValueChange={onValidationFilterChange}
           >
             <SelectTrigger className='w-full'>
-              <SelectValue placeholder='Statut validation' />
+              <SelectValue placeholder={t('ads.filters.validation_status_placeholder')} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value='all'>{t('general.status')}</SelectItem>
@@ -96,7 +96,7 @@ const MyAdsSearchAndFilters = ({
             onValueChange={onPublicationFilterChange}
           >
             <SelectTrigger className='w-full'>
-              <SelectValue placeholder='Statut publication' />
+              <SelectValue placeholder={t('ads.filters.publication_status_placeholder')} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value='all'>{t('general.public')}</SelectItem>
@@ -111,7 +111,7 @@ const MyAdsSearchAndFilters = ({
 
           <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
             <SelectTrigger className='w-full'>
-              <SelectValue placeholder='Catégorie' />
+              <SelectValue placeholder={t('ads.filters.category_placeholder')} />
               {categoriesLoading && (
                 <Loader2 className='h-4 w-4 animate-spin ml-2' />
               )}
@@ -120,7 +120,7 @@ const MyAdsSearchAndFilters = ({
               <SelectItem value='all'>{t('general.categories')}</SelectItem>
               {categoriesError ? (
                 <SelectItem value='error' disabled>
-                  Erreur de chargement
+                  {t('ads.filters.loading_error')}
                 </SelectItem>
               ) : (
                 categories.map((category) => (

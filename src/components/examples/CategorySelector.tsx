@@ -42,12 +42,9 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
     const loadCategories = async () => {
       try {
         setLoadingCategories(true);
-        console.log('🔄 Chargement des catégories...');
         const categoriesData = await toolsService.getCategories();
-        console.log('✅ Catégories chargées:', categoriesData);
         setCategories(categoriesData);
       } catch (error) {
-        console.error('❌ Erreur lors du chargement des catégories:', error);
         toast({
           title: "Erreur",
           description: "Impossible de charger les catégories",
@@ -65,12 +62,9 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
   const loadSubcategories = async (categoryId: string) => {
     try {
       setLoadingSubcategories(true);
-      console.log('🔄 Chargement des sous-catégories pour la catégorie:', categoryId);
       const subcategoriesData = await toolsService.getSubcategoriesByCategory(categoryId);
-      console.log('✅ Sous-catégories chargées:', subcategoriesData);
       setSubcategories(subcategoriesData);
     } catch (error) {
-      console.error('❌ Erreur lors du chargement des sous-catégories:', error);
       setSubcategories([]);
       toast({
         title: "Erreur",
@@ -243,8 +237,6 @@ export default CategorySelector;
 
 // Exemple d'utilisation :
 // <CategorySelector 
-//   onCategoryChange={(categoryId) => console.log('Catégorie:', categoryId)}
-//   onSubcategoryChange={(subcategoryId) => console.log('Sous-catégorie:', subcategoryId)}
 //   selectedCategoryId="category-id-123"
 //   selectedSubcategoryId="subcategory-id-456"
 // />

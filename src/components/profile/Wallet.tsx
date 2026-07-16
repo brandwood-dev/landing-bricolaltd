@@ -17,7 +17,6 @@ import {
   Clock,
   Shield,
 } from 'lucide-react'
-import { PriceDisplay } from '@/components/PriceDisplay'
 import { DateRange } from 'react-day-picker'
 import { isWithinInterval, parseISO } from 'date-fns'
 import TransactionFilters from './TransactionFilters'
@@ -76,10 +75,13 @@ const Wallet = () => {
         walletService.getUserStats(user.id),
       ])
 
-      const withdrawalsData = await walletService.getWithdrawalHistory(user.id, {
-        page: 1,
-        limit: 10,
-      })
+      const withdrawalsData = await walletService.getWithdrawalHistory(
+        user.id,
+        {
+          page: 1,
+          limit: 10,
+        },
+      )
 
       const finalBalance = balanceData?.balance
       const finalTransactions = Array.isArray(transactionsData?.data)
@@ -110,8 +112,8 @@ const Wallet = () => {
       setTransactions([])
       setTotalTransactions(0)
       toast({
-        title: 'Erreur',
-        description: 'Impossible de charger les données du portefeuille',
+        title: t('general.error'),
+        description: t('wallet.load_failed'),
         variant: 'destructive',
       })
     } finally {
@@ -209,7 +211,6 @@ const Wallet = () => {
   if (stats.availableBalance >= 50 && !hasActiveWithdrawal) {
     canWithdraw = true
   }
-
 
   const handleResetFilters = () => {
     setDateRange(undefined)
@@ -345,46 +346,43 @@ const Wallet = () => {
                     }`}
                     disabled={!canWithdraw}
                     onClick={async () => {
-                      if (!canWithdraw) return;
+                      if (!canWithdraw) return
                       try {
                         const data = await userService.createVeriffSession()
-                        if (data && data.verification && data.verification.url) {
+                        if (
+                          data &&
+                          data.verification &&
+                          data.verification.url
+                        ) {
                           createVeriffFrame({
                             url: data.verification.url,
                             onEvent: async function (msg) {
                               switch (msg) {
                                 case 'CANCELED':
-                                  console.log('Veriff CANCELED')
                                   break
                                 case 'FINISHED':
-                                  console.log('Veriff FINISHED')
                                   // Polling the status instead of directly verifying
-                                  let attempts = 0;
-                                  const maxAttempts = 12; // 1 minute max polling (every 5s)
+                                  let attempts = 0
+                                  const maxAttempts = 12 // 1 minute max polling (every 5s)
                                   const pollInterval = setInterval(async () => {
                                     try {
-                                      attempts++;
-                                      const statusData = await userService.checkVeriffStatus();
+                                      attempts++
+                                      const statusData =
+                                        await userService.checkVeriffStatus()
                                       if (statusData && statusData.isVerified) {
-                                        clearInterval(pollInterval);
-                                        window.location.reload();
+                                        clearInterval(pollInterval)
+                                        window.location.reload()
                                       } else if (attempts >= maxAttempts) {
-                                        clearInterval(pollInterval);
-                                        console.log("Polling timed out. Wait for webhook.");
-                                        // Optional: show a message that it's taking longer
+                                        clearInterval(pollInterval)
                                       }
-                                    } catch (err) {
-                                      console.error("Polling error:", err);
-                                    }
-                                  }, 5000);
+                                    } catch (err) {}
+                                  }, 5000)
                                   break
                               }
                             },
                           })
                         }
-                      } catch (err) {
-                        console.error('Error starting veriff', err)
-                      }
+                      } catch (err) {}
                     }}
                   >
                     <Shield className='h-5 w-5 mr-2' />
@@ -476,7 +474,7 @@ const Wallet = () => {
               {loading ? (
                 <div className='text-center py-8 text-gray-500'>
                   <Loader2 className='h-6 w-6 animate-spin mx-auto mb-2' />
-                  <p>Chargement des transactions...</p>
+                  <p>{t('wallet.loading_transactions')}</p>
                 </div>
               ) : filteredTransactions.length > 0 ? (
                 filteredTransactions.map((transaction) => (

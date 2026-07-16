@@ -106,7 +106,6 @@ export class NewsService {
       return response.data.data || [];
     } catch (error: any) {
       // Return empty array if categories endpoint doesn't exist yet
-      console.warn('News categories endpoint not available:', error.message);
       return [];
     }
   }

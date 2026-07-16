@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import phonePrefixes from '@/data/phonePrefixes'
-import AddressAutocomplete from '@/components/AddressAutocomplete'
+import AddressAutocomplete from '@/components/ui/AddressAutocomplete'
 
 const Register = () => {
   const { t, language } = useLanguage()

@@ -72,7 +72,6 @@ class UserService {
   async saveProfilePicture(imageUrl: string) {
     const profilePicture = imageUrl
     const response = await api.patch('/users/me', { profilePicture })
-    console.log('response  : ', response)
     return response.data.data
   }
 
@@ -114,7 +113,6 @@ class UserService {
   // Get user statistics from API endpoint
   async getUserStats(): Promise<UserStats> {
     try {
-      console.log('UserService - Fetching stats for current user');
       
       // Call the dedicated stats endpoint
       const response = await api.get<ApiResponse<{
@@ -124,12 +122,9 @@ class UserService {
         averageRating: number;
       }>>('/users/me/stats')
       
-      console.log('UserService - Raw API response:', response);
-      console.log('UserService - Response data:', response.data);
       
       const stats = response.data.data.data //
       
-      console.log('UserService - Extracted stats:', stats);
       
      
 
@@ -143,11 +138,9 @@ class UserService {
         globalAverageRating: stats.averageRating,
       }
       
-      console.log('UserService - Transformed stats:', transformedStats);
       
       return transformedStats;
     } catch (error) {
-      console.error('UserService - Error fetching user stats:', error)
       throw error
     }
   }

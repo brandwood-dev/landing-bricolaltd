@@ -143,19 +143,18 @@ const Reservations = () => {
       toolImage,
       toolBrand: booking.tool?.brand || '',
       toolModel: booking.tool?.model || '',
-      //  NEW = 1,      LIKE_NEW = 2,      GOOD = 3,      FAIR = 4,      POOR = 5,
       toolCondition:
         booking.tool?.condition === 1
           ? 'NEW'
           : booking.tool?.condition === 2
-          ? 'LIKE_NEW'
-          : booking.tool?.condition === 3
-          ? 'GOOD'
-          : booking.tool?.condition === 4
-          ? 'FAIR'
-          : booking.tool?.condition === 5
-          ? 'POOR'
-          : '',
+            ? 'LIKE_NEW'
+            : booking.tool?.condition === 3
+              ? 'GOOD'
+              : booking.tool?.condition === 4
+                ? 'FAIR'
+                : booking.tool?.condition === 5
+                  ? 'POOR'
+                  : '',
       ownerId: booking.tool?.owner?.id || '',
       owner:
         `${booking.tool?.owner?.firstName || ''} ${
@@ -210,10 +209,10 @@ const Reservations = () => {
 
     try {
       const userToolReviews = await reviewsService.getToolReviewsByUserId(
-        user.id
+        user.id,
       )
       const reviewedBookingIds = new Set(
-        userToolReviews.map((r) => r.bookingId)
+        userToolReviews.map((r) => r.bookingId),
       )
 
       setHasReviewedToolMap((prev) => {
@@ -245,7 +244,7 @@ const Reservations = () => {
       })
 
       const transformedReservations = bookingsData.map(
-        transformBookingToReservation
+        transformBookingToReservation,
       )
       setReservations(transformedReservations)
       // setBookings(transformedReservations)
@@ -298,18 +297,7 @@ const Reservations = () => {
   const isCancellationAllowed = (startDate: string) => {
     const today = new Date()
     const start = new Date(startDate)
-    // If pickup hour is available (though not passed here directly, assuming logic needs to be robust)
-    // For now simple date comparison 24h check:
 
-    // We need to compare full timestamps if possible.
-    // Assuming startDate is YYYY-MM-DD, we treat it as 00:00 of that day if no hour.
-    // If we want stricter 24h rule relative to pickup time, we need pickupHour.
-
-    // Logic from BookingsCancellationService:
-    // const hoursDiff = (pickupDate.getTime() - now.getTime()) / (1000 * 60 * 60);
-    // return hoursDiff >= 24;
-
-    // Simple check: is NOW < (Start Date - 1 Day)?
     const deadline = new Date(start)
     deadline.setDate(deadline.getDate() - 1) // 24h before
 
@@ -320,8 +308,8 @@ const Reservations = () => {
   const handleCancelReservation = async (reservationId: string) => {
     if (!cancellationReason) {
       toast({
-        title: 'Erreur',
-        description: "Veuillez sélectionner une raison d'annulation.",
+        title: t('general.error'),
+        description: t('reservations.cancel_reason_required'),
         variant: 'destructive',
       })
       return
@@ -331,7 +319,7 @@ const Reservations = () => {
       const cancelledBooking = await bookingService.cancelBooking(
         reservationId,
         cancellationReason,
-        cancellationMessage
+        cancellationMessage,
       )
 
       // Transform the cancelled booking from API to Reservation format
@@ -341,8 +329,8 @@ const Reservations = () => {
       // Update local state with the transformed reservation
       setReservations((prev) =>
         prev.map((res) =>
-          res.id === reservationId ? transformedReservation : res
-        )
+          res.id === reservationId ? transformedReservation : res,
+        ),
       )
 
       // Calculate refund message based on status and time
@@ -385,9 +373,8 @@ const Reservations = () => {
       setCancellationMessage('')
     } catch (error: any) {
       toast({
-        title: 'Erreur',
-        description:
-          error.message || "Erreur lors de l'annulation de la réservation",
+        title: t('general.error'),
+        description: error.message || t('reservations.cancel_failed'),
         variant: 'destructive',
       })
     }
@@ -433,22 +420,21 @@ const Reservations = () => {
       totalPrice: reservation.price,
       deposit: reservation.deposit,
     }
-// selon la langue 
+    // selon la langue
     if (language === 'fr') {
       generateRentalContractFr(contractData)
       toast({
-      title: 'Contrat téléchargé',
-      description:
-        'Le contrat de location a été généré et téléchargé avec succès.',
-    })
+        title: 'Contrat téléchargé',
+        description:
+          'Le contrat de location a été généré et téléchargé avec succès.',
+      })
     } else if (language === 'ar') {
       generateRentalContractAr(contractData)
       //toast en arabe Contrat téléchargé'
       toast({
-      title: 'تم تنزيل العقد.',
-      description:
-        'تم إنشاء اتفاقية الإيجار وتنزيلها بنجاح.',
-    })
+        title: 'تم تنزيل العقد.',
+        description: 'تم إنشاء اتفاقية الإيجار وتنزيلها بنجاح.',
+      })
     } else {
       generateRentalContractFr(contractData)
       toast({
@@ -457,8 +443,6 @@ const Reservations = () => {
           'The rental agreement was successfully generated and downloaded.',
       })
     }
-
-    
   }
   const handleDetailClick = (toolId: string) => {
     navigate(`/tool/${toolId}`)
@@ -496,8 +480,8 @@ const Reservations = () => {
       // Marquer la réservation comme ayant une réclamation active
       setReservations((prev) =>
         prev.map((res) =>
-          res.id === reservationId ? { ...res, hasActiveClaim: true } : res
-        )
+          res.id === reservationId ? { ...res, hasActiveClaim: true } : res,
+        ),
       )
 
       toast({
@@ -512,8 +496,7 @@ const Reservations = () => {
     } catch (error: any) {
       toast({
         title: t('general.error'),
-        description:
-          error.message || 'Erreur lors de la création du signalement',
+        description: error.message || t('reservations.report_create_failed'),
         variant: 'destructive',
       })
     }
@@ -541,8 +524,8 @@ const Reservations = () => {
                 renterHasReturned: true,
                 hasUsedReturnButton: true,
               }
-            : res
-        )
+            : res,
+        ),
       )
 
       toast({
@@ -556,9 +539,8 @@ const Reservations = () => {
       setSelectedReservationId('')
     } catch (error: any) {
       toast({
-        title: 'Erreur',
-        description:
-          error.message || "Impossible de confirmer le retour de l'outil",
+        title: t('general.error'),
+        description: error.message || t('reservations.return_confirm_failed'),
         variant: 'destructive',
       })
     }
@@ -569,9 +551,8 @@ const Reservations = () => {
     const reservation = reservations.find((res) => res.id === reservationId)
     if (reservation?.hasActiveClaim) {
       toast({
-        title: 'Réclamation existante',
-        description:
-          'Une réclamation active existe déjà pour cette réservation.',
+        title: t('reservations.claim_exists_title'),
+        description: t('reservations.claim_exists_description'),
         variant: 'destructive',
       })
       return
@@ -593,8 +574,8 @@ const Reservations = () => {
 
     if (!selectedReservationId) {
       toast({
-        title: 'Erreur',
-        description: 'Aucune réservation sélectionnée.',
+        title: t('general.error'),
+        description: t('reservations.no_selected_reservation'),
         variant: 'destructive',
       })
       return
@@ -607,8 +588,8 @@ const Reservations = () => {
 
       if (invalidFiles.length > 0) {
         toast({
-          title: 'Erreur',
-          description: `Certains fichiers dépassent la taille limite de 1MB.`,
+          title: t('general.error'),
+          description: t('reservations.files_too_large'),
           variant: 'destructive',
         })
         return
@@ -631,7 +612,7 @@ const Reservations = () => {
       if (uploadedFiles.length > 0) {
         response = await disputeService.createDisputeWithImages(
           disputeData,
-          uploadedFiles
+          uploadedFiles,
         )
       } else {
         response = await disputeService.createDispute(disputeData)
@@ -671,7 +652,7 @@ const Reservations = () => {
       }
 
       toast({
-        title: 'Erreur',
+        title: t('general.error'),
         description: errorMessage,
         variant: 'destructive',
       })
@@ -768,8 +749,8 @@ const Reservations = () => {
       }, 2000)
     } catch (err) {
       toast({
-        title: 'Erreur',
-        description: 'Impossible de copier le code.',
+        title: t('general.error'),
+        description: t('reservations.copy_code_failed'),
         variant: 'destructive',
       })
     }
@@ -824,10 +805,6 @@ const Reservations = () => {
 
   const handleOpenReview = (reservationId: string) => {
     setSelectedReservationId(reservationId)
-    console.log('[Reservations] Opening review dialog', {
-      reservationId,
-      reviewType,
-    })
     setIsReviewDialogOpen(true)
   }
   const handleSubmitReview = async (e?: React.SyntheticEvent) => {
@@ -835,17 +812,7 @@ const Reservations = () => {
       if (e) {
         e.preventDefault()
       }
-      console.log('[Reservations] handleSubmitReview called', {
-        selectedReservationId,
-        reviewType,
-        rating,
-        reviewCommentLen: reviewComment.trim().length,
-        userId: user?.id,
-      })
       if (!selectedReservationId || !user?.id) {
-        console.warn(
-          '[Reservations] Missing selectedReservationId or user.id, aborting submit'
-        )
         toast({
           title: t('review.error'),
           description: t('review.error_message'),
@@ -856,9 +823,6 @@ const Reservations = () => {
 
       // Validations common to both review types
       if (rating < 1 || rating > 5) {
-        console.warn('[Reservations] Invalid rating, must be between 1 and 5', {
-          rating,
-        })
         toast({
           title: t('review.error'),
           description: t('review.error_message'),
@@ -867,9 +831,6 @@ const Reservations = () => {
         return
       }
       if (reviewComment.trim().length < 3) {
-        console.warn('[Reservations] Invalid comment length', {
-          len: reviewComment.trim().length,
-        })
         toast({
           title: t('review.error'),
           description: t('review.error_message'),
@@ -880,13 +841,12 @@ const Reservations = () => {
 
       if (reviewType === 'app') {
         // Créer un avis d'application
-        console.log('[Reservations] Creating app review payload')
         const appPayload = {
           rating: rating,
           comment: reviewComment,
           reviewerId: user.id,
         }
-        console.log('[Reservations] POST /reviews/app', appPayload)
+
         await reviewsService.createAppReview(appPayload)
 
         toast({
@@ -899,12 +859,9 @@ const Reservations = () => {
       } else {
         // Créer un avis d'outil avec tous les paramètres requis
         const selectedReservation = reservations.find(
-          (r) => r.id === selectedReservationId
+          (r) => r.id === selectedReservationId,
         )
         if (!selectedReservation) {
-          console.error('[Reservations] Selected reservation not found', {
-            selectedReservationId,
-          })
           toast({
             title: t('review.error'),
             description: t('review.error_message'),
@@ -915,9 +872,6 @@ const Reservations = () => {
 
         // Ensure booking is completed before allowing tool review
         if (selectedReservation.status !== BookingStatus.COMPLETED) {
-          console.warn('[Reservations] Reservation not COMPLETED', {
-            status: selectedReservation.status,
-          })
           toast({
             title: t('review.error'),
             description: t('review.error_message'),
@@ -934,7 +888,6 @@ const Reservations = () => {
           rating: rating,
           comment: reviewComment,
         }
-        console.log('[Reservations] POST /reviews/tools', toolPayload)
         await reviewsService.createToolReview(toolPayload)
 
         toast({
@@ -955,24 +908,17 @@ const Reservations = () => {
 
       // Actualiser la liste des réservations si nécessaire
       if (reviewType === 'tool') {
-        console.log('[Reservations] Refreshing bookings after tool review')
         try {
           const bookingsData = await bookingService.getUserBookings(user.id, {
             page: 1,
             limit: 100,
           })
           const transformedReservations = bookingsData.map(
-            transformBookingToReservation
+            transformBookingToReservation,
           )
-          console.log('[Reservations] bookings refresh received', {
-            count: transformedReservations.length,
-          })
+
           handleFilteredDataChange(transformedReservations)
         } catch (err) {
-          console.error(
-            '[Reservations] Failed to refresh bookings after review',
-            err
-          )
           toast({
             title: t('review.error'),
             description: t('review.error_message'),
@@ -981,16 +927,14 @@ const Reservations = () => {
         }
       }
     } catch (error) {
-      // Vérifier si c'est l'erreur spécifique "A tool review already exists for this booking"
-      console.error('[Reservations] Review submission error', error)
       if (
         error.response?.data?.message?.includes(
-          'A tool review already exists for this booking'
+          'A tool review already exists for this booking',
         )
       ) {
         toast({
-          title: 'Avis déjà existant',
-          description: 'Vous avez déjà laissé un avis pour cette réservation',
+          title: t('reservations.review_exists_title'),
+          description: t('reservations.review_exists_description'),
           variant: 'destructive',
         })
       } else {
@@ -1033,8 +977,8 @@ const Reservations = () => {
               {language === 'ar'
                 ? 'لا توجد حجوزات.'
                 : language === 'en'
-                ? 'No reservations found.'
-                : 'Aucune réservation trouvée.'}
+                  ? 'No reservations found.'
+                  : 'Aucune réservation trouvée.'}
             </div>
           ) : (
             paginatedReservations.map((reservation) => (
@@ -1162,7 +1106,7 @@ const Reservations = () => {
                           <div className='text-xs text-gray-500 mb-3'>
                             {language === 'ar'
                               ? `${reservation.referenceId} : ${t(
-                                  'general.reference'
+                                  'general.reference',
                                 )}`
                               : `${t('general.reference')}: ${
                                   reservation.referenceId
@@ -1231,24 +1175,24 @@ const Reservations = () => {
                                   <SelectTrigger>
                                     <SelectValue
                                       placeholder={t(
-                                        'reservation.cancel.reason'
+                                        'reservation.cancel.reason',
                                       )}
                                     />
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value='change-plans'>
                                       {t(
-                                        'reservation.cancel.reason.unavailable'
+                                        'reservation.cancel.reason.unavailable',
                                       )}
                                     </SelectItem>
                                     <SelectItem value='found-alternative'>
                                       {t(
-                                        'reservation.cancel.reason.other_alternative'
+                                        'reservation.cancel.reason.other_alternative',
                                       )}
                                     </SelectItem>
                                     <SelectItem value='no-longer-needed'>
                                       {t(
-                                        'reservation.cancel.reason.not_needed'
+                                        'reservation.cancel.reason.not_needed',
                                       )}
                                     </SelectItem>
                                     <SelectItem value='other'>
@@ -1286,12 +1230,12 @@ const Reservations = () => {
                                   size='sm'
                                   disabled={
                                     !isCancellationAllowed(
-                                      reservation.startDate
+                                      reservation.startDate,
                                     )
                                   }
                                   className={
                                     !isCancellationAllowed(
-                                      reservation.startDate
+                                      reservation.startDate,
                                     )
                                       ? 'opacity-50 cursor-not-allowed'
                                       : ''
@@ -1318,24 +1262,24 @@ const Reservations = () => {
                                     <SelectTrigger>
                                       <SelectValue
                                         placeholder={t(
-                                          'reservation.cancel.reason'
+                                          'reservation.cancel.reason',
                                         )}
                                       />
                                     </SelectTrigger>
                                     <SelectContent>
                                       <SelectItem value='change-plans'>
                                         {t(
-                                          'reservation.cancel.reason.not_needed'
+                                          'reservation.cancel.reason.not_needed',
                                         )}
                                       </SelectItem>
                                       <SelectItem value='found-alternative'>
                                         {t(
-                                          'reservation.cancel.reason.other_alternative'
+                                          'reservation.cancel.reason.other_alternative',
                                         )}
                                       </SelectItem>
                                       <SelectItem value='no-longer-needed'>
                                         {t(
-                                          'reservation.cancel.reason.unavailable'
+                                          'reservation.cancel.reason.unavailable',
                                         )}
                                       </SelectItem>
                                       <SelectItem value='other'>
@@ -1345,7 +1289,7 @@ const Reservations = () => {
                                   </Select>
                                   <Textarea
                                     placeholder={t(
-                                      'reservation.cancel.message'
+                                      'reservation.cancel.message',
                                     )}
                                     value={cancellationMessage}
                                     onChange={(e) =>
@@ -1365,7 +1309,7 @@ const Reservations = () => {
                                       {t('requests.refund_notice')}:
                                     </strong>
                                     {isCancellationAllowed(
-                                      reservation.startDate
+                                      reservation.startDate,
                                     )
                                       ? t('requests.renter_cancel_refund_full')
                                       : t('requests.renter_cancel_refund_none')}
@@ -1514,7 +1458,7 @@ const Reservations = () => {
                                       <SelectTrigger>
                                         <SelectValue
                                           placeholder={t(
-                                            'booking.report.reason'
+                                            'booking.report.reason',
                                           )}
                                         />
                                       </SelectTrigger>
@@ -1814,8 +1758,8 @@ const Reservations = () => {
                                 {language === 'ar'
                                   ? 'لا يمكنك عرض الرمز قبل تاريخ بدء الحجز. في ذلك التاريخ، قم بتسليم هذا الرمز للمؤجّر لتفعيل حجزك.'
                                   : language === 'en'
-                                  ? 'You cannot view the code before the start date of your reservation. On that date, provide this code to the renter to activate your reservation.'
-                                  : 'Vous ne pouvez pas consulter le code avant la date de début de votre réservation. À cette date, transmettez ce code au loueur afin de mettre votre réservation en cours.'}
+                                    ? 'You cannot view the code before the start date of your reservation. On that date, provide this code to the renter to activate your reservation.'
+                                    : 'Vous ne pouvez pas consulter le code avant la date de début de votre réservation. À cette date, transmettez ce code au loueur afin de mettre votre réservation en cours.'}
                               </div>
                             )}
                             {showValidationCode[reservation.id] && (
@@ -1830,7 +1774,7 @@ const Reservations = () => {
                                     onClick={() =>
                                       copyValidationCode(
                                         reservation.validationCode!,
-                                        reservation.id
+                                        reservation.id,
                                       )
                                     }
                                     className='text-blue-700 hover:text-blue-900 hover:bg-blue-50'
@@ -2002,13 +1946,6 @@ const Reservations = () => {
             )}
           </>
         )}
-        {/* {totalItems > 0 && (
-          <div className='mt-4 text-sm text-muted-foreground text-center'>
-            {t('pagination.showof')} {startIndex + 1} {t('pagination.to')}
-            {Math.min(endIndex, totalItems)} {t('pagination.of')} {totalItems}{' '}
-            {t('pagination.ads')}
-          </div>
-        )} */}
 
         {/* Modal de confirmation de retour */}
         <Dialog open={isReturnDialogOpen} onOpenChange={setIsReturnDialogOpen}>
@@ -2025,8 +1962,8 @@ const Reservations = () => {
                 {language === 'ar'
                   ? 'يرجى تأكيد أن الأداة قد تمت إعادتها وهي في حالة جيدة وتم تسليمها إلى الشخص الصحيح. سيؤدي هذا الإجراء إلى اعتماد عملية الإرجاع بشكل نهائي.'
                   : language === 'en'
-                  ? 'Please confirm that the tool has been returned in good condition and handed over to the correct person. This action will definitively validate the return.'
-                  : 'Veuillez confirmer que l’outil est rendu en bon état et remis à la bonne personne. Cette action validera définitivement le retour.'}
+                    ? 'Please confirm that the tool has been returned in good condition and handed over to the correct person. This action will definitively validate the return.'
+                    : 'Veuillez confirmer que l’outil est rendu en bon état et remis à la bonne personne. Cette action validera définitivement le retour.'}
               </p>
               <p
                 className={`text-sm text-muted-foreground ${
@@ -2036,8 +1973,8 @@ const Reservations = () => {
                 {language === 'ar'
                   ? 'وفي حال تم اكتشاف أي مشكلة في الأداة، يحقّ للمالك تقييم الخلل، ويمكنكما بعد ذلك التفاوض معًا بشأن مبلغ التأمين.'
                   : language === 'en'
-                  ? 'If any issue is detected on the tool, the owner has the right to assess the anomaly, and you may then negotiate together the amount of the deposit.'
-                  : 'En cas de problème constaté sur l’outil, le propriétaire est en droit d’en évaluer l’anomalie et vous pourrez alors négocier ensemble le montant de la caution.'}
+                    ? 'If any issue is detected on the tool, the owner has the right to assess the anomaly, and you may then negotiate together the amount of the deposit.'
+                    : 'En cas de problème constaté sur l’outil, le propriétaire est en droit d’en évaluer l’anomalie et vous pourrez alors négocier ensemble le montant de la caution.'}
               </p>
               <div className='flex flex-col gap-2'>
                 <Button onClick={handleConfirmReturn} className='w-full'>
@@ -2292,10 +2229,6 @@ const Reservations = () => {
               <Button
                 type='button'
                 onClick={(e) => {
-                  console.log('[Reservations] Review submit button clicked', {
-                    selectedReservationId,
-                    reviewType,
-                  })
                   handleSubmitReview(e)
                 }}
                 className='w-full'

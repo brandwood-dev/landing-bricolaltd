@@ -51,7 +51,6 @@ export const HeaderRTL: React.FC = () => {
       await logout()
       navigate('/')
     } catch (error) {
-      console.error('Logout failed:', error)
     }
   }
 
@@ -118,13 +117,13 @@ export const HeaderRTL: React.FC = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value='fr'>
-                  <span className='fi fi-fr'></span> Français
+                  <span className='fi fi-fr'></span> {t('language.option_french')}
                 </SelectItem>
                 <SelectItem value='en'>
-                  <span className='fi fi-gb-eng'></span> English
+                  <span className='fi fi-gb-eng'></span> {t('language.option_english')}
                 </SelectItem>
                 <SelectItem value='ar'>
-                  <span className='fi fi-sa'></span> العربية
+                  <span className='fi fi-sa'></span> {t('language.option_arabic')}
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -341,7 +340,7 @@ export const HeaderRTL: React.FC = () => {
                     {/* Sélecteur de langue */}
                     <div className='space-y-3 border-t pt-6'>
                       <h3 className='font-semibold text-lg text-right'>
-                        اللغة
+                        {t('common.language')}
                       </h3>
                       <Select
                         value={language}
@@ -354,13 +353,13 @@ export const HeaderRTL: React.FC = () => {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value='fr'>
-                            <span className='fi fi-fr'></span> Français
+                            <span className='fi fi-fr'></span> {t('language.option_french')}
                           </SelectItem>
                           <SelectItem value='en'>
-                            <span className='fi fi-gb-eng'></span> English
+                            <span className='fi fi-gb-eng'></span> {t('language.option_english')}
                           </SelectItem>
                           <SelectItem value='ar'>
-                            <span className='fi fi-sa'></span> العربية
+                            <span className='fi fi-sa'></span> {t('language.option_arabic')}
                           </SelectItem>
                         </SelectContent>
                       </Select>
@@ -369,7 +368,7 @@ export const HeaderRTL: React.FC = () => {
                     {/* Sélecteur de devise */}
                     <div className='space-y-3 border-t pt-6'>
                       <h3 className='font-semibold text-lg text-right'>
-                        العملة
+                        {t('currency.label')}
                       </h3>
                       <Select
                         value={currency.code}

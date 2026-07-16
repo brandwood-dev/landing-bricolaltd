@@ -55,7 +55,6 @@ const Header = () => {
       await logout()
       navigate('/')
     } catch (error) {
-      console.error('Logout failed:', error)
     }
   }
 
@@ -159,15 +158,17 @@ const Header = () => {
                 <SelectValue placeholder={t('common.language')} />
               </SelectTrigger>
               <SelectContent>
-               
+                 <SelectItem disabled>
+                  {t('common.language')}
+                </SelectItem>
                 <SelectItem value='fr'>
-                  <span className='fi fi-fr'></span> Français
+                  <span className='fi fi-fr'></span> {t('language.option_french')}
                 </SelectItem>
                 <SelectItem value='en'>
-                  <span className='fi fi-gb-eng'></span> English
+                  <span className='fi fi-gb-eng'></span> {t('language.option_english')}
                 </SelectItem>
                 <SelectItem value='ar'>
-                  <span className='fi fi-sa'></span> العربية
+                  <span className='fi fi-sa'></span> {t('language.option_arabic')}
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -536,7 +537,7 @@ const Header = () => {
                           language === 'ar' ? 'text-right' : 'text-left'
                         }`}
                       >
-                        {language === 'ar' ? 'اللغة' : 'Langue'}
+                        {t('common.language')}
                       </h3>
                       <Select
                         value={language}
@@ -553,13 +554,13 @@ const Header = () => {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value='fr'>
-                            <span className='fi fi-fr'></span> Français
+                            <span className='fi fi-fr'></span> {t('language.option_french')}
                           </SelectItem>
                           <SelectItem value='en'>
-                            <span className='fi fi-gb-eng'></span> English
+                            <span className='fi fi-gb-eng'></span> {t('language.option_english')}
                           </SelectItem>
                           <SelectItem value='ar'>
-                            <span className='fi fi-sa'></span> العربية
+                            <span className='fi fi-sa'></span> {t('language.option_arabic')}
                           </SelectItem>
                         </SelectContent>
                       </Select>
@@ -572,7 +573,7 @@ const Header = () => {
                           language === 'ar' ? 'text-right' : 'text-left'
                         }`}
                       >
-                        {language === 'ar' ? 'العملة' : 'Devise'}
+                        {t('currency.label')}
                       </h3>
                       <Select
                         value={currency.code}

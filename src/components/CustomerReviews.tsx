@@ -19,8 +19,7 @@ const CustomerReviews = () => {
         const latestReviews = await reviewsService.getLatestAppReviews(6);
         setReviews(latestReviews);
       } catch (err: any) {
-        console.error('Error fetching app reviews:', err);
-        setError(err.message || 'Failed to load reviews');
+        setError(t('customer_reviews.load_failed'));
         setReviews([]);
       } finally {
         setLoading(false);
@@ -28,7 +27,7 @@ const CustomerReviews = () => {
     };
 
     fetchReviews();
-  }, []);
+  }, [t]);
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, index) => (
@@ -65,7 +64,7 @@ const CustomerReviews = () => {
               onClick={() => window.location.reload()} 
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
-              Réessayer
+              {t('general.retry')}
             </button>
           </div>
         ) : reviews.length === 0 ? (

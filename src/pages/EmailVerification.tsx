@@ -28,13 +28,10 @@ const EmailVerification = () => {
   const [countdown, setCountdown] = useState(0);
   const [hasVerified, setHasVerified] = useState(false);
 
-
   
   const token = searchParams.get('token');
   const email = searchParams.get('email') || user?.email || '';
   const from = searchParams.get('from') || '/profile';
-
-
 
   // Auto-verify if token is provided in URL
   useEffect(() => {

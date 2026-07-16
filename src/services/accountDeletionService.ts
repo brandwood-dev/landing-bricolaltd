@@ -41,14 +41,6 @@ class AccountDeletionService {
       const ts = new Date().toISOString()
       const validationData = envelope?.data || {}
       // Debug raw response envelope and payload
-      console.debug('📦 Raw deletion-validation response envelope:', {
-        ts,
-        userId,
-        hasSuccess: typeof envelope?.success !== 'undefined',
-        hasMessage: typeof envelope?.message !== 'undefined',
-        keys: Object.keys(envelope || {}),
-      })
-      console.debug('🧯 Raw deletion-validation payload (data):', { ts, userId, payloadKeys: Object.keys(validationData || {}) })
 
       // Normalize blocking issues to ensure numbers are present
       const rawBlocking = validationData.blockingIssues || {}
@@ -67,22 +59,6 @@ class AccountDeletionService {
       const details = validationData.details || {}
 
       // Debug logging to trace validation result
-      console.debug('🔎 AccountDeletionService.validateAccountDeletion:', {
-        ts,
-        userId,
-        canDelete: canDeleteFlag,
-        blockingIssues,
-        detailsKeys: Object.keys(details)
-      })
-      console.debug('✅ Computed decision:', {
-        ts,
-        userId,
-        proceedToPassword: canDeleteFlag,
-        reason:
-          typeof validationData.canDelete === 'boolean'
-            ? 'Backend flag used'
-            : 'Inferred from blockingIssues counts',
-      })
 
       return {
         canDelete: canDeleteFlag,
@@ -97,11 +73,6 @@ class AccountDeletionService {
     } catch (error: any) {
       // If endpoint doesn't exist, perform manual validation
       const tsErr = new Date().toISOString()
-      console.warn('⚠️ deletion-validation endpoint failed, falling back to manual validation:', {
-        ts: tsErr,
-        userId,
-        message: error?.response?.data?.message || error?.message,
-      })
       return await this.performManualValidation(userId)
     }
   }

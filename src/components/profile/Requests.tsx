@@ -49,14 +49,17 @@ import ReviewDialog from './requests/ReviewDialog'
 import ClaimDialog from './requests/ClaimDialog'
 import CancellationDetailsDialog from './requests/CancellationDetailsDialog'
 import { useLanguage } from '@/contexts/LanguageContext'
-import { generateRentalContract, generateRentalContractAr, generateRentalContractFr } from '@/utils/contractGenerator'
+import {
+  generateRentalContract,
+  generateRentalContractAr,
+  generateRentalContractFr,
+} from '@/utils/contractGenerator'
 import { disputeService } from '@/services/disputeService'
 import { notificationService } from '@/services/notificationService'
 import { reviewsService } from '@/services/reviewsService'
 import { toolsService, Tool } from '@/services/toolsService'
 import AdViewDialog from './AdViewDialog'
 import { Dialog } from '@/components/ui/dialog'
-
 
 const Requests = () => {
   const { user } = useAuth()
@@ -113,14 +116,14 @@ const Requests = () => {
         booking.tool?.condition === 1
           ? 'NEW'
           : booking.tool?.condition === 2
-          ? 'LIKE_NEW'
-          : booking.tool?.condition === 3
-          ? 'GOOD'
-          : booking.tool?.condition === 4
-          ? 'FAIR'
-          : booking.tool?.condition === 5
-          ? 'POOR'
-          : '',
+            ? 'LIKE_NEW'
+            : booking.tool?.condition === 3
+              ? 'GOOD'
+              : booking.tool?.condition === 4
+                ? 'FAIR'
+                : booking.tool?.condition === 5
+                  ? 'POOR'
+                  : '',
       ownerName:
         `${booking.owner?.firstName || ''} ${
           booking.owner?.lastName || ''
@@ -184,7 +187,6 @@ const Requests = () => {
       setError(null)
 
       // Debug log: Afficher l'ID utilisateur utilisé pour la requête
-      console.log('🔍 [DEBUG] Fetching bookings for user ID:', user.id)
 
       const ownerBookings = await bookingService.getOwnerBookings(user.id, {
         page: 1,
@@ -192,35 +194,29 @@ const Requests = () => {
       })
 
       // Debug log: Afficher la réponse complète de l'API
-      console.log('🔍 [DEBUG] API Response:', ownerBookings)
 
       // Debug log: Afficher le nombre de réservations récupérées
-      console.log(
-        '🔍 [DEBUG] Number of bookings received:',
-        ownerBookings.data?.length || 0
-      )
+      //   '🔍 [DEBUG] Number of bookings received:',
+      //   ownerBookings.data?.length || 0
+      // )
 
       // Debug log: Afficher un échantillon de la première réservation si elle existe
-      if (ownerBookings.data && ownerBookings.data.length > 0) {
-        console.log(
-          '🔍 [DEBUG] Sample booking (first one):',
-          ownerBookings.data[0]
-        )
-      }
+      // if (ownerBookings.data && ownerBookings.data.length > 0) {
+      //   //   '🔍 [DEBUG] Sample booking (first one):',
+      //   //   ownerBookings.data[0]
+      //   // )
+      // }
 
       const transformedReq = ownerBookings.data.map(transformBookingToRequest)
 
       // Debug log: Afficher les données transformées
-      console.log('🔍 [DEBUG] Transformed requests:', transformedReq)
-      console.log(
-        '🔍 [DEBUG] Number of transformed requests:',
-        transformedReq.length
-      )
+      //   '🔍 [DEBUG] Number of transformed requests:',
+      //   transformedReq.length
+      // )
 
       setBookings(ownerBookings.data)
       setRequests(transformedReq)
     } catch (err: any) {
-      console.error('Error fetching bookings:', err)
       setError(err.message || t('request.load_error'))
       setRequests([])
     } finally {
@@ -243,21 +239,18 @@ const Requests = () => {
       setHasReviewedApp(!!result.hasReviewed)
       return !!result.hasReviewed
     } catch (error) {
-      console.error('Failed to check app review status', error)
       return false
     }
   }
 
   const handleAcceptRequest = async (requestId: string) => {
     try {
-      console.log('[REQUESTS] Accepting booking', { requestId })
       const updatedBooking = await bookingService.acceptBooking(requestId)
-      console.log('[REQUESTS] Booking accepted response', {
-        id: updatedBooking?.id,
-        status: (updatedBooking as any)?.status,
-        validationCode: (updatedBooking as any)?.validationCode,
-        paymentStatus: (updatedBooking as any)?.paymentStatus,
-      })
+      //   id: updatedBooking?.id,
+      //   status: (updatedBooking as any)?.status,
+      //   validationCode: (updatedBooking as any)?.validationCode,
+      //   paymentStatus: (updatedBooking as any)?.paymentStatus,
+      // })
 
       // Update local state after successful API call
       setRequests((prev) =>
@@ -268,8 +261,8 @@ const Requests = () => {
                 status: 'ACCEPTED',
                 validationCode: (updatedBooking as any).validationCode,
               }
-            : req
-        )
+            : req,
+        ),
       )
 
       toast({
@@ -277,14 +270,13 @@ const Requests = () => {
         description: `${t('request.ACCEPTED.message')}`,
       })
     } catch (error: any) {
-      console.error('[REQUESTS] Accept booking failed', {
-        requestId,
-        error: error?.message,
-        response: error?.response?.data,
-      })
+      //   requestId,
+      //   error: error?.message,
+      //   response: error?.response?.data,
+      // })
       toast({
         title: t('general.error'),
-        description: error.message || 'Failed to accept booking',
+        description: error.message || t('request.errors.accept_failed'),
         variant: 'destructive',
       })
     }
@@ -293,7 +285,7 @@ const Requests = () => {
   const handleDeclineRequest = async (
     requestId: string,
     reason: string,
-    message: string
+    message: string,
   ) => {
     try {
       await bookingService.rejectBooking(requestId, reason, message)
@@ -308,8 +300,8 @@ const Requests = () => {
                 refusalReason: reason,
                 refusalMessage: message,
               } as Request)
-            : req
-        )
+            : req,
+        ),
       )
 
       toast({
@@ -321,7 +313,7 @@ const Requests = () => {
     } catch (error: any) {
       toast({
         title: t('general.error'),
-        description: error.message || 'Failed to reject booking',
+        description: error.message || t('request.errors.reject_failed'),
         variant: 'destructive',
       })
     }
@@ -340,14 +332,14 @@ const Requests = () => {
     try {
       const updatedBooking = await bookingService.validateBookingCode(
         requestId,
-        validationCode
+        validationCode,
       )
 
       // Update local state after successful API call
       setRequests((prev) =>
         prev.map((req) =>
-          req.id === requestId ? { ...req, status: 'ONGOING' } : req
-        )
+          req.id === requestId ? { ...req, status: 'ONGOING' } : req,
+        ),
       )
 
       toast({
@@ -399,8 +391,8 @@ const Requests = () => {
         prev.map((req) =>
           req.id === selectedRequestId
             ? { ...req, status: 'COMPLETED', pickupTool: true }
-            : req
-        )
+            : req,
+        ),
       )
 
       toast({
@@ -417,7 +409,7 @@ const Requests = () => {
     } catch (error: any) {
       toast({
         title: t('general.error'),
-        description: error.message || 'Failed to confirm pickup',
+        description: error.message || t('request.errors.confirm_pickup_failed'),
         variant: 'destructive',
       })
     }
@@ -436,12 +428,12 @@ const Requests = () => {
     bookingId?: string,
     toolId?: string,
     revieweeId?: string,
-    reviewerId?: string
+    reviewerId?: string,
   ) => {
     if (!user?.id || !bookingId || !toolId || !revieweeId) {
       toast({
         title: t('general.error'),
-        description: 'Missing required information for review',
+        description: t('request.errors.missing_review_information'),
         variant: 'destructive',
       })
       return
@@ -459,8 +451,8 @@ const Requests = () => {
 
       setRequests((prev) =>
         prev.map((req) =>
-          req.id === selectedRequestId ? { ...req, status: 'COMPLETED' } : req
-        )
+          req.id === selectedRequestId ? { ...req, status: 'COMPLETED' } : req,
+        ),
       )
 
       toast({
@@ -473,7 +465,7 @@ const Requests = () => {
     } catch (error: any) {
       toast({
         title: t('general.error'),
-        description: error.message || 'Failed to submit review',
+        description: error.message || t('request.errors.submit_review_failed'),
         variant: 'destructive',
       })
     }
@@ -484,7 +476,7 @@ const Requests = () => {
     if (!user?.id) {
       toast({
         title: t('general.error'),
-        description: 'Missing user information for app review',
+        description: t('request.errors.missing_app_review_user'),
         variant: 'destructive',
       })
       return
@@ -507,7 +499,8 @@ const Requests = () => {
     } catch (error: any) {
       toast({
         title: t('general.error'),
-        description: error.message || 'Failed to submit app review',
+        description:
+          error.message || t('request.errors.submit_app_review_failed'),
         variant: 'destructive',
       })
     }
@@ -526,7 +519,7 @@ const Requests = () => {
           reportReason: disputeData.reason,
           reportMessage: disputeData.reportMessage,
         },
-        images
+        images,
       )
 
       // Update booking status and pickupTool flag
@@ -534,15 +527,6 @@ const Requests = () => {
         status: 'ONGOING',
         pickupTool: true,
       })
-
-      // // Send notification
-      // await notificationService.createNotification({
-      //   userId: user.id,
-      //   type: 'dispute_created',
-      //   title: 'Dispute créée',
-      //   message: `Une dispute a été créée pour la réservation ${selectedRequestId}`,
-      //   data: { bookingId: selectedRequestId },
-      // })
 
       // Update local state after successful API calls
       setRequests((prev) =>
@@ -554,8 +538,8 @@ const Requests = () => {
                 pickupTool: true,
                 status: 'ONGOING',
               }
-            : req
-        )
+            : req,
+        ),
       )
 
       toast({
@@ -570,7 +554,8 @@ const Requests = () => {
     } catch (error: any) {
       toast({
         title: t('general.error'),
-        description: error.message || 'Failed to report pickup issue',
+        description:
+          error.message || t('request.errors.report_pickup_issue_failed'),
         variant: 'destructive',
       })
     }
@@ -580,8 +565,8 @@ const Requests = () => {
     // Mark the request as having an active claim when reported
     setRequests((prev) =>
       prev.map((req) =>
-        req.id === requestId ? { ...req, hasActiveClaim: true } : req
-      )
+        req.id === requestId ? { ...req, hasActiveClaim: true } : req,
+      ),
     )
   }
 
@@ -589,14 +574,9 @@ const Requests = () => {
   const dataToDisplay = isFiltering ? filteredRequests : requests
 
   // 🔍 Debug: Log final data for display
-  console.log('🔍 [Requests] Final data to display:', dataToDisplay)
-  console.log(
-    '🔍 [Requests] Using filtered requests:',
-    filteredRequests.length > 0
-  )
-  console.log('🔍 [Requests] Total requests:', requests.length)
-  console.log('🔍 [Requests] Filtered requests:', filteredRequests.length)
-  console.log('🔍 [Requests] Data to display length:', dataToDisplay.length)
+  //   '🔍 [Requests] Using filtered requests:',
+  //   filteredRequests.length > 0
+  // )
   // Calcul de la pagination
   const totalPages = Math.ceil(dataToDisplay.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
@@ -604,34 +584,31 @@ const Requests = () => {
   const paginatedRequests = dataToDisplay.slice(startIndex, endIndex)
 
   // Debug logs pour la pagination
-  console.log('🔍 DEBUG PAGINATION:', {
-    currentPage,
-    totalPages,
-    dataToDisplayLength: dataToDisplay.length,
-    itemsPerPage,
-    startIndex,
-    endIndex,
-    paginatedRequestsLength: paginatedRequests.length,
-  })
+  //   currentPage,
+  //   totalPages,
+  //   dataToDisplayLength: dataToDisplay.length,
+  //   itemsPerPage,
+  //   startIndex,
+  //   endIndex,
+  //   paginatedRequestsLength: paginatedRequests.length,
+  // })
 
   // Gestion du changement de page
   const handlePageChange = (page: number) => {
-    console.log(
-      '📄 handlePageChange appelée avec page:',
-      page,
-      'currentPage actuel:',
-      currentPage
-    )
+    //   '📄 handlePageChange appelée avec page:',
+    //   page,
+    //   'currentPage actuel:',
+    //   currentPage
+    // )
     setCurrentPage(page)
   }
 
   // Reset de la page quand les filtres changent
   const handleFilteredDataChange = (data: Request[]) => {
-    console.log(
-      '🔄 handleFilteredDataChange appelée avec',
-      data.length,
-      'éléments'
-    )
+    //   '🔄 handleFilteredDataChange appelée avec',
+    //   data.length,
+    //   'éléments'
+    // )
 
     // Vérifier si les données ont réellement changé
     const previousData = previousFilteredDataRef.current
@@ -640,24 +617,21 @@ const Requests = () => {
       data.length !== previousData.length ||
       data.some((item, index) => item.id !== previousData[index]?.id)
 
-    console.log(
-      '📊 Données changées:',
-      hasDataChanged,
-      'Initial load:',
-      isInitialLoadRef.current
-    )
+    //   '📊 Données changées:',
+    //   hasDataChanged,
+    //   'Initial load:',
+    //   isInitialLoadRef.current
+    // )
 
     setFilteredRequests(data)
 
     // Ne réinitialiser currentPage que si les données ont réellement changé
     if (hasDataChanged) {
-      console.log('🔄 Réinitialisation de currentPage à 1')
       setCurrentPage(1)
       isInitialLoadRef.current = false
     } else {
-      console.log(
-        '⏭️ Pas de réinitialisation de currentPage, données identiques'
-      )
+      //   '⏭️ Pas de réinitialisation de currentPage, données identiques'
+      // )
     }
 
     // Mettre à jour la référence des données précédentes
@@ -700,22 +674,21 @@ const Requests = () => {
       deposit: request.deposit || 0,
     }
 
-    // selon la langue 
+    // selon la langue
     if (language === 'fr') {
       generateRentalContractFr(contractData)
       toast({
-      title: 'Contrat téléchargé',
-      description:
-        'Le contrat de location a été généré et téléchargé avec succès.',
-    })
+        title: 'Contrat téléchargé',
+        description:
+          'Le contrat de location a été généré et téléchargé avec succès.',
+      })
     } else if (language === 'ar') {
       generateRentalContractAr(contractData)
       //toast en arabe Contrat téléchargé'
       toast({
-      title: 'تم تنزيل العقد.',
-      description:
-        'تم إنشاء اتفاقية الإيجار وتنزيلها بنجاح.',
-    })
+        title: 'تم تنزيل العقد.',
+        description: 'تم إنشاء اتفاقية الإيجار وتنزيلها بنجاح.',
+      })
     } else {
       generateRentalContractFr(contractData)
       toast({
@@ -836,8 +809,8 @@ const Requests = () => {
                     {language === 'ar'
                       ? 'المبلغ الإجمالي :'
                       : language === 'en'
-                      ? 'Total amount:'
-                      : 'Montant total :'}
+                        ? 'Total amount:'
+                        : 'Montant total :'}
                   </span>
                   <span className='font-semibold text-primary'>
                     <OptimizedPriceDisplay
@@ -851,8 +824,8 @@ const Requests = () => {
                     {language === 'ar'
                       ? '(دون 15% من عمولة المنصة)'
                       : language === 'en'
-                      ? '(including 15% platform commission)'
-                      : '(dont 15% de commission plateforme)'}
+                        ? '(including 15% platform commission)'
+                        : '(dont 15% de commission plateforme)'}
                   </span>
                 </div>
 
@@ -1019,12 +992,6 @@ const Requests = () => {
           <>
             {totalPages > 1 && (
               <div className='mt-6'>
-                {console.log(
-                  '🎯 PAGINATION RENDUE - totalPages:',
-                  totalPages,
-                  'currentPage:',
-                  currentPage
-                )}
                 <div
                   className={`flex flex-row items-center gap-1 ${
                     language === 'ar' ? '[direction:ltr]' : ''
@@ -1084,12 +1051,6 @@ const Requests = () => {
           <>
             {totalPages > 1 && (
               <div className='mt-6'>
-                {console.log(
-                  '🎯 PAGINATION RENDUE - totalPages:',
-                  totalPages,
-                  'currentPage:',
-                  currentPage
-                )}
                 <div
                   className={`flex flex-row items-center gap-1 ${
                     language === 'ar' ? '[direction:ltr]' : ''

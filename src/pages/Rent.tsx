@@ -51,7 +51,6 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react'
-import { PriceDisplay } from '@/components/PriceDisplay'
 import { OptimizedPriceDisplay } from '@/components/OptimizedPriceDisplay'
 import { useCurrencyOptimized } from '@/hooks/useCurrencyOptimized'
 import { RateFetchTrigger } from '@/types/currency'
@@ -136,7 +135,6 @@ const Rent: React.FC = () => {
       const storageKey = getStorageKey(id, user?.id)
       localStorage.setItem(storageKey, JSON.stringify(dataToSave))
     } catch (error) {
-      console.warn('Failed to save form data to localStorage:', error)
     }
   }
 
@@ -172,10 +170,8 @@ const Rent: React.FC = () => {
           paymentMethod: parsedData.paymentMethod || 'card',
         }))
 
-        console.log('Form data restored from localStorage')
       }
     } catch (error) {
-      console.warn('Failed to restore form data from localStorage:', error)
     }
   }
 
@@ -187,7 +183,6 @@ const Rent: React.FC = () => {
       const storageKey = getStorageKey(id, user?.id)
       localStorage.removeItem(storageKey)
     } catch (error) {
-      console.warn('Failed to clear saved form data:', error)
     }
   }
 
@@ -205,7 +200,6 @@ const Rent: React.FC = () => {
         }
       }
     } catch (error) {
-      console.warn('Failed to clear other tools data:', error)
     }
   }
 
@@ -308,14 +302,12 @@ const Rent: React.FC = () => {
       }
 
       const result = await response.json()
-      console.table(result.data)
       //bookings are in result.data filtred by status without CANCELED or REJECTED
       const bookings =
         result.data?.filter(
           (booking: any) =>
             booking.status !== 'CANCELLED' && booking.status !== 'REJECTED',
         ) || []
-      console.table(bookings)
       setExistingBookings(bookings)
 
       // Organiser les dates par statut
@@ -569,7 +561,7 @@ const Rent: React.FC = () => {
         startDate: startDate.toISOString().split('T')[0],
         endDate: endDate.toISOString().split('T')[0],
         serviceFee: Number(fees),
-        currency: 'EUR',
+        currency: 'GBP',
         breakdown: {
           dailyRate: Number(basePrice),
           numberOfDays: days,
@@ -597,11 +589,6 @@ const Rent: React.FC = () => {
   )
 
   // 🔍 LOGS DE DÉBOGAGE POUR LE CALCUL DES JOURS
-  console.log('🔍 [DEBUG] Calcul des jours:')
-  console.log('  - calculateDays():', calculateDays())
-  console.log('  - pricing?.totalDays:', pricing?.totalDays)
-  console.log('  - startDate:', startDate)
-  console.log('  - endDate:', endDate)
 
   // FORCER l'utilisation de calculateDays() au lieu de pricing?.totalDays
   const days = Math.max(calculateDays() || 1, 1)
@@ -613,14 +600,6 @@ const Rent: React.FC = () => {
   const totalToPay = Number((Number(totalPrice) + Number(totalFees)).toFixed(2))
 
   // 🔍 LOGS DE DÉBOGAGE POUR TRACER LE CALCUL DU MONTANT TOTAL
-  console.log('🔍 [Rent.tsx] Calcul du montant total:')
-  console.log('  - basePrice:', basePrice)
-  console.log('  - days:', days)
-  console.log('  - totalPrice:', totalPrice)
-  console.log('  - totalFees:', totalFees)
-  console.log('  - deposit:', deposit)
-  console.log('  - totalToPay (final):', totalToPay)
-  console.log('  - pricing object:', pricing)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -757,15 +736,6 @@ const Rent: React.FC = () => {
       }
 
       // 🔍 SÉCURITÉ: Toujours utiliser les données actuelles du formulaire
-      console.log(
-        '🔍 [Rent.tsx] Création des données de réservation avec les valeurs actuelles:',
-      )
-      console.log('🔍 [Rent.tsx] - startDate:', startDate)
-      console.log('🔍 [Rent.tsx] - endDate:', endDate)
-      console.log('🔍 [Rent.tsx] - pickupHour:', formData.pickupHour)
-      console.log('🔍 [Rent.tsx] - paymentMethod:', formData.paymentMethod)
-      console.log('🔍 [Rent.tsx] - message:', formData.message)
-      console.log('🔍 [Rent.tsx] - totalToPay:', totalToPay)
 
       // Préparer les données de réservation (sans créer la réservation encore)
       const bookingData: CreateBookingData = {
@@ -787,7 +757,6 @@ const Rent: React.FC = () => {
 
       // Stocker les données pour les utiliser après le paiement
       setPendingBookingData(bookingData)
-      console.log('🔍 Booking data prepared:', bookingData)
 
       toast({
         title: t('rent.toast.validated.title'),
@@ -798,7 +767,6 @@ const Rent: React.FC = () => {
 
       // Afficher le formulaire de paiement
       setShowPayment(true)
-      console.log('🔍 ShowPayment set to true')
       // Focus et scroll vers le formulaire de paiement
       setTimeout(() => {
         paymentRef.current?.scrollIntoView({
@@ -1433,24 +1401,9 @@ const Rent: React.FC = () => {
                           paymentMethod={formData.paymentMethod}
                           onPaymentSuccess={async (paymentIntentId: string) => {
                             // 🔍 LOG AVANT CRÉATION DE LA RÉSERVATION
-                            console.log(
-                              '🔍 [Rent.tsx] Paiement réussi, création de la réservation avec totalToPay:',
-                              totalToPay,
-                            )
-                            console.log(
-                              '🔍 [Rent.tsx] PaymentIntentId reçu:',
-                              paymentIntentId,
-                            )
-                            console.log(
-                              '🔍 [Rent.tsx] PendingBookingData:',
-                              pendingBookingData,
-                            )
 
                             // 🔍 SÉCURITÉ: Vérifier que nous avons des données de réservation
                             if (!pendingBookingData) {
-                              console.error(
-                                '❌ [Rent.tsx] Aucune donnée de réservation disponible après paiement réussi',
-                              )
                               toast({
                                 title: t('rent.toast.system_error.title'),
                                 description: t(
@@ -1466,37 +1419,11 @@ const Rent: React.FC = () => {
 
                             // 🔍 SÉCURITÉ: Vérifier que le prix correspond
                             if (pendingBookingData.totalPrice !== totalToPay) {
-                              console.warn(
-                                '🔍 [Rent.tsx] Attention: Discordance de prix détectée!',
-                                'Prix enregistré:',
-                                pendingBookingData.totalPrice,
-                                'Prix actuel:',
-                                totalToPay,
-                              )
                               // Mettre à jour avec le prix actuel pour être sûr
                               pendingBookingData.totalPrice = totalToPay
                             }
 
                             // 🔍 LOGS ULTRA-DÉTAILLÉS POUR LES DATES
-                            console.log(
-                              '🔍 [Rent.tsx] === ANALYSE DÉTAILLÉE DES DATES ===',
-                            )
-                            console.log(
-                              '🔍 [Rent.tsx] startDate (string):',
-                              pendingBookingData.startDate,
-                            )
-                            console.log(
-                              '🔍 [Rent.tsx] endDate (string):',
-                              pendingBookingData.endDate,
-                            )
-                            console.log(
-                              '🔍 [Rent.tsx] Type de startDate:',
-                              typeof pendingBookingData.startDate,
-                            )
-                            console.log(
-                              '🔍 [Rent.tsx] Type de endDate:',
-                              typeof pendingBookingData.endDate,
-                            )
 
                             // Conversion en Date pour vérification
                             const startDateObj = new Date(
@@ -1505,73 +1432,24 @@ const Rent: React.FC = () => {
                             const endDateObj = new Date(
                               pendingBookingData.endDate,
                             )
-                            console.log(
-                              '🔍 [Rent.tsx] startDate converti en Date:',
-                              startDateObj,
-                            )
-                            console.log(
-                              '🔍 [Rent.tsx] endDate converti en Date:',
-                              endDateObj,
-                            )
-                            console.log(
-                              '🔍 [Rent.tsx] startDate.getTime():',
-                              startDateObj.getTime(),
-                            )
-                            console.log(
-                              '🔍 [Rent.tsx] endDate.getTime():',
-                              endDateObj.getTime(),
-                            )
-                            console.log(
-                              '🔍 [Rent.tsx] Comparaison startDate < endDate:',
-                              startDateObj < endDateObj,
-                            )
-                            console.log(
-                              '🔍 [Rent.tsx] Différence en millisecondes:',
-                              endDateObj.getTime() - startDateObj.getTime(),
-                            )
-                            console.log(
-                              '🔍 [Rent.tsx] Différence en jours:',
-                              (endDateObj.getTime() - startDateObj.getTime()) /
-                                (1000 * 60 * 60 * 24),
-                            )
-                            console.log(
-                              '🔍 [Rent.tsx] === FIN ANALYSE DES DATES ===',
-                            )
 
                             try {
                               // Créer la réservation après paiement réussi avec statut de paiement "authorized"
-                              console.log(
-                                '🔍 [Rent.tsx] Appel de bookingService.createBooking...',
-                              )
                               const bookingDataWithPaymentStatus = {
                                 ...pendingBookingData,
                                 paymentStatus: 'authorized', // Définir le statut de paiement comme autorisé après paiement réussi
                                 paymentIntentId: paymentIntentId, // Save the Stripe Payment Intent ID
                               }
-                              console.log(
-                                '🔍 [Rent.tsx] Booking data with payment status:',
-                                bookingDataWithPaymentStatus,
-                              )
                               const booking =
                                 await bookingService.createBooking(
                                   bookingDataWithPaymentStatus,
                                 )
-                              console.log(
-                                '🔍 [Rent.tsx] Booking created after payment:',
-                                booking,
-                              )
 
                               // Nettoyer les données
-                              console.log(
-                                '🔍 [Rent.tsx] Nettoyage des données...',
-                              )
                               setPendingBookingData(null)
                               setShowPayment(false)
                               clearSavedFormData()
 
-                              console.log(
-                                '🔍 [Rent.tsx] Affichage du toast de succès...',
-                              )
                               toast({
                                 title: t('rent.toast.payment_success.title'),
                                 description: t(
@@ -1581,23 +1459,8 @@ const Rent: React.FC = () => {
                                   'bg-green-50 border-green-200 text-green-800',
                               })
 
-                              console.log(
-                                '🔍 [Rent.tsx] Navigation vers /profile?tab=reservations...',
-                              )
                               navigate('/profile?tab=reservations')
                             } catch (error: any) {
-                              console.error(
-                                '❌ [Rent.tsx] Erreur lors de la création de la réservation:',
-                                error,
-                              )
-                              console.error(
-                                '❌ [Rent.tsx] Stack trace:',
-                                error.stack,
-                              )
-                              console.error(
-                                '❌ [Rent.tsx] Response data:',
-                                error.response?.data,
-                              )
                               toast({
                                 title: t(
                                   'rent.toast.booking_creation_failed.title',
@@ -1620,9 +1483,6 @@ const Rent: React.FC = () => {
                               variant: 'destructive',
                             })
                             // 🔍 RÉINITIALISATION APRÈS ÉCHEC DE PAIEMENT
-                            console.log(
-                              '🔍 [Rent.tsx] Réinitialisation après échec de paiement',
-                            )
                             // Revenir au formulaire et réinitialiser les données
                             setShowPayment(false)
                             setPendingBookingData(null)

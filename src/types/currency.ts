@@ -30,6 +30,7 @@ export interface BulkConvertedPrice extends PriceItem {
 // Énumération des déclencheurs de récupération des taux
 export enum RateFetchTrigger {
   USER_CURRENCY_CHANGE = 'user_currency_change',
+  SEARCH_PAGE_ENTRY = 'search_page_entry',
   RENT_PAGE_ENTRY = 'rent_page_entry',
   PAYMENT_INITIATION = 'payment_initiation',
   APP_INITIALIZATION = 'app_initialization',
@@ -57,6 +58,11 @@ export const RATE_FETCH_CONFIG: Record<RateFetchTrigger, RateFetchConfig> = {
   [RateFetchTrigger.USER_CURRENCY_CHANGE]: {
     immediate: false, // Changé pour utiliser le cache si disponible
     cacheDuration: 30 * 60 * 1000 // 30 minutes
+  },
+  [RateFetchTrigger.SEARCH_PAGE_ENTRY]: {
+    immediate: false,
+    condition: 'cache_age > 5min',
+    cacheDuration: 30 * 60 * 1000
   },
   [RateFetchTrigger.RENT_PAGE_ENTRY]: {
     immediate: false,

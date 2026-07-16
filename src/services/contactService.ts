@@ -60,7 +60,6 @@ export class ContactService {
         priority: contact.priority
       });
     } catch (error) {
-      console.error('Failed to send admin notification:', error);
       // Don't throw error - notification failure shouldn't break the contact submission
     }
   }

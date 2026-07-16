@@ -41,7 +41,7 @@ const FeaturedToolsSection = () => {
           setTools([])
         }
       } catch (err: any) {
-        setError(err.message)
+        setError(t('featured_tools.load_error'))
         setTools([])
       } finally {
         setLoading(false)
@@ -49,28 +49,31 @@ const FeaturedToolsSection = () => {
     }
 
     fetchFeaturedTools()
-  }, [])
+  }, [t])
 
   const handleFavoriteToggle = async (tool: Tool) => {
     try {
       if (isFavorite(tool.id)) {
         await removeFromFavorites(tool.id)
         toast({
-          title: 'Retiré des favoris',
-          description: `${tool.title} a été retiré de vos favoris.`,
+          title: t('featured_tools.favorite_removed_title'),
+          description: t('featured_tools.favorite_removed_description', {
+            toolName: tool.title,
+          }),
         })
       } else {
         await addToFavorites(tool)
         toast({
-          title: 'Ajouté aux favoris',
-          description: `${tool.title} a été ajouté à vos favoris.`,
+          title: t('featured_tools.favorite_added_title'),
+          description: t('featured_tools.favorite_added_description', {
+            toolName: tool.title,
+          }),
         })
       }
     } catch (error) {
       toast({
-        title: 'Erreur',
-        description:
-          "Une erreur s'est produite lors de la mise à jour des favoris.",
+        title: t('general.error'),
+        description: t('featured_tools.favorites_update_error'),
         variant: 'destructive',
       })
     }
@@ -129,14 +132,14 @@ const FeaturedToolsSection = () => {
           </div>
           <div className='text-center py-12'>
             <p className='text-gray-600'>
-              Impossible de charger les outils pour le moment.
+              {t('featured_tools.load_error')}
             </p>
             <Button
               onClick={() => window.location.reload()}
               className='mt-4'
               variant='outline'
             >
-              Réessayer
+              {t('general.retry')}
             </Button>
           </div>
         </div>

@@ -16,6 +16,7 @@ interface LanguageContextType {
 
 const translations = {
   fr: {
+'change_message_clarification':'La valeur affichée peut légèrement varier en raison des fluctuations du taux de change de la livre sterling (GBP)',
     'report.describe_problem': 'Description du problème',
     'report.justification_documents': 'Pièces justificatives (optionnel)',
     'report.justification_documents_description':
@@ -1465,6 +1466,61 @@ const translations = {
     'customer_reviews.description':
       'Découvrez ce que nos utilisateurs pensent de notre plateforme',
     'customer_reviews.no_reviews': 'Aucun avis disponible pour le moment.',
+    'customer_reviews.load_failed': 'Impossible de charger les avis.',
+    'categories.load_error': 'Impossible de charger les catégories.',
+    'featured_tools.load_error':
+      'Impossible de charger les outils mis en avant.',
+    'featured_tools.favorite_removed_title': 'Retiré des favoris',
+    'featured_tools.favorite_removed_description':
+      '{toolName} a été retiré de vos favoris.',
+    'featured_tools.favorite_added_title': 'Ajouté aux favoris',
+    'featured_tools.favorite_added_description':
+      '{toolName} a été ajouté à vos favoris.',
+    'featured_tools.favorites_update_error':
+      'Impossible de mettre à jour les favoris.',
+    'pricing.load_error': 'Erreur lors du chargement du prix',
+    'share.share_with_family':
+      'Partagez cette publication avec votre famille et vos amis.',
+    'suspension.title': 'Compte suspendu',
+    'suspension.account_suspended':
+      'Votre compte a été suspendu temporairement ou définitivement.',
+    'suspension.reason_label': 'Motif de la suspension',
+    'suspension.help_text':
+      'Si vous pensez qu’il s’agit d’une erreur, contactez notre support.',
+    'video.close_fullscreen': 'Fermer le plein écran',
+    'video.play': 'Lire la vidéo',
+    'video.title': 'Vidéo de présentation de Bricola',
+    'footer.address': '128 City Road, Londres EC1V 2NX, Royaume-Uni',
+    'footer.designed_by': 'Conçu par',
+    'general.image': 'Image',
+    'language.option_french': 'Français',
+    'language.option_english': 'Anglais',
+    'language.option_arabic': 'Arabe',
+    'address_autocomplete.placeholder': 'Entrez votre adresse...',
+    'address_autocomplete.mapbox_key_missing_fallback':
+      'Clé API Mapbox manquante. Mode saisie manuelle activé.',
+    'address_autocomplete.api_unavailable_fallback':
+      'API Mapbox indisponible. Mode saisie manuelle activé.',
+    'address_autocomplete.autocomplete_issue_fallback':
+      "Problème avec l'autocomplétion. Mode saisie manuelle activé.",
+    'address_autocomplete.initialization_error_fallback':
+      "Erreur d'initialisation. Mode saisie manuelle activé.",
+    'address_autocomplete.configuration_required':
+      "Configuration Mapbox requise pour l'autocomplétion",
+    'address_autocomplete.manual_entry_hint':
+      'Saisissez votre adresse manuellement',
+    'map.address_unavailable': 'Adresse non disponible',
+    'map.address_not_found': 'Adresse non trouvée',
+    'map.coordinates_fallback': 'Coordonnées : {lat}, {lng}',
+    'map.missing_token':
+      "Token Mapbox manquant dans les variables d'environnement",
+    'map.api_access_error':
+      "Impossible d'accéder à l'API Mapbox ({status})",
+    'map.load_error': 'Erreur de chargement de la carte',
+    'map.internet_connection_error':
+      'Erreur de chargement de la carte. Vérifiez votre connexion internet.',
+    'map.latitude': 'Lat',
+    'map.longitude': 'Lng',
 
     // rental process
 
@@ -1536,7 +1592,7 @@ const translations = {
     'wallet.withdraw_pending': 'Retrait en cours de traitement...',
     'wallet.withdrawal_note':
       'Vous pouvez demander le paiement dès que vos revenus cumulés atteignent 50 GBP.',
-    'wallet.conversion_rate': '50 GBP = {minWithdrawalEUR} EUR',
+    'wallet.conversion_rate': '50 GBP = {minWithdrawalEUR}',
     'wallet.dynamic_conversion':
       "Le taux de conversion s'actualise dynamiquement en fonction de la devise choisie dans le compte.",
 
@@ -1552,6 +1608,103 @@ const translations = {
     'wallet.failed': 'Échouée',
     'wallet.no_transactions_found':
       'Aucune transaction trouvée pour les filtres sélectionnés.',
+    'ads.load_tool_details_error': "Impossible de charger les détails de l'outil",
+    'ads.filters.validation_status_placeholder': 'Statut de validation',
+    'ads.filters.publication_status_placeholder': 'Statut de publication',
+    'ads.filters.category_placeholder': 'Catégorie',
+    'ads.filters.loading_error': 'Erreur de chargement',
+    'ads.user_reviews_title': 'Avis des utilisateurs',
+    'ads.reviews_count': '({count} avis)',
+    'favorites.remove_success_title': 'Retiré des favoris',
+    'favorites.remove_success_description':
+      "L'outil a été retiré de vos favoris.",
+    'favorites.remove_error':
+      "Une erreur s'est produite lors de la suppression.",
+    'favorites.loading': 'Chargement de vos favoris...',
+    'claim.image_too_large': "L'image {fileName} dépasse la limite de 1MB.",
+    'claim.invalid_image': "Le fichier {fileName} n'est pas une image valide.",
+    'claim.creation_failed':
+      'Une erreur est survenue lors de la création de la dispute',
+    'claim.create_dispute_error':
+      'Erreur lors de la création de la dispute : {message}',
+    'claim.update_booking_error':
+      'Dispute créée mais erreur lors de la mise à jour de la réservation : {message}',
+    'claim.unknown_error': 'Erreur inconnue',
+    'claim.creating_progress': 'Création de la dispute...',
+    'claim.updating_booking_progress':
+      'Mise à jour de la réservation...',
+    'claim.sending_progress': 'Envoi en cours...',
+    'profile.photo_updated_title': 'Photo de profil mise à jour',
+    'profile.photo_updated_description':
+      'Votre photo de profil a été mise à jour avec succès.',
+    'profile.photo_update_failed':
+      'Échec de la mise à jour de la photo de profil.',
+    'profile.updated_title': 'Profil mis à jour',
+    'profile.updated_description':
+      'Vos informations ont été mises à jour avec succès.',
+    'profile.update_failed': 'Échec de la mise à jour du profil.',
+    'profile.password_validation_error_title': 'Erreur de validation',
+    'profile.password_fill_all_fields':
+      'Veuillez remplir tous les champs de mot de passe.',
+    'profile.password_current_incorrect':
+      'Le mot de passe actuel est incorrect.',
+    'profile.password_criteria_invalid':
+      'Le nouveau mot de passe ne respecte pas les critères requis.',
+    'profile.password_confirmation_mismatch':
+      'La confirmation du mot de passe ne correspond pas.',
+    'profile.password_updated_title': 'Mot de passe modifié',
+    'profile.password_updated_description':
+      'Votre mot de passe a été modifié avec succès.',
+    'profile.password_update_failed':
+      'Échec de la modification du mot de passe.',
+    'profile.image_invalid_type':
+      'Seuls les fichiers JPEG, PNG et WebP sont autorisés.',
+    'profile.image_too_large':
+      'La taille du fichier ne doit pas dépasser 5MB.',
+    'profile.image_upload_success_title': 'Succès',
+    'profile.image_upload_success_description':
+      'Image téléchargée avec succès.',
+    'profile.image_upload_failed': "Échec de l'upload de l'image.",
+    'profile.password_incorrect_title': 'Mot de passe incorrect',
+    'profile.password_check_failed':
+      'Impossible de vérifier le mot de passe actuel.',
+    'profile.uploading_image': 'Upload...',
+    'request.errors.accept_failed': "Échec de l'acceptation de la réservation",
+    'request.errors.reject_failed': 'Échec du refus de la réservation',
+    'request.errors.missing_review_information':
+      "Informations requises manquantes pour l'avis",
+    'request.errors.submit_review_failed':
+      "Échec de l'envoi de l'avis",
+    'request.errors.missing_app_review_user':
+      "Informations utilisateur manquantes pour l'avis sur l'application",
+    'request.errors.submit_app_review_failed':
+      "Échec de l'envoi de l'avis sur l'application",
+    'request.errors.report_pickup_issue_failed':
+      "Échec du signalement d'un problème de récupération",
+    'request.errors.confirm_pickup_failed':
+      'Échec de la confirmation de récupération',
+    'reservations.cancel_reason_required':
+      "Veuillez sélectionner une raison d'annulation.",
+    'reservations.cancel_failed':
+      "Erreur lors de l'annulation de la réservation",
+    'reservations.report_create_failed':
+      'Erreur lors de la création du signalement',
+    'reservations.return_confirm_failed':
+      "Impossible de confirmer le retour de l'outil",
+    'reservations.no_selected_reservation':
+      'Aucune réservation sélectionnée.',
+    'reservations.claim_exists_title': 'Réclamation existante',
+    'reservations.claim_exists_description':
+      'Une réclamation active existe déjà pour cette réservation.',
+    'reservations.files_too_large':
+      'Certains fichiers dépassent la taille limite de 1MB.',
+    'reservations.copy_code_failed': 'Impossible de copier le code.',
+    'reservations.review_exists_title': 'Avis déjà existant',
+    'reservations.review_exists_description':
+      'Vous avez déjà laissé un avis pour cette réservation',
+    'wallet.load_failed':
+      'Impossible de charger les données du portefeuille',
+    'wallet.loading_transactions': 'Chargement des transactions...',
 
     // Wallet Dialog
     'wallet.dialog.title': 'Retrait de fonds',
@@ -2538,6 +2691,7 @@ const translations = {
     'resetpwd.check_error': 'Une erreur est survenue lors de la vérification',
   },
   en: {
+    'change_message_clarification' : 'The displayed value may vary slightly due to fluctuations in the British Pound (GBP) exchange rate.',
     'report.describe_problem': 'Describe the problem',
     'report.justification_documents': 'Justification Documents (optional)',
     'report.justification_documents_description':
@@ -3655,6 +3809,58 @@ const translations = {
     'customer_reviews.description':
       'Find out what our users think about our platform.',
     'customer_reviews.no_reviews': 'No reviews available at this time.',
+    'customer_reviews.load_failed': 'Unable to load reviews.',
+    'categories.load_error': 'Unable to load categories.',
+    'featured_tools.load_error': 'Unable to load featured tools.',
+    'featured_tools.favorite_removed_title': 'Removed from favorites',
+    'featured_tools.favorite_removed_description':
+      '{toolName} was removed from your favorites.',
+    'featured_tools.favorite_added_title': 'Added to favorites',
+    'featured_tools.favorite_added_description':
+      '{toolName} was added to your favorites.',
+    'featured_tools.favorites_update_error':
+      'Unable to update favorites.',
+    'pricing.load_error': 'Error loading price',
+    'share.share_with_family':
+      'Share this post with your family and friends.',
+    'suspension.title': 'Account suspended',
+    'suspension.account_suspended':
+      'Your account has been suspended temporarily or permanently.',
+    'suspension.reason_label': 'Reason for suspension',
+    'suspension.help_text':
+      'If you think this is a mistake, please contact our support team.',
+    'video.close_fullscreen': 'Close fullscreen',
+    'video.play': 'Play video',
+    'video.title': 'Bricola promotional video',
+    'footer.address': '128 City Road, London EC1V 2NX, United Kingdom',
+    'footer.designed_by': 'Designed by',
+    'general.image': 'Image',
+    'language.option_french': 'French',
+    'language.option_english': 'English',
+    'language.option_arabic': 'Arabic',
+    'address_autocomplete.placeholder': 'Enter your address...',
+    'address_autocomplete.mapbox_key_missing_fallback':
+      'Mapbox API key is missing. Manual entry mode enabled.',
+    'address_autocomplete.api_unavailable_fallback':
+      'Mapbox API is unavailable. Manual entry mode enabled.',
+    'address_autocomplete.autocomplete_issue_fallback':
+      'There is an issue with autocomplete. Manual entry mode enabled.',
+    'address_autocomplete.initialization_error_fallback':
+      'Initialization error. Manual entry mode enabled.',
+    'address_autocomplete.configuration_required':
+      'Mapbox configuration is required for autocomplete',
+    'address_autocomplete.manual_entry_hint':
+      'Enter your address manually',
+    'map.address_unavailable': 'Address unavailable',
+    'map.address_not_found': 'Address not found',
+    'map.coordinates_fallback': 'Coordinates: {lat}, {lng}',
+    'map.missing_token': 'Mapbox token is missing from environment variables',
+    'map.api_access_error': 'Unable to access the Mapbox API ({status})',
+    'map.load_error': 'Error loading the map',
+    'map.internet_connection_error':
+      'Error loading the map. Please check your internet connection.',
+    'map.latitude': 'Lat',
+    'map.longitude': 'Lng',
 
     // rental process
 
@@ -3721,7 +3927,7 @@ const translations = {
     'wallet.withdraw_pending': 'Withdrawal is being processed...',
     'wallet.withdrawal_note':
       'You can request a payout once your total earnings reach 50 GBP.',
-    'wallet.conversion_rate': '50 GBP = {minWithdrawalEUR} EUR',
+    'wallet.conversion_rate': '50 GBP = {minWithdrawalEUR}',
     'wallet.dynamic_conversion':
       'The conversion rate updates dynamically based on the currency selected in the account.',
 
@@ -3736,6 +3942,90 @@ const translations = {
     'wallet.pending': 'Pending',
     'wallet.failed': 'Failed',
     'wallet.no_transactions_found': 'No transactions available at this time.',
+    'ads.load_tool_details_error': 'Unable to load tool details',
+    'ads.filters.validation_status_placeholder': 'Validation status',
+    'ads.filters.publication_status_placeholder': 'Publication status',
+    'ads.filters.category_placeholder': 'Category',
+    'ads.filters.loading_error': 'Loading error',
+    'ads.user_reviews_title': 'User reviews',
+    'ads.reviews_count': '({count} reviews)',
+    'favorites.remove_success_title': 'Removed from favorites',
+    'favorites.remove_success_description':
+      'The tool was removed from your favorites.',
+    'favorites.remove_error': 'An error occurred while removing the favorite.',
+    'favorites.loading': 'Loading your favorites...',
+    'claim.image_too_large': 'The image {fileName} exceeds the 1MB limit.',
+    'claim.invalid_image': 'The file {fileName} is not a valid image.',
+    'claim.creation_failed': 'An error occurred while creating the dispute',
+    'claim.create_dispute_error': 'Error while creating the dispute: {message}',
+    'claim.update_booking_error':
+      'Dispute created but failed to update the booking: {message}',
+    'claim.unknown_error': 'Unknown error',
+    'claim.creating_progress': 'Creating dispute...',
+    'claim.updating_booking_progress': 'Updating booking...',
+    'claim.sending_progress': 'Sending...',
+    'profile.photo_updated_title': 'Profile picture updated',
+    'profile.photo_updated_description':
+      'Your profile picture was updated successfully.',
+    'profile.photo_update_failed': 'Failed to update profile picture.',
+    'profile.updated_title': 'Profile updated',
+    'profile.updated_description':
+      'Your information was updated successfully.',
+    'profile.update_failed': 'Failed to update profile.',
+    'profile.password_validation_error_title': 'Validation error',
+    'profile.password_fill_all_fields':
+      'Please fill in all password fields.',
+    'profile.password_current_incorrect':
+      'The current password is incorrect.',
+    'profile.password_criteria_invalid':
+      'The new password does not meet the required criteria.',
+    'profile.password_confirmation_mismatch':
+      'The password confirmation does not match.',
+    'profile.password_updated_title': 'Password changed',
+    'profile.password_updated_description':
+      'Your password was changed successfully.',
+    'profile.password_update_failed': 'Failed to change password.',
+    'profile.image_invalid_type':
+      'Only JPEG, PNG, and WebP files are allowed.',
+    'profile.image_too_large': 'The file size must not exceed 5MB.',
+    'profile.image_upload_success_title': 'Success',
+    'profile.image_upload_success_description':
+      'Image uploaded successfully.',
+    'profile.image_upload_failed': 'Failed to upload image.',
+    'profile.password_incorrect_title': 'Incorrect password',
+    'profile.password_check_failed':
+      'Unable to verify the current password.',
+    'profile.uploading_image': 'Uploading...',
+    'request.errors.accept_failed': 'Failed to accept booking',
+    'request.errors.reject_failed': 'Failed to reject booking',
+    'request.errors.missing_review_information':
+      'Missing required information for review',
+    'request.errors.submit_review_failed': 'Failed to submit review',
+    'request.errors.missing_app_review_user':
+      'Missing user information for app review',
+    'request.errors.submit_app_review_failed':
+      'Failed to submit app review',
+    'request.errors.report_pickup_issue_failed':
+      'Failed to report pickup issue',
+    'request.errors.confirm_pickup_failed': 'Failed to confirm pickup',
+    'reservations.cancel_reason_required':
+      'Please select a cancellation reason.',
+    'reservations.cancel_failed': 'Failed to cancel the booking',
+    'reservations.report_create_failed': 'Failed to create the report',
+    'reservations.return_confirm_failed':
+      'Unable to confirm the tool return',
+    'reservations.no_selected_reservation': 'No booking selected.',
+    'reservations.claim_exists_title': 'Existing claim',
+    'reservations.claim_exists_description':
+      'An active claim already exists for this booking.',
+    'reservations.files_too_large':
+      'Some files exceed the 1MB size limit.',
+    'reservations.copy_code_failed': 'Unable to copy the code.',
+    'reservations.review_exists_title': 'Review already exists',
+    'reservations.review_exists_description':
+      'You have already left a review for this booking',
+    'wallet.load_failed': 'Unable to load wallet data',
+    'wallet.loading_transactions': 'Loading transactions...',
 
     // Wallet Dialog
     'wallet.dialog.title': 'Withdrawal',
@@ -4974,6 +5264,7 @@ const translations = {
     'mobile_app.google_play': 'Get it from Google Play',
   },
   ar: {
+     'change_message_clarification' : 'قد تختلف القيمة المعروضة قليلاً بسبب تغيّر سعر صرف الجنيه الإسترليني.',
     'report.describe_problem': 'وصف المشكلة',
     'report.justification_documents': 'الملفات الاصلاحية',
     'report.justification_documents_description':
@@ -6237,6 +6528,57 @@ const translations = {
     'customer_reviews.title': 'آراء عملائنا',
     'customer_reviews.description': 'إكتشف آراء مستخدمينا حول المنصة',
     'customer_reviews.no_reviews': 'لا توجد آراء متاحة في الوقت الحالي.',
+    'customer_reviews.load_failed': 'تعذر تحميل الآراء.',
+    'categories.load_error': 'تعذر تحميل الفئات.',
+    'featured_tools.load_error': 'تعذر تحميل الأدوات المميزة.',
+    'featured_tools.favorite_removed_title': 'تمت الإزالة من المفضلة',
+    'featured_tools.favorite_removed_description':
+      'تمت إزالة {toolName} من المفضلة.',
+    'featured_tools.favorite_added_title': 'تمت الإضافة إلى المفضلة',
+    'featured_tools.favorite_added_description':
+      'تمت إضافة {toolName} إلى المفضلة.',
+    'featured_tools.favorites_update_error':
+      'تعذر تحديث المفضلة.',
+    'pricing.load_error': 'خطأ أثناء تحميل السعر',
+    'share.share_with_family':
+      'شارك هذا المنشور مع عائلتك وأصدقائك.',
+    'suspension.title': 'تم تعليق الحساب',
+    'suspension.account_suspended':
+      'تم تعليق حسابك بشكل مؤقت أو دائم.',
+    'suspension.reason_label': 'سبب التعليق',
+    'suspension.help_text':
+      'إذا كنت تعتقد أن هذا خطأ، فيرجى التواصل مع فريق الدعم.',
+    'video.close_fullscreen': 'إغلاق ملء الشاشة',
+    'video.play': 'تشغيل الفيديو',
+    'video.title': 'فيديو تعريفي عن Bricola',
+    'footer.address': '128 City Road, London EC1V 2NX, United Kingdom',
+    'footer.designed_by': 'تصميم',
+    'general.image': 'صورة',
+    'language.option_french': 'الفرنسية',
+    'language.option_english': 'الإنجليزية',
+    'language.option_arabic': 'العربية',
+    'address_autocomplete.placeholder': 'أدخل عنوانك...',
+    'address_autocomplete.mapbox_key_missing_fallback':
+      'مفتاح Mapbox API مفقود. تم تفعيل وضع الإدخال اليدوي.',
+    'address_autocomplete.api_unavailable_fallback':
+      'واجهة Mapbox غير متاحة. تم تفعيل وضع الإدخال اليدوي.',
+    'address_autocomplete.autocomplete_issue_fallback':
+      'هناك مشكلة في الإكمال التلقائي. تم تفعيل وضع الإدخال اليدوي.',
+    'address_autocomplete.initialization_error_fallback':
+      'حدث خطأ أثناء التهيئة. تم تفعيل وضع الإدخال اليدوي.',
+    'address_autocomplete.configuration_required':
+      'إعداد Mapbox مطلوب لتفعيل الإكمال التلقائي',
+    'address_autocomplete.manual_entry_hint': 'أدخل عنوانك يدويًا',
+    'map.address_unavailable': 'العنوان غير متاح',
+    'map.address_not_found': 'لم يتم العثور على العنوان',
+    'map.coordinates_fallback': 'الإحداثيات: {lat}, {lng}',
+    'map.missing_token': 'رمز Mapbox مفقود من متغيرات البيئة',
+    'map.api_access_error': 'تعذر الوصول إلى واجهة Mapbox ({status})',
+    'map.load_error': 'خطأ أثناء تحميل الخريطة',
+    'map.internet_connection_error':
+      'خطأ أثناء تحميل الخريطة. يرجى التحقق من اتصال الإنترنت.',
+    'map.latitude': 'خط العرض',
+    'map.longitude': 'خط الطول',
 
     // rental process
 
@@ -6264,7 +6606,7 @@ const translations = {
     'wallet.withdraw_pending': 'جارٍ معالجة طلب التحويل...',
     'wallet.withdrawal_note':
       'يمكنك طلب تحويل مستحقّاتك عندما يبلغ الإجمالي 50 جنيهًا إسترلينيًا',
-    'wallet.conversion_rate': '50£ = {minWithdrawalEUR} €',
+    'wallet.conversion_rate': '50£ = {minWithdrawalEUR}',
     'wallet.dynamic_conversion':
       'يتم تحديث سعر الصرف تلقائيًا حسب العملة المختارة في الحساب.',
 
@@ -6280,6 +6622,91 @@ const translations = {
     'wallet.failed': 'فشلت',
     // Aucune transaction trouvée pour les filtres sélectionnés. // arabe
     'wallet.no_transactions_found': 'لا توجد معاملات متاحة في الوقت الحالي.',
+    'ads.load_tool_details_error': 'تعذر تحميل تفاصيل الأداة',
+    'ads.filters.validation_status_placeholder': 'حالة التحقق',
+    'ads.filters.publication_status_placeholder': 'حالة النشر',
+    'ads.filters.category_placeholder': 'الفئة',
+    'ads.filters.loading_error': 'خطأ في التحميل',
+    'ads.user_reviews_title': 'آراء المستخدمين',
+    'ads.reviews_count': '({count} مراجعات)',
+    'favorites.remove_success_title': 'تمت الإزالة من المفضلة',
+    'favorites.remove_success_description':
+      'تمت إزالة الأداة من قائمتك المفضلة.',
+    'favorites.remove_error': 'حدث خطأ أثناء إزالة العنصر من المفضلة.',
+    'favorites.loading': 'جارٍ تحميل المفضلة...',
+    'claim.image_too_large':
+      'الصورة {fileName} تتجاوز الحد الأقصى البالغ 1 ميغابايت.',
+    'claim.invalid_image': 'الملف {fileName} ليس صورة صالحة.',
+    'claim.creation_failed': 'حدث خطأ أثناء إنشاء النزاع',
+    'claim.create_dispute_error': 'خطأ أثناء إنشاء النزاع: {message}',
+    'claim.update_booking_error':
+      'تم إنشاء النزاع ولكن فشل تحديث الحجز: {message}',
+    'claim.unknown_error': 'خطأ غير معروف',
+    'claim.creating_progress': 'جارٍ إنشاء النزاع...',
+    'claim.updating_booking_progress': 'جارٍ تحديث الحجز...',
+    'claim.sending_progress': 'جارٍ الإرسال...',
+    'profile.photo_updated_title': 'تم تحديث صورة الملف الشخصي',
+    'profile.photo_updated_description':
+      'تم تحديث صورة ملفك الشخصي بنجاح.',
+    'profile.photo_update_failed': 'فشل تحديث صورة الملف الشخصي.',
+    'profile.updated_title': 'تم تحديث الملف الشخصي',
+    'profile.updated_description': 'تم تحديث معلوماتك بنجاح.',
+    'profile.update_failed': 'فشل تحديث الملف الشخصي.',
+    'profile.password_validation_error_title': 'خطأ في التحقق',
+    'profile.password_fill_all_fields':
+      'يرجى تعبئة جميع حقول كلمة المرور.',
+    'profile.password_current_incorrect':
+      'كلمة المرور الحالية غير صحيحة.',
+    'profile.password_criteria_invalid':
+      'كلمة المرور الجديدة لا تستوفي الشروط المطلوبة.',
+    'profile.password_confirmation_mismatch':
+      'تأكيد كلمة المرور غير متطابق.',
+    'profile.password_updated_title': 'تم تغيير كلمة المرور',
+    'profile.password_updated_description':
+      'تم تغيير كلمة المرور بنجاح.',
+    'profile.password_update_failed': 'فشل تغيير كلمة المرور.',
+    'profile.image_invalid_type':
+      'يُسمح فقط بملفات JPEG وPNG وWebP.',
+    'profile.image_too_large':
+      'يجب ألا يتجاوز حجم الملف 5 ميغابايت.',
+    'profile.image_upload_success_title': 'نجاح',
+    'profile.image_upload_success_description': 'تم رفع الصورة بنجاح.',
+    'profile.image_upload_failed': 'فشل رفع الصورة.',
+    'profile.password_incorrect_title': 'كلمة مرور غير صحيحة',
+    'profile.password_check_failed':
+      'تعذر التحقق من كلمة المرور الحالية.',
+    'profile.uploading_image': 'جارٍ الرفع...',
+    'request.errors.accept_failed': 'فشل قبول الحجز',
+    'request.errors.reject_failed': 'فشل رفض الحجز',
+    'request.errors.missing_review_information':
+      'معلومات المراجعة المطلوبة مفقودة',
+    'request.errors.submit_review_failed': 'فشل إرسال المراجعة',
+    'request.errors.missing_app_review_user':
+      'معلومات المستخدم لمراجعة التطبيق مفقودة',
+    'request.errors.submit_app_review_failed':
+      'فشل إرسال مراجعة التطبيق',
+    'request.errors.report_pickup_issue_failed':
+      'فشل الإبلاغ عن مشكلة الاستلام',
+    'request.errors.confirm_pickup_failed':
+      'فشل تأكيد الاستلام',
+    'reservations.cancel_reason_required':
+      'يرجى اختيار سبب الإلغاء.',
+    'reservations.cancel_failed': 'فشل إلغاء الحجز',
+    'reservations.report_create_failed': 'فشل إنشاء البلاغ',
+    'reservations.return_confirm_failed':
+      'تعذر تأكيد إرجاع الأداة',
+    'reservations.no_selected_reservation': 'لم يتم اختيار أي حجز.',
+    'reservations.claim_exists_title': 'يوجد نزاع قائم',
+    'reservations.claim_exists_description':
+      'يوجد نزاع نشط بالفعل لهذا الحجز.',
+    'reservations.files_too_large':
+      'بعض الملفات تتجاوز الحد الأقصى البالغ 1 ميغابايت.',
+    'reservations.copy_code_failed': 'تعذر نسخ الرمز.',
+    'reservations.review_exists_title': 'المراجعة موجودة بالفعل',
+    'reservations.review_exists_description':
+      'لقد تركت بالفعل مراجعة لهذا الحجز',
+    'wallet.load_failed': 'تعذر تحميل بيانات المحفظة',
+    'wallet.loading_transactions': 'جارٍ تحميل المعاملات...',
 
     // Wallet Dialog
     'wallet.dialog.title': 'سحب الأموال',
@@ -7237,7 +7664,6 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
         ? savedLanguage
         : 'en'
     } catch (error) {
-      console.warn('Failed to load language from localStorage:', error)
       return 'en'
     }
   })
@@ -7248,7 +7674,6 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
       localStorage.setItem('selectedLanguage', lang)
       setLanguage(lang)
     } catch (error) {
-      console.warn('Failed to save language to localStorage:', error)
       setLanguage(lang)
     }
   }
@@ -7299,9 +7724,6 @@ export const useLanguage = () => {
   const context = useContext(LanguageContext)
   if (context === undefined) {
     // Return a fallback object instead of throwing an error
-    console.warn(
-      'useLanguage called outside LanguageProvider, returning fallback',
-    )
     return {
       language: 'fr' as Language,
       setLanguage: () => {},

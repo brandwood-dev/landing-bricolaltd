@@ -56,10 +56,6 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
         numericPrice > 0
       const validPrice = isValidPrice ? numericPrice : 0
 
-      console.log(
-        `💰 [OptimizedPriceDisplay] Processing price: ${price} (valid: ${validPrice}) from ${baseCurrency} to ${currency.code}`
-      )
-
       // Obtenir le symbole de devise de base selon la langue
       const baseSymbol = getCurrencySymbol(baseCurrency)
 
@@ -70,9 +66,6 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
       if (!isValidPrice) {
         const targetSymbol = getCurrencySymbol(currency.code)
         const zeroPrice = `0.00 ${targetSymbol}`
-        console.log(
-          `⚠️ [OptimizedPriceDisplay] Invalid price, displaying zero: ${zeroPrice}`
-        )
         return {
           convertedPrice: zeroPrice,
           originalPrice: originalFormatted,
@@ -84,9 +77,6 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
       if (baseCurrency === currency.code) {
         const targetSymbol = getCurrencySymbol(currency.code)
         const samePrice = `${validPrice.toFixed(2)} ${targetSymbol}`
-        console.log(
-          `✅ [OptimizedPriceDisplay] Same currency, no conversion: ${samePrice}`
-        )
         return {
           convertedPrice: samePrice,
           originalPrice: originalFormatted,
@@ -104,12 +94,6 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
         const targetSymbol = getCurrencySymbol(currency.code)
         const formattedPrice = `${convertedAmount.toFixed(2)} ${targetSymbol}`
 
-        console.log(
-          `⚡ [OptimizedPriceDisplay] Instant calculation: ${validPrice} ${baseCurrency} → ${convertedAmount.toFixed(
-            2
-          )} ${currency.code}`
-        )
-
         return {
           convertedPrice: formattedPrice,
           originalPrice: originalFormatted,
@@ -118,9 +102,6 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
       } else {
         // Pour les paiements critiques, utiliser l'ancienne méthode avec API
         // Cette partie sera gérée de manière asynchrone
-        console.log(
-          `🔄 [OptimizedPriceDisplay] Using legacy conversion for critical payment`
-        )
         const targetSymbol = getCurrencySymbol(currency.code)
         return {
           convertedPrice: `${validPrice.toFixed(2)} ${targetSymbol}`, // Fallback temporaire
@@ -129,7 +110,6 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
         }
       }
     } catch (err) {
-      console.error('❌ [OptimizedPriceDisplay] Calculation error:', err)
 
       // Fallback en cas d'erreur
       const numericPrice = typeof price === 'string' ? parseFloat(price) : price
@@ -205,7 +185,7 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
   if (error && !convertedPrice) {
     return (
       <div className={`${getSizeClasses()} ${className} text-red-500`}>
-        Error loading price
+        {t('pricing.load_error')}
       </div>
     )
   }

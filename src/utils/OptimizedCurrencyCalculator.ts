@@ -35,14 +35,11 @@ export class OptimizedCurrencyCalculator {
         
         if (cacheAge < maxAge) {
           this.globalCache = parsedCache;
-          console.log(`🔄 [OptimizedCalculator] Cache loaded from storage (age: ${Math.round(cacheAge / 1000)}s)`);
         } else {
-          console.log(`⏰ [OptimizedCalculator] Cache expired (age: ${Math.round(cacheAge / 1000)}s)`);
           this.clearCache();
         }
       }
     } catch (error) {
-      console.error('❌ [OptimizedCalculator] Failed to load cache from storage:', error);
       this.clearCache();
     }
   }
@@ -54,10 +51,8 @@ export class OptimizedCurrencyCalculator {
     try {
       if (this.globalCache) {
         localStorage.setItem(this.CACHE_KEY, JSON.stringify(this.globalCache));
-        console.log(`💾 [OptimizedCalculator] Cache saved to storage`);
       }
     } catch (error) {
-      console.error('❌ [OptimizedCalculator] Failed to save cache to storage:', error);
     }
   }
 
@@ -79,7 +74,6 @@ export class OptimizedCurrencyCalculator {
     };
     
     this.saveCacheToStorage();
-    console.log(`✅ [OptimizedCalculator] Cache updated with ${Object.keys(rates).length} rates (trigger: ${trigger})`);
   }
 
   /**
@@ -87,7 +81,6 @@ export class OptimizedCurrencyCalculator {
    */
   public isCacheValid(trigger?: RateFetchTrigger): boolean {
     if (!this.globalCache) {
-      console.log(`❌ [OptimizedCalculator] No cache available`);
       return false;
     }
 
@@ -99,12 +92,6 @@ export class OptimizedCurrencyCalculator {
 
     const isValid = cacheAge < maxAge && !this.globalCache.isStale;
     
-    console.log(`🔍 [OptimizedCalculator] Cache validation:`, {
-      age: Math.round(cacheAge / 1000),
-      maxAge: Math.round(maxAge / 1000),
-      isStale: this.globalCache.isStale,
-      isValid
-    });
 
     return isValid;
   }
@@ -176,12 +163,10 @@ export class OptimizedCurrencyCalculator {
   public calculatePrice(amount: number, from: string, to?: string): number {
     // Validation des entrées
     if (typeof amount !== 'number' || isNaN(amount)) {
-      console.warn(`⚠️ [OptimizedCalculator] Invalid amount: ${amount}`);
       return 0;
     }
 
     if (!to) {
-      console.warn(`⚠️ [OptimizedCalculator] No target currency specified`);
       return amount;
     }
 
@@ -193,12 +178,10 @@ export class OptimizedCurrencyCalculator {
     const rate = this.getRate(from, to);
     
     if (rate === null) {
-      console.warn(`⚠️ [OptimizedCalculator] No rate available for ${from} → ${to}, returning original amount`);
       return amount; // Fallback à la valeur originale
     }
 
     const result = amount * rate;
-    console.log(`💱 [OptimizedCalculator] ${amount} ${from} → ${result.toFixed(2)} ${to} (rate: ${rate})`);
     
     return result;
   }
@@ -207,7 +190,6 @@ export class OptimizedCurrencyCalculator {
    * Calcule plusieurs prix en une seule opération (optimisation pour les listes)
    */
   public calculateBulkPrices(prices: PriceItem[], targetCurrency: string): BulkConvertedPrice[] {
-    console.log(`📊 [OptimizedCalculator] Bulk calculation: ${prices.length} prices → ${targetCurrency}`);
     
     return prices.map((price, index) => {
       const converted = this.calculatePrice(price.amount, price.from, targetCurrency);
@@ -231,25 +213,24 @@ export class OptimizedCurrencyCalculator {
     
     // Vérification de sécurité pour éviter l'erreur TypeError
     if (!config) {
-      console.warn(`⚠️ [OptimizedCalculator] Unknown trigger: ${trigger}, defaulting to fetch required`);
       return true;
     }
     
     if (config.immediate) {
-      console.log(`🚀 [OptimizedCalculator] Immediate fetch required for trigger: ${trigger}`);
       return true;
     }
 
     if (!this.globalCache) {
-      console.log(`📭 [OptimizedCalculator] No cache, fetch required for trigger: ${trigger}`);
       return true;
     }
 
     // Vérification des conditions spéciales
-    if (trigger === RateFetchTrigger.RENT_PAGE_ENTRY) {
+    if (
+      trigger === RateFetchTrigger.RENT_PAGE_ENTRY ||
+      trigger === RateFetchTrigger.SEARCH_PAGE_ENTRY
+    ) {
       const cacheAge = this.getCacheAge();
       const shouldFetch = cacheAge > 5 * 60 * 1000; // > 5 minutes
-      console.log(`🏠 [OptimizedCalculator] Rent page entry: cache age ${Math.round(cacheAge / 1000)}s, should fetch: ${shouldFetch}`);
       return shouldFetch;
     }
 
@@ -257,7 +238,6 @@ export class OptimizedCurrencyCalculator {
     if (trigger === RateFetchTrigger.USER_CURRENCY_CHANGE) {
       const cacheAge = this.getCacheAge();
       const shouldFetch = cacheAge > 10 * 60 * 1000; // > 10 minutes
-      console.log(`💱 [OptimizedCalculator] Currency change: cache age ${Math.round(cacheAge / 1000)}s, should fetch: ${shouldFetch}`);
       return shouldFetch;
     }
 
@@ -271,7 +251,6 @@ export class OptimizedCurrencyCalculator {
     if (this.globalCache) {
       this.globalCache.isStale = true;
       this.saveCacheToStorage();
-      console.log(`⚠️ [OptimizedCalculator] Cache marked as stale`);
     }
   }
 
@@ -281,7 +260,6 @@ export class OptimizedCurrencyCalculator {
   public clearCache(): void {
     this.globalCache = null;
     localStorage.removeItem(this.CACHE_KEY);
-    console.log(`🗑️ [OptimizedCalculator] Cache cleared`);
   }
 
   /**

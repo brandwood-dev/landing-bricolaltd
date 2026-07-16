@@ -41,7 +41,7 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { useCurrency } from '@/contexts/CurrencyContext'
 import { toolsService } from '@/services/toolsService'
-import AddressAutocomplete from '@/components/AddressAutocomplete'
+import AddressAutocomplete from '@/components/ui/AddressAutocomplete'
 import MapboxLocationPicker from '@/components/MapboxLocationPicker'
 import { OptimizedPriceDisplay } from '@/components/OptimizedPriceDisplay'
 
@@ -123,12 +123,12 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
 
   // Photo management states
   const [existingPhotos, setExistingPhotos] = useState<ToolPhoto[]>(
-    ad.photos || []
+    ad.photos || [],
   )
   const [newPhotos, setNewPhotos] = useState<File[]>([])
   const [photosToDelete, setPhotosToDelete] = useState<string[]>([])
   const [primaryPhotoId, setPrimaryPhotoId] = useState<string | null>(
-    ad.photos?.find((photo) => photo.isPrimary)?.id || null
+    ad.photos?.find((photo) => photo.isPrimary)?.id || null,
   )
   const [newPhotoPrimaryIndex, setNewPhotoPrimaryIndex] = useState<
     number | null
@@ -193,7 +193,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
         const convertedPrice = calculatePrice(
           formData.price,
           currency.code,
-          'GBP'
+          'GBP',
         )
         if (convertedPrice !== null && convertedPrice !== undefined) {
           setPriceInGBP(convertedPrice)
@@ -211,7 +211,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
         const convertedDeposit = calculatePrice(
           formData.deposit,
           currency.code,
-          'GBP'
+          'GBP',
         )
         if (convertedDeposit !== null && convertedDeposit !== undefined) {
           setDepositInGBP(convertedDeposit)
@@ -227,7 +227,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
         try {
           setLoadingSubcategories(true)
           const subcategories = await toolsService.getSubcategoriesByCategory(
-            formData.category
+            formData.category,
           )
           setSubcategories(subcategories || [])
         } catch (error) {
@@ -275,24 +275,25 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
 
     if (!formData.title.trim()) {
       newErrors.title = t('validation.title_required')
-   }
-   if (!formData.description.trim())
+    }
+    if (!formData.description.trim())
       newErrors.description = t('validation.description_required')
-    if (!formData.category) newErrors.category = t('validation.category_required')
-   if (!formData.condition)
+    if (!formData.category)
+      newErrors.category = t('validation.category_required')
+    if (!formData.condition)
       newErrors.condition = t('validation.condition_required')
-   if (!formData.price || formData.price <= 0)
+    if (!formData.price || formData.price <= 0)
       newErrors.price = t('validation.price_positive')
-   if (!formData.deposit || formData.deposit <= 0)
+    if (!formData.deposit || formData.deposit <= 0)
       newErrors.deposit = t('validation.deposit_positive')
-   if (!isAddressSelected)
+    if (!isAddressSelected)
       newErrors.location = t('validation.address_required')
 
     // Validation des photos - au moins une photo doit exister
-   const totalPhotos = existingPhotos.length + newPhotos.length
-   if (totalPhotos === 0) {
+    const totalPhotos = existingPhotos.length + newPhotos.length
+    if (totalPhotos === 0) {
       newErrors.photos = t('validation.photos_required')
-   }
+    }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -361,7 +362,6 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
         description: t('ads.edit.photo_deleted_description'),
       })
     } catch (error) {
-      console.error('Error deleting photo:', error)
       toast({
         title: t('general.error'),
         description: t('ads.edit.photo_delete_error'),
@@ -401,7 +401,6 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
         description: t('ads.edit.photo_primary_description'),
       })
     } catch (error) {
-      console.error('Error setting primary photo:', error)
       toast({
         title: t('general.error'),
         description: t('ads.edit.photo_primary_error'),
@@ -469,7 +468,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
           const uploadedPhoto = await toolsService.addToolPhoto(
             ad.id,
             photo,
-            isPrimary
+            isPrimary,
           )
           uploadedPhotos.push(uploadedPhoto)
 
@@ -478,12 +477,11 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
             setPrimaryPhotoId(uploadedPhoto.id)
           }
         } catch (error) {
-          console.error('Error uploading photo:', error)
           toast({
             title: t('general.error'),
             description: t('ads.edit.photo_upload_error').replace(
               '{name}',
-              photo.name
+              photo.name,
             ),
             variant: 'destructive',
           })
@@ -508,9 +506,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
         try {
           await toolsService.setPhotoPrimary(firstPhoto.id)
           setPrimaryPhotoId(firstPhoto.id)
-        } catch (error) {
-          console.error('Error setting default primary photo:', error)
-        }
+        } catch (error) {}
       }
 
       // Clear new photos and reset states
@@ -530,7 +526,6 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
       onSave()
       onClose()
     } catch (error) {
-      console.error('Error updating tool:', error)
       toast({
         title: t('ads.edit.update_error_title'),
         description: t('ads.edit.update_error_description'),
@@ -540,8 +535,6 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
       setIsSaving(false)
     }
   }
-
-
 
   return (
     <TooltipProvider>
@@ -785,12 +778,22 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                     <SelectValue placeholder={t('ads.tool_condition')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value='1'>{t('add_tool.condition_new')}</SelectItem>
-                    <SelectItem value='2'>{t('add_tool.condition_excellent')}</SelectItem>
-                    <SelectItem value='3'>{t('add_tool.condition_good')}</SelectItem>
-                    <SelectItem value='4'>{t('add_tool.condition_fair')}</SelectItem>
-                    <SelectItem value='5'>{t('add_tool.condition_poor')}</SelectItem>
-                 </SelectContent>
+                    <SelectItem value='1'>
+                      {t('add_tool.condition_new')}
+                    </SelectItem>
+                    <SelectItem value='2'>
+                      {t('add_tool.condition_excellent')}
+                    </SelectItem>
+                    <SelectItem value='3'>
+                      {t('add_tool.condition_good')}
+                    </SelectItem>
+                    <SelectItem value='4'>
+                      {t('add_tool.condition_fair')}
+                    </SelectItem>
+                    <SelectItem value='5'>
+                      {t('add_tool.condition_poor')}
+                    </SelectItem>
+                  </SelectContent>
                 </Select>
                 {errors.condition && (
                   <p className='text-sm text-red-500'>{errors.condition}</p>
@@ -950,8 +953,8 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                         ? typeof formData.latitude === 'number'
                           ? formData.latitude.toFixed(6)
                           : !isNaN(parseFloat(formData.latitude))
-                          ? parseFloat(formData.latitude).toFixed(6)
-                          : formData.latitude
+                            ? parseFloat(formData.latitude).toFixed(6)
+                            : formData.latitude
                         : t('ads.edit.not_defined')}
                     </p>
                   </div>
@@ -964,8 +967,8 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                         ? typeof formData.longitude === 'number'
                           ? formData.longitude.toFixed(6)
                           : !isNaN(parseFloat(formData.longitude))
-                          ? parseFloat(formData.longitude).toFixed(6)
-                          : formData.longitude
+                            ? parseFloat(formData.longitude).toFixed(6)
+                            : formData.longitude
                         : t('ads.edit.not_defined')}
                     </p>
                   </div>

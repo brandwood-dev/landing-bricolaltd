@@ -214,15 +214,12 @@ export const useNotifications = (): UseNotificationsReturn => {
       try {
         socketRef.current?.disconnect();
       } catch {
-        console.log('--------No notifications ---------')
       }
       socketRef.current = null;
     };
   }, [isAuthenticated, fetchNotifications, t]);
 
   const unreadCount = (notifications || []).filter(n => !n.isRead).length;
-
-
 
   return {
     notifications,

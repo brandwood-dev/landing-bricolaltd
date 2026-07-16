@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface ImageCarouselProps {
   images: Array<{
@@ -19,6 +20,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
   language = 'fr',
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0)
+  const { t } = useLanguage()
 
   if (!images || images.length === 0) {
     return null
@@ -37,7 +39,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
             <div className='aspect-video relative'>
               <img
                 src={images[0].url}
-                alt={images[0].alt || title || 'Image'}
+                  alt={images[0].alt || title || t('general.image')}
                 className='w-full h-full object-cover'
               />
             </div>
@@ -61,7 +63,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
               <div className='aspect-video relative'>
                 <img
                   src={image.url}
-                  alt={image.alt || title || 'Image'}
+                  alt={image.alt || title || t('general.image')}
                   className='w-full h-full object-cover'
                 />
               </div>
@@ -103,7 +105,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
         <div className='aspect-video relative'>
           <img
             src={images[currentIndex].url}
-            alt={images[currentIndex].alt || title || 'Image'}
+            alt={images[currentIndex].alt || title || t('general.image')}
             className='w-full h-full object-cover transition-transform duration-500 ease-in-out'
           />
           

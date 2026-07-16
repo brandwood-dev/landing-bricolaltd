@@ -8,7 +8,6 @@ import { toolsService } from '@/services/toolsService';
 import { Category } from '../types/bridge/tool.types';
 import { useToast } from '@/hooks/use-toast';
 
-
 const CategoriesSection = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
@@ -80,8 +79,7 @@ const CategoriesSection = () => {
         const fetchedCategories = await toolsService.getCategories();
         setCategories(fetchedCategories.slice(0, 4)); // Show only first 4 categories
       } catch (err: any) {
-        console.error('Error fetching categories:', err);
-        setError(err.message);
+        setError(t('categories.load_error'));
         // Fallback to hardcoded categories
         setCategories([
           { id: '1', name: 'jardinage', displayName: t('categories.gardening') },
@@ -111,7 +109,7 @@ const CategoriesSection = () => {
           </div>
           <div className="flex justify-center items-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <span className="ml-2 text-gray-600">Chargement des catégories...</span>
+            <span className="ml-2 text-gray-600">{t('categories.loading')}</span>
           </div>
         </div>
       </section>

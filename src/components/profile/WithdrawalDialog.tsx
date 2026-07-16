@@ -146,9 +146,9 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
         amount: amountGBP,
         currency: 'GBP'
       };
-      console.log('[WithdrawalDialog] Submitting withdrawal', { selectedCurrency: currency.code, enteredAmount: withdrawalData.amount, amountGBP, method: withdrawalData.paymentMethod, bankDetails: withdrawalData.bankDetails })
+    
       const createdTx = await walletService.createWithdrawal(userId, payload as any);
-      console.log('[WithdrawalDialog] Withdrawal created successfully')
+      
       toast({
         title: t('wallet.dialog.success.title'),
         description: t('wallet.dialog.success.desc'),
@@ -160,7 +160,6 @@ const WithdrawalDialog: React.FC<WithdrawalDialogProps> = ({
       setWithdrawalData({ amount: 0, paymentMethod: 'bank_transfer', currency: 'GBP' });
       setErrors({});
     } catch (error) {
-      console.error('[WithdrawalDialog] Withdrawal creation failed', error)
       toast({
         title: t('wallet.dialog.error.title'),
         description: t('wallet.dialog.errors.creation_failed'),

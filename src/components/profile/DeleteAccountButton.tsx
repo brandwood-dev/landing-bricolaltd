@@ -48,21 +48,9 @@ const DeleteAccountButton = ({
     
     try {
       const tsStart = new Date().toISOString();
-      console.debug('🧩 DeleteAccountButton.click', { ts: tsStart, userId, msg: 'start validation' });
       const validation = await accountDeletionService.validateAccountDeletion(userId);
       // Debug validation result
       const tsRes = new Date().toISOString();
-      console.debug('✅ Deletion validation result:', { ts: tsRes, userId, validation });
-      console.debug('🧭 Deletion flow decision:', {
-        ts: tsRes,
-        userId,
-        canDelete: validation?.canDelete,
-        pendingBookings: validation?.blockingIssues?.pendingBookings,
-        confirmedReservations: validation?.blockingIssues?.confirmedReservations,
-        ongoingDisputes: validation?.blockingIssues?.ongoingDisputes,
-        unreturnedTools: validation?.blockingIssues?.unreturnedTools,
-        stepChosen: validation?.canDelete ? 'password' : 'validation',
-      });
       setValidationResult(validation);
       
       if (validation.canDelete) {
@@ -70,12 +58,10 @@ const DeleteAccountButton = ({
         setDeletionStep('password');
       } else {
         const tsShow = new Date().toISOString();
-        console.debug('🪧 Showing validation blockers to the user', { ts: tsShow, userId });
         setDeletionStep('validation');
       }
     } catch (error: any) {
       const tsErr = new Date().toISOString();
-      console.warn('❌ Deletion validation failed', { ts: tsErr, userId, err: error?.message || error });
       toast.error(
         language === 'fr' ? 'Erreur lors de la validation' :
         language === 'ar' ? 'خطأ في التحقق' :
@@ -84,7 +70,6 @@ const DeleteAccountButton = ({
       setIsDialogOpen(false);
     } finally {
       const tsEnd = new Date().toISOString();
-      console.debug('🏁 DeleteAccountButton.click end', { ts: tsEnd, userId });
       setIsLoading(false);
     }
   };
@@ -184,8 +169,6 @@ const DeleteAccountButton = ({
     }> = [];
     const { blockingIssues } = validationResult;
     // Debug blocking issues transformation
-    console.debug('🧩 Blocking issues received:', blockingIssues);
-    console.debug('🧾 Full validationResult for display:', validationResult);
 
     // If backend conservatively set canDelete=false due to an internal error,
     // the blockingIssues counts may all be zero. Provide a helpful fallback.
@@ -217,7 +200,6 @@ const DeleteAccountButton = ({
           handleDeleteAccountClick();
         },
       });
-      console.debug('🧱 Displaying fallback inconclusive issue');
       return issues;
     }
 
@@ -247,7 +229,6 @@ const DeleteAccountButton = ({
           handleDeleteAccountClick();
         },
       });
-      console.debug('🧱 Displaying fallback validation error issue');
       return issues;
     }
 
@@ -357,7 +338,6 @@ const DeleteAccountButton = ({
 
     const displayableIssues = getDisplayableIssues();
     const tsIssues = new Date().toISOString();
-    console.debug('📋 Displayable issues:', { ts: tsIssues, userId, count: displayableIssues.length, issues: displayableIssues });
 
     return (
       <>

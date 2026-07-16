@@ -13,7 +13,6 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent } from '@/components/ui/card'
 
-
 const RentalProcess = () => {
   const { t, language } = useLanguage()
 const [isWindows, setIsWindows] = useState(false)

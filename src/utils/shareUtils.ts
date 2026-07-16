@@ -71,7 +71,6 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
     await navigator.clipboard.writeText(text)
     return true
   } catch (err) {
-    console.error('Erreur lors de la copie :', err)
     return false
   }
 }
@@ -95,7 +94,6 @@ export const shareViaWebAPI = async (
     }
     return false
   } catch (err) {
-    console.error('Erreur lors du partage natif :', err)
     return false
   }
 }

@@ -9,7 +9,6 @@ export type { Tool, ToolPhoto, Category, Subcategory, CreateToolData, UpdateTool
 export class ToolsService {
   // Get all tools with pagination and filters
   async getTools(filters?: ToolFilters): Promise<PaginatedResponse<Tool>> {
-    console.log('🔍 [toolsService] getTools appelé avec filtres:', filters);
     
     // Récupérer TOUS les outils de l'API sans filtres côté serveur
     // L'API ne gère pas correctement les filtres search et location
@@ -17,11 +16,9 @@ export class ToolsService {
     
     // Access the nested data structure: response.data.data.data
     let allTools = response.data.data?.data || response.data.data;
-    console.log('📦 [toolsService] Outils récupérés de l\'API:', allTools?.length || 0);
     
     // Ensure we have a valid array
     if (!Array.isArray(allTools)) {
-      console.warn('⚠️ [toolsService] La réponse n\'est pas un tableau:', allTools);
       return {
         data: [],
         total: 0,
@@ -43,16 +40,13 @@ export class ToolsService {
       tool.moderationStatus === ModerationStatus.CONFIRMED && 
       tool.toolStatus === ToolStatus.PUBLISHED
     );
-    console.log('✅ [toolsService] Outils confirmés et publiés:', allTools.length);
     
     // Apply client-side filters
     if (filters) {
-      console.log('🔧 [toolsService] Application des filtres côté client...');
       
       // Filtrage par recherche de titre
       if (filters.search && filters.search.trim()) {
         const searchTerm = filters.search.toLowerCase().trim();
-        console.log('🔍 [toolsService] Filtrage par titre avec:', searchTerm);
         const beforeSearchCount = allTools.length;
         
         allTools = allTools.filter(tool => {
@@ -67,13 +61,11 @@ export class ToolsService {
           return titleMatch || descriptionMatch || brandMatch || modelMatch || categoryMatch || subcategoryMatch;
         });
         
-        console.log(`📊 [toolsService] Après filtrage par titre: ${allTools.length} (était ${beforeSearchCount})`);
       }
       
       // Filtrage par adresse/localisation
       if (filters.location && filters.location.trim()) {
         const locationTerm = filters.location.toLowerCase().trim();
-        console.log('📍 [toolsService] Filtrage par adresse avec:', locationTerm);
         const beforeLocationCount = allTools.length;
         
         allTools = allTools.filter(tool => {
@@ -81,35 +73,28 @@ export class ToolsService {
           return addressMatch;
         });
         
-        console.log(`📊 [toolsService] Après filtrage par adresse: ${allTools.length} (était ${beforeLocationCount})`);
       }
       
       // Autres filtres existants
       if (filters.categoryId && filters.categoryId !== 'all') {
         allTools = allTools.filter(tool => tool.categoryId === filters.categoryId);
-        console.log(`📊 [toolsService] Après filtrage par catégorie: ${allTools.length}`);
       }
       if (filters.subcategoryId && filters.subcategoryId !== 'all') {
         allTools = allTools.filter(tool => tool.subcategoryId === filters.subcategoryId);
-        console.log(`📊 [toolsService] Après filtrage par sous-catégorie: ${allTools.length}`);
       }
       if (filters.minPrice !== undefined) {
         allTools = allTools.filter(tool => tool.basePrice >= filters.minPrice!);
-        console.log(`📊 [toolsService] Après filtrage prix min: ${allTools.length}`);
       }
       if (filters.maxPrice !== undefined) {
         allTools = allTools.filter(tool => tool.basePrice <= filters.maxPrice!);
-        console.log(`📊 [toolsService] Après filtrage prix max: ${allTools.length}`);
       }
       if (filters.toolStatus) {
         allTools = allTools.filter(tool => tool.toolStatus === filters.toolStatus);
-        console.log(`📊 [toolsService] Après filtrage statut: ${allTools.length}`);
       }
     }
     
     // Apply sorting
     if (filters?.sortBy) {
-      console.log(`🔧 [toolsService] Tri par: ${filters.sortBy}, ordre: ${filters.sortOrder}`);
       allTools.sort((a, b) => {
         let aValue: any, bValue: any;
         
@@ -138,7 +123,6 @@ export class ToolsService {
         if (aValue > bValue) return filters.sortOrder === 'asc' ? 1 : -1;
         return 0;
       });
-      console.log(`✅ [toolsService] Tri terminé, premier outil: ${allTools[0]?.title} (${filters.sortBy}: ${allTools[0]?.[filters.sortBy]})`);
     }
     
     // Apply pagination
@@ -148,8 +132,6 @@ export class ToolsService {
     const endIndex = startIndex + limit;
     const paginatedTools = allTools.slice(startIndex, endIndex);
     
-    console.log(`📄 [toolsService] Pagination: page ${page}, limit ${limit}, total ${allTools.length}`);
-    console.log(`🎯 [toolsService] Retour de ${paginatedTools.length} outils sur ${allTools.length} trouvés`);
     
     return {
       data: paginatedTools,
@@ -168,7 +150,6 @@ export class ToolsService {
       // Access the nested data structure: response.data.data.data
       const tools = response.data.data?.data || response.data.data;
       if (!Array.isArray(tools)) {
-        console.warn('Featured tools response is not an array:', tools);
         return [];
       }
       
@@ -180,7 +161,6 @@ export class ToolsService {
           depositAmount: typeof tool.depositAmount === 'string' ? parseFloat(tool.depositAmount) : tool.depositAmount,
         }));
     } catch (error: any) {
-      console.error('Error fetching featured tools:', error);
       return [];
     }
   }
@@ -201,14 +181,6 @@ export class ToolsService {
 
       const response = await api.get<ApiResponse<Tool[]>>(`/tools/user/${userId}`);
       const tools = response.data.data?.data || response.data.data;
-console.log ('**********************************************')
-console.log ('**********************************************')
-console.log ('**********************************************')
-console.log(tools)
-console.log ('**********************************************')
-console.log ('**********************************************')
-console.log ('**********************************************')
-console.log ('**********************************************')
 
 
 
@@ -379,13 +351,11 @@ console.log ('**********************************************')
       
       // Ensure we return an array
       if (!Array.isArray(categories)) {
-        console.warn('Categories response is not an array:', categories);
         return [];
       }
       
       return categories;
     } catch (error: any) {
-      console.error('Error fetching categories:', error);
       return []; // Return empty array instead of throwing to prevent component crashes
     }
   }

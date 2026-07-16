@@ -68,7 +68,6 @@ const Wallet: React.FC = () => {
       setBalance(balanceData);
       setStats(statsData);
     } catch (error) {
-      console.error('Erreur lors du chargement des données du portefeuille:', error);
       toast.error('Erreur lors du chargement des données du portefeuille');
     } finally {
       setLoading(false);
@@ -90,7 +89,6 @@ const Wallet: React.FC = () => {
       setTransactions(response.data);
       setTotalPages(Math.ceil(response.total / 10));
     } catch (error) {
-      console.error('Erreur lors du chargement des transactions:', error);
       toast.error('Erreur lors du chargement des transactions');
     } finally {
       setTransactionLoading(false);
@@ -136,7 +134,6 @@ const Wallet: React.FC = () => {
       loadWalletData();
       loadTransactions();
     } catch (error) {
-      console.error('Erreur lors de la création de la demande de retrait:', error);
       toast.error('Erreur lors de la création de la demande de retrait');
     } finally {
       setWithdrawalLoading(false);

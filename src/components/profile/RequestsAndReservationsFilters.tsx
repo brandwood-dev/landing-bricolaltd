@@ -92,20 +92,7 @@ const RequestsAndReservationsFilters = ({
     }
 
     if (filters.periodFilter !== 'all') {
-      // const now = new Date()
-      // const threshold = new Date(now)
-      // const daysMap: Record<string, number> = { week: 7, month: 30, year: 365 }
-      // const days = daysMap[filters.periodFilter] || 0
-      // threshold.setDate(now.getDate() - days)
-      // threshold.setHours(0, 0, 0, 0)
-
-      // result = result.filter((item) => {
-      //   const raw = item.startDate
-      //   if (!raw) return false
-      //   const itemDate = new Date(raw)
-      //   if (isNaN(itemDate.getTime())) return false
-      //   return itemDate >= threshold
-      // })
+      
 
       //if period = week the filter by this week (from lundi to dimanche)
       if (filters.periodFilter === 'week') {
@@ -115,18 +102,15 @@ const RequestsAndReservationsFilters = ({
           now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1)
         )
         lundi.setHours(0, 0, 0, 0)
-        console.log('lundi', lundi)
         const dimanche = new Date(now)
         dimanche.setDate(
           now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1) + 6
         )
         dimanche.setHours(23, 59, 59, 999)
-        console.log('dimanche', dimanche)
       
         //result filter by date between lundi and dimanche
         result = result.filter((item) => {
           const raw = item.startDate
-          console.log('raw', raw)
           if (!raw) return false
           const itemDate = new Date(raw)
           if (isNaN(itemDate.getTime())) return false
@@ -138,14 +122,11 @@ const RequestsAndReservationsFilters = ({
          //identify the firstday and last day of current month
          const firstDay = new Date(now.getFullYear(), now.getMonth(), 1)
          firstDay.setHours(0, 0, 0, 0)
-         console.log('firstDay', firstDay)
          const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0)
          lastDay.setHours(23, 59, 59, 999)
-         console.log('lastDay', lastDay)
           //result filter by date between lundi and dimanche
           result = result.filter((item) => {
             const raw = item.startDate
-            console.log('raw', raw)
             if (!raw) return false
             const itemDate = new Date(raw)
             if (isNaN(itemDate.getTime())) return false
@@ -158,14 +139,11 @@ const RequestsAndReservationsFilters = ({
           //identify the firstday and last day of current year
           const firstDay = new Date(now.getFullYear(), 0, 1)
           firstDay.setHours(0, 0, 0, 0)
-          console.log('firstDay', firstDay)
           const lastDay = new Date(now.getFullYear(), 11, 31)
           lastDay.setHours(23, 59, 59, 999)
-          console.log('lastDay', lastDay)
           //result filter by date between firstDay and lastDay
           result = result.filter((item) => {
             const raw = item.startDate
-            console.log('raw', raw)
             if (!raw) return false
             const itemDate = new Date(raw)
             if (isNaN(itemDate.getTime())) return false

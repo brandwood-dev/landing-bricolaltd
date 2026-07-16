@@ -47,7 +47,7 @@ const AdCard = ({
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [toolData, setToolData] = useState<Tool | null>(null)
   const [isWindows, setIsWindows] = useState(false)
-  console.table('ad details', ad)
+
   const handleEditClick = async () => {
     try {
       const tool = await toolsService.getTool(ad.id)
@@ -55,8 +55,8 @@ const AdCard = ({
       setIsEditDialogOpen(true)
     } catch (error) {
       toast({
-        title: 'Erreur',
-        description: "Impossible de charger les détails de l'outil",
+        title: t('general.error'),
+        description: t('ads.load_tool_details_error'),
         variant: 'destructive',
       })
     }
@@ -75,9 +75,9 @@ const AdCard = ({
   const handleViewClick = () => {
     navigate(`/tool/${ad.id}`)
   }
-   useEffect(() => {
-     setIsWindows(window.navigator.userAgent.indexOf('Windows') !== -1)
-   }, [])
+  useEffect(() => {
+    setIsWindows(window.navigator.userAgent.indexOf('Windows') !== -1)
+  }, [])
   return (
     <>
       {isWindows ? (

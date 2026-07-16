@@ -36,17 +36,14 @@ const MapboxLocationPicker: React.FC<MapboxLocationPickerProps> = ({
 
   // Fonction pour obtenir les coordonnées par défaut basées sur le pays de l'utilisateur
   const getDefaultCoordinates = () => {
-    console.log('🌍 Getting default coordinates for user country:', userCountry)
     
     if (userCountry) {
       const countryCoords = getCountryCoordinates(userCountry)
-      console.log('📍 Country coordinates found:', countryCoords)
       return countryCoords
     }
     
     // Fallback vers Bahreïn si pas de pays spécifié
     const fallbackCoords = { lat: 26.0667, lng: 50.5577, zoom: 11 }
-    console.log('📍 Using fallback coordinates (Bahrain):', fallbackCoords)
     return fallbackCoords
   }
 
@@ -55,8 +52,7 @@ const MapboxLocationPicker: React.FC<MapboxLocationPickerProps> = ({
     try {
       const token = import.meta.env.VITE_MAPBOX_API_KEY
       if (!token) {
-        console.warn('⚠️ Mapbox token not found, skipping reverse geocoding')
-        return 'Adresse non disponible'
+        return t('map.address_unavailable')
       }
 
       const response = await fetch(
@@ -73,10 +69,12 @@ const MapboxLocationPicker: React.FC<MapboxLocationPickerProps> = ({
         return data.features[0].place_name
       }
       
-      return 'Adresse non trouvée'
+      return t('map.address_not_found')
     } catch (error) {
-      console.error('❌ Reverse geocoding error:', error)
-      return `Coordonnées: ${lat.toFixed(6)}, ${lng.toFixed(6)}`
+      return t('map.coordinates_fallback', {
+        lat: lat.toFixed(6),
+        lng: lng.toFixed(6),
+      })
     }
   }
 
@@ -88,19 +86,17 @@ const MapboxLocationPicker: React.FC<MapboxLocationPickerProps> = ({
       
       const token = import.meta.env.VITE_MAPBOX_API_KEY
       if (!token) {
-        throw new Error('Token Mapbox manquant dans les variables d\'environnement')
+        throw new Error(t('map.missing_token'))
       }
 
       // Vérifier si Mapbox GL JS est déjà chargé
       if (typeof window !== 'undefined' && (window as any).mapboxgl) {
-        console.log('✅ Mapbox GL JS already loaded')
         setMapboxLoaded(true)
         return (window as any).mapboxgl
       }
 
       // Charger Mapbox GL JS dynamiquement
       const mapboxgl = await import('mapbox-gl')
-      console.log('✅ Mapbox GL JS loaded successfully')
       
       // Vérifier la connectivité à l'API Mapbox
       const testResponse = await fetch(`https://api.mapbox.com/styles/v1/mapbox/streets-v12?access_token=${token}`, {
@@ -109,15 +105,18 @@ const MapboxLocationPicker: React.FC<MapboxLocationPickerProps> = ({
       })
       
       if (!testResponse.ok) {
-        throw new Error(`Impossible d'accéder à l'API Mapbox (${testResponse.status})`)
+        throw new Error(
+          t('map.api_access_error', { status: testResponse.status })
+        )
       }
       
       mapboxgl.default.accessToken = token
       setMapboxLoaded(true)
       return mapboxgl.default
     } catch (error) {
-      console.error('❌ Error loading Mapbox:', error)
-      setError(error instanceof Error ? error.message : 'Erreur de chargement de la carte')
+      setError(
+        error instanceof Error ? error.message : t('map.load_error')
+      )
       setMapboxLoaded(false)
       throw error
     }
@@ -131,7 +130,6 @@ const MapboxLocationPicker: React.FC<MapboxLocationPickerProps> = ({
       const mapboxgl = await loadMapbox()
       const defaultCoords = getDefaultCoordinates()
       
-      console.log('🗺️ Initializing map with coordinates:', defaultCoords)
 
       // Créer la carte
       map.current = new mapboxgl.Map({
@@ -156,21 +154,18 @@ const MapboxLocationPicker: React.FC<MapboxLocationPickerProps> = ({
 
       // Gérer les événements
       map.current.on('load', () => {
-        console.log('✅ Map loaded successfully')
         setIsLoading(false)
         setError(null)
       })
 
       map.current.on('error', (e: any) => {
-        console.error('❌ Map error:', e)
-        setError('Erreur de chargement de la carte. Vérifiez votre connexion internet.')
+        setError(t('map.internet_connection_error'))
         setIsLoading(false)
       })
 
       // Clic sur la carte
       map.current.on('click', async (e: any) => {
         const { lng, lat } = e.lngLat
-        console.log('🖱️ Map clicked at:', { lat, lng })
         
         marker.current.setLngLat([lng, lat])
         setCurrentCoordinates({ lat, lng })
@@ -186,7 +181,6 @@ const MapboxLocationPicker: React.FC<MapboxLocationPickerProps> = ({
       marker.current.on('dragend', async () => {
         const lngLat = marker.current.getLngLat()
         const { lng, lat } = lngLat
-        console.log('🔄 Marker dragged to:', { lat, lng })
         
         setCurrentCoordinates({ lat, lng })
         onCoordinatesChange({ lat, lng })
@@ -199,14 +193,12 @@ const MapboxLocationPicker: React.FC<MapboxLocationPickerProps> = ({
 
       // Définir les coordonnées initiales si fournies
       if (coordinates) {
-        console.log('📍 Setting initial coordinates:', coordinates)
         marker.current.setLngLat([coordinates.lng, coordinates.lat])
         map.current.setCenter([coordinates.lng, coordinates.lat])
         setCurrentCoordinates(coordinates)
       }
 
     } catch (error) {
-      console.error('❌ Failed to initialize map:', error)
       setIsLoading(false)
     }
   }
@@ -225,7 +217,6 @@ const MapboxLocationPicker: React.FC<MapboxLocationPickerProps> = ({
   // Effet pour mettre à jour les coordonnées
   useEffect(() => {
     if (map.current && marker.current && coordinates) {
-      console.log('🔄 Updating coordinates:', coordinates)
       marker.current.setLngLat([coordinates.lng, coordinates.lat])
       map.current.setCenter([coordinates.lng, coordinates.lat])
       setCurrentCoordinates(coordinates)
@@ -235,7 +226,6 @@ const MapboxLocationPicker: React.FC<MapboxLocationPickerProps> = ({
   // Fonction pour réinitialiser à la position par défaut
   const resetToDefaultLocation = () => {
     const defaultCoords = getDefaultCoordinates()
-    console.log('🔄 Resetting to default location:', defaultCoords)
     
     if (map.current && marker.current) {
       marker.current.setLngLat([defaultCoords.lng, defaultCoords.lat])
@@ -251,7 +241,6 @@ const MapboxLocationPicker: React.FC<MapboxLocationPickerProps> = ({
 
   // Fonction pour réessayer le chargement
   const retryLoading = () => {
-    console.log('🔄 Retrying map loading...')
     setError(null)
     setIsLoading(true)
     initializeMap()
@@ -335,8 +324,8 @@ const MapboxLocationPicker: React.FC<MapboxLocationPickerProps> = ({
         {currentCoordinates && (
           <div className="absolute bottom-4 left-4 bg-white bg-opacity-90 rounded-lg p-2 shadow-lg">
             <p className="text-xs text-gray-600">
-              Lat: {typeof currentCoordinates.lat === 'number' ? currentCoordinates.lat.toFixed(6) : parseFloat(currentCoordinates.lat || 0).toFixed(6)}, 
-              Lng: {typeof currentCoordinates.lng === 'number' ? currentCoordinates.lng.toFixed(6) : parseFloat(currentCoordinates.lng || 0).toFixed(6)}
+              {t('map.latitude')}: {typeof currentCoordinates.lat === 'number' ? currentCoordinates.lat.toFixed(6) : parseFloat(currentCoordinates.lat || 0).toFixed(6)}, 
+              {t('map.longitude')}: {typeof currentCoordinates.lng === 'number' ? currentCoordinates.lng.toFixed(6) : parseFloat(currentCoordinates.lng || 0).toFixed(6)}
             </p>
           </div>
         )}
