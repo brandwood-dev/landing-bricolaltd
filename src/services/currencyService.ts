@@ -1,6 +1,18 @@
-const API_BASE_URL = import.meta.env.VITE_BASE_URL
-  ? `${import.meta.env.VITE_BASE_URL}`
-  : 'http://localhost:4000/api'
+const normalizeApiBaseUrl = (rawBaseUrl?: string): string => {
+  if (!rawBaseUrl) {
+    return 'http://localhost:4000/api'
+  }
+
+  const trimmedBaseUrl = rawBaseUrl.replace(/\/+$/, '')
+  return trimmedBaseUrl.endsWith('/api')
+    ? trimmedBaseUrl
+    : `${trimmedBaseUrl}/api`
+}
+
+const API_BASE_URL = normalizeApiBaseUrl(import.meta.env.VITE_BASE_URL)
+const DEBUG_SERVER_URL = 'http://127.0.0.1:7777/event'
+const DEBUG_SESSION_ID = 'currency-price-error'
+const DEBUG_RUN_ID = 'post-fix'
 
 export interface ExchangeRateResponse {
   fromCurrency: string
@@ -40,6 +52,12 @@ export interface CurrencyRequestStats {
   networkCallsByEndpoint: Record<string, number>
   requestDurationsMsByEndpoint: Record<string, number>
   lastRequestAt: string | null
+}
+
+type ResponseEnvelope<T> = {
+  success?: boolean
+  message?: string
+  data?: T | ResponseEnvelope<T>
 }
 
 class CurrencyService {
@@ -156,6 +174,22 @@ class CurrencyService {
     return Date.now() - timestamp < this.CACHE_DURATION
   }
 
+  private unwrapResponseData<T>(payload: unknown): T {
+    let current: unknown = payload
+
+    while (
+      current &&
+      typeof current === 'object' &&
+      'data' in (current as Record<string, unknown>) &&
+      ('success' in (current as Record<string, unknown>) ||
+        'message' in (current as Record<string, unknown>))
+    ) {
+      current = (current as ResponseEnvelope<T>).data
+    }
+
+    return current as T
+  }
+
   private async fetchWithCache<T>(
     endpoint: string,
     params: Record<string, string> = {}
@@ -164,6 +198,9 @@ class CurrencyService {
     const cached = this.cache.get(cacheKey)
 
     if (cached && this.isValidCache(cached.timestamp)) {
+      // #region debug-point C:currency-cache-hit
+      fetch(DEBUG_SERVER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:DEBUG_SESSION_ID,runId:DEBUG_RUN_ID,hypothesisId:'C',location:'currencyService.ts:fetchWithCache:cache-hit',msg:'[DEBUG] currency cache hit',data:{endpoint,params,cacheKey},ts:Date.now()})}).catch(()=>{})
+      // #endregion
       this.recordCacheHit()
       return cached.data
     }
@@ -179,16 +216,26 @@ class CurrencyService {
     }`
 
     try {
+      // #region debug-point C:currency-request-start
+      fetch(DEBUG_SERVER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:DEBUG_SESSION_ID,runId:DEBUG_RUN_ID,hypothesisId:'C',location:'currencyService.ts:fetchWithCache:request-start',msg:'[DEBUG] currency request start',data:{endpoint,params,url,cacheKey},ts:Date.now()})}).catch(()=>{})
+      // #endregion
       const startTime = Date.now()
       const response = await fetch(url)
       const requestTime = Date.now() - startTime
       this.recordNetworkCall(endpoint, requestTime)
 
+      // #region debug-point C:currency-response-meta
+      fetch(DEBUG_SERVER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:DEBUG_SESSION_ID,runId:DEBUG_RUN_ID,hypothesisId:'C',location:'currencyService.ts:fetchWithCache:response-meta',msg:'[DEBUG] currency response meta',data:{endpoint,url,status:response.status,ok:response.ok,requestTime},ts:Date.now()})}).catch(()=>{})
+      // #endregion
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
       const result = await response.json()
+
+      // #region debug-point C:currency-response-shape
+      fetch(DEBUG_SERVER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:DEBUG_SESSION_ID,runId:DEBUG_RUN_ID,hypothesisId:'C',location:'currencyService.ts:fetchWithCache:response-shape',msg:'[DEBUG] currency response shape',data:{endpoint,hasData:!!result?.data,dataKeys:result?.data&&typeof result.data==='object'?Object.keys(result.data):[],ratesKeys:result?.data?.rates&&typeof result.data.rates==='object'?Object.keys(result.data.rates):[]},ts:Date.now()})}).catch(()=>{})
+      // #endregion
 
       if (!result || typeof result !== 'object') {
         throw new Error('Invalid response structure')
@@ -198,13 +245,22 @@ class CurrencyService {
         throw new Error('Missing data field in response')
       }
 
+      const payload = this.unwrapResponseData<T>(result)
+
+      if (!payload || typeof payload !== 'object') {
+        throw new Error('Missing normalized payload in response')
+      }
+
       this.cache.set(cacheKey, {
-        data: result.data,
+        data: payload,
         timestamp: Date.now(),
       })
 
-      return result.data
+      return payload
     } catch (error) {
+      // #region debug-point C:currency-request-error
+      fetch(DEBUG_SERVER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:DEBUG_SESSION_ID,runId:DEBUG_RUN_ID,hypothesisId:'C',location:'currencyService.ts:fetchWithCache:error',msg:'[DEBUG] currency request error',data:{endpoint,params,url,error:error instanceof Error?error.message:String(error)},ts:Date.now()})}).catch(()=>{})
+      // #endregion
       throw error
     }
   }

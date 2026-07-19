@@ -97,8 +97,8 @@ export interface UseCurrencyOptimizedReturn {
 }
 
 export interface UsePaymentRatesReturn {
-  getFreshRate: (from: string, to: string) => Promise<number>;
-  calculatePaymentAmount: (amount: number, from: string, to: string) => Promise<number>;
+  getFreshRate: (from: string, to: string) => Promise<number | null>;
+  calculatePaymentAmount: (amount: number, from: string, to: string) => Promise<number | null>;
   isRateFresh: boolean;
   lastUpdate: Date;
 }

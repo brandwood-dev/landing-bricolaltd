@@ -39,7 +39,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   paymentMethod = 'card',
 }) => {
   const { t } = useLanguage()
-  const { currency, calculatePrice } = useCurrency()
+  const { currency, convertInstantly } = useCurrency()
   const stripe = useStripe()
   const elements = useElements()
 
@@ -70,8 +70,13 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null)
 
   // Calculer le montant affiché dans la devise sélectionnée
-  const displayAmount = calculatePrice(amount, 'GBP', currency.code)
   const amountInGBP = amount // Le montant est déjà en GBP
+  const displayAmount =
+    currency.code === 'GBP'
+      ? amountInGBP
+      : convertInstantly(amountInGBP, 'GBP', currency.code)
+  const isDisplayAmountReady =
+    currency.code === 'GBP' || displayAmount !== null
 
   // 🔍 LOGS DE DÉBOGAGE ULTRA-DÉTAILLÉS POUR TRACER LE FLUX DES MONTANTS
 
@@ -121,7 +126,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               source: 'booking_payment',
               paymentMethod: paymentMethod,
               displayCurrency: currency.code,
-              displayAmount: displayAmount,
+              displayAmount: displayAmount ?? null,
             },
           }
 
@@ -260,7 +265,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           source: 'booking_payment',
           paymentMethod: 'card',
           displayCurrency: currency.code,
-          displayAmount: displayAmount,
+          displayAmount: displayAmount ?? null,
         },
       }
 
@@ -353,7 +358,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             <div className='text-lg font-semibold'>
               {t('payment_form.amount_to_pay')}{' '}
               <OptimizedPriceDisplay
-                price={displayAmount}
+                price={amount}
                 baseCurrency={'GBP'}
                 size='lg'
                 cible='totalPrice'
@@ -376,7 +381,14 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             </Alert>
           )}
 
-          {paymentRequest && canMakePayment ? (
+          {!isDisplayAmountReady && (
+            <Alert variant='destructive'>
+              <AlertCircle className='h-4 w-4' />
+              <AlertDescription>{t('pricing.load_error')}</AlertDescription>
+            </Alert>
+          )}
+
+          {paymentRequest && canMakePayment && isDisplayAmountReady ? (
             <div className='w-full'>
               <PaymentRequestButtonElement
                 options={{ paymentRequest }}
@@ -461,7 +473,12 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             type='submit'
             className='w-full'
             disabled={
-              !stripe || !cardComplete || processing || disabled || loading
+              !stripe ||
+              !cardComplete ||
+              processing ||
+              disabled ||
+              loading ||
+              !isDisplayAmountReady
             }
           >
             {processing ? (

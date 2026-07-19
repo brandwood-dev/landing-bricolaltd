@@ -54,7 +54,7 @@ const EnhancedPaymentForm: React.FC<EnhancedPaymentFormProps> = ({
   show3DSIndicator = true,
 }) => {
   const { t } = useLanguage()
-  const { currency, calculatePrice } = useCurrency()
+  const { currency, convertInstantly, formatInstantPrice } = useCurrency()
   const stripe = useStripe()
   const elements = useElements()
 
@@ -114,8 +114,13 @@ const EnhancedPaymentForm: React.FC<EnhancedPaymentFormProps> = ({
   })
 
   // Calculer le montant affiché dans la devise sélectionnée
-  const displayAmount = calculatePrice(amount, 'GBP', currency)
+  const displayAmount =
+    currency.code === 'GBP'
+      ? amount
+      : convertInstantly(amount, 'GBP', currency.code)
   const amountInGBP = amount
+  const isDisplayAmountReady =
+    currency.code === 'GBP' || displayAmount !== null
 
   // Initialize payment request for Google Pay/Apple Pay
   useEffect(() => {
@@ -164,7 +169,7 @@ const EnhancedPaymentForm: React.FC<EnhancedPaymentFormProps> = ({
               source: 'digital_wallet_payment',
               paymentMethod: paymentMethod,
               displayCurrency: currency.code,
-              displayAmount: displayAmount,
+              displayAmount: displayAmount ?? null,
             },
           }),
         })
@@ -212,7 +217,7 @@ const EnhancedPaymentForm: React.FC<EnhancedPaymentFormProps> = ({
     })
 
     setPaymentRequest(pr)
-  }, [stripe, paymentMethod, amountInGBP, bookingId, currency, displayAmount, t, onPaymentSuccess, onPaymentError])
+  }, [stripe, paymentMethod, amountInGBP, bookingId, currency.code, displayAmount, t, onPaymentSuccess, onPaymentError])
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -248,7 +253,7 @@ const EnhancedPaymentForm: React.FC<EnhancedPaymentFormProps> = ({
           source: 'booking_payment',
           paymentMethod: 'card',
           displayCurrency: currency.code,
-          displayAmount: displayAmount,
+          displayAmount: displayAmount ?? null,
           cardholderName: cardholderName,
           cardholderEmail: cardholderEmail,
         },
@@ -389,7 +394,13 @@ const EnhancedPaymentForm: React.FC<EnhancedPaymentFormProps> = ({
           {/* Affichage du montant dans la devise sélectionnée avec conversion GBP */}
           <div className='text-center space-y-2'>
             <div className='text-lg font-semibold'>
-              {t('total_amount')}: <OptimizedPriceDisplay amount={displayAmount} currency={currency.code} />
+              {t('total_amount')}{' '}
+              <OptimizedPriceDisplay
+                price={amountInGBP}
+                baseCurrency='GBP'
+                size='lg'
+                cible='totalPrice'
+              />
             </div>
             <div className='text-sm text-gray-500'>
               {t('original_amount')}: £{amountInGBP.toFixed(2)} GBP
@@ -403,7 +414,14 @@ const EnhancedPaymentForm: React.FC<EnhancedPaymentFormProps> = ({
             </Alert>
           )}
 
-          {canMakePayment ? (
+          {!isDisplayAmountReady && (
+            <Alert variant='destructive'>
+              <AlertCircle className='h-4 w-4' />
+              <AlertDescription>{t('pricing.load_error')}</AlertDescription>
+            </Alert>
+          )}
+
+          {canMakePayment && isDisplayAmountReady ? (
             <PaymentRequestButtonElement
               options={{ paymentRequest }}
               className='PaymentRequestButton'
@@ -442,7 +460,13 @@ const EnhancedPaymentForm: React.FC<EnhancedPaymentFormProps> = ({
           {/* Amount Display */}
           <div className='text-center space-y-2'>
             <div className='text-lg font-semibold'>
-              {t('total_amount')}: <OptimizedPriceDisplay amount={displayAmount} currency={currency.code} />
+              {t('total_amount')}{' '}
+              <OptimizedPriceDisplay
+                price={amountInGBP}
+                baseCurrency='GBP'
+                size='lg'
+                cible='totalPrice'
+              />
             </div>
             <div className='text-sm text-gray-500'>
               {t('original_amount')}: £{amountInGBP.toFixed(2)} GBP
@@ -453,6 +477,13 @@ const EnhancedPaymentForm: React.FC<EnhancedPaymentFormProps> = ({
             <Alert variant='destructive'>
               <AlertCircle className='h-4 w-4' />
               <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {!isDisplayAmountReady && (
+            <Alert variant='destructive'>
+              <AlertCircle className='h-4 w-4' />
+              <AlertDescription>{t('pricing.load_error')}</AlertDescription>
             </Alert>
           )}
 
@@ -591,7 +622,7 @@ const EnhancedPaymentForm: React.FC<EnhancedPaymentFormProps> = ({
           <Button
             type='submit'
             onClick={handleSubmit}
-            disabled={!isFormValid || threeDSProcessing}
+            disabled={!isFormValid || threeDSProcessing || !isDisplayAmountReady}
             className='w-full'
             size='lg'
           >
@@ -603,7 +634,12 @@ const EnhancedPaymentForm: React.FC<EnhancedPaymentFormProps> = ({
             ) : (
               <>
                 <CreditCard className='mr-2 h-4 w-4' />
-                {t('pay_amount', { amount: displayAmount })}
+                {t('pay_amount', {
+                  amount:
+                    displayAmount !== null
+                      ? formatInstantPrice(amountInGBP, 'GBP', currency.code)
+                      : t('pricing.load_error'),
+                })}
               </>
             )}
           </Button>

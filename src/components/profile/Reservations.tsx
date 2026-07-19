@@ -462,7 +462,7 @@ const Reservations = () => {
     if (!user?.id) {
       toast({
         title: t('general.error'),
-        description: 'Utilisateur non connecté',
+        description: t('reservations.user_not_connected'),
         variant: 'destructive',
       })
       return
@@ -693,8 +693,10 @@ const Reservations = () => {
 
     if (invalidFiles.length > 0) {
       toast({
-        title: 'Fichiers trop volumineux',
-        description: `${invalidFiles.length} fichier(s) dépassent la limite de 1MB et ont été ignorés.`,
+        title: t('reservations.files_too_large_title'),
+        description: t('reservations.files_too_large_description', {
+          count: invalidFiles.length,
+        }),
         variant: 'destructive',
       })
     }
@@ -702,8 +704,10 @@ const Reservations = () => {
     if (validFiles.length > 0) {
       setUploadedFiles((prev) => [...prev, ...validFiles])
       toast({
-        title: 'Fichiers ajoutés',
-        description: `${validFiles.length} fichier(s) ajouté(s) avec succès.`,
+        title: t('reservations.files_added_title'),
+        description: t('reservations.files_added_description', {
+          count: validFiles.length,
+        }),
       })
     }
   }

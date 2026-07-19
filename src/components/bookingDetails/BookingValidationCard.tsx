@@ -109,7 +109,7 @@ const BookingValidationCard = ({
     )
   }
 
-  if (isOwner) {
+  if (isOwner && isStartDateReached) {
     return (
       <div className='space-y-4'>
         <div>

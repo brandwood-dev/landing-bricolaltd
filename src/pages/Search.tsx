@@ -88,7 +88,7 @@ const Search = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { calculateBulkPrices, refreshRates } = useCurrencyOptimized()
-  const { selectedCurrency, calculatePrice, formatPrice } = useCurrency()
+  const { currency, getInstantRate, formatPrice } = useCurrency()
 
   // Debug log pour vérifier la valeur de isAuthenticated
 
@@ -124,20 +124,22 @@ const Search = () => {
   // Currency conversion functions for price slider
   const convertGBPToUserCurrency = useCallback(
     (gbpPrice: number) => {
-      if (selectedCurrency === 'GBP') return gbpPrice
-      return calculatePrice(gbpPrice, 'GBP') || gbpPrice
+      if (currency.code === 'GBP') return gbpPrice
+
+      const rate = getInstantRate('GBP', currency.code)
+      return rate === null ? 0 : gbpPrice * rate
     },
-    [selectedCurrency, calculatePrice]
+    [currency.code, getInstantRate]
   )
 
   const convertUserCurrencyToGBP = useCallback(
     (userPrice: number) => {
-      if (selectedCurrency === 'GBP') return userPrice
-      // Convert back to GBP by dividing by the rate
-      const rate = calculatePrice(1, 'GBP') || 1
-      return userPrice / rate
+      if (currency.code === 'GBP') return userPrice
+
+      const rate = getInstantRate('GBP', currency.code)
+      return rate ? userPrice / rate : 0
     },
-    [selectedCurrency, calculatePrice]
+    [currency.code, getInstantRate]
   )
 
   // Convert slider range for display
@@ -595,10 +597,10 @@ const Search = () => {
                           max={Math.round(convertGBPToUserCurrency(500))}
                           step={1}
                           className='mt-2'
-                          currencySymbol={selectedCurrency}
+                          currencySymbol={currency.code}
                           convertValue={(value) => value}
                           formatValue={(value) =>
-                            formatPrice(value, selectedCurrency)
+                            formatPrice(value, currency.code)
                           }
                         />
                       </div>

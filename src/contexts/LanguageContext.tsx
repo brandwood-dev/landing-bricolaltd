@@ -97,7 +97,7 @@ const translations = {
       "En cas d'annulation par le propriétaire, le locataire sera intégralement remboursé.",
     'requests.owner_reject_refund_policy':
       'En cas de refus par le propriétaire, le locataire sera intégralement remboursé.',
-    'requests.renter_cancel_refund_full':
+    'requests.renter_cancel_refund_full': 
       'Annulation plus de 24h avant : Remboursement intégral.',
     'requests.renter_cancel_refund_none':
       'Annulation moins de 24h avant : Aucun remboursement.',
@@ -1384,7 +1384,7 @@ const translations = {
       'Êtes-vous sûr de vouloir accepter cette demande de location ?',
     'request.validation_code_accepted': 'Remise confirmée',
     'request.validation_code_accepted_message':
-      "L'outil a été remis avec succès. Le statut passe à 'En cours'.",
+      "Le code est bien valide. Le statut passe à 'En cours'.",
     'request.validation_code_rejected': 'Code invalide',
     'request.validation_code_rejected_message':
       'Le code de validation est incorrect.',
@@ -1696,8 +1696,15 @@ const translations = {
     'reservations.claim_exists_title': 'Réclamation existante',
     'reservations.claim_exists_description':
       'Une réclamation active existe déjà pour cette réservation.',
+    'reservations.user_not_connected': 'Utilisateur non connecté',
     'reservations.files_too_large':
       'Certains fichiers dépassent la taille limite de 1MB.',
+    'reservations.files_too_large_title': 'Fichiers trop volumineux',
+    'reservations.files_too_large_description':
+      '{count} fichier(s) dépassent la limite de 1MB et ont été ignoré(s).',
+    'reservations.files_added_title': 'Fichiers ajoutés',
+    'reservations.files_added_description':
+      '{count} fichier(s) ajouté(s) avec succès.',
     'reservations.copy_code_failed': 'Impossible de copier le code.',
     'reservations.review_exists_title': 'Avis déjà existant',
     'reservations.review_exists_description':
@@ -3748,7 +3755,7 @@ const translations = {
     'request.confirm': 'Confirm',
     'request.validation_code_accepted': 'Return confirmed',
     'request.validation_code_accepted_message':
-      'The tool has been successfully returned. The status is now "In Progress".',
+      'The code is valid. The status is now "In Progress".',
     'request.validation_code_rejected': 'Invalid Code',
     'request.validation_code_rejected_message':
       'The verification code is incorrect!',
@@ -4018,8 +4025,15 @@ const translations = {
     'reservations.claim_exists_title': 'Existing claim',
     'reservations.claim_exists_description':
       'An active claim already exists for this booking.',
+    'reservations.user_not_connected': 'User not connected',
     'reservations.files_too_large':
       'Some files exceed the 1MB size limit.',
+    'reservations.files_too_large_title': 'Files too large',
+    'reservations.files_too_large_description':
+      '{count} file(s) exceed the 1MB limit and were ignored.',
+    'reservations.files_added_title': 'Files added',
+    'reservations.files_added_description':
+      '{count} file(s) added successfully.',
     'reservations.copy_code_failed': 'Unable to copy the code.',
     'reservations.review_exists_title': 'Review already exists',
     'reservations.review_exists_description':
@@ -6481,7 +6495,7 @@ const translations = {
     'request.confirm': 'تأكيد',
     'request.validation_code_accepted': 'تم تأكيد الإرجاع',
     'request.validation_code_accepted_message':
-      'تمت إعادة الأداة بنجاح. الحالة الآن "قيد التقدم".',
+      'تأكيد الرمز, والحجز قد بدأ',
     'request.validation_code_rejected': 'رمز غير صالح',
     'request.validation_code_rejected_message': 'رمز التحقق غير صحيح!',
     'request.contact_renter_information': 'معلومات المستأجر',
@@ -6699,8 +6713,15 @@ const translations = {
     'reservations.claim_exists_title': 'يوجد نزاع قائم',
     'reservations.claim_exists_description':
       'يوجد نزاع نشط بالفعل لهذا الحجز.',
+    'reservations.user_not_connected': 'المستخدم غير متصل',
     'reservations.files_too_large':
       'بعض الملفات تتجاوز الحد الأقصى البالغ 1 ميغابايت.',
+    'reservations.files_too_large_title': 'الملفات كبيرة جدًا',
+    'reservations.files_too_large_description':
+      'تم تجاهل {count} ملف(ات) لأنها تتجاوز حد 1 ميغابايت.',
+    'reservations.files_added_title': 'تمت إضافة الملفات',
+    'reservations.files_added_description':
+      'تمت إضافة {count} ملف(ات) بنجاح.',
     'reservations.copy_code_failed': 'تعذر نسخ الرمز.',
     'reservations.review_exists_title': 'المراجعة موجودة بالفعل',
     'reservations.review_exists_description':

@@ -18,7 +18,13 @@ export const usePaymentRates = (): UsePaymentRatesReturn => {
    * Obtient un taux de change frais pour les paiements
    * Force une récupération si le cache est trop ancien
    */
-  const getFreshRate = useCallback(async (from: string, to: string): Promise<number> => {
+  const getFreshRate = useCallback(async (
+    from: string,
+    to: string,
+  ): Promise<number | null> => {
+    if (from === to) {
+      return 1
+    }
     
     // Vérifier l'âge du cache
     const cacheAge = optimizedCalculator.getCacheAge();
@@ -30,7 +36,7 @@ export const usePaymentRates = (): UsePaymentRatesReturn => {
     }
     
     // Calculer le taux avec le cache frais
-    const rate = optimizedCalculator.calculatePrice(1, from, to);
+    const rate = optimizedCalculator.calculatePriceStrict(1, from, to);
     
     return rate;
   }, [refreshRates]);
@@ -42,13 +48,16 @@ export const usePaymentRates = (): UsePaymentRatesReturn => {
     amount: number, 
     from: string, 
     to: string
-  ): Promise<number> => {
+  ): Promise<number | null> => {
     
     if (from === to) {
       return amount;
     }
     
     const rate = await getFreshRate(from, to);
+    if (rate === null) {
+      return null;
+    }
     const result = amount * rate;
     
     return result;

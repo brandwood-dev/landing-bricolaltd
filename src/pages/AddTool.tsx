@@ -40,7 +40,7 @@ const AddTool = () => {
   const { t, language } = useLanguage()
   const { user } = useAuth()
   const currencyContext = useCurrency()
-  const { currency, formatPrice, convertPrice } = currencyContext
+  const { currency, formatPrice, convertPrice, getInstantRate } = currencyContext
   const navigate = useNavigate()
   const location = useLocation()
   const { toast } = useToast()
@@ -78,80 +78,77 @@ const AddTool = () => {
   // Currency conversion state
   const [priceInGBP, setPriceInGBP] = useState<number | null>(null)
   const [depositInGBP, setDepositInGBP] = useState<number | null>(null)
+  const pricingRatesReady =
+    currency.code === 'GBP' || getInstantRate('GBP', currency.code) !== null
 
-  // Real-time currency conversion for price using instant conversion
+  // Keep displayed values derived from canonical GBP amounts when currency changes.
   useEffect(() => {
-    if (!formData.basePrice) {
-      setPriceInGBP(null)
-      // Re-validate when price is cleared
-      if (formData.basePrice !== undefined) {
-        const validation = validatePrice(formData.basePrice, null)
-        setPriceValidation({
-          isValid: validation.isValid,
-          message: validation.message,
-        })
-      }
+    if (currency.code === 'GBP') {
+      setFormData((prev) => ({
+        ...prev,
+        basePrice: priceInGBP ?? undefined,
+        depositAmount: depositInGBP ?? undefined,
+      }))
       return
     }
 
-    let convertedAmount: number
-    if (currency.code === 'GBP') {
-      convertedAmount = formData.basePrice
-      setPriceInGBP(formData.basePrice)
-    } else {
-      // Use instant conversion from CurrencyContext
-      convertedAmount = currencyContext.convertInstantly(
-        formData.basePrice,
-        currency.code,
-        'GBP',
-      )
-      setPriceInGBP(convertedAmount)
+    if (!pricingRatesReady) {
+      return
     }
 
-    // Trigger validation with the converted GBP amount
-    const validation = validatePrice(formData.basePrice, convertedAmount)
+    const displayPrice =
+      priceInGBP === null
+        ? undefined
+        : currencyContext.convertInstantly(priceInGBP, 'GBP', currency.code)
+    const displayDeposit =
+      depositInGBP === null
+        ? undefined
+        : currencyContext.convertInstantly(depositInGBP, 'GBP', currency.code)
+
+    setFormData((prev) => ({
+      ...prev,
+      basePrice:
+        displayPrice === null || displayPrice === undefined
+          ? undefined
+          : Number(displayPrice.toFixed(2)),
+      depositAmount:
+        displayDeposit === null || displayDeposit === undefined
+          ? undefined
+          : Number(displayDeposit.toFixed(2)),
+    }))
+  }, [
+    currency.code,
+    pricingRatesReady,
+    priceInGBP,
+    depositInGBP,
+    currencyContext,
+  ])
+
+  useEffect(() => {
+    if (formData.basePrice === undefined) {
+      setPriceValidation({ isValid: true, message: '' })
+      return
+    }
+
+    const validation = validatePrice(formData.basePrice, priceInGBP)
     setPriceValidation({
       isValid: validation.isValid,
       message: validation.message,
     })
-  }, [formData.basePrice, currency.code, currencyContext, validatePrice])
+  }, [formData.basePrice, priceInGBP, validatePrice])
 
-  // Real-time currency conversion for deposit using instant conversion
   useEffect(() => {
-    if (!formData.depositAmount) {
-      setDepositInGBP(null)
-      // Re-validate when deposit is cleared
-      if (formData.depositAmount !== undefined) {
-        const validation = validateDeposit(formData.depositAmount, null)
-        setDepositValidation({
-          isValid: validation.isValid,
-          message: validation.message,
-        })
-      }
+    if (formData.depositAmount === undefined) {
+      setDepositValidation({ isValid: true, message: '' })
       return
     }
 
-    let convertedAmount: number
-    if (currency.code === 'GBP') {
-      convertedAmount = formData.depositAmount
-      setDepositInGBP(formData.depositAmount)
-    } else {
-      // Use instant conversion from CurrencyContext
-      convertedAmount = currencyContext.convertInstantly(
-        formData.depositAmount,
-        currency.code,
-        'GBP',
-      )
-      setDepositInGBP(convertedAmount)
-    }
-
-    // Trigger validation with the converted GBP amount
-    const validation = validateDeposit(formData.depositAmount, convertedAmount)
+    const validation = validateDeposit(formData.depositAmount, depositInGBP)
     setDepositValidation({
       isValid: validation.isValid,
       message: validation.message,
     })
-  }, [formData.depositAmount, currency.code, currencyContext, validateDeposit])
+  }, [formData.depositAmount, depositInGBP, validateDeposit])
 
   // File upload state
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
@@ -269,27 +266,81 @@ const AddTool = () => {
       })
     }
 
-    if (field === 'basePrice') {
-      const validation = validatePrice(value, priceInGBP)
-      setPriceValidation({
-        isValid: validation.isValid,
-        message: validation.message,
-      })
-    }
-
-    if (field === 'depositAmount') {
-      const validation = validateDeposit(value, depositInGBP)
-      setDepositValidation({
-        isValid: validation.isValid,
-        message: validation.message,
-      })
-    }
-
     // Handle category change to load subcategories
     if (field === 'categoryId' && value) {
       loadSubcategories(value)
       setFormData((prev) => ({ ...prev, subcategoryId: '' })) // Reset subcategory
     }
+  }
+
+  const handlePriceChange = (value?: number) => {
+    setFormData((prev) => ({ ...prev, basePrice: value }))
+
+    if (value === undefined) {
+      setPriceInGBP(null)
+      setPriceValidation({ isValid: true, message: '' })
+      return
+    }
+
+    if (currency.code === 'GBP') {
+      setPriceInGBP(value)
+      const validation = validatePrice(value, value)
+      setPriceValidation({
+        isValid: validation.isValid,
+        message: validation.message,
+      })
+      return
+    }
+
+    const convertedValue = currencyContext.convertInstantly(
+      value,
+      currency.code,
+      'GBP',
+    )
+    const normalizedValue =
+      convertedValue === null ? null : Number(convertedValue.toFixed(2))
+    setPriceInGBP(normalizedValue)
+
+    const validation = validatePrice(value, normalizedValue)
+    setPriceValidation({
+      isValid: validation.isValid,
+      message: validation.message,
+    })
+  }
+
+  const handleDepositChange = (value?: number) => {
+    setFormData((prev) => ({ ...prev, depositAmount: value }))
+
+    if (value === undefined) {
+      setDepositInGBP(null)
+      setDepositValidation({ isValid: true, message: '' })
+      return
+    }
+
+    if (currency.code === 'GBP') {
+      setDepositInGBP(value)
+      const validation = validateDeposit(value, value)
+      setDepositValidation({
+        isValid: validation.isValid,
+        message: validation.message,
+      })
+      return
+    }
+
+    const convertedValue = currencyContext.convertInstantly(
+      value,
+      currency.code,
+      'GBP',
+    )
+    const normalizedValue =
+      convertedValue === null ? null : Number(convertedValue.toFixed(2))
+    setDepositInGBP(normalizedValue)
+
+    const validation = validateDeposit(value, normalizedValue)
+    setDepositValidation({
+      isValid: validation.isValid,
+      message: validation.message,
+    })
   }
 
   // Load categories on component mount
@@ -406,6 +457,20 @@ const AddTool = () => {
 
   // Form validation
   const validateForm = () => {
+    if (
+      currency.code !== 'GBP' &&
+      (!pricingRatesReady ||
+        priceInGBP === null ||
+        (formData.depositAmount !== undefined && depositInGBP === null))
+    ) {
+      toast({
+        title: t('general.error'),
+        description: t('pricing.load_error'),
+        variant: 'destructive',
+      })
+      return false
+    }
+
     if (!formData.title?.trim()) {
       toast({
         title: t('add_tool.toast.required_field.title'),
@@ -978,10 +1043,10 @@ const AddTool = () => {
                                     currency.code,
                                     'GBP',
                                   )
-                            if (numValue && gbpValue > 500) {
+                            if (numValue && gbpValue !== null && gbpValue > 500) {
                               return
                             }
-                            handleInputChange('basePrice', numValue)
+                            handlePriceChange(numValue)
                           }}
                           className={`h-12 text-base  ${
                             !priceValidation.isValid
@@ -1007,7 +1072,7 @@ const AddTool = () => {
                             <span>≈ £{priceInGBP.toFixed(2)} GBP</span>
                           ) : (
                             <span className='text-amber-600'>
-                              Conversion unavailable
+                              {t('pricing.load_error')}
                             </span>
                           )}
                         </div>
@@ -1047,10 +1112,10 @@ const AddTool = () => {
                                     currency.code,
                                     'GBP',
                                   )
-                            if (numValue && gbpValue > 500) {
+                            if (numValue && gbpValue !== null && gbpValue > 500) {
                               return
                             }
-                            handleInputChange('depositAmount', numValue)
+                            handleDepositChange(numValue)
                           }}
                           className={`h-12 text-base  ${
                             !depositValidation.isValid
@@ -1076,7 +1141,7 @@ const AddTool = () => {
                             <span>≈ £{depositInGBP.toFixed(2)} GBP</span>
                           ) : (
                             <span className='text-amber-600'>
-                              Conversion unavailable
+                              {t('pricing.load_error')}
                             </span>
                           )}
                         </div>

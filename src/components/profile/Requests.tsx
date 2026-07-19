@@ -86,7 +86,14 @@ const Requests = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isWindows, setIsWindows] = useState(false)
-
+  const isStartDateReached = (startDateStr: string) => {
+    if (!startDateStr) return false
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const start = new Date(startDateStr)
+    start.setHours(0, 0, 0, 0)
+    return start.getTime() <= today.getTime()
+  }
   useEffect(() => {
     setIsWindows(window.navigator.userAgent.indexOf('Windows') !== -1)
   }, [])
@@ -306,9 +313,7 @@ const Requests = () => {
 
       toast({
         title: t('request.refuse'),
-        description:
-          t('requests.owner_reject_refund_policy') ||
-          t('request.refuse.message'),
+        description: t('request.refuse.message'),
       })
     } catch (error: any) {
       toast({
@@ -945,8 +950,8 @@ const Requests = () => {
                     </>
                   )}
 
-                  {/* Code de validation pour les demandes acceptées */}
-                  {req.status === 'ACCEPTED' && (
+                  {/* Code de validation pour les demandes acceptées */} 
+                  {req.status === 'ACCEPTED' && isStartDateReached(req.startDate) && (
                     <div className='w-full mt-3 p-3 bg-blue-50 rounded border'>
                       <p className='text-sm font-medium mb-2'>
                         {t('request.validation_code')}

@@ -55,6 +55,13 @@ export const useValidation = (): UseValidationReturn => {
       // Si pas de conversion fournie, calculer
       gbpAmount = currency.code === 'GBP' ? price : convertInstantly(price, currency.code, 'GBP')
     }
+
+    if (gbpAmount === null || gbpAmount === undefined) {
+      return {
+        isValid: false,
+        message: t('pricing.load_error')
+      }
+    }
     
     const isValid = gbpAmount <= maxValue && price >= 0
     return {
@@ -79,6 +86,13 @@ export const useValidation = (): UseValidationReturn => {
     if (gbpAmount === null || gbpAmount === undefined) {
       // Si pas de conversion fournie, calculer
       gbpAmount = currency.code === 'GBP' ? deposit : convertInstantly(deposit, currency.code, 'GBP')
+    }
+
+    if (gbpAmount === null || gbpAmount === undefined) {
+      return {
+        isValid: false,
+        message: t('pricing.load_error')
+      }
     }
     
     const isValid = gbpAmount <= maxValue && deposit >= 0

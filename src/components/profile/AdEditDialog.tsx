@@ -91,18 +91,7 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
   const { toast } = useToast()
   const { user } = useAuth()
   const { t, language } = useLanguage()
-  const { currency, calculatePrice } = useCurrency()
-
-  // Convert prices from GBP (database) to user's currency for display
-  const initialPrice =
-    currency.code === 'GBP'
-      ? Number(ad.basePrice) || 0
-      : Number(calculatePrice(ad.basePrice, 'GBP', currency.code)) || 0
-
-  const initialDeposit =
-    currency.code === 'GBP'
-      ? Number(ad.depositAmount) || 0
-      : Number(calculatePrice(ad.depositAmount, 'GBP', currency.code)) || 0
+  const { currency, convertInstantly, getInstantRate } = useCurrency()
 
   const [formData, setFormData] = useState({
     title: ad.title,
@@ -112,8 +101,8 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
     category: ad.category?.id || '',
     subcategory: ad.subcategory?.id || '',
     condition: ad.condition.toString(),
-    price: initialPrice,
-    deposit: initialDeposit,
+    price: Number(ad.basePrice) || 0,
+    deposit: Number(ad.depositAmount) || 0,
     location: ad.pickupAddress,
     description: ad.description,
     instructions: ad.ownerInstructions || '',
@@ -160,8 +149,14 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
   const [isAddressSelected, setIsAddressSelected] = useState(true) // true car on modifie un outil existant avec une adresse
 
   // Currency conversion states - similar to AddTool.tsx
-  const [priceInGBP, setPriceInGBP] = useState<number | null>(null)
-  const [depositInGBP, setDepositInGBP] = useState<number | null>(null)
+  const [priceInGBP, setPriceInGBP] = useState<number | null>(
+    Number(ad.basePrice) || 0,
+  )
+  const [depositInGBP, setDepositInGBP] = useState<number | null>(
+    Number(ad.depositAmount) || 0,
+  )
+  const pricingRatesReady =
+    currency.code === 'GBP' || getInstantRate('GBP', currency.code) !== null
 
   // Load categories on component mount
   useEffect(() => {
@@ -184,41 +179,44 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
     loadCategories()
   }, [])
 
-  // Convert price to GBP in real-time (similar to AddTool.tsx)
+  // Keep displayed values derived from canonical GBP values.
   useEffect(() => {
-    if (formData.price !== null && formData.price !== undefined) {
-      if (currency.code === 'GBP') {
-        setPriceInGBP(formData.price)
-      } else {
-        const convertedPrice = calculatePrice(
-          formData.price,
-          currency.code,
-          'GBP',
-        )
-        if (convertedPrice !== null && convertedPrice !== undefined) {
-          setPriceInGBP(convertedPrice)
-        }
-      }
+    if (priceInGBP === null || depositInGBP === null) {
+      return
     }
-  }, [formData.price, currency.code, calculatePrice])
 
-  // Convert deposit to GBP in real-time (similar to AddTool.tsx)
-  useEffect(() => {
-    if (formData.deposit !== null && formData.deposit !== undefined) {
-      if (currency.code === 'GBP') {
-        setDepositInGBP(formData.deposit)
-      } else {
-        const convertedDeposit = calculatePrice(
-          formData.deposit,
-          currency.code,
-          'GBP',
-        )
-        if (convertedDeposit !== null && convertedDeposit !== undefined) {
-          setDepositInGBP(convertedDeposit)
-        }
-      }
+    if (currency.code === 'GBP') {
+      setFormData((prev) => ({
+        ...prev,
+        price: priceInGBP,
+        deposit: depositInGBP,
+      }))
+      return
     }
-  }, [formData.deposit, currency.code, calculatePrice])
+
+    if (!pricingRatesReady) {
+      return
+    }
+
+    const displayPrice = convertInstantly(priceInGBP, 'GBP', currency.code)
+    const displayDeposit = convertInstantly(depositInGBP, 'GBP', currency.code)
+
+    if (displayPrice === null || displayDeposit === null) {
+      return
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      price: Number(displayPrice.toFixed(2)),
+      deposit: Number(displayDeposit.toFixed(2)),
+    }))
+  }, [
+    currency.code,
+    pricingRatesReady,
+    priceInGBP,
+    depositInGBP,
+    convertInstantly,
+  ])
 
   // Load subcategories when category changes
   useEffect(() => {
@@ -257,6 +255,44 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
     // Clear error for this field
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: '' }))
+    }
+  }
+
+  const handlePriceChange = (value?: number) => {
+    setFormData((prev) => ({ ...prev, price: value }))
+
+    if (value === undefined) {
+      setPriceInGBP(null)
+      return
+    }
+
+    if (currency.code === 'GBP') {
+      setPriceInGBP(value)
+      return
+    }
+
+    const convertedValue = convertInstantly(value, currency.code, 'GBP')
+    if (convertedValue !== null) {
+      setPriceInGBP(Number(convertedValue.toFixed(2)))
+    }
+  }
+
+  const handleDepositChange = (value?: number) => {
+    setFormData((prev) => ({ ...prev, deposit: value }))
+
+    if (value === undefined) {
+      setDepositInGBP(null)
+      return
+    }
+
+    if (currency.code === 'GBP') {
+      setDepositInGBP(value)
+      return
+    }
+
+    const convertedValue = convertInstantly(value, currency.code, 'GBP')
+    if (convertedValue !== null) {
+      setDepositInGBP(Number(convertedValue.toFixed(2)))
     }
   }
 
@@ -429,6 +465,10 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
     try {
       setIsSaving(true)
 
+      if (currency.code !== 'GBP' && !pricingRatesReady) {
+        throw new Error(t('pricing.load_error'))
+      }
+
       // Use pre-calculated GBP values (similar to AddTool.tsx)
       const finalPriceInGBP = priceInGBP || Number(formData.price) || 0
       const finalDepositInGBP = depositInGBP || Number(formData.deposit) || 0
@@ -561,6 +601,11 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
               </CardTitle>
             </CardHeader>
             <CardContent className='space-y-6'>
+              {!pricingRatesReady && currency.code !== 'GBP' && (
+                <div className='rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-600'>
+                  {t('pricing.load_error')}
+                </div>
+              )}
               <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                 <div className='space-y-3'>
                   <Label
@@ -841,17 +886,27 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                       onChange={(e) => {
                         const value = e.target.value
                         const numValue = value ? parseFloat(value) : undefined
-                        // Block input if value exceeds 500
-                        // Block input if GBP-converted value exceeds 500
                         const gbpValue =
                           currency.code === 'GBP'
                             ? numValue
-                            : calculatePrice(numValue, currency.code, 'GBP')
-                        if (numValue && gbpValue > 500) {
+                            : numValue === undefined
+                              ? undefined
+                              : convertInstantly(numValue, currency.code, 'GBP')
+
+                        if (
+                          currency.code !== 'GBP' &&
+                          numValue !== undefined &&
+                          gbpValue === null
+                        ) {
                           return
                         }
-                        handleInputChange('price', numValue)
+
+                        if (numValue && gbpValue !== null && gbpValue > 500) {
+                          return
+                        }
+                        handlePriceChange(numValue)
                       }}
+                      disabled={currency.code !== 'GBP' && !pricingRatesReady}
                       className={`h-12 text-base ${
                         errors.price ? 'border-red-500' : ''
                       }`}
@@ -886,18 +941,28 @@ const AdEditDialog = ({ ad, onClose, onSave }: AdEditDialogProps) => {
                       onChange={(e) => {
                         const value = e.target.value
                         const numValue = value ? parseFloat(value) : undefined
-                        // Block input if value exceeds 500
-                        // Block input if GBP-converted value exceeds 500
                         const gbpValue =
                           currency.code === 'GBP'
                             ? numValue
-                            : calculatePrice(numValue, currency.code, 'GBP')
-                        if (numValue && gbpValue > 500) {
+                            : numValue === undefined
+                              ? undefined
+                              : convertInstantly(numValue, currency.code, 'GBP')
+
+                        if (
+                          currency.code !== 'GBP' &&
+                          numValue !== undefined &&
+                          gbpValue === null
+                        ) {
                           return
                         }
-                        handleInputChange('deposit', numValue)
+
+                        if (numValue && gbpValue !== null && gbpValue > 500) {
+                          return
+                        }
+                        handleDepositChange(numValue)
                       }}
                       placeholder={t('ads.edit.deposit_placeholder')}
+                      disabled={currency.code !== 'GBP' && !pricingRatesReady}
                       className={`h-12 text-base ${
                         errors.deposit ? 'border-red-500' : ''
                       }`}

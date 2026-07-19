@@ -56,6 +56,17 @@ export class OptimizedCurrencyCalculator {
     }
   }
 
+  public getCacheSnapshot(): GlobalRateCache | null {
+    if (!this.globalCache) {
+      return null;
+    }
+
+    return {
+      ...this.globalCache,
+      rates: { ...this.globalCache.rates },
+    };
+  }
+
   /**
    * Met à jour le cache global avec de nouveaux taux
    */
@@ -121,34 +132,37 @@ export class OptimizedCurrencyCalculator {
       return null;
     }
 
+    const normalizedFrom = from.toUpperCase();
+    const normalizedTo = to.toUpperCase();
+
     // Même devise
-    if (from === to) return 1;
+    if (normalizedFrom === normalizedTo) return 1;
 
     // Conversion directe
-    const directKey = `${from}_${to}`;
+    const directKey = `${normalizedFrom}_${normalizedTo}`;
     if (this.globalCache.rates[directKey]) {
       return this.globalCache.rates[directKey];
     }
 
     // Conversion inverse
-    const inverseKey = `${to}_${from}`;
+    const inverseKey = `${normalizedTo}_${normalizedFrom}`;
     if (this.globalCache.rates[inverseKey]) {
       return 1 / this.globalCache.rates[inverseKey];
     }
 
     // Conversion via devise de base
-    if (this.globalCache.baseCurrency === from) {
-      return this.globalCache.rates[to] || null;
+    if (this.globalCache.baseCurrency === normalizedFrom) {
+      return this.globalCache.rates[normalizedTo] || null;
     }
 
-    if (this.globalCache.baseCurrency === to) {
-      const baseRate = this.globalCache.rates[from];
+    if (this.globalCache.baseCurrency === normalizedTo) {
+      const baseRate = this.globalCache.rates[normalizedFrom];
       return baseRate ? 1 / baseRate : null;
     }
 
     // Conversion croisée via devise de base
-    const fromToBase = this.globalCache.rates[from];
-    const toToBase = this.globalCache.rates[to];
+    const fromToBase = this.globalCache.rates[normalizedFrom];
+    const toToBase = this.globalCache.rates[normalizedTo];
     
     if (fromToBase && toToBase) {
       return toToBase / fromToBase;
@@ -157,33 +171,38 @@ export class OptimizedCurrencyCalculator {
     return null;
   }
 
-  /**
-   * Calcule un prix instantanément sans appel API
-   */
-  public calculatePrice(amount: number, from: string, to?: string): number {
-    // Validation des entrées
+  public getCachedRate(from: string, to: string): number | null {
+    return this.getRate(from, to);
+  }
+
+  public calculatePriceStrict(
+    amount: number,
+    from: string,
+    to?: string
+  ): number | null {
     if (typeof amount !== 'number' || isNaN(amount)) {
       return 0;
     }
 
-    if (!to) {
-      return amount;
-    }
-
-    // Même devise
-    if (from === to) {
+    if (!to || from === to) {
       return amount;
     }
 
     const rate = this.getRate(from, to);
-    
+
     if (rate === null) {
-      return amount; // Fallback à la valeur originale
+      return null;
     }
 
-    const result = amount * rate;
-    
-    return result;
+    return amount * rate;
+  }
+
+  /**
+   * Calcule un prix instantanément sans appel API
+   */
+  public calculatePrice(amount: number, from: string, to?: string): number {
+    const result = this.calculatePriceStrict(amount, from, to);
+    return result ?? 0;
   }
 
   /**
@@ -242,6 +261,21 @@ export class OptimizedCurrencyCalculator {
     }
 
     return !this.isCacheValid(trigger);
+  }
+
+  public shouldFetchRatesForBase(
+    trigger: RateFetchTrigger,
+    expectedBaseCurrency: string
+  ): boolean {
+    if (!this.globalCache) {
+      return true;
+    }
+
+    if (this.globalCache.baseCurrency !== expectedBaseCurrency) {
+      return true;
+    }
+
+    return this.shouldFetchRates(trigger);
   }
 
   /**

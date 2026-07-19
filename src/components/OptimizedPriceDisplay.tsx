@@ -2,6 +2,10 @@ import React, { useMemo } from 'react'
 import { useCurrency } from '../contexts/CurrencyContext'
 import { useLanguage } from '../contexts/LanguageContext'
 
+const DEBUG_SERVER_URL = 'http://127.0.0.1:7777/event'
+const DEBUG_SESSION_ID = 'currency-price-error'
+const DEBUG_RUN_ID = 'post-fix'
+
 interface OptimizedPriceDisplayProps {
   price: number
   baseCurrency?: string
@@ -28,11 +32,15 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
   const {
     currency,
     currencies,
-    calculatePrice,
-    legacyConvertPrice,
+    getInstantRate,
     isLoading,
   } = useCurrency()
   const { t, language } = useLanguage()
+  const normalizedBaseCurrency = baseCurrency.toUpperCase()
+
+  // #region debug-point B:price-display-input
+  fetch(DEBUG_SERVER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:DEBUG_SESSION_ID,runId:DEBUG_RUN_ID,hypothesisId:'B',location:'OptimizedPriceDisplay.tsx:render-input',msg:'[DEBUG] price display render input',data:{price,baseCurrency,normalizedBaseCurrency,targetCurrency:currency.code,useCache,cible,isLoading},ts:Date.now()})}).catch(()=>{})
+  // #endregion
 
   // Fonction pour obtenir le symbole de devise selon la langue
   const getCurrencySymbol = (currencyCode: string) => {
@@ -57,7 +65,7 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
       const validPrice = isValidPrice ? numericPrice : 0
 
       // Obtenir le symbole de devise de base selon la langue
-      const baseSymbol = getCurrencySymbol(baseCurrency)
+      const baseSymbol = getCurrencySymbol(normalizedBaseCurrency)
 
       // Prix original formaté
       const originalFormatted = `${validPrice.toFixed(2)} ${baseSymbol}`
@@ -74,7 +82,7 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
       }
 
       // Si même devise, pas de conversion nécessaire
-      if (baseCurrency === currency.code) {
+      if (normalizedBaseCurrency === currency.code) {
         const targetSymbol = getCurrencySymbol(currency.code)
         const samePrice = `${validPrice.toFixed(2)} ${targetSymbol}`
         return {
@@ -86,13 +94,22 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
 
       // Utiliser le calcul optimisé instantané si le cache est activé
       if (useCache) {
-        const convertedAmount = calculatePrice(
-          validPrice,
-          baseCurrency,
-          currency.code
-        )
+        const instantRate = getInstantRate(normalizedBaseCurrency, currency.code)
         const targetSymbol = getCurrencySymbol(currency.code)
-        const formattedPrice = `${convertedAmount.toFixed(2)} ${targetSymbol}`
+
+        // #region debug-point B:price-display-rate
+        fetch(DEBUG_SERVER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:DEBUG_SESSION_ID,runId:DEBUG_RUN_ID,hypothesisId:'B',location:'OptimizedPriceDisplay.tsx:instant-rate',msg:'[DEBUG] price display instant rate lookup',data:{baseCurrency:normalizedBaseCurrency,targetCurrency:currency.code,instantRate,price:validPrice,useCache},ts:Date.now()})}).catch(()=>{})
+        // #endregion
+
+        if (instantRate === null) {
+          return {
+            convertedPrice: '',
+            originalPrice: originalFormatted,
+            error: true,
+          }
+        }
+
+        const formattedPrice = `${(validPrice * instantRate).toFixed(2)} ${targetSymbol}`
 
         return {
           convertedPrice: formattedPrice,
@@ -100,38 +117,29 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
           error: false,
         }
       } else {
-        // Pour les paiements critiques, utiliser l'ancienne méthode avec API
-        // Cette partie sera gérée de manière asynchrone
-        const targetSymbol = getCurrencySymbol(currency.code)
         return {
-          convertedPrice: `${validPrice.toFixed(2)} ${targetSymbol}`, // Fallback temporaire
+          convertedPrice: '',
           originalPrice: originalFormatted,
-          error: false,
+          error: true,
         }
       }
     } catch (err) {
 
       // Fallback en cas d'erreur
-      const numericPrice = typeof price === 'string' ? parseFloat(price) : price
-      const validPrice =
-        typeof numericPrice === 'number' && !isNaN(numericPrice)
-          ? numericPrice
-          : 0
-      const baseSymbol = getCurrencySymbol(baseCurrency)
-
       return {
-        convertedPrice: `${validPrice.toFixed(2)} ${baseSymbol}`,
-        originalPrice: `${validPrice.toFixed(2)} ${baseSymbol}`,
+        convertedPrice: '',
+        originalPrice: '',
         error: true,
       }
     }
   }, [
     price,
     baseCurrency,
+    normalizedBaseCurrency,
     currency.code,
     currency.symbol,
     currencies,
-    calculatePrice,
+    getInstantRate,
     useCache,
     language,
   ])
@@ -173,7 +181,7 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
   }
 
   // Affichage de chargement uniquement pour les conversions critiques sans cache
-  if (!useCache && isLoading && !convertedPrice) {
+  if (isLoading && !convertedPrice) {
     return (
       <div className={`${getSizeClasses()} ${className}`}>
         <div className='animate-pulse bg-gray-200 h-4 w-16 rounded'></div>
@@ -183,6 +191,9 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
 
   // Affichage d'erreur
   if (error && !convertedPrice) {
+    // #region debug-point D:price-display-error-state
+    fetch(DEBUG_SERVER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:DEBUG_SESSION_ID,runId:DEBUG_RUN_ID,hypothesisId:'D',location:'OptimizedPriceDisplay.tsx:error-state',msg:'[DEBUG] price display error state',data:{price,baseCurrency,normalizedBaseCurrency,targetCurrency:currency.code,useCache,isLoading},ts:Date.now()})}).catch(()=>{})
+    // #endregion
     return (
       <div className={`${getSizeClasses()} ${className} text-red-500`}>
         {t('pricing.load_error')}
@@ -193,7 +204,7 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
   return (
     <div className={`${getSizeClasses()} ${className}`}>
       <span className='font-medium'>{getDisplayText()}</span>
-      {showOriginal && baseCurrency !== currency.code && (
+      {showOriginal && normalizedBaseCurrency !== currency.code && (
         <span className='text-gray-500 text-sm ml-2'>({originalPrice})</span>
       )}
     </div>
