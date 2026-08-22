@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+} from 'react'
 import {
   Currency,
   ConvertedPrice,
@@ -79,6 +86,32 @@ const DEBUG_SERVER_URL = 'http://127.0.0.1:7777/event'
 const DEBUG_SESSION_ID = 'currency-price-error'
 const DEBUG_RUN_ID = 'post-fix'
 
+const reportCtxEvent = (event: {
+  hypothesisId: string
+  location: string
+  msg: string
+  data?: Record<string, unknown>
+}) => {
+  const fullEvent = {
+    sessionId: DEBUG_SESSION_ID,
+    runId: DEBUG_RUN_ID,
+    hypothesisId: event.hypothesisId,
+    location: event.location,
+    msg: event.msg,
+    data: event.data ?? {},
+    ts: Date.now(),
+  }
+  if (typeof window !== 'undefined') {
+    // eslint-disable-next-line no-console
+    console.log('[CURRENCY DEBUG]', event.location, event.msg, event.data ?? {})
+  }
+  fetch(DEBUG_SERVER_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(fullEvent),
+  }).catch(() => {})
+}
+
 export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
@@ -99,26 +132,19 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({
   // Auto-select currency based on user's country when logged in
   useEffect(() => {
     // #region debug-point A:provider-auth-autoselect
-    fetch(DEBUG_SERVER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sessionId: DEBUG_SESSION_ID,
-        runId: DEBUG_RUN_ID,
-        hypothesisId: 'A',
-        location: 'CurrencyContext.tsx:auth-auto-select',
-        msg: '[DEBUG] currency auth auto-select effect',
-        data: {
-          isAuthenticated,
-          hasUser: !!user,
-          hasAutoSelected,
-          currentCurrency: currency.code,
-          savedCurrency: localStorage.getItem('selectedCurrency'),
-          manualSelection: localStorage.getItem('hasManualCurrencySelection'),
-        },
-        ts: Date.now(),
-      }),
-    }).catch(() => {})
+    reportCtxEvent({
+      hypothesisId: 'A',
+      location: 'CurrencyContext.tsx:auth-auto-select',
+      msg: '[DEBUG] currency auth auto-select effect',
+      data: {
+        isAuthenticated,
+        hasUser: !!user,
+        hasAutoSelected,
+        currentCurrency: currency.code,
+        savedCurrency: localStorage.getItem('selectedCurrency'),
+        manualSelection: localStorage.getItem('hasManualCurrencySelection'),
+      },
+    })
     // #endregion
     if (isAuthenticated && user && !hasAutoSelected) {
       // Check if user has manually selected a currency before
@@ -159,22 +185,15 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({
   // Load saved currency from localStorage on mount (for non-authenticated users)
   useEffect(() => {
     // #region debug-point A:provider-nonauth-autoselect
-    fetch(DEBUG_SERVER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sessionId: DEBUG_SESSION_ID,
-        runId: DEBUG_RUN_ID,
-        hypothesisId: 'A',
-        location: 'CurrencyContext.tsx:non-auth-init',
-        msg: '[DEBUG] currency non-auth init effect',
-        data: {
-          isAuthenticated,
-          savedCurrency: localStorage.getItem('selectedCurrency'),
-        },
-        ts: Date.now(),
-      }),
-    }).catch(() => {})
+    reportCtxEvent({
+      hypothesisId: 'A',
+      location: 'CurrencyContext.tsx:non-auth-init',
+      msg: '[DEBUG] currency non-auth init effect',
+      data: {
+        isAuthenticated,
+        savedCurrency: localStorage.getItem('selectedCurrency'),
+      },
+    })
     // #endregion
     if (!isAuthenticated) {
       const savedCurrencyCode = localStorage.getItem('selectedCurrency')
@@ -194,19 +213,12 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({
   // Save currency to localStorage when it changes
   useEffect(() => {
     // #region debug-point A:provider-currency-persist
-    fetch(DEBUG_SERVER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sessionId: DEBUG_SESSION_ID,
-        runId: DEBUG_RUN_ID,
-        hypothesisId: 'A',
-        location: 'CurrencyContext.tsx:persist-currency',
-        msg: '[DEBUG] currency persisted',
-        data: { currency: currency.code },
-        ts: Date.now(),
-      }),
-    }).catch(() => {})
+    reportCtxEvent({
+      hypothesisId: 'A',
+      location: 'CurrencyContext.tsx:persist-currency',
+      msg: '[DEBUG] currency persisted',
+      data: { currency: currency.code },
+    })
     // #endregion
     localStorage.setItem('selectedCurrency', currency.code)
   }, [currency])
@@ -215,51 +227,43 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const trigger = RateFetchTrigger.USER_CURRENCY_CHANGE
     // #region debug-point A:provider-refresh-effect
-    fetch(DEBUG_SERVER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sessionId: DEBUG_SESSION_ID,
-        runId: DEBUG_RUN_ID,
-        hypothesisId: 'A',
-        location: 'CurrencyContext.tsx:refresh-effect',
-        msg: '[DEBUG] currency refresh effect fired',
-        data: { currency: currency.code, trigger },
-        ts: Date.now(),
-      }),
-    }).catch(() => {})
+    reportCtxEvent({
+      hypothesisId: 'A',
+      location: 'CurrencyContext.tsx:refresh-effect',
+      msg: '[DEBUG] currency refresh effect fired',
+      data: { currency: currency.code, trigger },
+    })
     // #endregion
 
     // Utiliser le système optimisé pour décider si un fetch est nécessaire
     refreshRates(trigger)
   }, [currency.code])
 
-  const handleSetCurrency = (newCurrency: Currency) => {
-    // #region debug-point A:provider-set-currency
-    fetch(DEBUG_SERVER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sessionId: DEBUG_SESSION_ID,
-        runId: DEBUG_RUN_ID,
+  const handleSetCurrency = useCallback(
+    (newCurrency: Currency) => {
+      // #region debug-point A:provider-set-currency
+      reportCtxEvent({
         hypothesisId: 'A',
         location: 'CurrencyContext.tsx:set-currency',
         msg: '[DEBUG] setCurrency requested',
         data: { from: currency.code, to: newCurrency.code },
-        ts: Date.now(),
-      }),
-    }).catch(() => {})
-    // #endregion
-    setCurrency(newCurrency)
+      })
+      // #endregion
+      setCurrency(newCurrency)
 
-    // Mark as manual selection to prevent auto-selection on future logins
-    localStorage.setItem('hasManualCurrencySelection', 'true')
-  }
+      // Mark as manual selection to prevent auto-selection on future logins
+      localStorage.setItem('hasManualCurrencySelection', 'true')
+    },
+    [currency.code],
+  )
 
-  const syncLegacyCacheState = (cacheSnapshot: GlobalRateCache | null) => {
-    setExchangeRatesCache(cacheSnapshot?.rates || {})
-    setCacheTimestamp(cacheSnapshot?.timestamp || 0)
-  }
+  const syncLegacyCacheState = useCallback(
+    (cacheSnapshot: GlobalRateCache | null) => {
+      setExchangeRatesCache(cacheSnapshot?.rates || {})
+      setCacheTimestamp(cacheSnapshot?.timestamp || 0)
+    },
+    [],
+  )
 
   const buildConversionResult = (
     amount: number,
@@ -280,209 +284,205 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({
   }
 
   // Nouvelles méthodes pour conversion instantanée
-  const getInstantRate = (
-    fromCurrency: string,
-    toCurrency: string,
-  ): number | null => {
-    return optimizedCalculator.getCachedRate(
-      fromCurrency.toUpperCase(),
-      toCurrency.toUpperCase(),
-    )
-  }
-
-  const convertInstantly = (
-    amount: number,
-    fromCurrency: string,
-    toCurrency: string,
-  ): number | null => {
-    if (!amount || amount <= 0) {
-      return null
-    }
-
-    const rate = getInstantRate(fromCurrency, toCurrency)
-    if (rate === null) {
-      return null
-    }
-
-    return amount * rate
-  }
-
-  const formatInstantPrice = (
-    amount: number,
-    fromCurrency: string,
-    toCurrency?: string,
-  ): string => {
-    const targetCurrency = toCurrency || currency.code
-    const targetCurrencyObj = currencies.find((c) => c.code === targetCurrency)
-
-    if (!targetCurrencyObj) {
-      return `${amount.toFixed(2)} ${targetCurrency}`
-    }
-
-    if (fromCurrency === targetCurrency) {
-      return `${targetCurrencyObj.symbol}${amount.toFixed(2)}`
-    }
-
-    const convertedAmount = convertInstantly(
-      amount,
-      fromCurrency,
-      targetCurrency,
-    )
-
-    if (convertedAmount === null) {
-      return getCurrencyPlaceholder(targetCurrency)
-    }
-
-    return `${targetCurrencyObj.symbol}${convertedAmount.toFixed(2)}`
-  }
-
-  const convertPrice = async (
-    amount: number,
-    fromCurrency: string,
-    toCurrency?: string,
-  ): Promise<ConvertedPrice> => {
-    const targetCurrency = toCurrency || currency.code
-    const normalizedFromCurrency = fromCurrency.toUpperCase()
-    const normalizedTargetCurrency = targetCurrency.toUpperCase()
-
-    if (normalizedFromCurrency === normalizedTargetCurrency) {
-      return buildConversionResult(
-        amount,
-        normalizedFromCurrency,
-        normalizedTargetCurrency,
-        1,
+  const getInstantRate = useCallback(
+    (fromCurrency: string, toCurrency: string): number | null => {
+      return optimizedCalculator.getCachedRate(
+        fromCurrency.toUpperCase(),
+        toCurrency.toUpperCase(),
       )
-    }
+    },
+    [],
+  )
 
-    // Main path: only use local table-derived cache. This keeps item rendering
-    // off the network and makes `/convert` an explicit legacy-only path.
-    const instantRate = getInstantRate(
-      normalizedFromCurrency,
-      normalizedTargetCurrency,
-    )
-    if (instantRate !== null) {
-      return buildConversionResult(
-        amount,
-        normalizedFromCurrency,
-        normalizedTargetCurrency,
-        instantRate,
+  const convertInstantly = useCallback(
+    (
+      amount: number,
+      fromCurrency: string,
+      toCurrency: string,
+    ): number | null => {
+      if (!amount || amount <= 0) {
+        return null
+      }
+
+      const rate = getInstantRate(fromCurrency, toCurrency)
+      if (rate === null) {
+        return null
+      }
+
+      return amount * rate
+    },
+    [getInstantRate],
+  )
+
+  const formatInstantPrice = useCallback(
+    (amount: number, fromCurrency: string, toCurrency?: string): string => {
+      const targetCurrency = toCurrency || currency.code
+      const targetCurrencyObj = currencies.find(
+        (c) => c.code === targetCurrency,
       )
-    }
 
-    return buildConversionResult(
-      amount,
-      normalizedFromCurrency,
-      normalizedTargetCurrency,
-      0,
-    )
-  }
+      if (!targetCurrencyObj) {
+        return `${amount.toFixed(2)} ${targetCurrency}`
+      }
 
-  const legacyConvertPrice = async (
-    amount: number,
-    fromCurrency: string,
-    toCurrency?: string,
-  ): Promise<ConvertedPrice> => {
-    const targetCurrency = toCurrency || currency.code
-    const cachedConversion = await convertPrice(
-      amount,
-      fromCurrency,
-      targetCurrency,
-    )
+      if (fromCurrency === targetCurrency) {
+        return `${targetCurrencyObj.symbol}${amount.toFixed(2)}`
+      }
 
-    if (
-      fromCurrency === targetCurrency ||
-      cachedConversion.rate > 0 ||
-      amount === 0
-    ) {
-      return cachedConversion
-    }
-
-    setIsLoading(true)
-    try {
-      const { currencyService } = await import('../services/currencyService')
-      return await currencyService.convertCurrency(
+      const convertedAmount = convertInstantly(
         amount,
         fromCurrency,
         targetCurrency,
       )
-    } catch (error) {
-      return cachedConversion
-    } finally {
-      setIsLoading(false)
-    }
-  }
+
+      if (convertedAmount === null) {
+        return getCurrencyPlaceholder(targetCurrency)
+      }
+
+      return `${targetCurrencyObj.symbol}${convertedAmount.toFixed(2)}`
+    },
+    [currency.code, convertInstantly],
+  )
+
+  const convertPrice = useCallback(
+    async (
+      amount: number,
+      fromCurrency: string,
+      toCurrency?: string,
+    ): Promise<ConvertedPrice> => {
+      const targetCurrency = toCurrency || currency.code
+      const normalizedFromCurrency = fromCurrency.toUpperCase()
+      const normalizedTargetCurrency = targetCurrency.toUpperCase()
+
+      if (normalizedFromCurrency === normalizedTargetCurrency) {
+        return buildConversionResult(
+          amount,
+          normalizedFromCurrency,
+          normalizedTargetCurrency,
+          1,
+        )
+      }
+
+      // Main path: only use local table-derived cache. This keeps item rendering
+      // off the network and makes `/convert` an explicit legacy-only path.
+      const instantRate = getInstantRate(
+        normalizedFromCurrency,
+        normalizedTargetCurrency,
+      )
+      if (instantRate !== null) {
+        return buildConversionResult(
+          amount,
+          normalizedFromCurrency,
+          normalizedTargetCurrency,
+          instantRate,
+        )
+      }
+
+      return buildConversionResult(
+        amount,
+        normalizedFromCurrency,
+        normalizedTargetCurrency,
+        0,
+      )
+    },
+    [currency.code, getInstantRate],
+  )
+
+  const legacyConvertPrice = useCallback(
+    async (
+      amount: number,
+      fromCurrency: string,
+      toCurrency?: string,
+    ): Promise<ConvertedPrice> => {
+      const targetCurrency = toCurrency || currency.code
+      const cachedConversion = await convertPrice(
+        amount,
+        fromCurrency,
+        targetCurrency,
+      )
+
+      if (
+        fromCurrency === targetCurrency ||
+        cachedConversion.rate > 0 ||
+        amount === 0
+      ) {
+        return cachedConversion
+      }
+
+      setIsLoading(true)
+      try {
+        const { currencyService } = await import('../services/currencyService')
+        return await currencyService.convertCurrency(
+          amount,
+          fromCurrency,
+          targetCurrency,
+        )
+      } catch (error) {
+        return cachedConversion
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [currency.code, convertPrice],
+  )
 
   // Nouvelle méthode optimisée pour le formatage instantané
-  const formatPrice = (price: number, fromCurrency?: string): string => {
-    const validPrice = typeof price === 'number' && !isNaN(price) ? price : 0
+  const formatPrice = useCallback(
+    (price: number, fromCurrency?: string): string => {
+      const validPrice = typeof price === 'number' && !isNaN(price) ? price : 0
 
-    if (!fromCurrency || fromCurrency === currency.code) {
-      return `${currency.symbol}${validPrice.toFixed(2)}`
-    }
+      if (!fromCurrency || fromCurrency === currency.code) {
+        return `${currency.symbol}${validPrice.toFixed(2)}`
+      }
 
-    const instantRate = getInstantRate(fromCurrency, currency.code)
-    if (instantRate === null) {
-      return getCurrencyPlaceholder(currency.code)
-    }
+      const instantRate = getInstantRate(fromCurrency, currency.code)
+      if (instantRate === null) {
+        return getCurrencyPlaceholder(currency.code)
+      }
 
-    const convertedAmount = validPrice * instantRate
-    return `${currency.symbol}${convertedAmount.toFixed(2)}`
-  }
+      const convertedAmount = validPrice * instantRate
+      return `${currency.symbol}${convertedAmount.toFixed(2)}`
+    },
+    [currency.code, currency.symbol, getInstantRate],
+  )
 
   // Méthode de compatibilité avec l'ancien système (async)
-  const legacyFormatPrice = async (
-    price: number,
-    fromCurrency?: string,
-  ): Promise<string> => {
-    // Validate price input
-    const validPrice = typeof price === 'number' && !isNaN(price) ? price : 0
-
-    if (!fromCurrency || fromCurrency === currency.code) {
-      const formatted = `${currency.symbol}${validPrice.toFixed(2)}`
-      return formatted
-    }
-
-    try {
-      const converted = await legacyConvertPrice(validPrice, fromCurrency)
-      const convertedAmount =
-        typeof converted.convertedAmount === 'number' &&
-        !isNaN(converted.convertedAmount)
-          ? converted.convertedAmount
-          : 0
-      const formatted = `${currency.symbol}${convertedAmount.toFixed(2)}`
-      return formatted
-    } catch (error) {
-      return getCurrencyPlaceholder(currency.code)
-    }
-  }
+  const legacyFormatPrice = useCallback(
+    async (price: number, fromCurrency?: string): Promise<string> => {
+      return formatPrice(price, fromCurrency)
+    },
+    [formatPrice],
+  )
 
   // Nouvelles méthodes optimisées
-  const calculatePrice = (
-    amount: number,
-    from: string,
-    to?: string,
-  ): number => {
-    return optimizedCalculator.calculatePrice(amount, from, to || currency.code)
-  }
+  const calculatePrice = useCallback(
+    (amount: number, from: string, to?: string): number => {
+      return optimizedCalculator.calculatePrice(
+        amount,
+        from,
+        to || currency.code,
+      )
+    },
+    [currency.code],
+  )
 
-  const calculateBulkPrices = (prices: PriceItem[]): BulkConvertedPrice[] => {
-    return optimizedCalculator.calculateBulkPrices(prices, currency.code)
-  }
+  const calculateBulkPrices = useCallback(
+    (prices: PriceItem[]): BulkConvertedPrice[] => {
+      return optimizedCalculator.calculateBulkPrices(prices, currency.code)
+    },
+    [currency.code],
+  )
 
-  const refreshRates = async (trigger: RateFetchTrigger): Promise<void> => {
-    const currentSnapshot = optimizedCalculator.getCacheSnapshot()
-    const shouldFetch = optimizedCalculator.shouldFetchRatesForBase(
-      trigger,
-      currency.code,
-    )
+  const refreshRates = useCallback(
+    async (trigger: RateFetchTrigger): Promise<void> => {
+      const currentSnapshot = optimizedCalculator.getCacheSnapshot()
+      const shouldFetch = optimizedCalculator.shouldFetchRatesForBase(
+        trigger,
+        currency.code,
+      )
 
-    // #region debug-point A:provider-refresh-start
-    fetch(DEBUG_SERVER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sessionId: DEBUG_SESSION_ID,
-        runId: DEBUG_RUN_ID,
+      // #region debug-point A:provider-refresh-start
+      reportCtxEvent({
         hypothesisId: 'A',
         location: 'CurrencyContext.tsx:refresh-start',
         msg: '[DEBUG] refreshRates start',
@@ -496,51 +496,44 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({
             : 0,
           cacheTimestamp: currentSnapshot?.timestamp || null,
         },
-        ts: Date.now(),
-      }),
-    }).catch(() => {})
-    // #endregion
+      })
+      // #endregion
 
-    if (
-      currentSnapshot &&
-      currentSnapshot.baseCurrency === currency.code &&
-      !shouldFetch
-    ) {
-      syncLegacyCacheState(currentSnapshot)
-      return
-    }
+      if (
+        currentSnapshot &&
+        currentSnapshot.baseCurrency === currency.code &&
+        !shouldFetch
+      ) {
+        syncLegacyCacheState(currentSnapshot)
+        return
+      }
 
-    // Vérifier si une récupération est nécessaire
-    if (!shouldFetch) {
-      syncLegacyCacheState(currentSnapshot)
-      return
-    }
+      // Vérifier si une récupération est nécessaire
+      if (!shouldFetch) {
+        syncLegacyCacheState(currentSnapshot)
+        return
+      }
 
-    setIsLoading(true)
+      setIsLoading(true)
 
-    try {
-      const { currencyService } = await import('../services/currencyService')
-      const exchangeRateTable = await currencyService.getExchangeRateTable(
-        currency.code,
-      )
-      const rawRates = exchangeRateTable?.rates
-      const rates =
-        rawRates && typeof rawRates === 'object'
-          ? Object.fromEntries(
-              Object.entries(rawRates).map(([code, value]) => [
-                code.toUpperCase(),
-                value,
-              ]),
-            )
-          : null
+      try {
+        const { currencyService } = await import('../services/currencyService')
+        const exchangeRateTable = await currencyService.getExchangeRateTable(
+          currency.code,
+        )
+        const rawRates = exchangeRateTable?.rates
+        const rates =
+          rawRates && typeof rawRates === 'object'
+            ? Object.fromEntries(
+                Object.entries(rawRates).map(([code, value]) => [
+                  code.toUpperCase(),
+                  value,
+                ]),
+              )
+            : null
 
-      // #region debug-point C:provider-refresh-response
-      fetch(DEBUG_SERVER_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sessionId: DEBUG_SESSION_ID,
-          runId: DEBUG_RUN_ID,
+        // #region debug-point C:provider-refresh-response
+        reportCtxEvent({
           hypothesisId: 'C',
           location: 'CurrencyContext.tsx:refresh-response',
           msg: '[DEBUG] refreshRates response received',
@@ -552,22 +545,19 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({
             rateKeys: rates ? Object.keys(rates) : [],
             stale: exchangeRateTable?.stale ?? null,
           },
-          ts: Date.now(),
-        }),
-      }).catch(() => {})
-      // #endregion
+        })
+        // #endregion
 
-      if (rates && typeof rates === 'object' && Object.keys(rates).length > 0) {
-        // Mettre à jour le cache optimisé
-        optimizedCalculator.updateCache(currency.code, rates, trigger)
-        syncLegacyCacheState(optimizedCalculator.getCacheSnapshot())
-        // #region debug-point A:provider-refresh-cache-updated
-        fetch(DEBUG_SERVER_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            sessionId: DEBUG_SESSION_ID,
-            runId: DEBUG_RUN_ID,
+        if (
+          rates &&
+          typeof rates === 'object' &&
+          Object.keys(rates).length > 0
+        ) {
+          // Mettre à jour le cache optimisé
+          optimizedCalculator.updateCache(currency.code, rates, trigger)
+          syncLegacyCacheState(optimizedCalculator.getCacheSnapshot())
+          // #region debug-point A:provider-refresh-cache-updated
+          reportCtxEvent({
             hypothesisId: 'A',
             location: 'CurrencyContext.tsx:refresh-cache-updated',
             msg: '[DEBUG] refreshRates cache updated',
@@ -576,35 +566,21 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({
               rateCount: Object.keys(rates).length,
               rateKeys: Object.keys(rates),
             },
-            ts: Date.now(),
-          }),
-        }).catch(() => {})
-        // #endregion
-      } else {
-        // #region debug-point C:provider-refresh-empty-rates
-        fetch(DEBUG_SERVER_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            sessionId: DEBUG_SESSION_ID,
-            runId: DEBUG_RUN_ID,
+          })
+          // #endregion
+        } else {
+          // #region debug-point C:provider-refresh-empty-rates
+          reportCtxEvent({
             hypothesisId: 'C',
             location: 'CurrencyContext.tsx:refresh-empty-rates',
             msg: '[DEBUG] refreshRates empty rates',
             data: { currency: currency.code, rawRatesType: typeof rawRates },
-            ts: Date.now(),
-          }),
-        }).catch(() => {})
-        // #endregion
-      }
-    } catch (error) {
-      // #region debug-point C:provider-refresh-error
-      fetch(DEBUG_SERVER_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sessionId: DEBUG_SESSION_ID,
-          runId: DEBUG_RUN_ID,
+          })
+          // #endregion
+        }
+      } catch (error) {
+        // #region debug-point C:provider-refresh-error
+        reportCtxEvent({
           hypothesisId: 'C',
           location: 'CurrencyContext.tsx:refresh-error',
           msg: '[DEBUG] refreshRates error',
@@ -613,45 +589,70 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({
             trigger,
             error: error instanceof Error ? error.message : String(error),
           },
-          ts: Date.now(),
-        }),
-      }).catch(() => {})
-      // #endregion
-    } finally {
-      setIsLoading(false)
-    }
-  }
+        })
+        // #endregion
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [currency.code, syncLegacyCacheState],
+  )
 
-  const cacheAge = optimizedCalculator.getCacheAge()
-  const isRatesFresh = optimizedCalculator.isRatesFresh()
+  const cacheAge = useMemo(
+    () => optimizedCalculator.getCacheAge(),
+    [cacheTimestamp, exchangeRatesCache],
+  )
+  const isRatesFresh = useMemo(
+    () => optimizedCalculator.isRatesFresh(),
+    [cacheTimestamp, exchangeRatesCache],
+  )
 
   // Renommer convertPrice en legacyConvertPrice pour la compatibilité
+  const providerValue = useMemo<OptimizedCurrencyContextType>(
+    () => ({
+      currency,
+      setCurrency: handleSetCurrency,
+      currencies,
+      formatPrice,
+      convertPrice,
+      legacyFormatPrice,
+      legacyConvertPrice,
+      calculatePrice,
+      calculateBulkPrices,
+      refreshRates,
+      isLoading,
+      cacheAge,
+      isRatesFresh,
+      exchangeRatesCache,
+      cacheTimestamp,
+      // Nouvelles méthodes instantanées
+      getInstantRate,
+      convertInstantly,
+      formatInstantPrice,
+    }),
+    [
+      currency,
+      handleSetCurrency,
+      formatPrice,
+      convertPrice,
+      legacyFormatPrice,
+      legacyConvertPrice,
+      calculatePrice,
+      calculateBulkPrices,
+      refreshRates,
+      isLoading,
+      cacheAge,
+      isRatesFresh,
+      exchangeRatesCache,
+      cacheTimestamp,
+      getInstantRate,
+      convertInstantly,
+      formatInstantPrice,
+    ],
+  )
+
   return (
-    <CurrencyContext.Provider
-      value={{
-        currency,
-        setCurrency: handleSetCurrency,
-        currencies,
-        formatPrice,
-        convertPrice,
-        legacyFormatPrice: async (price: number, fromCurrency?: string) => {
-          return formatPrice(price, fromCurrency)
-        },
-        legacyConvertPrice,
-        calculatePrice,
-        calculateBulkPrices,
-        refreshRates,
-        isLoading,
-        cacheAge,
-        isRatesFresh,
-        exchangeRatesCache,
-        cacheTimestamp,
-        // Nouvelles méthodes instantanées
-        getInstantRate,
-        convertInstantly,
-        formatInstantPrice,
-      }}
-    >
+    <CurrencyContext.Provider value={providerValue}>
       {children}
     </CurrencyContext.Provider>
   )

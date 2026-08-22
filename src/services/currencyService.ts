@@ -14,6 +14,32 @@ const DEBUG_SERVER_URL = 'http://127.0.0.1:7777/event'
 const DEBUG_SESSION_ID = 'currency-price-error'
 const DEBUG_RUN_ID = 'post-fix'
 
+const reportDebugEvent = (event: {
+  hypothesisId: string
+  location: string
+  msg: string
+  data?: Record<string, unknown>
+}) => {
+  const fullEvent = {
+    sessionId: DEBUG_SESSION_ID,
+    runId: DEBUG_RUN_ID,
+    hypothesisId: event.hypothesisId,
+    location: event.location,
+    msg: event.msg,
+    data: event.data ?? {},
+    ts: Date.now(),
+  }
+  if (typeof window !== 'undefined') {
+    // eslint-disable-next-line no-console
+    console.log('[CURRENCY DEBUG]', event.location, event.msg, event.data ?? {})
+  }
+  fetch(DEBUG_SERVER_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(fullEvent),
+  }).catch(() => {})
+}
+
 export interface ExchangeRateResponse {
   fromCurrency: string
   toCurrency: string
@@ -176,15 +202,30 @@ class CurrencyService {
 
   private unwrapResponseData<T>(payload: unknown): T {
     let current: unknown = payload
+    let safety = 0
 
     while (
+      ++safety < 8 &&
       current &&
       typeof current === 'object' &&
       'data' in (current as Record<string, unknown>) &&
-      ('success' in (current as Record<string, unknown>) ||
-        'message' in (current as Record<string, unknown>))
+      (('success' in (current as Record<string, unknown>)) ||
+        ('message' in (current as Record<string, unknown>)))
     ) {
-      current = (current as ResponseEnvelope<T>).data
+      const inner = (current as ResponseEnvelope<T>).data
+      if (inner && typeof inner === 'object') {
+        const innerRec = inner as Record<string, unknown>
+        if (
+          'rates' in innerRec ||
+          'rate' in innerRec ||
+          'convertedAmount' in innerRec ||
+          ('baseCurrency' in innerRec && !('data' in innerRec))
+        ) {
+          current = inner
+          break
+        }
+      }
+      current = inner
     }
 
     return current as T
@@ -199,7 +240,12 @@ class CurrencyService {
 
     if (cached && this.isValidCache(cached.timestamp)) {
       // #region debug-point C:currency-cache-hit
-      fetch(DEBUG_SERVER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:DEBUG_SESSION_ID,runId:DEBUG_RUN_ID,hypothesisId:'C',location:'currencyService.ts:fetchWithCache:cache-hit',msg:'[DEBUG] currency cache hit',data:{endpoint,params,cacheKey},ts:Date.now()})}).catch(()=>{})
+      reportDebugEvent({
+        hypothesisId: 'C',
+        location: 'currencyService.ts:fetchWithCache:cache-hit',
+        msg: '[DEBUG] currency cache hit',
+        data: { endpoint, params, cacheKey },
+      })
       // #endregion
       this.recordCacheHit()
       return cached.data
@@ -217,7 +263,12 @@ class CurrencyService {
 
     try {
       // #region debug-point C:currency-request-start
-      fetch(DEBUG_SERVER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:DEBUG_SESSION_ID,runId:DEBUG_RUN_ID,hypothesisId:'C',location:'currencyService.ts:fetchWithCache:request-start',msg:'[DEBUG] currency request start',data:{endpoint,params,url,cacheKey},ts:Date.now()})}).catch(()=>{})
+      reportDebugEvent({
+        hypothesisId: 'C',
+        location: 'currencyService.ts:fetchWithCache:request-start',
+        msg: '[DEBUG] currency request start',
+        data: { endpoint, params, url, cacheKey },
+      })
       // #endregion
       const startTime = Date.now()
       const response = await fetch(url)
@@ -225,17 +276,18 @@ class CurrencyService {
       this.recordNetworkCall(endpoint, requestTime)
 
       // #region debug-point C:currency-response-meta
-      fetch(DEBUG_SERVER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:DEBUG_SESSION_ID,runId:DEBUG_RUN_ID,hypothesisId:'C',location:'currencyService.ts:fetchWithCache:response-meta',msg:'[DEBUG] currency response meta',data:{endpoint,url,status:response.status,ok:response.ok,requestTime},ts:Date.now()})}).catch(()=>{})
+      reportDebugEvent({
+        hypothesisId: 'C',
+        location: 'currencyService.ts:fetchWithCache:response-meta',
+        msg: '[DEBUG] currency response meta',
+        data: { endpoint, url, status: response.status, ok: response.ok, requestTime },
+      })
       // #endregion
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
       const result = await response.json()
-
-      // #region debug-point C:currency-response-shape
-      fetch(DEBUG_SERVER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:DEBUG_SESSION_ID,runId:DEBUG_RUN_ID,hypothesisId:'C',location:'currencyService.ts:fetchWithCache:response-shape',msg:'[DEBUG] currency response shape',data:{endpoint,hasData:!!result?.data,dataKeys:result?.data&&typeof result.data==='object'?Object.keys(result.data):[],ratesKeys:result?.data?.rates&&typeof result.data.rates==='object'?Object.keys(result.data.rates):[]},ts:Date.now()})}).catch(()=>{})
-      // #endregion
 
       if (!result || typeof result !== 'object') {
         throw new Error('Invalid response structure')
@@ -251,6 +303,28 @@ class CurrencyService {
         throw new Error('Missing normalized payload in response')
       }
 
+      const payloadRec = payload as Record<string, unknown>
+      const payloadRates =
+        payloadRec.rates && typeof payloadRec.rates === 'object'
+          ? Object.keys(payloadRec.rates as Record<string, unknown>)
+          : []
+
+      // #region debug-point C:currency-response-shape
+      reportDebugEvent({
+        hypothesisId: 'C',
+        location: 'currencyService.ts:fetchWithCache:response-shape',
+        msg: '[DEBUG] currency response shape after unwrap',
+        data: {
+          endpoint,
+          payloadKeys: Object.keys(payloadRec),
+          payloadBaseCurrency: (payloadRec as any).baseCurrency ?? null,
+          payloadRateCount: payloadRates.length,
+          payloadRateKeys: payloadRates,
+          payloadSource: (payloadRec as any).source ?? null,
+        },
+      })
+      // #endregion
+
       this.cache.set(cacheKey, {
         data: payload,
         timestamp: Date.now(),
@@ -259,7 +333,17 @@ class CurrencyService {
       return payload
     } catch (error) {
       // #region debug-point C:currency-request-error
-      fetch(DEBUG_SERVER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:DEBUG_SESSION_ID,runId:DEBUG_RUN_ID,hypothesisId:'C',location:'currencyService.ts:fetchWithCache:error',msg:'[DEBUG] currency request error',data:{endpoint,params,url,error:error instanceof Error?error.message:String(error)},ts:Date.now()})}).catch(()=>{})
+      reportDebugEvent({
+        hypothesisId: 'C',
+        location: 'currencyService.ts:fetchWithCache:error',
+        msg: '[DEBUG] currency request error',
+        data: {
+          endpoint,
+          params,
+          url,
+          error: error instanceof Error ? error.message : String(error),
+        },
+      })
       // #endregion
       throw error
     }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { StripeProvider } from '@/contexts/StripeContext'
@@ -267,7 +267,7 @@ const Rent: React.FC = () => {
   }))
 
   // Fetch existing bookings for the tool
-  const fetchExistingBookings = async (toolId: string) => {
+  const fetchExistingBookings = useCallback(async (toolId: string) => {
     try {
       // Récupérer le token d'authentification
       const token = localStorage.getItem('authToken')
@@ -363,10 +363,10 @@ const Rent: React.FC = () => {
       const dates = mockUnavailableDates.map((dateStr) => new Date(dateStr))
       setUnavailableDates(dates)
     }
-  }
+  }, [])
 
   // Fetch tool data
-  const fetchTool = async () => {
+  const fetchTool = useCallback(async () => {
     if (!id) return
 
     try {
@@ -381,13 +381,13 @@ const Rent: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [id, fetchExistingBookings])
 
   useEffect(() => {
     fetchTool()
     // Déclencher la récupération des taux de change pour la page de location
     refreshRates(RateFetchTrigger.RENT_PAGE_ENTRY)
-  }, [id, refreshRates])
+  }, [id, fetchTool, refreshRates])
 
   const isDateUnavailable = (date: Date) => {
     return unavailableDates.some(

@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useMemo } from 'react';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { 
   RateFetchTrigger, 
@@ -29,7 +29,7 @@ export const useCurrencyOptimized = (): UseCurrencyOptimizedReturn => {
     isRatesFresh
   } = context;
 
-  return {
+  return useMemo(() => ({
     currency,
     setCurrency,
     calculatePrice,
@@ -38,5 +38,14 @@ export const useCurrencyOptimized = (): UseCurrencyOptimizedReturn => {
     isLoading,
     cacheAge,
     isRatesFresh
-  };
+  }), [
+    currency,
+    setCurrency,
+    calculatePrice,
+    calculateBulkPrices,
+    refreshRates,
+    isLoading,
+    cacheAge,
+    isRatesFresh
+  ]);
 };

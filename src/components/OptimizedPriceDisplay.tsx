@@ -6,6 +6,32 @@ const DEBUG_SERVER_URL = 'http://127.0.0.1:7777/event'
 const DEBUG_SESSION_ID = 'currency-price-error'
 const DEBUG_RUN_ID = 'post-fix'
 
+const reportDisplayEvent = (event: {
+  hypothesisId: string
+  location: string
+  msg: string
+  data?: Record<string, unknown>
+}) => {
+  const fullEvent = {
+    sessionId: DEBUG_SESSION_ID,
+    runId: DEBUG_RUN_ID,
+    hypothesisId: event.hypothesisId,
+    location: event.location,
+    msg: event.msg,
+    data: event.data ?? {},
+    ts: Date.now(),
+  }
+  if (typeof window !== 'undefined') {
+    // eslint-disable-next-line no-console
+    console.log('[CURRENCY DEBUG]', event.location, event.msg, event.data ?? {})
+  }
+  fetch(DEBUG_SERVER_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(fullEvent),
+  }).catch(() => {})
+}
+
 interface OptimizedPriceDisplayProps {
   price: number
   baseCurrency?: string
@@ -39,7 +65,20 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
   const normalizedBaseCurrency = baseCurrency.toUpperCase()
 
   // #region debug-point B:price-display-input
-  fetch(DEBUG_SERVER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:DEBUG_SESSION_ID,runId:DEBUG_RUN_ID,hypothesisId:'B',location:'OptimizedPriceDisplay.tsx:render-input',msg:'[DEBUG] price display render input',data:{price,baseCurrency,normalizedBaseCurrency,targetCurrency:currency.code,useCache,cible,isLoading},ts:Date.now()})}).catch(()=>{})
+  reportDisplayEvent({
+    hypothesisId: 'B',
+    location: 'OptimizedPriceDisplay.tsx:render-input',
+    msg: '[DEBUG] price display render input',
+    data: {
+      price,
+      baseCurrency,
+      normalizedBaseCurrency,
+      targetCurrency: currency.code,
+      useCache,
+      cible,
+      isLoading,
+    },
+  })
   // #endregion
 
   // Fonction pour obtenir le symbole de devise selon la langue
@@ -98,7 +137,18 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
         const targetSymbol = getCurrencySymbol(currency.code)
 
         // #region debug-point B:price-display-rate
-        fetch(DEBUG_SERVER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:DEBUG_SESSION_ID,runId:DEBUG_RUN_ID,hypothesisId:'B',location:'OptimizedPriceDisplay.tsx:instant-rate',msg:'[DEBUG] price display instant rate lookup',data:{baseCurrency:normalizedBaseCurrency,targetCurrency:currency.code,instantRate,price:validPrice,useCache},ts:Date.now()})}).catch(()=>{})
+        reportDisplayEvent({
+          hypothesisId: 'B',
+          location: 'OptimizedPriceDisplay.tsx:instant-rate',
+          msg: '[DEBUG] price display instant rate lookup',
+          data: {
+            baseCurrency: normalizedBaseCurrency,
+            targetCurrency: currency.code,
+            instantRate,
+            price: validPrice,
+            useCache,
+          },
+        })
         // #endregion
 
         if (instantRate === null) {
@@ -192,7 +242,19 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
   // Affichage d'erreur
   if (error && !convertedPrice) {
     // #region debug-point D:price-display-error-state
-    fetch(DEBUG_SERVER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:DEBUG_SESSION_ID,runId:DEBUG_RUN_ID,hypothesisId:'D',location:'OptimizedPriceDisplay.tsx:error-state',msg:'[DEBUG] price display error state',data:{price,baseCurrency,normalizedBaseCurrency,targetCurrency:currency.code,useCache,isLoading},ts:Date.now()})}).catch(()=>{})
+    reportDisplayEvent({
+      hypothesisId: 'D',
+      location: 'OptimizedPriceDisplay.tsx:error-state',
+      msg: '[DEBUG] price display error state',
+      data: {
+        price,
+        baseCurrency,
+        normalizedBaseCurrency,
+        targetCurrency: currency.code,
+        useCache,
+        isLoading,
+      },
+    })
     // #endregion
     return (
       <div className={`${getSizeClasses()} ${className} text-red-500`}>
