@@ -156,21 +156,24 @@ const ToolDetails = () => {
       if (isFavorite(tool.id)) {
         await removeFromFavorites(tool.id)
         toast({
-          title: 'Retiré des favoris',
-          description: `${tool.title} a été retiré de vos favoris.`,
+          title: t('favorites.remove_success_title'),
+          description: t('favorites.remove_success_description', {
+            toolName: tool.title,
+          }),
         })
       } else {
         await addToFavorites(tool)
         toast({
-          title: 'Ajouté aux favoris',
-          description: `${tool.title} a été ajouté à vos favoris.`,
+          title: t('favorites.add_success_title'),
+          description: t('favorites.add_success_description', {
+            toolName: tool.title,
+          }),
         })
       }
     } catch (error) {
       toast({
-        title: 'Erreur',
-        description:
-          "Une erreur s'est produite lors de la mise à jour des favoris.",
+        title: t('general.error'),
+        description: t('favorites.update_error'),
         variant: 'destructive',
       })
     }
@@ -219,9 +222,11 @@ const ToolDetails = () => {
         <main className='py-20'>
           <div className='max-w-7xl mx-auto px-4'>
             <div className='text-center py-20'>
-              <p className='text-red-600 mb-4'>{error || 'Outil non trouvé'}</p>
+              <p className='text-red-600 mb-4'>
+                {error || t('tools.not_found')}
+              </p>
               <Link to='/search'>
-                <Button>Retour à la recherche</Button>
+                <Button>{t('tools.back_to_search')}</Button>
               </Link>
             </div>
           </div>
@@ -270,7 +275,6 @@ const ToolDetails = () => {
     typeof tool.depositAmount === 'string'
       ? parseFloat(tool.depositAmount)
       : tool.depositAmount || 0
-
 
   // Only show price components if the original values are not null/undefined
   const shouldShowBasePrice =
@@ -567,7 +571,7 @@ const ToolDetails = () => {
                     </Button>
                   ) : user?.id === tool.owner.id ? (
                     <Button className='w-full' size='lg' disabled>
-                      Votre outil
+                      {t('tools.your_tool')}
                     </Button>
                   ) : (
                     <Link to={`/rent/${tool.id}`}>
@@ -714,7 +718,7 @@ const ToolDetails = () => {
                         ))
                       ) : (
                         <p className='text-gray-500 text-center py-4'>
-                          Aucun avis pour le moment.
+                          {t('tools.no_reviews')}
                         </p>
                       )}
                     </div>

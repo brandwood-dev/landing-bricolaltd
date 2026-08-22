@@ -23,12 +23,12 @@ const MyFavorites = () => {
     return (basePriceNumber || 0) + feeAmount
   }
   
-  const handleRemoveFavorite = async (id: string) => {
+  const handleRemoveFavorite = async (id: string, toolName: string) => {
     try {
       await removeFromFavorites(id);
       toast({
         title: t('favorites.remove_success_title'),
-        description: t('favorites.remove_success_description'),
+        description: t('favorites.remove_success_description', { toolName }),
       });
     } catch (error) {
       toast({
@@ -100,7 +100,7 @@ const MyFavorites = () => {
                       <Button
                         variant='ghost'
                         size='sm'
-                        onClick={() => handleRemoveFavorite(favorite.id)}
+                        onClick={() => handleRemoveFavorite(favorite.id, favorite.title || t('general.unknown_tool'))}
                         className='text-red-500 hover:text-red-700'
                       >
                         <Trash2 className='h-4 w-4' />

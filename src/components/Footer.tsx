@@ -73,7 +73,7 @@ const Footer = () => {
             >
              
               <p> <MapPin/>
-              Adress : 24-26 Arcadia Avenue, Fin009, London, United Kingdom, N3 2JU 
+              Address : 24-26 Arcadia Avenue, Fin009, London, United Kingdom, N3 2JU 
               </p>
             </div>
             <div
