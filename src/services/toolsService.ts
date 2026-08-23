@@ -353,7 +353,7 @@ export class ToolsService {
       if (!Array.isArray(categories)) {
         return [];
       }
-      
+      console.log('[Categories] list categories :', categories)
       return categories;
     } catch (error: any) {
       return []; // Return empty array instead of throwing to prevent component crashes

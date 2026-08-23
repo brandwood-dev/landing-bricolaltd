@@ -16,14 +16,15 @@ const Index = () => {
       <Header />
       <main>
         <HeroSection />
-        <VideoSection />
+        <MobileAppSection />
+
         <CategoriesSection />
         <FeaturedToolsSection />
         <RentalProcess />
-        <CustomerReviews />
+        <CustomerReviews /> 
+        <VideoSection />
         <BlogSection />
-
-        <MobileAppSection />
+       
       </main>
       <Footer />
     </div>
