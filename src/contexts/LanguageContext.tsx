@@ -16,7 +16,10 @@ interface LanguageContextType {
 
 const translations = {
   fr: {
-'change_message_clarification':'La valeur affichée peut légèrement varier en raison des fluctuations du taux de change de la livre sterling (GBP)',
+    deposit_message_clarification:
+      'Le dépôt et sa restitution se font hors de la plateforme.',
+    change_message_clarification:
+      'La valeur affichée peut légèrement varier en raison des fluctuations du taux de change de la livre sterling (GBP)',
     'report.describe_problem': 'Description du problème',
     'report.justification_documents': 'Pièces justificatives (optionnel)',
     'report.justification_documents_description':
@@ -97,7 +100,7 @@ const translations = {
       "En cas d'annulation par le propriétaire, le locataire sera intégralement remboursé.",
     'requests.owner_reject_refund_policy':
       'En cas de refus par le propriétaire, le locataire sera intégralement remboursé.',
-    'requests.renter_cancel_refund_full': 
+    'requests.renter_cancel_refund_full':
       'Annulation plus de 24h avant : Remboursement intégral.',
     'requests.renter_cancel_refund_none':
       'Annulation moins de 24h avant : Aucun remboursement.',
@@ -1515,8 +1518,7 @@ const translations = {
     'map.coordinates_fallback': 'Coordonnées : {lat}, {lng}',
     'map.missing_token':
       "Token Mapbox manquant dans les variables d'environnement",
-    'map.api_access_error':
-      "Impossible d'accéder à l'API Mapbox ({status})",
+    'map.api_access_error': "Impossible d'accéder à l'API Mapbox ({status})",
     'map.load_error': 'Erreur de chargement de la carte',
     'map.internet_connection_error':
       'Erreur de chargement de la carte. Vérifiez votre connexion internet.',
@@ -1609,7 +1611,8 @@ const translations = {
     'wallet.failed': 'Échouée',
     'wallet.no_transactions_found':
       'Aucune transaction trouvée pour les filtres sélectionnés.',
-    'ads.load_tool_details_error': "Impossible de charger les détails de l'outil",
+    'ads.load_tool_details_error':
+      "Impossible de charger les détails de l'outil",
     'ads.filters.validation_status_placeholder': 'Statut de validation',
     'ads.filters.publication_status_placeholder': 'Statut de publication',
     'ads.filters.category_placeholder': 'Catégorie',
@@ -1637,8 +1640,7 @@ const translations = {
       'Dispute créée mais erreur lors de la mise à jour de la réservation : {message}',
     'claim.unknown_error': 'Erreur inconnue',
     'claim.creating_progress': 'Création de la dispute...',
-    'claim.updating_booking_progress':
-      'Mise à jour de la réservation...',
+    'claim.updating_booking_progress': 'Mise à jour de la réservation...',
     'claim.sending_progress': 'Envoi en cours...',
     'profile.photo_updated_title': 'Photo de profil mise à jour',
     'profile.photo_updated_description':
@@ -1665,8 +1667,7 @@ const translations = {
       'Échec de la modification du mot de passe.',
     'profile.image_invalid_type':
       'Seuls les fichiers JPEG, PNG et WebP sont autorisés.',
-    'profile.image_too_large':
-      'La taille du fichier ne doit pas dépasser 5MB.',
+    'profile.image_too_large': 'La taille du fichier ne doit pas dépasser 5MB.',
     'profile.image_upload_success_title': 'Succès',
     'profile.image_upload_success_description':
       'Image téléchargée avec succès.',
@@ -1679,8 +1680,7 @@ const translations = {
     'request.errors.reject_failed': 'Échec du refus de la réservation',
     'request.errors.missing_review_information':
       "Informations requises manquantes pour l'avis",
-    'request.errors.submit_review_failed':
-      "Échec de l'envoi de l'avis",
+    'request.errors.submit_review_failed': "Échec de l'envoi de l'avis",
     'request.errors.missing_app_review_user':
       "Informations utilisateur manquantes pour l'avis sur l'application",
     'request.errors.submit_app_review_failed':
@@ -1697,8 +1697,7 @@ const translations = {
       'Erreur lors de la création du signalement',
     'reservations.return_confirm_failed':
       "Impossible de confirmer le retour de l'outil",
-    'reservations.no_selected_reservation':
-      'Aucune réservation sélectionnée.',
+    'reservations.no_selected_reservation': 'Aucune réservation sélectionnée.',
     'reservations.claim_exists_title': 'Réclamation existante',
     'reservations.claim_exists_description':
       'Une réclamation active existe déjà pour cette réservation.',
@@ -1715,8 +1714,7 @@ const translations = {
     'reservations.review_exists_title': 'Avis déjà existant',
     'reservations.review_exists_description':
       'Vous avez déjà laissé un avis pour cette réservation',
-    'wallet.load_failed':
-      'Impossible de charger les données du portefeuille',
+    'wallet.load_failed': 'Impossible de charger les données du portefeuille',
     'wallet.loading_transactions': 'Chargement des transactions...',
 
     // Wallet Dialog
@@ -2708,7 +2706,10 @@ const translations = {
     'resetpwd.check_error': 'Une erreur est survenue lors de la vérification',
   },
   en: {
-    'change_message_clarification' : 'The displayed value may vary slightly due to fluctuations in the British Pound (GBP) exchange rate.',
+    deposit_message_clarification:
+        'The deposit handover and refund process is handled outside the platform.',
+    change_message_clarification:
+      'The displayed value may vary slightly due to fluctuations in the British Pound (GBP) exchange rate.',
     'report.describe_problem': 'Describe the problem',
     'report.justification_documents': 'Justification Documents (optional)',
     'report.justification_documents_description':
@@ -3835,11 +3836,9 @@ const translations = {
     'featured_tools.favorite_added_title': 'Added to favorites',
     'featured_tools.favorite_added_description':
       '{toolName} was added to your favorites.',
-    'featured_tools.favorites_update_error':
-      'Unable to update favorites.',
+    'featured_tools.favorites_update_error': 'Unable to update favorites.',
     'pricing.load_error': 'Error loading price',
-    'share.share_with_family':
-      'Share this post with your family and friends.',
+    'share.share_with_family': 'Share this post with your family and friends.',
     'suspension.title': 'Account suspended',
     'suspension.account_suspended':
       'Your account has been suspended temporarily or permanently.',
@@ -3867,8 +3866,7 @@ const translations = {
       'Initialization error. Manual entry mode enabled.',
     'address_autocomplete.configuration_required':
       'Mapbox configuration is required for autocomplete',
-    'address_autocomplete.manual_entry_hint':
-      'Enter your address manually',
+    'address_autocomplete.manual_entry_hint': 'Enter your address manually',
     'map.address_unavailable': 'Address unavailable',
     'map.address_not_found': 'Address not found',
     'map.coordinates_fallback': 'Coordinates: {lat}, {lng}',
@@ -3992,14 +3990,11 @@ const translations = {
       'Your profile picture was updated successfully.',
     'profile.photo_update_failed': 'Failed to update profile picture.',
     'profile.updated_title': 'Profile updated',
-    'profile.updated_description':
-      'Your information was updated successfully.',
+    'profile.updated_description': 'Your information was updated successfully.',
     'profile.update_failed': 'Failed to update profile.',
     'profile.password_validation_error_title': 'Validation error',
-    'profile.password_fill_all_fields':
-      'Please fill in all password fields.',
-    'profile.password_current_incorrect':
-      'The current password is incorrect.',
+    'profile.password_fill_all_fields': 'Please fill in all password fields.',
+    'profile.password_current_incorrect': 'The current password is incorrect.',
     'profile.password_criteria_invalid':
       'The new password does not meet the required criteria.',
     'profile.password_confirmation_mismatch':
@@ -4008,16 +4003,13 @@ const translations = {
     'profile.password_updated_description':
       'Your password was changed successfully.',
     'profile.password_update_failed': 'Failed to change password.',
-    'profile.image_invalid_type':
-      'Only JPEG, PNG, and WebP files are allowed.',
+    'profile.image_invalid_type': 'Only JPEG, PNG, and WebP files are allowed.',
     'profile.image_too_large': 'The file size must not exceed 5MB.',
     'profile.image_upload_success_title': 'Success',
-    'profile.image_upload_success_description':
-      'Image uploaded successfully.',
+    'profile.image_upload_success_description': 'Image uploaded successfully.',
     'profile.image_upload_failed': 'Failed to upload image.',
     'profile.password_incorrect_title': 'Incorrect password',
-    'profile.password_check_failed':
-      'Unable to verify the current password.',
+    'profile.password_check_failed': 'Unable to verify the current password.',
     'profile.uploading_image': 'Uploading...',
     'request.errors.accept_failed': 'Failed to accept booking',
     'request.errors.reject_failed': 'Failed to reject booking',
@@ -4026,8 +4018,7 @@ const translations = {
     'request.errors.submit_review_failed': 'Failed to submit review',
     'request.errors.missing_app_review_user':
       'Missing user information for app review',
-    'request.errors.submit_app_review_failed':
-      'Failed to submit app review',
+    'request.errors.submit_app_review_failed': 'Failed to submit app review',
     'request.errors.report_pickup_issue_failed':
       'Failed to report pickup issue',
     'request.errors.confirm_pickup_failed': 'Failed to confirm pickup',
@@ -4035,15 +4026,13 @@ const translations = {
       'Please select a cancellation reason.',
     'reservations.cancel_failed': 'Failed to cancel the booking',
     'reservations.report_create_failed': 'Failed to create the report',
-    'reservations.return_confirm_failed':
-      'Unable to confirm the tool return',
+    'reservations.return_confirm_failed': 'Unable to confirm the tool return',
     'reservations.no_selected_reservation': 'No booking selected.',
     'reservations.claim_exists_title': 'Existing claim',
     'reservations.claim_exists_description':
       'An active claim already exists for this booking.',
     'reservations.user_not_connected': 'User not connected',
-    'reservations.files_too_large':
-      'Some files exceed the 1MB size limit.',
+    'reservations.files_too_large': 'Some files exceed the 1MB size limit.',
     'reservations.files_too_large_title': 'Files too large',
     'reservations.files_too_large_description':
       '{count} file(s) exceed the 1MB limit and were ignored.',
@@ -5298,7 +5287,10 @@ const translations = {
     'mobile_app.google_play': 'Get it from Google Play',
   },
   ar: {
-     'change_message_clarification' : 'قد تختلف القيمة المعروضة قليلاً بسبب تغيّر سعر صرف الجنيه الإسترليني.',
+    deposit_message_clarification:
+      'عملية تسليم واسترداد مبلغ الضمان تتم خارج المنصة.',
+    change_message_clarification:
+      'قد تختلف القيمة المعروضة قليلاً بسبب تغيّر سعر صرف الجنيه الإسترليني.',
     'report.describe_problem': 'وصف المشكلة',
     'report.justification_documents': 'الملفات الاصلاحية',
     'report.justification_documents_description':
@@ -6514,8 +6506,7 @@ const translations = {
     'request.enter_code': 'أدخل الرمز',
     'request.confirm': 'تأكيد',
     'request.validation_code_accepted': 'تم تأكيد الإرجاع',
-    'request.validation_code_accepted_message':
-      'تأكيد الرمز, والحجز قد بدأ',
+    'request.validation_code_accepted_message': 'تأكيد الرمز, والحجز قد بدأ',
     'request.validation_code_rejected': 'رمز غير صالح',
     'request.validation_code_rejected_message': 'رمز التحقق غير صحيح!',
     'request.contact_renter_information': 'معلومات المستأجر',
@@ -6571,14 +6562,11 @@ const translations = {
     'featured_tools.favorite_added_title': 'تمت الإضافة إلى المفضلة',
     'featured_tools.favorite_added_description':
       'تمت إضافة {toolName} إلى المفضلة.',
-    'featured_tools.favorites_update_error':
-      'تعذر تحديث المفضلة.',
+    'featured_tools.favorites_update_error': 'تعذر تحديث المفضلة.',
     'pricing.load_error': 'خطأ أثناء تحميل السعر',
-    'share.share_with_family':
-      'شارك هذا المنشور مع عائلتك وأصدقائك.',
+    'share.share_with_family': 'شارك هذا المنشور مع عائلتك وأصدقائك.',
     'suspension.title': 'تم تعليق الحساب',
-    'suspension.account_suspended':
-      'تم تعليق حسابك بشكل مؤقت أو دائم.',
+    'suspension.account_suspended': 'تم تعليق حسابك بشكل مؤقت أو دائم.',
     'suspension.reason_label': 'سبب التعليق',
     'suspension.help_text':
       'إذا كنت تعتقد أن هذا خطأ، فيرجى التواصل مع فريق الدعم.',
@@ -6685,35 +6673,27 @@ const translations = {
     'claim.updating_booking_progress': 'جارٍ تحديث الحجز...',
     'claim.sending_progress': 'جارٍ الإرسال...',
     'profile.photo_updated_title': 'تم تحديث صورة الملف الشخصي',
-    'profile.photo_updated_description':
-      'تم تحديث صورة ملفك الشخصي بنجاح.',
+    'profile.photo_updated_description': 'تم تحديث صورة ملفك الشخصي بنجاح.',
     'profile.photo_update_failed': 'فشل تحديث صورة الملف الشخصي.',
     'profile.updated_title': 'تم تحديث الملف الشخصي',
     'profile.updated_description': 'تم تحديث معلوماتك بنجاح.',
     'profile.update_failed': 'فشل تحديث الملف الشخصي.',
     'profile.password_validation_error_title': 'خطأ في التحقق',
-    'profile.password_fill_all_fields':
-      'يرجى تعبئة جميع حقول كلمة المرور.',
-    'profile.password_current_incorrect':
-      'كلمة المرور الحالية غير صحيحة.',
+    'profile.password_fill_all_fields': 'يرجى تعبئة جميع حقول كلمة المرور.',
+    'profile.password_current_incorrect': 'كلمة المرور الحالية غير صحيحة.',
     'profile.password_criteria_invalid':
       'كلمة المرور الجديدة لا تستوفي الشروط المطلوبة.',
-    'profile.password_confirmation_mismatch':
-      'تأكيد كلمة المرور غير متطابق.',
+    'profile.password_confirmation_mismatch': 'تأكيد كلمة المرور غير متطابق.',
     'profile.password_updated_title': 'تم تغيير كلمة المرور',
-    'profile.password_updated_description':
-      'تم تغيير كلمة المرور بنجاح.',
+    'profile.password_updated_description': 'تم تغيير كلمة المرور بنجاح.',
     'profile.password_update_failed': 'فشل تغيير كلمة المرور.',
-    'profile.image_invalid_type':
-      'يُسمح فقط بملفات JPEG وPNG وWebP.',
-    'profile.image_too_large':
-      'يجب ألا يتجاوز حجم الملف 5 ميغابايت.',
+    'profile.image_invalid_type': 'يُسمح فقط بملفات JPEG وPNG وWebP.',
+    'profile.image_too_large': 'يجب ألا يتجاوز حجم الملف 5 ميغابايت.',
     'profile.image_upload_success_title': 'نجاح',
     'profile.image_upload_success_description': 'تم رفع الصورة بنجاح.',
     'profile.image_upload_failed': 'فشل رفع الصورة.',
     'profile.password_incorrect_title': 'كلمة مرور غير صحيحة',
-    'profile.password_check_failed':
-      'تعذر التحقق من كلمة المرور الحالية.',
+    'profile.password_check_failed': 'تعذر التحقق من كلمة المرور الحالية.',
     'profile.uploading_image': 'جارٍ الرفع...',
     'request.errors.accept_failed': 'فشل قبول الحجز',
     'request.errors.reject_failed': 'فشل رفض الحجز',
@@ -6722,22 +6702,17 @@ const translations = {
     'request.errors.submit_review_failed': 'فشل إرسال المراجعة',
     'request.errors.missing_app_review_user':
       'معلومات المستخدم لمراجعة التطبيق مفقودة',
-    'request.errors.submit_app_review_failed':
-      'فشل إرسال مراجعة التطبيق',
+    'request.errors.submit_app_review_failed': 'فشل إرسال مراجعة التطبيق',
     'request.errors.report_pickup_issue_failed':
       'فشل الإبلاغ عن مشكلة الاستلام',
-    'request.errors.confirm_pickup_failed':
-      'فشل تأكيد الاستلام',
-    'reservations.cancel_reason_required':
-      'يرجى اختيار سبب الإلغاء.',
+    'request.errors.confirm_pickup_failed': 'فشل تأكيد الاستلام',
+    'reservations.cancel_reason_required': 'يرجى اختيار سبب الإلغاء.',
     'reservations.cancel_failed': 'فشل إلغاء الحجز',
     'reservations.report_create_failed': 'فشل إنشاء البلاغ',
-    'reservations.return_confirm_failed':
-      'تعذر تأكيد إرجاع الأداة',
+    'reservations.return_confirm_failed': 'تعذر تأكيد إرجاع الأداة',
     'reservations.no_selected_reservation': 'لم يتم اختيار أي حجز.',
     'reservations.claim_exists_title': 'يوجد نزاع قائم',
-    'reservations.claim_exists_description':
-      'يوجد نزاع نشط بالفعل لهذا الحجز.',
+    'reservations.claim_exists_description': 'يوجد نزاع نشط بالفعل لهذا الحجز.',
     'reservations.user_not_connected': 'المستخدم غير متصل',
     'reservations.files_too_large':
       'بعض الملفات تتجاوز الحد الأقصى البالغ 1 ميغابايت.',
@@ -6745,8 +6720,7 @@ const translations = {
     'reservations.files_too_large_description':
       'تم تجاهل {count} ملف(ات) لأنها تتجاوز حد 1 ميغابايت.',
     'reservations.files_added_title': 'تمت إضافة الملفات',
-    'reservations.files_added_description':
-      'تمت إضافة {count} ملف(ات) بنجاح.',
+    'reservations.files_added_description': 'تمت إضافة {count} ملف(ات) بنجاح.',
     'reservations.copy_code_failed': 'تعذر نسخ الرمز.',
     'reservations.review_exists_title': 'المراجعة موجودة بالفعل',
     'reservations.review_exists_description':

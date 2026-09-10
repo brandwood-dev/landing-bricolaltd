@@ -441,10 +441,10 @@ const Rent: React.FC = () => {
     return `${year}-${month}-${day}`
   }
 
-  // Calculer la date minimum (maintenant + 48h)
+  // Calculer la date minimum (maintenant + 24h = lendemain)
   const getMinimumStartDate = () => {
     const now = new Date()
-    const minimumDate = new Date(now.getTime() + 48 * 60 * 60 * 1000)
+    const minimumDate = new Date(now.getTime() + 24 * 60 * 60 * 1000)
     return minimumDate
   }
 
@@ -522,9 +522,11 @@ const Rent: React.FC = () => {
 
   const calculateDays = () => {
     if (!startDate || !endDate) return 0
-    const diffTime = Math.abs(endDate.getTime() - startDate.getTime())
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-    return diffDays
+    const s = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 0, 0, 0, 0)
+    const e = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), 0, 0, 0, 0)
+    const diffMs = Math.abs(e.getTime() - s.getTime())
+    if (diffMs <= 0) return 0
+    return Math.max(1, Math.round(diffMs / (1000 * 60 * 60 * 24)))
   }
 
   // Fetch pricing when dates change
@@ -538,8 +540,8 @@ const Rent: React.FC = () => {
       setPricingLoading(true)
       const pricingData = await bookingService.calculateBookingPricing(
         tool.id,
-        startDate.toISOString().split('T')[0],
-        endDate.toISOString().split('T')[0],
+        formatDateLocal(startDate),
+        formatDateLocal(endDate),
       )
       setPricing(pricingData)
     } catch (err: any) {
@@ -558,8 +560,8 @@ const Rent: React.FC = () => {
         taxes: Number(fees),
         deposit,
         totalAmount: Number(subtotal) + Number(fees), // Exclure la caution du montant à payer
-        startDate: startDate.toISOString().split('T')[0],
-        endDate: endDate.toISOString().split('T')[0],
+        startDate: formatDateLocal(startDate),
+        endDate: formatDateLocal(endDate),
         serviceFee: Number(fees),
         currency: 'GBP',
         breakdown: {
@@ -776,15 +778,18 @@ const Rent: React.FC = () => {
       }, 50)
     } catch (err: any) {
       // Function to get user-friendly error message
+      // Priorité: code API structuré, sinon heuristique sur message
       const getErrorMessage = (error: any) => {
+        const payload = error?.response?.data || {}
+        const code: string | undefined = payload?.error?.code || payload?.code
         const errorMessage =
-          error.response?.data?.message || error.message || ''
+          payload?.error?.message || payload?.message || error?.message || ''
 
-        // Check for specific error types
         if (
-          errorMessage.includes(
-            'Tool is already booked for the requested dates',
-          )
+          code === 'TOOL_ALREADY_BOOKED' ||
+          code === 'CONFLICT_DETECTED' ||
+          errorMessage.includes('already booked') ||
+          errorMessage.includes('Outil déjà réservé')
         ) {
           return {
             title: t('rent.toast.error.tool_unavailable.title'),
@@ -793,6 +798,11 @@ const Rent: React.FC = () => {
         }
 
         if (
+          code === 'INVALID_START_DATE' ||
+          code === 'INVALID_END_DATE' ||
+          code === 'DATE_ORDER_INVALID' ||
+          code === 'INVALID_PICKUP_HOUR' ||
+          code === 'INVALID_INPUT' ||
           errorMessage.includes('validation') ||
           errorMessage.includes('Invalid')
         ) {
@@ -803,6 +813,8 @@ const Rent: React.FC = () => {
         }
 
         if (
+          code === 'PAYMENT_FAILED' ||
+          code === 'STRIPE_ERROR' ||
           errorMessage.includes('payment') ||
           errorMessage.includes('Payment')
         ) {
@@ -813,6 +825,8 @@ const Rent: React.FC = () => {
         }
 
         if (
+          code === 'UNAUTHORIZED' ||
+          code === 'NOT_AUTHENTICATED' ||
           errorMessage.includes('unauthorized') ||
           errorMessage.includes('Unauthorized')
         ) {
@@ -823,6 +837,7 @@ const Rent: React.FC = () => {
         }
 
         if (
+          code === 'TOOL_NOT_FOUND' ||
           errorMessage.includes('not found') ||
           errorMessage.includes('Not found')
         ) {

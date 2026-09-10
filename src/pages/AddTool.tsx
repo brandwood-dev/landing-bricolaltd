@@ -1043,7 +1043,11 @@ const AddTool = () => {
                                     currency.code,
                                     'GBP',
                                   )
-                            if (numValue && gbpValue !== null && gbpValue > 500) {
+                            if (
+                              numValue &&
+                              gbpValue !== null &&
+                              gbpValue > 500
+                            ) {
                               return
                             }
                             handlePriceChange(numValue)
@@ -1078,9 +1082,9 @@ const AddTool = () => {
                         </div>
                       )}
 
-                        <div className='text-xs text-muted-foreground mt-1'>
-                       {t('change_message_clarification')}
-                        </div>
+                      <div className='text-xs text-muted-foreground mt-1'>
+                        {t('change_message_clarification')}
+                      </div>
                     </div>
 
                     <div className='space-y-3'>
@@ -1112,7 +1116,11 @@ const AddTool = () => {
                                     currency.code,
                                     'GBP',
                                   )
-                            if (numValue && gbpValue !== null && gbpValue > 500) {
+                            if (
+                              numValue &&
+                              gbpValue !== null &&
+                              gbpValue > 500
+                            ) {
                               return
                             }
                             handleDepositChange(numValue)
@@ -1146,6 +1154,9 @@ const AddTool = () => {
                           )}
                         </div>
                       )}
+                      <div className='text-xs text-muted-foreground mt-1'>
+                        {t('deposit_message_clarification')}
+                      </div>
                     </div>
                   </div>
                 </div>

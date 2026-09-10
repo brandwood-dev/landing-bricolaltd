@@ -9,7 +9,20 @@ import {
 } from '../types/bridge';
 import { ApiResponse, PaginatedResponse } from '../types/bridge/common.types';
 
-// All interfaces are now imported from bridge types
+// Extract readable error message from API response payloads.
+// Compatibility chain:
+//   1. Nest GlobalExceptionFilter (nouveau): error.response.data.error.message + code
+//   2. Ancien format Nest natif  : error.response.data.message
+//   3. JS Error              : error.message
+const extractErrorMessage = (error: any, fallback: string): string => {
+  const payload = error?.response?.data;
+  return (
+    payload?.error?.message ||
+    payload?.message ||
+    error?.message ||
+    fallback
+  );
+};
 
 // Booking service
 export class BookingService {
@@ -19,7 +32,7 @@ export class BookingService {
       const response = await api.post<ApiResponse<Booking>>('/bookings', bookingData);
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to create booking');
+      throw new Error(extractErrorMessage(error, 'Failed to create booking'));
     }
   }
 
@@ -29,7 +42,7 @@ export class BookingService {
       const response = await api.get<ApiResponse<Booking>>(`/bookings/${id}`);
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to fetch booking');
+      throw new Error(extractErrorMessage(error, 'Failed to fetch booking'));
     }
   }
 
@@ -46,7 +59,7 @@ export class BookingService {
       return response.data.data
     } catch (error: any) {
       throw new Error(
-        error.response?.data?.message || 'Failed to fetch booking history'
+        extractErrorMessage(error, 'Failed to fetch booking history')
       )
     }
   }
@@ -55,7 +68,7 @@ export class BookingService {
   async getUserBookings(userId: string, filters?: BookingFilters): Promise<Booking[]> {
     try {
       const params = new URLSearchParams();
-      
+
       if (filters) {
         if (filters.page) params.append('page', filters.page.toString());
         if (filters.limit) params.append('limit', filters.limit.toString());
@@ -66,13 +79,13 @@ export class BookingService {
         if (filters.sortBy) params.append('sortBy', filters.sortBy);
         if (filters.sortOrder) params.append('sortOrder', filters.sortOrder);
       }
-      
+
       const queryString = params.toString();
       const url = queryString ? `/bookings/user/${userId}?${queryString}` : `/bookings/user/${userId}`;
       const response = await api.get<ApiResponse<Booking[]>>(url);
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to fetch user bookings');
+      throw new Error(extractErrorMessage(error, 'Failed to fetch user bookings'));
     }
   }
 
@@ -80,7 +93,7 @@ export class BookingService {
   async getOwnerBookings(userId: string, filters?: BookingFilters): Promise<{ data: Booking[] }> {
     try {
       const params = new URLSearchParams();
-      
+
       if (filters) {
         if (filters.page) params.append('page', filters.page.toString());
         if (filters.limit) params.append('limit', filters.limit.toString());
@@ -91,40 +104,40 @@ export class BookingService {
         if (filters.sortBy) params.append('sortBy', filters.sortBy);
         if (filters.sortOrder) params.append('sortOrder', filters.sortOrder);
       }
-      
+
       const queryString = params.toString();
       const url = queryString ? `/bookings/user/owner/${userId}?${queryString}` : `/bookings/user/owner/${userId}`;
       const response = await api.get<ApiResponse<Booking[]>>(url);
       return { data: response.data.data };
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to fetch owner bookings');
+      throw new Error(extractErrorMessage(error, 'Failed to fetch owner bookings'));
     }
   }
 
   // Update booking status
   async updateBookingStatus(id: string, statusOrData: Booking['status'] | { status?: Booking['status']; pickupTool?: boolean }): Promise<Booking> {
     try {
-      const updateData = typeof statusOrData === 'string' 
+      const updateData = typeof statusOrData === 'string'
         ? { status: statusOrData }
         : statusOrData;
-      
+
       const response = await api.patch<ApiResponse<Booking>>(`/bookings/${id}`, updateData);
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to update booking status');
+      throw new Error(extractErrorMessage(error, 'Failed to update booking status'));
     }
   }
 
   // Cancel booking
   async cancelBooking(id: string, reason?: string, cancellationMessage?: string): Promise<Booking> {
     try {
-      const response = await api.patch<ApiResponse<Booking>>(`/bookings/${id}/cancel`, { 
+      const response = await api.patch<ApiResponse<Booking>>(`/bookings/${id}/cancel`, {
         reason,
         cancellationMessage
       });
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to cancel booking');
+      throw new Error(extractErrorMessage(error, 'Failed to cancel booking'));
     }
   }
 
@@ -137,7 +150,7 @@ export class BookingService {
       });
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to reject booking');
+      throw new Error(extractErrorMessage(error, 'Failed to reject booking'));
     }
   }
 
@@ -147,7 +160,7 @@ export class BookingService {
       const response = await api.patch<ApiResponse<Booking>>(`/bookings/${id}/accept`);
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to accept booking');
+      throw new Error(extractErrorMessage(error, 'Failed to accept booking'));
     }
   }
 
@@ -159,7 +172,7 @@ export class BookingService {
       });
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to validate booking code');
+      throw new Error(extractErrorMessage(error, 'Failed to validate booking code'));
     }
   }
 
@@ -169,7 +182,7 @@ export class BookingService {
       const response = await api.patch<ApiResponse<Booking>>(`/bookings/${id}/complete`);
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to complete booking');
+      throw new Error(extractErrorMessage(error, 'Failed to complete booking'));
     }
   }
 
@@ -183,30 +196,21 @@ export class BookingService {
       });
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to check availability');
+      throw new Error(extractErrorMessage(error, 'Failed to check availability'));
     }
   }
 
-  // Get tool unavailable dates
+  // Get tool unavailable dates via dedicated endpoint GET /bookings/:toolId/unavailable-dates
   async getToolUnavailableDates(toolId: string): Promise<string[]> {
     try {
-      // Use a wide date range to get all unavailable dates for the tool
-      const now = new Date();
-      const futureDate = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
-      
-      // Format dates as simplified ISO 8601 format (YYYY-MM-DDTHH:mm:ssZ)
-      const startDate = now.toISOString().split('.')[0] + 'Z';
-      const endDate = futureDate.toISOString().split('.')[0] + 'Z';
-      
-      const response = await api.post<ApiResponse<{ unavailableDates: string[] }>>('/bookings/check-availability', {
-        toolId,
-        startDate,
-        endDate
-      });
-      
-      return response.data.data.unavailableDates || [];
+      const response = await api.get<ApiResponse<{
+        toolId: string;
+        unavailableDates: string[];
+        upcomingConflicts: Array<{ startDate: string; endDate: string; status: string }>;
+      }>>(`/bookings/${toolId}/unavailable-dates`);
+      return response.data.data?.unavailableDates || [];
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to fetch unavailable dates');
+      throw new Error(extractErrorMessage(error, 'Failed to fetch unavailable dates'));
     }
   }
 
@@ -220,21 +224,21 @@ export class BookingService {
       });
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to calculate pricing');
+      throw new Error(extractErrorMessage(error, 'Failed to calculate pricing'));
     }
   }
 
   // Process payment for booking
-  async processPayment(bookingId: string, paymentMethodId: string): Promise<{ 
-    success: boolean; 
-    paymentIntentId?: string; 
+  async processPayment(bookingId: string, paymentMethodId: string): Promise<{
+    success: boolean;
+    paymentIntentId?: string;
     clientSecret?: string;
     error?: string;
   }> {
     try {
-      const response = await api.post<ApiResponse<{ 
-        success: boolean; 
-        paymentIntentId?: string; 
+      const response = await api.post<ApiResponse<{
+        success: boolean;
+        paymentIntentId?: string;
         clientSecret?: string;
         error?: string;
       }>>(`/bookings/${bookingId}/with-payment`, {
@@ -242,7 +246,7 @@ export class BookingService {
       });
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Payment processing failed');
+      throw new Error(extractErrorMessage(error, 'Payment processing failed'));
     }
   }
 
@@ -252,7 +256,7 @@ export class BookingService {
       const response = await api.post<ApiResponse<Booking>>(`/bookings/${bookingId}/confirm-payment`, { paymentIntentId });
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to confirm payment');
+      throw new Error(extractErrorMessage(error, 'Failed to confirm payment'));
     }
   }
 
@@ -264,7 +268,7 @@ export class BookingService {
       });
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to confirm tool return');
+      throw new Error(extractErrorMessage(error, 'Failed to confirm tool return'));
     }
   }
 
@@ -274,7 +278,7 @@ export class BookingService {
       const response = await api.get<ApiResponse<BookingStats>>('/bookings/stats');
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to fetch booking statistics');
+      throw new Error(extractErrorMessage(error, 'Failed to fetch booking statistics'));
     }
   }
 
@@ -284,7 +288,7 @@ export class BookingService {
       const response = await api.patch<ApiResponse<Booking>>(`/bookings/${bookingId}/confirm-pickup`);
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to confirm pickup');
+      throw new Error(extractErrorMessage(error, 'Failed to confirm pickup'));
     }
   }
 
@@ -294,7 +298,7 @@ export class BookingService {
       const formData = new FormData();
       formData.append('reason', disputeData.reason);
       formData.append('description', disputeData.description);
-      
+
       if (images && images.length > 0) {
         images.forEach((image, index) => {
           formData.append(`images`, image);
@@ -308,7 +312,7 @@ export class BookingService {
       });
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to report pickup issue');
+      throw new Error(extractErrorMessage(error, 'Failed to report pickup issue'));
     }
   }
 }
