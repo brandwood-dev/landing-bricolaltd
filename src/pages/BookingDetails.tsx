@@ -105,6 +105,7 @@ const BookingDetails = () => {
           `${owner?.firstName || ''} ${owner?.lastName || ''}`.trim() ||
           t('general.unknown_owner'),
         email: owner?.email || '',
+        prefix: owner?.phone_prefix || '',
         phone: owner?.phoneNumber || '',
         address: owner?.address || '',
         profilePicture: owner?.profilePicture || '',
@@ -319,7 +320,20 @@ const BookingDetails = () => {
     start.setHours(0, 0, 0, 0)
     return start.getTime() <= today.getTime()
   }, [booking?.startDate])
+  // is24HourBeforeStart can be used to check if the booking is 24 hours before the start date
+  const isTwoFourHourBeforeStart = useMemo(() => {
+    if (!booking?.startDate) return false
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const start = new Date(booking.startDate)
+    start.setHours(0, 0, 0, 0)
+    // 24 hours in milliseconds
+    const twoFourHours = 24 * 60 * 60 * 1000
+    const diffHours = (start.getTime() - today.getTime()) / twoFourHours
+    return diffHours >= twoFourHours
+  }, [booking?.startDate])
 
+  // acceptedCancellationHasFullRefund can be used to check if the booking has full refund
   const acceptedCancellationHasFullRefund = useMemo(() => {
     if (!pickupDateTime) return false
     const now = new Date()
@@ -654,7 +668,18 @@ const BookingDetails = () => {
       toolDescription: booking.tool?.description || '',
       toolBrand: booking.tool?.brand || '*******',
       toolModel: booking.tool?.model || '*******',
-      condition: booking.tool?.condition || 'NEW',
+      condition:
+        booking.tool?.condition === 1
+          ? 'NEW'
+          : booking.tool?.condition === 2
+            ? 'LIKE_NEW'
+            : booking.tool?.condition === 3
+              ? 'GOOD'
+              : booking.tool?.condition === 4
+                ? 'FAIR'
+                : booking.tool?.condition === 5
+                  ? 'POOR'
+                  : '',
       ownerId: ownerDetails.id,
       ownerName: ownerDetails.fullName,
       ownerAddress: ownerDetails.address,
@@ -806,7 +831,9 @@ const BookingDetails = () => {
   const canReportOwnerIssue =
     canConfirmPickup && !booking?.hasActiveClaim && !booking?.pickupTool
   const canCancel =
-    isRenter && ['PENDING', 'ACCEPTED'].includes(booking?.status || '')
+    isRenter &&
+    ['PENDING', 'ACCEPTED'].includes(booking?.status || '') &&
+    isTwoFourHourBeforeStart
   const canDownloadContract =
     !!booking && ['ACCEPTED', 'ONGOING'].includes(booking.status)
   const canContact = !!booking && hasAcceptedReservation

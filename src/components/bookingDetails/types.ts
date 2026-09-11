@@ -23,6 +23,7 @@ export type ParticipantDetails = {
   fullName: string
   email: string
   phone: string
+  prefix: string
   address: string
   profilePicture?: string
 }

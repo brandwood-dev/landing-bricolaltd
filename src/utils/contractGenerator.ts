@@ -204,12 +204,12 @@ export const generateRentalContract = (data: ContractData): void => {
   yPosition += 8
   doc.setFont(undefined, 'normal')
   doc.text(
-    `Rental Price: ${data.totalPrice}€ for ${data.rentalDuration}`,
+    `Rental Price: ${data.totalPrice}£ for ${data.rentalDuration}`,
     margin,
     yPosition,
   )
   yPosition += 6
-  doc.text(`Deposit: ${data.deposit}€`, margin, yPosition)
+  doc.text(`Deposit: ${data.deposit}£`, margin, yPosition)
   yPosition += 6
   doc.text('Payment Method: Via the Bricola platform', margin, yPosition)
   yPosition += 15
@@ -478,12 +478,12 @@ export const generateRentalContractFr = (data: ContractData): void => {
   yPosition += 8
   doc.setFont(undefined, 'normal')
   doc.text(
-    `Prix de la location: ${data.totalPrice}€ pour ${data.rentalDuration}`,
+    `Prix de la location: ${data.totalPrice}£ pour ${data.rentalDuration}`,
     margin,
     yPosition,
   )
   yPosition += 6
-  doc.text(`Caution: ${data.deposit}€`, margin, yPosition)
+  doc.text(`Caution: ${data.deposit}£`, margin, yPosition)
   yPosition += 6
   doc.text('Mode de paiement: Via la plateforme Bricola', margin, yPosition)
   yPosition += 15

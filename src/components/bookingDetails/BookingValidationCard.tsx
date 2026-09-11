@@ -6,7 +6,7 @@ import { BookingDetailsRecord } from './types'
 type BookingValidationCardProps = {
   booking: BookingDetailsRecord
   isOwner: boolean
-  isRenter: boolean
+  isRenter: boolean 
   showValidationCode: boolean
   copiedCode: boolean
   isStartDateReached: boolean
