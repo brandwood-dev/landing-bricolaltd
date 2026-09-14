@@ -1968,6 +1968,7 @@ const translations = {
     'subcategories.waste-and-dust-management':
       'Gestion des déchets et des poussières',
     'subcategories.entertainment-games': 'Divertissements et jeux',
+    
     // Tools
     'tools.featured': 'Outils en vedette',
     'tools.description':

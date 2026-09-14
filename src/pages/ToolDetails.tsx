@@ -248,8 +248,7 @@ const ToolDetails = () => {
     `subcategories.${subcategoryKey}`
       ? t(`subcategories.${subcategoryKey}`)
       : tool.subcategory?.displayName || t('category.unknown')
-  const ownerName =
-    `${tool.owner?.firstName || ''} ${tool.owner?.lastName || ''}`.trim() ||
+  const ownerName = `${tool.owner?.firstName || ''} ${tool.owner?.lastName || ''}`.trim() ||
     'Unknown Owner'
   const displayPrice = calculateDisplayPrice(tool.basePrice)
   const primaryPhotoUrl = getPrimaryPhotoUrl(tool)

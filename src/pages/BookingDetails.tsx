@@ -32,6 +32,7 @@ import { useToast } from '@/hooks/use-toast'
 import { bookingService } from '@/services/bookingService'
 import { disputeService } from '@/services/disputeService'
 import { reviewsService } from '@/services/reviewsService'
+import { toolsService } from '@/services/toolsService'
 import { ToolCondition } from '@/types/bridge/enums'
 import {
   generateRentalContractAr,
@@ -365,32 +366,133 @@ const BookingDetails = () => {
   )
   const totalAmount = bookingAmount + depositAmount
 
- const categoryKey = booking?.tool?.category?.name || ''
- const subcategoryKey = booking?.tool?.subcategory?.name || ''
- const categoryName =
-   (categoryKey && t(`categories.${categoryKey}`)) !==
-   `categories.${categoryKey}`
-     ? t(`categories.${categoryKey}`)
-     : booking?.tool?.category?.displayName || t('category.unknown')
- const subcategoryName =
-   (subcategoryKey && t(`subcategories.${subcategoryKey}`)) !==
-   `subcategories.${subcategoryKey}`
-     ? t(`subcategories.${subcategoryKey}`)
-     : booking?.tool?.subcategory?.displayName || t('category.unknown')
+  const categoryData = booking?.tool?.category
+  const subcategoryData = booking?.tool?.subcategory
+  const categoryKey = categoryData?.name || ''
+  const subcategoryKey = subcategoryData?.name || ''
+
+  console.log('[BookingDetails] Category resolution debug:', {
+    toolTitle: booking?.tool?.title,
+    categoryExists: !!categoryData,
+    categoryData: categoryData || null,
+    subcategoryExists: !!subcategoryData,
+    subcategoryData: subcategoryData || null,
+    categoryKey,
+    subcategoryKey,
+  })
+
+  const translatedCategory = categoryKey ? t(`categories.${categoryKey}`) : ''
+  const hasCategoryTranslation =
+    categoryKey && translatedCategory !== `categories.${categoryKey}`
+  const categoryName = hasCategoryTranslation
+    ? translatedCategory
+    : categoryData?.displayName || t('category.unknown')
+
+  const translatedSubcategory = subcategoryKey
+    ? t(`subcategories.${subcategoryKey}`)
+    : ''
+  const hasSubcategoryTranslation =
+    subcategoryKey &&
+    translatedSubcategory !== `subcategories.${subcategoryKey}`
+  const subcategoryName = hasSubcategoryTranslation
+    ? translatedSubcategory
+    : subcategoryData?.displayName || t('category.unknown')
+
+  console.log('[BookingDetails] Category resolution result:', {
+    categoryName,
+    hasCategoryTranslation,
+    translatedCategory,
+    categoryDisplayName: categoryData?.displayName,
+    subcategoryName,
+    hasSubcategoryTranslation,
+    translatedSubcategory,
+    subcategoryDisplayName: subcategoryData?.displayName,
+  })
 
   const refreshDetails = useCallback(async () => {
-    if (!id) return
+    if (!id) {
+      console.log('[BookingDetails.refreshDetails] ⚠️ No booking ID, aborting')
+      return
+    }
 
     try {
+      console.log(
+        '[BookingDetails.refreshDetails] 🚀 START fetching booking id=',
+        id,
+        'userId=',
+        user?.id,
+      )
       setLoading(true)
       setError(null)
 
       const [bookingData, historyData] = await Promise.all([
         bookingService.getBooking(id),
-        bookingService.getBookingHistory(id).catch(() => []),
+        bookingService.getBookingHistory(id).catch((err) => {
+          console.warn(
+            '[BookingDetails.refreshDetails] History fetch failed:',
+            err?.message,
+          )
+          return []
+        }),
       ])
 
+      console.log(
+        '[BookingDetails.refreshDetails] 📥 bookingData received from service:',
+        {
+          hasBookingData: !!bookingData,
+          bookingId: (bookingData as any)?.id,
+          bookingToolId: (bookingData as any)?.toolId,
+          bookingToolExists: !!(bookingData as any)?.tool,
+          bookingToolType: typeof (bookingData as any)?.tool,
+          bookingToolKeys: (bookingData as any)?.tool
+            ? Object.keys((bookingData as any).tool)
+            : [],
+          categoryExists: !!(bookingData as any)?.tool?.category,
+          subcategoryExists: !!(bookingData as any)?.tool?.subcategory,
+        },
+      )
+
       const normalizedBooking = bookingData as BookingDetailsRecord
+
+      // --- Load tool via dedicated endpoint (SAME as ToolDetails.tsx pattern) ---
+      // This guarantees category + subcategory are loaded because GET /tools/:id
+      // explicitly includes them (confirmed working in ToolDetails page).
+      const rawToolId =
+        (bookingData as any)?.toolId || (bookingData as any)?.tool?.id
+      if (rawToolId) {
+        console.log(
+          '[BookingDetails.refreshDetails] 🔁 Fetching tool via toolsService.getTool (ToolDetails pattern) — toolId=',
+          rawToolId,
+        )
+        try {
+          const fetchedTool = await toolsService.getTool(rawToolId)
+          console.log(
+            '[BookingDetails.refreshDetails] ✅ Tool fetched OK via toolsService:',
+            {
+              toolTitle: (fetchedTool as any)?.title,
+              hasCategory: !!(fetchedTool as any)?.category,
+              categoryName: (fetchedTool as any)?.category?.name,
+              categoryDisplayName: (fetchedTool as any)?.category?.displayName,
+              hasSubcategory: !!(fetchedTool as any)?.subcategory,
+              subcategoryName: (fetchedTool as any)?.subcategory?.name,
+              subcategoryDisplayName: (fetchedTool as any)?.subcategory
+                ?.displayName,
+            },
+          )
+          ;(normalizedBooking as any).tool = fetchedTool
+        } catch (toolErr: any) {
+          console.error(
+            '[BookingDetails.refreshDetails] ❌ toolsService.getTool FAILED:',
+            toolErr?.message || toolErr,
+            '— keeping existing booking.tool if any',
+          )
+        }
+      } else {
+        console.warn(
+          '[BookingDetails.refreshDetails] ⚠️ No toolId on booking — cannot use dedicated tool fetch',
+        )
+      }
+
       setBooking(normalizedBooking)
       setHistory(historyData)
 
@@ -422,9 +524,14 @@ const BookingDetails = () => {
         await Promise.all(reviewTasks)
       }
     } catch (err: any) {
+      console.error(
+        '[BookingDetails.refreshDetails] ❌ FATAL error:',
+        err?.message || err,
+      )
       setError(err.message || 'Failed to load booking details')
     } finally {
       setLoading(false)
+      console.log('[BookingDetails.refreshDetails] 🏁 DONE loading')
     }
   }, [id, user?.id])
 
