@@ -17,6 +17,7 @@ const BookingParticipantCard = ({
   hiddenLabel,
   locationFallback,
 }: BookingParticipantCardProps) => {
+
   return (
     <div className='space-y-4 rounded-2xl border bg-background p-4'>
       <div className='flex items-center gap-3'>
@@ -31,20 +32,22 @@ const BookingParticipantCard = ({
           <p className='font-semibold'>{participant.fullName}</p>
         </div>
       </div>
-
       {showContacts ? (
-        <div className='space-y-2 text-sm text-muted-foreground'>
+        <div className='space-y-2 text-sm text-muted-foreground flex flex-col items-start'>
           <div className='flex items-center gap-2'>
             <Phone className='h-4 w-4' />
-            <span>{participant.prefix + participant.phone || '-'}</span>
+            {/* direction de text toujour à gauche */}
+            <span className='text-left'>{`${participant.prefix + participant.phone || '-'}`}</span>
           </div>
           <div className='flex items-center gap-2'>
             <Mail className='h-4 w-4' />
-            <span>{participant.email || '-'}</span>
+            {/* direction de text toujour à gauche */}
+            <span className='text-left'>{`${participant.email || '-'}`}</span>
           </div>
           <div className='flex items-start gap-2'>
             <MapPin className='mt-0.5 h-4 w-4 shrink-0' />
-            <span>{participant.address || locationFallback}</span>
+            {/* direction de text toujour à gauche */}
+            <span className='text-left'>{`${participant.address || locationFallback}`}</span>
           </div>
         </div>
       ) : (

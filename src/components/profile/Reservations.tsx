@@ -1251,7 +1251,9 @@ const Reservations = () => {
                               <DialogContent>
                                 <DialogHeader
                                   className={`${
-                                    language === 'ar' ? 'flex justify-end' : ''
+                                    language === 'ar'
+                                      ? 'flex justify-end'
+                                      : 'flex justify-start'
                                   }`}
                                 >
                                   <DialogTitle>

@@ -124,6 +124,7 @@ const BookingDetails = () => {
           t('general.unknown_renter'),
         email: renter?.email || '',
         phone: renter?.phoneNumber || '',
+        prefix: renter?.phone_prefix || '',
         address: renter?.address || '',
         profilePicture: renter?.profilePicture || '',
       }
@@ -321,16 +322,15 @@ const BookingDetails = () => {
     return start.getTime() <= today.getTime()
   }, [booking?.startDate])
   // is24HourBeforeStart can be used to check if the booking is 24 hours before the start date
-  const isTwoFourHourBeforeStart = useMemo(() => {
+  const isMoreThan24HoursBeforeStart = useMemo(() => {
     if (!booking?.startDate) return false
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const start = new Date(booking.startDate)
-    start.setHours(0, 0, 0, 0)
-    // 24 hours in milliseconds
-    const twoFourHours = 24 * 60 * 60 * 1000
-    const diffHours = (start.getTime() - today.getTime()) / twoFourHours
-    return diffHours >= twoFourHours
+
+    const start = new Date(booking.startDate).getTime()
+    const now = Date.now()
+
+    const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000
+
+    return start - now > TWENTY_FOUR_HOURS
   }, [booking?.startDate])
 
   // acceptedCancellationHasFullRefund can be used to check if the booking has full refund
@@ -365,31 +365,18 @@ const BookingDetails = () => {
   )
   const totalAmount = bookingAmount + depositAmount
 
-  const categoryName = useMemo(() => {
-    const categoryKey = booking?.tool?.category?.name || ''
-    if (
-      categoryKey &&
-      t(`categories.${categoryKey}`) !== `categories.${categoryKey}`
-    ) {
-      return t(`categories.${categoryKey}`)
-    }
-    return booking?.tool?.category?.displayName || t('category.unknown')
-  }, [booking?.tool?.category?.displayName, booking?.tool?.category?.name, t])
-
-  const subcategoryName = useMemo(() => {
-    const subcategoryKey = booking?.tool?.subcategory?.name || ''
-    if (
-      subcategoryKey &&
-      t(`subcategories.${subcategoryKey}`) !== `subcategories.${subcategoryKey}`
-    ) {
-      return t(`subcategories.${subcategoryKey}`)
-    }
-    return booking?.tool?.subcategory?.displayName || t('category.unknown')
-  }, [
-    booking?.tool?.subcategory?.displayName,
-    booking?.tool?.subcategory?.name,
-    t,
-  ])
+ const categoryKey = booking?.tool?.category?.name || ''
+ const subcategoryKey = booking?.tool?.subcategory?.name || ''
+ const categoryName =
+   (categoryKey && t(`categories.${categoryKey}`)) !==
+   `categories.${categoryKey}`
+     ? t(`categories.${categoryKey}`)
+     : booking?.tool?.category?.displayName || t('category.unknown')
+ const subcategoryName =
+   (subcategoryKey && t(`subcategories.${subcategoryKey}`)) !==
+   `subcategories.${subcategoryKey}`
+     ? t(`subcategories.${subcategoryKey}`)
+     : booking?.tool?.subcategory?.displayName || t('category.unknown')
 
   const refreshDetails = useCallback(async () => {
     if (!id) return
@@ -833,7 +820,7 @@ const BookingDetails = () => {
   const canCancel =
     isRenter &&
     ['PENDING', 'ACCEPTED'].includes(booking?.status || '') &&
-    isTwoFourHourBeforeStart
+    isMoreThan24HoursBeforeStart
   const canDownloadContract =
     !!booking && ['ACCEPTED', 'ONGOING'].includes(booking.status)
   const canContact = !!booking && hasAcceptedReservation
