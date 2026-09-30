@@ -348,8 +348,8 @@ const Requests = () => {
       )
 
       toast({
-        title: t('request.validation_code_ACCEPTED'),
-        description: t('request.validation_code_ACCEPTED_message'),
+        title: t('request.validation_code_accepted'),
+        description: t('request.validation_code_accepted_message'),
       })
 
       setValidationCode('')

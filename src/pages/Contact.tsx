@@ -525,7 +525,7 @@ const Contact = () => {
                       </h3>
                       <p className='text-gray-600 mb-1'>+44 7782 333 879</p>
                       <p className='text-sm text-gray-500'>
-                        {t('contact.hours_weekdays')}
+                        {t('contact.hours_weekdays')} 
                       </p>
                     </div>
                   </div>

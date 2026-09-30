@@ -1968,7 +1968,7 @@ const translations = {
     'subcategories.waste-and-dust-management':
       'Gestion des déchets et des poussières',
     'subcategories.entertainment-games': 'Divertissements et jeux',
-    
+
     // Tools
     'tools.featured': 'Outils en vedette',
     'tools.description':
@@ -2185,7 +2185,8 @@ const translations = {
     'contact.phone_title': 'Téléphone',
     'contact.address_title': 'Adresse',
     'contact.hours_title': 'Horaires',
-    'contact.hours_weekdays': 'Lundi - Vendredi : 9h00 - 18h00',
+    'contact.hours_weekdays':
+      'Notre équipe d’assistance est disponible 24h/24 et 7j/7.',
     'contact.hours_saturday': 'Samedi : 10h00 - 16h00',
     'contact.hours_sunday': 'Dimanche : Fermé',
     'contact.faq_title': 'Questions fréquentes',
@@ -2708,7 +2709,7 @@ const translations = {
   },
   en: {
     deposit_message_clarification:
-        'The deposit handover and refund process is handled outside the platform.',
+      'The deposit handover and refund process is handled outside the platform.',
     change_message_clarification:
       'The displayed value may vary slightly due to fluctuations in the British Pound (GBP) exchange rate.',
     'report.describe_problem': 'Describe the problem',
@@ -4593,7 +4594,7 @@ const translations = {
     'contact.phone_title': 'Phone',
     'contact.address_title': 'Address',
     'contact.hours_title': 'Hours',
-    'contact.hours_weekdays': 'Monday - Friday: 9:00 AM - 6:00 PM',
+    'contact.hours_weekdays': 'Our support team is available 24/7.',
     'contact.hours_saturday': 'Saturday: 10:00 AM - 4:00 PM',
     'contact.hours_sunday': 'Sunday: Closed',
     'contact.faq_title': 'Frequently asked questions',
@@ -7217,7 +7218,7 @@ const translations = {
     'contact.phone_title': 'الهاتف',
     'contact.address_title': 'العنوان',
     'contact.hours_title': 'ساعات العمل',
-    'contact.hours_weekdays': 'الاثنين - الجمعة: 9:00 صباحاً - 6:00 مساءً',
+    'contact.hours_weekdays': 'فريق الدعم متاح على مدار الساعة، طوال أيام الأسبوع.',
     'contact.hours_saturday': 'السبت: 10:00 صباحاً - 4:00 مساءً',
     'contact.hours_sunday': 'الأحد: مغلق',
     'contact.faq_title': 'الأسئلة الشائعة',
