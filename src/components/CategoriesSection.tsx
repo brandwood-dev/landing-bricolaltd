@@ -58,14 +58,14 @@ const CategoriesSection = () => {
   // Image mapping for categories
   const getCategoryImage = (categoryName: string) => {
     const imageMap: { [key: string]: string } = {
-      jardinage: 'public/gar.jpeg',
-      gardening: 'public/gar.jpeg',
-      bricolage: 'public/dy.jpeg',
-      diy: 'public/dy.jpeg',
-      nettoyage: 'public/clean.jpeg',
-      cleaning: 'public/clean.jpeg',
-      evenements: 'public/eve.jpeg',
-      events: 'public/eve.jpeg',
+      jardinage: '/gar.jpeg',
+      gardening: '/gar.jpeg',
+      bricolage: '/dy.jpeg',
+      diy: '/dy.jpeg',
+      nettoyage: '/clean.jpeg',
+      cleaning: '/clean.jpeg',
+      evenements: '/eve.jpeg',
+      events: '/eve.jpeg',
     }
     return imageMap[categoryName.toLowerCase()] || 'https://images.unsplash.com/photo-1504148455328-c376907d081c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80';
   };
