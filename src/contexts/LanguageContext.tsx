@@ -68,7 +68,7 @@ const translations = {
     //mobile
     'mobile_app.title': 'Téléchargez notre application mobile',
     'mobile_app.subtitle':
-      'Accédez à toutes nos outils et services directement depuis votre téléphone mobile.',
+      'Téléchargez l’application pour profiter d’un accès rapide et sécurisé, de notifications instantanées et d’un suivi simple de vos réservations, où que vous soyez.',
     'mobile_app.app_store': "Téléchargez depuis l'App Store",
     'mobile_app.google_play': 'Téléchargez depuis Google Play',
 
@@ -1806,81 +1806,72 @@ const translations = {
     'faq.title': 'Questions générales',
     'faq.general.q1': 'Qu’est-ce que Bricola et comment ça fonctionne ?',
     'faq.general.a1':
-      "Bricola LTD est une plateforme de location d’outils entre particuliers. Les utilisateurs peuvent proposer leurs outils à la location ou en louer auprès d'autres membres. La plateforme gère les paiements, les cautions et les litiges.",
-    'faq.general.q2': 'Quelles catégories d’outils peut-on proposer ?',
+      'C’est une plateforme de location d’outils et d’équipements entre particuliers, permettant aux utilisateurs de proposer leurs outils à la location ou d’en louer auprès d’autres personnes de manière simple et sécurisée. La plateforme gère les réservations, les paiements et la gestion des comptes, tout en offrant un environnement fiable sans intervenir dans la caution, qui reste exclusivement entre le propriétaire et le locataire.',
+    'faq.general.q2': 'Quelles catégories d’outils peuvent être proposées ?',
     'faq.general.a2':
-      'Actuellement, Bricola prend en charge les outils de bricolage, jardinage, nettoyage et ceux liés aux événements. D’autres catégories pourront être ajoutées selon les besoins du marché.',
-    'faq.general.q3': 'Existe-t-il une application mobile Bricola ?',
+      'Actuellement, Bricola prend en charge les outils et équipements pour les travaux manuels, le jardinage, le nettoyage et les évènements. D’autres catégories peuvent être ajoutées ultérieurement selon les besoins du marché.',
+    'faq.general.q3': 'Existe‑t‑il une application dédiée à Bricola ?',
     'faq.general.a3':
-      'Oui. Bricola est disponible sur iOS et Android, en plus de la version complète du site web.',
+      'Oui, Bricola est disponible sur iOS et Android, en plus d’une plateforme web complète.',
     'faq.general.q4': 'Puis-je utiliser Bricola depuis n’importe quel pays ?',
     'faq.general.a4':
-      'Pour le moment, Bricola est disponible uniquement dans la région du Golfe. Une expansion est prévue prochainement.',
+      'Actuellement, les services de Bricola sont limités à la région du Golfe, avec des plans d’expansion vers d’autres régions à l’avenir.',
     'faq.general.q5': 'Les entreprises peuvent-elles proposer des outils ?',
     'faq.general.a5':
-      'Oui, mais Bricola est principalement destiné aux particuliers. Les professionnels doivent respecter les lois et réglementations locales en vigueur.',
-    'faq.general.q6': 'Quels objets sont interdits ?',
+      'Oui, mais Bricola est principalement conçue pour les particuliers. Les utilisateurs professionnels doivent respecter les lois et réglementations locales relatives aux activités commerciales.',
+    'faq.general.q6': 'Quels sont les articles interdits ?',
     'faq.general.a6':
-      'Sont interdits : les objets illégaux, les équipements dangereux ou non conformes aux normes de sécurité.',
-    'faq.general.q7': 'Puis-je suggérer une fonctionnalité ?',
+      'Il est strictement interdit de proposer ou louer des articles illégaux, des équipements dangereux ou des outils qui enfreignent les règles de sécurité.',
+    'faq.general.q7': 'Puis‑je suggérer une nouvelle fonctionnalité ?',
     'faq.general.a7':
-      'Oui, vos suggestions sont les bienvenues. Contactez notre support pour nous faire part de votre idée, nous l’étudierons pour les prochaines mises à jour.',
+      'Oui, toutes les suggestions sont les bienvenues. Vous pouvez contacter le support technique avec votre proposition, qui sera étudiée pour de futures mises à jour.',
     'faq.general.q8': 'Comment contacter le service client ?',
     'faq.general.a8':
-      'Utilisez le chat WhatsApp ou envoyez-nous un email à : support@bricolaltd.com. Notre équipe est disponible 7 jours sur 7.',
+      'Vous pouvez utiliser la messagerie WhatsApp ou nous écrire par e‑mail à support@bricolaltd.com Notre équipe est disponible toute la semaine.',
     'faq.renters.title': 'Pour les locataires',
     'faq.renters.q1': 'Comment créer un compte ?',
     'faq.renters.a1':
-      'Il suffit de s’inscrire avec votre nom, votre email, votre numéro de téléphone et, si nécessaire, vos documents de vérification. Vous devrez confirmer votre numéro et votre adresse email.',
-    'faq.renters.q2': 'Pourquoi la vérification d’identité est-elle demandée ?',
+      'Inscrivez‑vous avec votre nom, votre e‑mail et votre numéro de téléphone. Il peut vous être demandé de fournir des documents pour vérifier votre identité. Vous devrez également confirmer votre e‑mail et votre numéro de téléphone.',
+    'faq.renters.q2': 'Pourquoi la vérification d’identité est‑elle requise ?',
     'faq.renters.a2':
-      'Pour garantir la sécurité et la confiance sur la plateforme, une vérification d’identité peut être exigée avant de louer des outils de grande valeur ou d’effectuer des retraits importants.',
-    'faq.renters.q3': 'Que dois-je faire avant de recevoir un outil ?',
+      'Pour garantir la sécurité et la confiance sur la plateforme. Une vérification d’identité peut être demandée avant la location d’outils de grande valeur ou le retrait de montants importants.',
+    'faq.renters.q3': 'Que dois‑je faire avant de recevoir l’outil ?',
     'faq.renters.a3':
-      'Assurez-vous de fournir une pièce d’identité valide, respectez les conditions de location, et examinez l’outil avec le propriétaire à la remise.',
+      'Vérifiez votre identité, mettez‑vous d’accord avec le propriétaire sur les conditions de location, et inspectez soigneusement l’outil lors de sa remise.',
     'faq.renters.q4':
-      'Que faire si l’outil est endommagé pendant la location ?',
+      'Que se passe‑t‑il si l’outil est endommagé pendant la période de location ?',
     'faq.renters.a4':
-      'Informez immédiatement le propriétaire et le support. Des preuves peuvent être demandées pour activer un recours via la caution.',
+      'En cas de dommage, vous devez avertir immédiatement le propriétaire et vous entendre directement avec lui concernant la compensation ou la réparation. La plateforme n’intervient pas dans la caution ou les litiges ; le problème est résolu uniquement entre les deux parties.',
     'faq.owners.title': 'Pour les propriétaires',
     'faq.owners.q1': 'Comment proposer un outil à la location ?',
     'faq.owners.a1':
-      'Cliquez sur « Proposer un outil », téléchargez des photos claires, ajoutez une description, précisez l’état de l’outil, les garanties éventuelles, le prix par jour et le montant de la caution.',
+      'Accédez à « Proposer un outil », téléchargez des photos claires, ajoutez une description de son état, les garanties éventuelles, le prix de location journalier, et indiquez le montant de la caution requise.',
     'faq.owners.q2': 'Que se passe-t-il après avoir proposé mon outil ?',
     'faq.owners.a2':
       'L’annonce sera d’abord vérifiée par notre équipe de modération. Vous serez ensuite notifié dès qu’un utilisateur effectue une réservation.',
     'faq.owners.q3': 'Puis-je refuser une demande de réservation ?',
     'faq.owners.a3':
-      'Oui, le propriétaire peut accepter ou refuser une demande. Cependant, un trop grand nombre de refus sans justification peut nuire à la visibilité de vos annonces.',
-    'faq.owners.q4':
-      'Que dois-je faire avant de remettre l’outil au locataire ?',
+      'Oui, vous pouvez accepter ou refuser toute demande. Cependant, des refus répétés sans raisons valables peuvent affecter la visibilité de vos outils sur la plateforme.',
+    'faq.owners.q4': 'Que dois‑je faire avant de remettre l’outil ?',
     'faq.owners.a4':
-      'Vérifiez l’identité du locataire, prenez des photos de l’état de l’outil, et convenez ensemble des conditions de retour.',
-    'faq.owners.q5': 'Que faire si mon outil est endommagé ?',
+      'Vérifiez l’identité du locataire, documentez l’état de l’outil avec des photos et accordez‑vous sur les conditions de retour.',
+    'faq.owners.q5': 'Que faire si mon outil est endommagé ?',
     'faq.owners.a5':
-      'Envoyez des preuves dans les 24 heures suivant le retour. L’équipe Bricola examinera le dossier et pourra décider d’un remboursement à partir de la caution.',
-    'faq.owners.q6': 'Y a-t-il une assurance sur les outils proposés ?',
+      'Le propriétaire et le locataire conviennent de déduire tout ou partie de la caution selon les dommages causés à l’outil.',
+    'faq.owners.q6': 'Existe‑t‑il des assurances pour les outils proposés ?',
     'faq.owners.a6':
-      'Non, Bricola ne propose pas encore d’assurance. Il est recommandé de ne proposer que les outils que vous êtes prêt à prêter en toute sécurité.',
-    'faq.payment.title': 'Paiement et sécurité',
-    'faq.payment.q1': 'Comment se passent les paiements ?',
-    'faq.payment.a1':
-      'Les paiements sont traités de manière sécurisée via Stripe. Le locataire paie à l’avance, y compris la caution.',
-    'faq.payment.q2': 'Qu’est-ce que la caution ?',
-    'faq.payment.a2':
-      'Il s’agit d’un montant remboursable, conservé par Stripe pour couvrir d’éventuels dommages ou non-retours. Il est automatiquement restitué après le bon retour de l’outil.',
+      'Actuellement, Bricola n’offre pas d’assurance. Nous recommandons de ne proposer que des outils que vous êtes en mesure de louer sans risque.',
+
     'faq.payment.q3': 'Comment retirer mes gains ?',
     'faq.payment.a3':
       'Vous pouvez demander un virement vers votre compte bancaire via Wise.',
     'faq.payment.q4': 'Quels sont les frais appliqués par Bricola ?',
     'faq.payment.a4':
-      'Bricola prélève une commission de 15 % sur chaque location réussie. Aucun frais d’inscription ou abonnement mensuel.',
-    'faq.payment.q5': 'Comment sont traités les litiges ?',
-    'faq.payment.a5':
-      'Tous les litiges sont gérés par notre équipe d’assistance dans un délai de 72 heures. Leur décision est finale.',
-    'faq.payment.q6': 'Quelles mesures de sécurité sont mises en place ?',
+      'Une commission de 15 % sur chaque location réussie. Aucun frais d’insertion ou abonnement mensuel.',
+
+    'faq.payment.q6': 'Quelles mesures de sécurité sont appliquées ?',
     'faq.payment.a6':
-      'Vérification d’identité, évaluations utilisateurs, paiements sécurisés et surveillance par notre support assurent un environnement fiable.',
+      'Vérification d’identité, évaluations des utilisateurs, paiements sécurisés et suivi continu par l’équipe de support pour garantir un environnement fiable et sûr.',
 
     // Navigation
     'nav.home': 'Accueil',
@@ -2075,6 +2066,8 @@ const translations = {
     'footer.faq': 'FAQ',
     'footer.description':
       "La plateforme de location d'outils qui met en relation les propriétaires avec ceux qui en ont besoin. Simple, sécurisée et locale. « www.bricolaltd.com » est une marque déposée de BRICOLA LTD. Enregistrée en Angleterre et au Pays de Galles sous le numéro : 16401372.",
+    'footer.description_serv':
+      'Au service du Koweït, de Bahreïn, de l’Arabie saoudite, du Qatar, d’Oman et des Émirats arabes unis.',
     'footer.contrat': 'Contrat de location', // Added
     'footer.payment': 'Modes de paiement', // Added
     'footer.help_center': "Centre d'assistance", // Added
@@ -2370,158 +2363,129 @@ const translations = {
     'cgu.section3.li3':
       'Le partage ou la vente de comptes est strictement interdit.',
 
-    'cgu.section4.title': '4. Règles de Location et Responsabilités',
+    'cgu.section4.title': '4. Conditions de Location et Obligations',
 
     'cgu.section4.li1':
-      'Le locataire s’engage à restituer les objets loués dans leur état initial.',
+      'Le Locataire doit rendre les outils dans le même état que celui de la réception.',
 
     'cgu.section4.li2':
-      'Le propriétaire garantit que les équipements proposés sont fonctionnels, propres et conformes à la législation en vigueur.',
-
-    'cgu.section4.li3':
-      'En cas de litige, Bricola peut exiger des éléments justificatifs (photographies, vidéos, attestations).',
+      'Le Propriétaire est responsable de l’exactitude, de la propreté et de la sécurité des outils avant leur publication.',
 
     'cgu.section4.li4':
-      'Tout retard de restitution peut entraîner des pénalités calculées à l’heure ou à la journée.',
+      'Une mauvaise utilisation des outils peut entraîner la suspension du compte.',
 
     'cgu.section4.li5':
-      'La durée de location ne peut excéder 5 jours consécutifs. Toute prolongation nécessite une nouvelle réservation via la plateforme, après confirmation de disponibilité par le propriétaire',
+      'En cas de dommage ou perte, le Propriétaire peut déduire tout ou partie du dépôt de garantie.',
 
-    'cgu.section4.li6':
-      'En cas de perte de l’objet, la totalité du dépôt de garantie pourra être retenue.',
-
-    'cgu.section4.li7':
-      'Une utilisation abusive ou non conforme des équipements peut entraîner la suspension définitive du compte.',
-
-    'cgu.section5.title': '5. Paiement, Commissions et Portefeuilles',
+    'cgu.section5.title': '5. Paiement et Commission',
 
     'cgu.section5.li1':
-      'Tous les paiements sont traités via Stripe, dans le respect des réglementations financières locales.',
+      'Les paiements sont acceptés exclusivement via un prestataire de paiement approuvé.',
 
     'cgu.section5.li2':
-      'Des frais de service de 6 % sont appliqués au locataire lors du paiement. Ils couvrent les frais de traitement Stripe ainsi qu’une partie des coûts techniques de la plateforme (hébergement, maintenance, mises à jour).',
+      'Des frais de service de 5.25% + 0.25£ sont ajoutés pour couvrir les coûts techniques et les transactions.',
 
     'cgu.section5.li3':
-      'Une commission de 15 % est automatiquement prélevée sur chaque transaction réussie.',
+      'Une commission de 15% est déduite du montant original de la location au bénéfice de la plateforme.',
 
     'cgu.section5.li4':
-      'Les revenus des propriétaires sont crédités sur un portefeuille interne, avec possibilité de retrait via Wise, dès que le solde atteint 50 £.',
+      'Le Propriétaire peut demander ses gains uniquement après avoir atteint le seuil minimum de 50 GBP. Ce mécanisme vise à réduire le nombre de retraits et les coûts des transferts.',
 
     'cgu.section5.li5':
-      'Cette limite vise à réduire les petites demandes de retrait, à optimiser les coûts bancaires et à fluidifier les opérations financières.',
+      'Bricola LTD n’est pas responsable des retards causés par des systèmes bancaires externes.',
 
     'cgu.section5.li6':
-      'Bricola ne saurait être tenue responsable des délais de virement ou restrictions externes liés à Wise.',
+      'Les paiements internationaux effectués via le réseau SWIFT peuvent faire l’objet de déductions bancaires ou de frais de réception appliqués par les banques intermédiaires ou réceptrices. Ces frais sont entièrement à la charge du propriétaire de l`outil, et Bricola LTD n’assume aucune responsabilité concernant les frais appliqués lors du transfert.',
 
-    'cgu.section6.title': '6. Politique de Dépôt de Garantie',
+    'cgu.section6.title': '6. Dépôt de Garantie',
 
     'cgu.section6.li1':
-      'Chaque location implique un dépôt de garantie temporaire, bloqué via Stripe.',
+      'Le Propriétaire peut demander du locataire un dépôt convenu avant la remise de l’outil.',
 
     'cgu.section6.li2':
-      'Ce dépôt est libéré 24 heures après la restitution du matériel, sous réserve de validation.',
+      'En cas de dommage, le Propriétaire peut déduire tout ou partie du dépôt après accord avec le Locataire.',
 
     'cgu.section6.li3':
-      'En cas de dommage, de perte ou de contestation, tout ou partie du dépôt pourra être prélevé.',
+      'Bricola LTD n’intervient pas dans les dépôts ni dans les litiges les concernant.',
 
-    'cgu.section6.li4':
-      'L’utilisateur concerné sera informé par email avant toute retenue définitive.',
+    'cgu.section8.title': '7. Utilisation Équitable et Sécurité',
+    'cgu.section8.desc': 'Interdiction de :',
 
-    'cgu.section7.title': '7. Gestion des Litiges',
+    'cgu.section8.li1': 'Publier des outils illégaux ou non possédés.',
 
-    'cgu.section7.li1':
-      'Tout différend doit être signalé dans un délai de 24 heures suivant la restitution prévue.',
+    'cgu.section8.li2': 'Publier du contenu trompeur ou nuisible.',
 
-    'cgu.section7.li2':
-      'L’équipe de support s’engage à instruire le dossier dans un délai de 72 heures et à émettre une décision définitive.',
+    'cgu.section8.li3': 'Proposer des outils dangereux ou réglementés.',
 
-    'cgu.section7.li3':
-      'Bricola se réserve le droit de jouer un rôle de médiateur et d’appliquer les ajustements financiers qu’elle juge appropriés.',
+    'cgu.section8.li4': 'Commettre fraude ou tromperie.',
 
-    'cgu.section7.li4':
-      'La décision rendue est réputée définitive et contraignante pour les deux parties.',
-
-    'cgu.section8.title': '8. Bon Usage et Intégrité de la Plateforme',
-
-    'cgu.section8.li1':
-      'Les annonces doivent refléter des objets réels et légalement détenus.',
-
-    'cgu.section8.li2':
-      'Le téléchargement massif ou automatisé de fausses annonces est interdit.',
-
-    'cgu.section8.li3':
-      'La mise en location d’objets interdits (armes, substances dangereuses, etc.) est strictement prohibée.',
-
-    'cgu.section8.li4':
-      'Les contrevenants récurrents seront définitivement exclus de la plateforme.',
-
-    'cgu.section9.title': '9. Politique d’Annulation et de Remboursement',
+    'cgu.section9.title': '8. Annulation et Remboursement',
 
     'cgu.section9.li1':
-      'Le locataire peut annuler sa réservation et obtenir un remboursement intégral s’il effectue l’annulation au moins 24 heures avant le début de la location.',
+      'Le Locataire peut annuler avec remboursement complet jusqu’à 24h avant le début.',
 
-    'cgu.section9.li2':
-      'Aucune annulation avec remboursement ne sera acceptée dans les 24 heures précédant le début prévu.',
+    'cgu.section9.li2': 'Aucun remboursement dans les dernières 24h.',
 
     'cgu.section9.li3':
-      'Si l’annulation provient du propriétaire, le locataire sera intégralement remboursé. Des annulations répétées de la part des propriétaires peuvent entraîner des sanctions.',
+      'Si le Propriétaire annule, un remboursement complet est effectué.',
+    'cgu.section9.li4':
+      'Bricola peut agir contre les Propriétaires annulant à répétition.',
 
-    'cgu.section10.title': '10. Disponibilité du Service et Évolutions',
+    'cgu.section10.title': '9. Disponibilité du Service',
 
     'cgu.section10.li1':
-      'Des interruptions ponctuelles peuvent survenir pour maintenance ou mise à jour.',
+      'La plateforme peut être indisponible temporairement pour maintenance.',
 
     'cgu.section10.li2':
-      'Les utilisateurs seront informés à l’avance en cas d’indisponibilité programmée.',
+      'Les utilisateurs seront informés en cas d’interruption programmée.',
 
     'cgu.section10.li3':
-      'Bricola se réserve le droit de modifier ou supprimer certaines fonctionnalités sans préavis, dans le but d’optimiser l’expérience utilisateur.',
+      'Les fonctionnalités peuvent être modifiées sans préavis.',
 
-    'cgu.section11.title': '11. Protection des Données et Vie Privée',
+    'cgu.section11.title': '10. Protection des Données',
 
-    'cgu.section11.li1':
-      'Les données personnelles sont traitées conformément au RGPD (Règlement Général sur la Protection des Données – Royaume-Uni et Union Européenne).',
+    'cgu.section11.li1': 'Bricola respecte le RGPD et les lois britanniques.',
 
     'cgu.section11.li2':
-      'Les données sensibles sont chiffrées et conservées de manière sécurisée.',
+      'Les données sont stockées de manière sécurisée et chiffrée.',
 
     'cgu.section11.li3':
-      'Chaque utilisateur peut demander la suppression, la modification ou l’export de ses données à tout moment.',
+      'L’utilisateur peut demander modification ou suppression de ses données.',
 
     'cgu.section11.li4':
-      'Aucune donnée ne sera vendue ni partagée sans consentement explicite.',
+      'Aucune donnée n’est vendue ou partagée sans consentement.',
 
-    'cgu.section12.title': '12. Droit Applicable et Juridiction Compétente',
+    'cgu.section12.title': '11. Droit Applicable et Juridiction Compétente',
 
     'cgu.section12.li1':
-      'Les présentes conditions sont régies par le droit anglais.',
+      'Les présentes conditions sont régies par le pays d’enregistrement de Bricola LTD.',
 
     'cgu.section12.li2':
-      'En cas de litige non résolu par voie amiable, compétence exclusive est attribuée aux tribunaux de Londres.',
+      'L’utilisateur doit respecter les lois locales de son pays.',
 
     'cgu.section12.li3':
-      'Toute mise à jour des présentes sera notifiée sur la plateforme. La poursuite de l’utilisation vaut acceptation des nouvelles conditions.',
+      'Les litiges sont résolus selon les cadres juridiques applicables.',
 
-    'cgu.section13.title': '13. Contact',
+    'cgu.section13.title': '12. Confirmation Automatique en Cas d’Inactivité',
 
     'cgu.section13.p':
-      'Dans certaines situations où un utilisateur (locataire ou propriétaire) ne réagit pas dans un délai raisonnable, Bricola LTD se réserve le droit de confirmer automatiquement l’état d’une transaction (livraison ou retour). Cette mesure vise à garantir la continuité et la fiabilité du service. Les utilisateurs sont donc invités à suivre et valider leurs opérations dans les temps impartis.',
+      'Si l’utilisateur (Locataire ou Propriétaire) ne complète pas l’action requise dans un délai raisonnable, Bricola LTD peut prendre les mesures nécessaires pour assurer la continuité du service. Ce mécanisme aide les utilisateurs à suivre leurs transactions et répondre aux notifications.',
 
-    'cgu.section14.title': '14. Modification et Acceptation des Conditions',
+    'cgu.section14.title': '13. Modification des Conditions',
 
     'cgu.section14.p1':
-      'Les présentes CGU peuvent être modifiées à tout moment pour s’adapter aux évolutions légales, techniques ou opérationnelles.',
+      'Les conditions peuvent être mises à jour en fonction des évolutions techniques ou légales.',
 
     'cgu.section14.p2':
-      'Les utilisateurs seront informés des modifications substantielles.',
+      'Les utilisateurs seront informés des mises à jour majeures.',
 
     'cgu.section14.p3':
-      'L’utilisation continue de la plateforme après modification vaut acceptation tacite des nouvelles conditions.',
+      ' L’usage continu de la plateforme vaut acceptation des nouvelles conditions.',
 
-    'cgu.section15.title': '15. Contact et Notifications Officielles',
+    'cgu.section15.title': '14. Contact',
 
     'cgu.section15.p1':
-      'Pour toute question, réclamation ou notification légale relative aux présentes conditions, les utilisateurs peuvent contacter Bricola LTD à l’adresse suivante : Contact@bricolaltd.com',
+      'Pour toute demande vous pouvez nous contacter à travers WhatsApp or la messagerie : support@bricolaltd.com',
 
     'cgu.section15.p2':
       'Toute communication officielle sera transmise via l’adresse email associée au compte utilisateur.',
@@ -4113,35 +4077,35 @@ const translations = {
     'faq.title': 'General Questions',
     'faq.general.q1': 'What is Bricola and how does it work?',
     'faq.general.a1':
-      'Bricola LTD is a peer-to-peer rental platform for tools and equipment. Users can list their tools for rent or rent tools from others. The platform manages transactions, deposits, and dispute resolution.',
+      'Bricola is a platform for renting tools and equipment between individuals, allowing users to list their tools for rent or rent tools from others easily and safely. The platform manages booking operations, payments, and account management, while providing a trusted environment for users without interfering in the security deposit, which remains strictly between the owner and the renter.',
     'faq.general.q2': 'What categories of tools can be listed?',
     'faq.general.a2':
-      'Currently, Bricola supports DIY, gardening, cleaning, and event-related equipment. More categories may be added based on market needs.',
-    'faq.general.q3': 'Is there a mobile app for Bricola?',
+      'Currently, Bricola supports tools and equipment for DIY work, gardening, cleaning, and events. Additional categories may be added later based on market needs.',
+    'faq.general.q3': 'Is there a dedicated Bricola app?',
     'faq.general.a3':
-      'Yes. Bricola is available on both iOS and Android, in addition to a full-featured web platform.',
+      'Yes, Bricola is available on both iOS and Android systems, in addition to a full web platform.',
     'faq.general.q4': 'Can I use Bricola from any country?',
     'faq.general.a4':
-      'Currently, Bricola serves users in the Gulf region. Expansion to other regions is planned.',
-    'faq.general.q5': 'Can businesses list tools?',
+      'Currently, Bricola’s services are limited to the Gulf region, with plans to expand to other regions in the future.',
+    'faq.general.q5': 'Can companies list their tools?',
     'faq.general.a5':
-      'Yes, but Bricola is primarily designed for individual users. Professional listings must comply with local business regulations.',
+      'Yes, but Bricola is primarily designed for individuals. Professional users must comply with local laws and regulations related to business activities.',
     'faq.general.q6': 'What items are prohibited?',
     'faq.general.a6':
-      'Illegal items, hazardous equipment, or tools that violate safety laws are strictly forbidden.',
-    'faq.general.q7': 'Can I suggest a feature?',
+      'It is strictly prohibited to list or rent illegal items, dangerous equipment, or tools that violate safety regulations.',
+    'faq.general.q7': 'Can I suggest a new feature?',
     'faq.general.a7':
-      'Yes, we welcome feedback. Contact support with your idea and we’ll consider it for future updates.',
-    'faq.general.q8': 'How do I contact customer support?',
+      'Yes, we welcome all suggestions. You can contact technical support with your proposal, and we will review it for future updates.',
+    'faq.general.q8': 'How can I contact customer service?',
     'faq.general.a8':
-      'Use the WhatsApp chat, or email us at support@bricolaltd.com. Our team is available 7 days a week.',
+      'You can use WhatsApp chat or contact us via email at support@bricolaltd.com Our team is available throughout the week.',
     'faq.renters.title': 'For Renters',
     'faq.renters.q1': 'How do I create an account?',
     'faq.renters.a1':
-      'Register with your name, email, phone number, and verification documents if required. You will need to confirm your phone and email.',
-    'faq.renters.q2': 'Why is ID verification required?',
+      'Register with your name, email, and phone number. You may be asked to provide documents for identity verification. You will also need to confirm your email address and phone number.',
+    'faq.renters.q2': 'Why is identity verification required?',
     'faq.renters.a2':
-      'To ensure trust and security, ID verification may be requested before renting out high-value tools or making large withdrawals.',
+      'To ensure safety and trust on the platform. Identity verification may be required before renting high‑value tools or withdrawing large amounts.',
     'faq.renters.q3': 'What should I do before receiving a tool?',
     'faq.renters.a3':
       'Make sure your ID is verified, agree on rental terms with the owner, and inspect the tool upon handover.',
@@ -4149,42 +4113,35 @@ const translations = {
     'faq.renters.a4':
       'Inform the owner and support immediately. You may be asked to provide evidence so the issue can be resolved through the deposit.',
     'faq.owners.title': 'For Owners',
-    'faq.owners.q1': 'How do I list a tool?',
+    'faq.owners.q1': 'How do I list a tool for rent?',
     'faq.owners.a1':
-      'Go to "List a Tool", upload clear photos, provide a description, condition, guarantee, price per day, and select the required deposit.',
+      'Go to “List a Tool,” upload clear photos, add a description of its condition, any applicable guarantees, the daily rental price, and specify the required security deposit.',
     'faq.owners.q2': 'What happens after I list my item?',
     'faq.owners.a2':
-      'It will be reviewed by our moderation team before going live. You’ll be notified when someone makes a booking.',
+      'The listing will be reviewed by the moderation team before it appears to users. You will be notified when someone submits a booking request.',
     'faq.owners.q3': 'Can I reject a booking request?',
     'faq.owners.a3':
       'Yes, owners can accept or reject requests. However, excessive rejections without valid reason may affect your visibility.',
     'faq.owners.q4': 'What should I do before handing over my tool?',
     'faq.owners.a4':
       'Check the renter’s ID, document the tool’s condition with photos, and agree on return terms.',
-    'faq.owners.q5': 'What if the tool is damaged?',
+    'faq.owners.q5': 'What if the tool is damaged during the rental period?',
     'faq.owners.a5':
-      'Submit evidence within 24 hours of return. Bricola will review and decide whether to compensate from the deposit.',
+      'In case of damage, you must notify the owner immediately and settle the matter directly regarding compensation or repair. The platform does not intervene in the deposit or disputes; the issue is resolved strictly between the two parties.',
     'faq.owners.q6': 'Is there insurance for listed tools?',
     'faq.owners.a6':
-      'Currently, Bricola does not offer insurance. Owners are advised to list only tools they can risk renting.',
+      'Bricola currently does not provide insurance. We recommend listing tools that you can afford to rent out.',
     'faq.payment.title': 'Payments & Safety',
-    'faq.payment.q1': 'How are payments handled?',
-    'faq.payment.a1':
-      'Payments are processed securely via Stripe. Renters pay in advance, including the deposit.',
-    'faq.payment.q2': 'What is the security deposit?',
-    'faq.payment.a2':
-      'A refundable amount held by Stripe to cover potential damages or non-return. It’s automatically released upon successful return.',
+
     'faq.payment.q3': 'How do I withdraw my earnings?',
     'faq.payment.a3': 'You can request a payout to your bank account via Wise.',
     'faq.payment.q4': 'What fees does Bricola charge?',
     'faq.payment.a4':
-      'Bricola charges a 15% commission on every successful rental. No listing or monthly fees.',
-    'faq.payment.q5': 'How are disputes handled?',
-    'faq.payment.a5':
-      'All disputes are handled by our internal support team within 72 hours. Their decision is final.',
-    'faq.payment.q6': 'What measures are in place for safety?',
+      'A 15% commission on each successful rental. There are no listing fees or monthly subscriptions.',
+
+    'faq.payment.q6': 'What safety measures are applied?',
     'faq.payment.a6':
-      'ID verification, user reviews, secure payments, and support monitoring ensure a safe and trusted environment.',
+      'Identity verification, user reviews, secure payments, and continuous monitoring by the support team to ensure a trusted and safe environment.',
     // Navigation
     'nav.home': 'Home',
     'nav.catalog': 'Catalogue',
@@ -4485,6 +4442,8 @@ const translations = {
     'footer.faq': 'FAQ',
     'footer.description':
       'The tool rental platform that connects owners with those who need them. Simple, secure, and local.“www.bricolaltd.com” is a trademark of BRICOLA LTD.Registered in England and Wales under number: 16401372',
+    'footer.description_serv':
+      'Serving Kuwait, Bahrain, Saudi Arabia, Qatar, Oman & the United Arab Emirates.',
     'footer.contrat': 'Rental Agreement', // Added
     'footer.payment': 'Payment Methods', // Added
     'footer.help_center': 'Help Center', // Added
@@ -4744,187 +4703,161 @@ const translations = {
     'cgu.section1.title': '1. Introduction',
 
     'cgu.section1.p1':
-      'Bricola LTD is an online peer-to-peer rental platform specialized in tools and equipment for DIY, gardening, cleaning, and event organization.',
+      'Welcome to Bricola LTD. Bricola operates as a digital platform using a SaaS model that allows users to publish listings, complete bookings, and manage payment flows related to renting tools and equipment for DIY, gardening, cleaning, and event-related activities.',
 
     'cgu.section1.p2':
-      'Bricola acts solely as a trusted intermediary. It does not own, store, transport, or handle any of the rented items.',
+      'Bricola does not provide the tools itself and does not act as any party’s agent or representative. Its role is limited to providing the technical infrastructure that facilitates interactions between users.',
+    'cgu.section1.p3':
+      'The rental relationship takes place directly between the Owner and the Renter. The Owner acts as an independent service provider and no agency, partnership, or representation relationship is established with Bricola.',
+    'cgu.section1.p4':
+      'Using the platform constitutes full acceptance of these terms.',
+    'cgu.section1.p5': 'These Terms of Use apply starting 1 September 2025.',
 
     'cgu.section2.title': '2. Access to the Platform',
 
     'cgu.section2.p1':
-      'Access to the platform is available via web and mobile applications.',
+      'The platform can be accessed through the website or mobile applications.',
 
-    'cgu.section2.p2':
-      'The service is reserved for adults (18 years and older) who are legally capable.',
+    'cgu.section2.p2': 'Users must be adults (18+) and legally competent.',
 
     'cgu.section2.p3':
-      'Bricola reserves the right to suspend or terminate any user account in case of a breach of these terms, fraudulent activity, or abuse.',
+      'Bricola reserves the right to suspend or terminate accounts in case of violation or misuse.',
 
-    'cgu.section3.title': '3. User Registration and Verification',
+    'cgu.section3.title': '3. Registration and Identity Verification',
 
     'cgu.section3.li1':
-      'Registration requires a valid email address, an active phone number, and official identification.',
+      'Users must provide a valid email address, phone number, and accurate personal information.',
 
     'cgu.section3.li2':
-      'To request withdrawals, users must provide accurate bank account details.',
+      'Bricola may request additional documents before activating certain operations.',
 
-    'cgu.section3.li3':
-      'Bricola reserves the right to request identity verification documents (KYC) for high-value transactions.',
+    'cgu.section3.li3': 'Account sharing or selling is strictly prohibited.',
 
-    'cgu.section3.li4':
-      'Account access is strictly personal and non-transferable. Sharing, duplicating, or transferring the account is prohibited.',
-
-    'cgu.section4.title': '4. Rental Rules and Responsibilities',
+    'cgu.section4.title': '4. Rental Rules and User Obligations',
 
     'cgu.section4.li1':
-      'Renters agree to return rented items in their original condition.',
+      'The Renter must return the tools in the same condition in which they were received.',
 
     'cgu.section4.li2':
-      'Owners guarantee that listed items are functional, clean, and compliant with current laws.',
+      'The Owner is responsible for the accuracy, cleanliness, and safety of tools before publishing them.',
 
-    'cgu.section4.li3':
-      'In case of disputes, Bricola may require supporting evidence (photos, videos, statements).',
-
-    'cgu.section4.li4':
-      'Delayed returns may incur penalties calculated hourly or daily.',
+    'cgu.section4.li4': 'Misuse of tools may lead to account suspension.',
 
     'cgu.section4.li5':
-      'The rental duration may not exceed 5 consecutive days. Extensions require a new booking on the platform, after availability is confirmed by the owner.',
+      'In case of damage or loss, the Owner may deduct part or all of the security deposit to cover the damage.',
 
-    'cgu.section4.li6':
-      'In the event of item loss, the full security deposit may be retained.',
-
-    'cgu.section4.li7':
-      'Abuse or misuse of equipment may result in permanent account suspension.',
-
-    'cgu.section5.title': '5. Payments, Commission & Wallets',
+    'cgu.section5.title': '5. Payments and Commission',
 
     'cgu.section5.li1':
-      'All payments are processed via Stripe, in accordance with local financial regulations.',
+      'Payments are accepted exclusively through an approved payment provider.',
 
     'cgu.section5.li2':
       'A 5.25% + 0.25£ service fee is applied to the renter at checkout. This covers Stripe processing fees and a portion of the platform’s technical costs (hosting, maintenance, updates).',
 
     'cgu.section5.li3':
-      'A 15% commission is automatically deducted from each successful transaction.',
+      'A 15% commission is deducted from the original rental amount for the benefit of the platform.',
 
     'cgu.section5.li4':
-      'Owner earnings are credited to an internal wallet and can be withdrawn via Wise when the balance reaches £50.',
+      'Owners can get their earnings once they reach the minimum threshold of 50 GBP. This mechanism aims to reduce the number of withdrawal operations and transfer costs.',
 
     'cgu.section5.li5':
-      'This threshold helps reduce small withdrawal requests, minimize banking fees, and streamline financial operations.',
+      'Bricola LTD is not responsible for delays caused by external banking systems.',
 
     'cgu.section5.li6':
-      'Bricola is not responsible for delays or external restrictions related to Wise transfers.',
+      'International payouts processed via the SWIFT network may be subject to bank deductions or receiving fees applied by intermediary or recipient banks. These fees are entirely borne by the tool owner, and BRICOLA LTD is not responsible for any charges applied during the transfer process.',
 
     'cgu.section6.title': '6. Security Deposit Policy',
 
     'cgu.section6.li1':
-      'Each rental involves a temporary security deposit held via Stripe.',
+      'The Owner may request a security deposit from the renter agreed upon before handing over the tool.',
 
     'cgu.section6.li2':
-      'This deposit is released 24 hours after item return, subject to validation.',
+      'In case of damage, the Owner may deduct part or all of the deposit after agreement with the Renter.',
 
     'cgu.section6.li3':
-      'In case of damage, loss, or dispute, all or part of the deposit may be withheld.',
+      'Bricola LTD does not intervene in the deposit process or disputes related to it.',
 
-    'cgu.section6.li4':
-      'The affected user will be notified by email before any final deduction.',
+    'cgu.section8.title': '7. Fair Use and Platform Safety',
+    'cgu.section8.desc': 'Users are prohibited from :',
+    'cgu.section8.li1': 'Listing illegal or unowned tools.',
 
-    'cgu.section7.title': '7. Dispute Handling',
+    'cgu.section8.li2': 'Publishing misleading or harmful content.',
 
-    'cgu.section7.li1':
-      'All disputes must be reported within 24 hours of the scheduled return.',
+    'cgu.section8.li3': 'Listing dangerous or restricted tools.',
 
-    'cgu.section7.li2':
-      'The support team will investigate the case within 72 hours and issue a final decision.',
+    'cgu.section8.li4': 'Committing fraud or deceptive acts.',
 
-    'cgu.section7.li3':
-      'Bricola reserves the right to mediate and apply any financial adjustments it deems necessary.',
-
-    'cgu.section7.li4':
-      'The decision is considered final and binding for both parties.',
-
-    'cgu.section8.title': '8. Fair Use and Platform Integrity',
-
-    'cgu.section8.li1': 'Listings must represent real, legally owned items.',
-
-    'cgu.section8.li2':
-      'Mass or automated uploading of fake listings is prohibited.',
-
-    'cgu.section8.li3':
-      'The listing of prohibited items (weapons, hazardous substances, etc.) is strictly forbidden.',
-
-    'cgu.section8.li4':
-      'Repeat offenders will be permanently banned from the platform.',
-
-    'cgu.section9.title': '9. Cancellations & Refund Policy',
+    'cgu.section9.title': '8. Cancellations & Refund Policy',
 
     'cgu.section9.li1':
-      'Renters may cancel and receive a full refund if cancellation is made at least 24 hours before the rental start time.',
+      'Renters may cancel and receive a full refund if cancellation occurs 24 hours before the rental start.',
 
     'cgu.section9.li2':
-      'No refund will be issued for cancellations made within 24 hours of the rental start.',
+      'No refund applies if cancelled within the last 24 hours.',
 
     'cgu.section9.li3':
-      'If the owner cancels, the renter will receive a full refund. Repeated cancellations by owners may lead to sanctions.',
+      'If the Owner cancels, the full amount is refunded to the Renter.',
+    'cgu.section9.li4':
+      'Bricola may take action against Owners who repeatedly cancel.',
 
-    'cgu.section10.title': '10. Service Availability & Updates',
+    'cgu.section10.title': '9. Service Availability and Updates',
 
     'cgu.section10.li1':
-      'Occasional service interruptions may occur due to maintenance or updates.',
+      'The platform may be temporarily unavailable for maintenance or technical reasons.',
 
     'cgu.section10.li2':
-      'Users will be notified in advance in the case of planned downtime.',
+      'Users will be notified in advance of scheduled downtime.',
 
     'cgu.section10.li3':
-      'Bricola reserves the right to modify or remove certain features without prior notice to optimize user experience.',
+      'Features may be added or modified without prior notice.',
 
-    'cgu.section11.title': '11. Data Protection and Privacy',
+    'cgu.section11.title': '10. Data Protection and Privacy',
 
-    'cgu.section11.li1':
-      'Personal data is processed in accordance with GDPR (UK and EU General Data Protection Regulation).',
+    'cgu.section11.li1': 'Bricola complies with UK and EU GDPR regulations.',
 
-    'cgu.section11.li2': 'Sensitive data is encrypted and securely stored.',
+    'cgu.section11.li2': 'Data is stored securely and encrypted.',
 
     'cgu.section11.li3':
-      'Users may request deletion, modification, or export of their data at any time.',
+      'Users may request deletion or modification of their data at any time.',
 
     'cgu.section11.li4':
-      'No data will be sold or shared without explicit consent.',
+      'No data is sold or shared with third parties without consent.',
 
-    'cgu.section12.title': '12. Jurisdiction and Legal Framework',
+    'cgu.section12.title': '11. Governing Law and Jurisdiction',
 
-    'cgu.section12.li1': 'These terms are governed by English law.',
+    'cgu.section12.li1':
+      'These Terms are governed by the laws of the country where Bricola LTD is registered.',
 
     'cgu.section12.li2':
-      'If no amicable solution is found, disputes shall be resolved exclusively by the courts of London.',
+      'Users must comply with local laws in their respective countries.',
 
     'cgu.section12.li3':
-      'Any updates to these terms will be notified on the platform. Continued use implies acceptance of the revised terms.',
+      'Disputes are resolved according to applicable legal frameworks without affecting any mandatory local rules.',
 
-    'cgu.section13.title': '13. Automatic Confirmation in Case of Inactivity',
+    'cgu.section13.title': '12. utomatic Confirmation in Case of Inactivity',
 
     'cgu.section13.p':
-      'In certain cases where a user (renter or owner) does not respond within a reasonable time, Bricola LTD reserves the right to automatically confirm the status of a transaction (delivery or return). This ensures continuity and reliability of service. Users are encouraged to follow up and validate their actions promptly.',
+      'If a user (Owner or Renter) does not complete the required action within a reasonable time, Bricola LTD reserves the right to take appropriate action (terminate the operation, refund, or cancel the request) to ensure service continuity. This mechanism helps users follow up on their transactions on time and respond to platform notifications.',
 
-    'cgu.section14.title': '14. Modification and Acceptance of Terms',
+    'cgu.section14.title': '13. Modification of Terms',
 
     'cgu.section14.p1':
-      'These Terms of Use may be modified at any time to reflect legal, technical, or operational changes.',
+      'Terms may be updated periodically due to technical, legal, or operational changes.',
 
-    'cgu.section14.p2': 'Users will be notified of any substantial updates.',
+    'cgu.section14.p2': 'Users will be informed of major updates.',
 
     'cgu.section14.p3':
-      'Continued use of the platform after changes implies acceptance of the new terms.',
+      'Continued use of the platform constitutes acceptance of the updated terms.',
 
-    'cgu.section15.title': '15. Contact and Official Communication',
+    'cgu.section15.title': '14. Contact',
 
     'cgu.section15.p1':
-      'For questions, complaints, or legal notices related to these terms, users can contact Bricola LTD at: contact@bricolaltd.com',
+      'Users can contact Bricola LTD for support or inquiries via WhatsApp or email : support@bricolaltd.com',
 
     'cgu.section15.p2':
-      'All official communications will be sent to the email address associated with the user account.', // Privacy Policy
+      'All official communications will be sent to the email address associated with the user account.',
+
+    // Privacy Policy
 
     'privacy.title': 'Privacy Policy',
 
@@ -5284,7 +5217,7 @@ const translations = {
     //mobile
     'mobile_app.title': 'Download our mobile app',
     'mobile_app.subtitle':
-      'Access all our tools and services directly from your mobile phone.',
+      'Download the app for quick, secure access, instant notifications, and easy booking management wherever you are.',
     'mobile_app.app_store': 'Download from App Store',
     'mobile_app.google_play': 'Get it from Google Play',
   },
@@ -5332,7 +5265,7 @@ const translations = {
     'rental_process.owner.step4.description': 'استلم دفعتك بأمان.',
     'mobile_app.title': 'حمل تطبيقنا',
     'mobile_app.subtitle':
-      'الوصول إلى جميع أدواتنا وخدماتنا مباشرة من هاتفك المحمول.',
+      'حمّل التطبيق واستمتع بدخول سريع وآمن، وإشعارات فورية، ومتابعة حجوزاتك بسهولة أينما كنت.',
     'mobile_app.app_store': 'حمل من App Store',
     'mobile_app.google_play': 'احصل عليه من Google Play',
     // {t('pagination.showof')} {startIndex + 1} {t('pagination.to')}
@@ -6826,28 +6759,28 @@ const translations = {
     'faq.title': 'أسئلة عامة',
     'faq.general.q1': 'ما هي Bricola وكيف تعمل؟',
     'faq.general.a1':
-      'Bricola LTD هي منصة تأجير أدوات ومعدات بين الأفراد. يمكن للمستخدمين عرض أدواتهم للإيجار أو استئجار أدوات من الآخرين. تتولى المنصة إدارة المعاملات، والودائع (التأمينات)، وحل النزاعات.',
+      'Bricola هي منصة مبتكرة تتيح للأفراد استئجار الأدوات والمعدات من بعضهم البعض بطريقة سهلة وآمنة. توفر المنصة تجربة موثوقة لإدارة عمليات التأجير، بدءًا من عرض الأدوات وحتى تنظيم الحجوزات والدفع، مع الحفاظ على الخصوصية بين المؤجر والمستأجر في ما يتعلق بالضمانات.',
     'faq.general.q2': 'ما هي فئات الأدوات التي يمكن عرضها؟',
     'faq.general.a2':
-      'حاليًا، تدعم Bricola أدوات ومعدات الأعمال اليدوية، والبستنة، والتنظيف، والمناسبات. يمكن إضافة فئات أخرى لاحقًا حسب احتياجات السوق.',
+      'تدعم Bricola حالياً تأجير أدوات ومعدات الأعمال اليدوية، والبستنة، والتنظيف، والمناسبات. وتسعى المنصة إلى التوسع مستقبلاً بإضافة فئات جديدة حسب تطورات واحتياجات السوق.',
     'faq.general.q3': 'هل يوجد تطبيق مخصص لـ Bricola؟',
     'faq.general.a3':
-      'نعم، Bricola متاحة على كل من أنظمة iOS وAndroid، بالإضافة إلى منصة ويب شاملة.',
+      'يمكن للمستخدمين الاستفادة من خدمات Bricola عبر تطبيقات مخصصة لأنظمة iOS وAndroid، إضافة إلى منصة ويب شاملة تتيح سهولة الوصول من أي جهاز.',
     'faq.general.q4': 'هل يمكنني إستخدام Bricola من أي دولة؟',
     'faq.general.a4':
-      'حاليًا، تقتصر خدمات Bricola على منطقة الخليج، مع وجود خطط للتوسع إلى مناطق أخرى مستقبلًا.',
+      'تقتصر خدمات Bricola حالياً على منطقة الخليج، مع وجود خطط مستقبلية لتوسيع النطاق الجغرافي لتشمل مناطق أخرى.',
     'faq.general.q5': 'هل يمكن للشركات عرض أدواتها؟',
     'faq.general.a5':
-      'نعم، ولكن Bricola مصممة أساسًا للأفراد. يجب على المستخدمين المحترفين الالتزام بالقوانين واللوائح المحلية الخاصة بالأعمال.',
+      'على الرغم من أن المنصة موجهة بشكل أساسي للأفراد، إلا أن الشركات يمكنها أيضاً عرض أدواتها، شريطة الالتزام بالقوانين واللوائح المحلية الخاصة بالأعمال.',
     'faq.general.q6': 'ما هي العناصر الممنوعة؟',
     'faq.general.a6':
-      'يُمنع تمامًا عرض أو تأجير العناصر غير القانونية، أو المعدات الخطرة، أو الأدوات التي تنتهك قوانين السلامة.',
+      'يُحظر بشكل قاطع عرض أو تأجير العناصر غير القانونية أو المعدات الخطرة أو الأدوات التي تخالف قوانين السلامة، حفاظاً على سلامة المستخدمين.',
     'faq.general.q7': 'هل يمكنني اقتراح ميزة جديدة؟',
     'faq.general.a7':
-      'نعم، نرحب بجميع الاقتراحات. يمكنك التواصل مع الدعم الفني بمقترحك، وسنقوم بدراسته للتحديثات المستقبلية.',
+      'ترحب Bricola بجميع الاقتراحات من المستخدمين لتطوير المنصة. يمكن التواصل مع الدعم الفني لإرسال المقترحات، حيث تتم دراسة كل فكرة لإمكانية إضافتها ضمن التحديثات المستقبلية.',
     'faq.general.q8': 'كيف يمكنني التواصل مع خدمة العملاء؟',
     'faq.general.a8':
-      'يمكنك إستخدام دردشة WhatsApp، أو مراسلتنا عبر البريد الإلكتروني: support@bricolaltd.com. فريقنا متاح طوال أيام الأسبوع.',
+      'يمكن التواصل مع فريق دعم العملاء عبر دردشة WhatsApp أو البريد الإلكتروني على support@bricolaltd.com حيث يتوفر الدعم طوال أيام الأسبوع.',
     'faq.renters.title': 'للمستأجرين',
     'faq.renters.q1': 'كيف أنشئ حسابًا؟',
     'faq.renters.a1':
@@ -6857,48 +6790,39 @@ const translations = {
       'لضمان الأمان والثقة على المنصة، قد يُطلب التحقق من الهوية قبل استئجار أدوات عالية القيمة أو سحب مبالغ كبيرة.',
     'faq.renters.q3': 'ماذا يجب أن أفعل قبل استلام الأداة؟',
     'faq.renters.a3':
-      'تأكد من التحقق من هويتك، واتفق مع المالك على شروط الإيجار، وافحص الأداة عند استلامها.',
+      'ينبغي للمستأجر الاتفاق مع المالك على شروط الإيجار، بالإضافة إلى فحص الأداة جيداً عند استلامها لضمان سلامتها.',
     'faq.renters.q4': 'ماذا لو تعرضت الأداة للتلف أثناء فترة الإيجار؟',
     'faq.renters.a4':
-      'أخطر المالك وفريق الدعم فورًا. قد يُطلب منك تقديم أدلة لمعالجة المشكلة من خلال مبلغ الضمان.',
+      'في حال حدوث تلف للأداة خلال فترة الإيجار، يتوجب إعلام المالك فوراً والتفاهم معه حول التعويض أو إصلاح الضرر. المنصة لا تتدخل في النزاعات أو الضمانات، حيث يتم حل المشكلة مباشرة بين الطرفين فقط.',
     'faq.owners.title': 'لأصحاب الأدوات',
     'faq.owners.q1': 'كيف أعرض أداة للإيجار؟',
     'faq.owners.a1':
       'انتقل إلى "عرض أداة"، وقم برفع صور واضحة، وأضف وصفًا للحالة، والضمانات إن وُجدت، وسعر الإيجار اليومي، وحدد مبلغ الضمان المطلوب.',
     'faq.owners.q2': 'ماذا يحدث بعد أن أُدرج أداتي؟',
     'faq.owners.a2':
-      'سيتم مراجعة الإعلان من قبل فريق الإشراف قبل أن يظهر للمستخدمين. سيتم إشعارك عند قيام أحدهم بالحجز.',
+      'بعد إدراج الأداة، يقوم فريق الإشراف بمراجعة الإعلان للتأكد من مطابقته للمعايير قبل ظهوره للمستخدمين، ويتم إشعار صاحب الأداة حال وجود حجز جديد.',
     'faq.owners.q3': 'هل يمكنني رفض طلب الحجز؟',
     'faq.owners.a3':
-      'نعم، يمكنك قبول أو رفض أي طلب. لكن تكرار الرفض دون أسباب مقنعة قد يؤثر على ظهور أدواتك على المنصة.',
+      'يحق للمستخدم قبول أو رفض أي طلب حجز، إلا أن تكرار الرفض دون أسباب مقنعة قد يؤثر على ظهور الأدوات الخاصة به في نتائج البحث على المنصة.',
     'faq.owners.q4': 'ماذا يجب أن أفعل قبل تسليم الأداة؟',
     'faq.owners.a4':
       'تحقق من هوية المستأجر، وثق حالة الأداة بالصور، واتفق معه على شروط الإرجاع.',
     'faq.owners.q5': 'ماذا أفعل إذا تضررت أداتي؟',
     'faq.owners.a5':
-      'أرسل الأدلة خلال 24 ساعة من استرجاع الأداة. ستقوم Bricola بمراجعة الحالة وقد تُصدر تعويضًا من مبلغ الضمان.',
+      'يتفق المالك والمستأجر فيما بينهم على خصم جزء أو كامل مبلغ التأمين حسب حجم الضرر الذي تعرضت له الأداة خلال فترة الإيجار',
     'faq.owners.q6': 'هل توجد تأمينات على الأدوات المعروضة؟',
     'faq.owners.a6':
-      'حاليًا، لا توفر Bricola تأمينًا. ننصح بعرض الأدوات التي يمكنك تحمل تأجيرها في حال حدوث أي ضرر.',
+      'حالياً، لا توفر Bricola تأميناً على الأدوات المعروضة. لذا ينصح بعرض الأدوات التي يمكن تحمل تأجيرها من حيث المخاطر',
     'faq.payment.title': 'الدفع والسلامة',
-    'faq.payment.q1': 'كيف تتم معالجة عملية الدفع؟',
-    'faq.payment.a1':
-      'تتم جميع الدفعات بأمان من خلال نظام Stripe. يدفع المستأجر مقدمًا، بما في ذلك مبلغ الضمان.',
-    'faq.payment.q2': 'ما هو مبلغ التأمين؟',
-    'faq.payment.a2':
-      'هو مبلغ قابل للاسترداد تحتفظ به Stripe لتغطية أي أضرار أو حالات عدم الإرجاع. يُعاد تلقائيًا بعد استرجاع الأداة بنجاح.',
     'faq.payment.q3': 'كيف أسحب أرباحي؟',
     'faq.payment.a3':
-      'يمكنك طلب تحويل أرباحك إلى حسابك البنكي من خلال خدمة Wise.',
+      'يمكن للمؤجر طلب تحويل مستحقاته مباشرة إلى حسابه البنكي عبر خدمة Wise، مما يوفر سهولة ومرونة في إدارة المستحقات.',
     'faq.payment.q4': 'ما هي الرسوم التي تفرضها Bricola؟',
     'faq.payment.a4':
-      'تتقاضى Bricola عمولة بنسبة 15% على كل عملية تأجير ناجحة. لا توجد رسوم على الإدراج أو إشتراكات شهرية.',
-    'faq.payment.q5': 'كيف يتم التعامل مع النزاعات؟',
-    'faq.payment.a5':
-      'يتم حل جميع النزاعات من خلال فريق الدعم الداخلي خلال 72 ساعة. القرار الصادر يعتبر نهائيًا.',
+      'تفرض Bricola عمولة بنسبة 15% على كل عملية تأجير ناجحة، ولا توجد رسوم على إدراج الأدوات أو اشتراكات شهرية.',
     'faq.payment.q6': 'ما هي تدابير السلامة المطبقة؟',
     'faq.payment.a6':
-      'التحقق من الهوية، تقييمات المستخدمين، المدفوعات الآمنة، ومتابعة مستمرة من فريق الدعم لضمان بيئة موثوقة وآمنة.',
+      'تشمل تدابير السلامة التحقق من الهوية، وتقييمات المستخدمين، والمدفوعات الآمنة، والمتابعة المستمرة من فريق الدعم لضمان بيئة موثوقة وآمنة لجميع الأطراف.',
     'payment_form.amount_to_pay': 'المبلغ الواجب دفعه:',
     'payment_form.equivalent_gbp': '(المعادِل: £{amount} GBP)',
     'payment_form.processed_in_gbp':
@@ -7114,6 +7038,8 @@ const translations = {
     'footer.faq': 'الأسئلة الشائعة',
     'footer.description':
       'المنصة التي تربط أصحاب الأدوات بمن يحتاجون إليها. بسيطة، آمنة، ومحلية« www.bricolaltd.com » هي علامة تجارية تابعة لشركة « BRICOLA LTD »مسجلة في إنجلترا وويلز تحت الرقم: 16401372',
+    'footer.description_serv':
+      'نخدمكم في الكويت، البحرين، السعودية، قطر، سلطنة عُمان والإمارات العربية المتحدة.',
     'footer.contrat': 'عقد الإيجار', // Added
     'footer.payment': 'وسائل الدفع', // Added
     'footer.useful_links': 'روابط مفيدة', // Added
@@ -7218,7 +7144,8 @@ const translations = {
     'contact.phone_title': 'الهاتف',
     'contact.address_title': 'العنوان',
     'contact.hours_title': 'ساعات العمل',
-    'contact.hours_weekdays': 'فريق الدعم متاح على مدار الساعة، طوال أيام الأسبوع.',
+    'contact.hours_weekdays':
+      'فريق الدعم متاح على مدار الساعة، طوال أيام الأسبوع.',
     'contact.hours_saturday': 'السبت: 10:00 صباحاً - 4:00 مساءً',
     'contact.hours_sunday': 'الأحد: مغلق',
     'contact.faq_title': 'الأسئلة الشائعة',
@@ -7376,7 +7303,12 @@ const translations = {
       'Bricola LTD هي منصة رقمية تربط بين الأفراد لتبادل كراء الأدوات المتعلقة بالبستنة، التنظيف، الأشغال اليدوية، وتنظيم المناسبات.',
     'cgu.section1.p2':
       'تعمل المنصة كوسيط رقمي موثوق ولا تتحمل مسؤولية الأدوات فعليًا أو عمليات التوصيل.',
-
+  
+    'cgu.section1.p3':
+      'تقوم علاقة الإيجار مباشرة بين المؤجر والمستأجر. يعمل المؤجر كمقدم خدمة مستقل ولا يتم إنشاء أي علاقة وكالة، شراكة، أو تمثيل مع شركة Bricola.',
+    'cgu.section1.p4':
+      'إن استخدام المنصة يُشكل قبولاً تاماً بهذه الشروط.',
+    'cgu.section1.p5': 'تسري شروط الاستخدام هذه ابتداءً من 1 سبتمبر 2025.',
     'cgu.section2.title': '2. الوصول إلى المنصة',
     'cgu.section2.p1':
       'يمكن إستخدام المنصة عبر الموقع الإلكتروني أو التطبيقات.',
@@ -7389,100 +7321,88 @@ const translations = {
     'cgu.section3.li1':
       'يجب على المستخدم تقديم بريد إلكتروني صالح، رقم هاتف، وبيانات هوية دقيقة.',
     'cgu.section3.li2':
-      'يجب على المؤجرين تقديم بياناتهم البنكية بدقة لتلقي الأرباح عبر Wise.',
-    'cgu.section3.li3':
       'تحتفظ بريكولا بحق طلب وثائق تحقق قبل تفعيل بعض المعاملات.',
-    'cgu.section3.li4': 'لا يُسمح بمشاركة أو بيع الحسابات بين الأطراف.',
+    'cgu.section3.li3': 'لا يُسمح بمشاركة أو بيع الحسابات بين الأطراف.',
 
     'cgu.section4.title': '4. شروط الكراء وواجبات المستخدم',
     'cgu.section4.li1':
-      'يجب على المستأجر إرجاع الأدوات في نفس الحالة التي استلمها بها.',
+      'يلتزم المستأجر بإرجاع الأدوات في نفس الحالة التي استلمها بها.',
     'cgu.section4.li2':
-      'المؤجر مسؤول عن صلاحية، نظافة، وسلامة الأدوات قبل نشرها.',
-    'cgu.section4.li3':
-      'في حال وجود ضرر أو نزاع، قد تطلب المنصة أدلة (صور أو فيديو).',
-    'cgu.section4.li4':
-      'التأخير في الإرجاع يؤدي إلى خصومات من الضمان بمعدل يومي أو ساعي.',
+      'يتحمل المؤجّر مسؤولية صحة، نظافة، وسلامة الأدوات قبل نشرها على المنصّة.',
+    'cgu.section4.li4': ' سوء استخدام الأدوات قد يؤدي إلى تعليق الحساب.',
+
     'cgu.section4.li5':
-      'لا يمكن أن تتجاوز مدة الكراء 5 أيام في العملية الواحدة. في حال رغبة المستأجر في تمديد المدة، يجب أولًا التحقق من توفر الأداة لدى المؤجر، ثم إعادة إجراء عملية حجز جديدة عبر المنصة.',
-    'cgu.section4.li6': 'فقدان الأداة يؤدي إلى خسارة الضمان بالكامل.',
-    'cgu.section4.li7': 'سوء إستخدام الأدوات قد يؤدي إلى تعليق الحساب.',
+      ' في حال حدوث ضرر أو ضياع الأداة، يحق للمؤجّر خصم جزء أو كل مبلغ الضمان لتعويض الضرر الواقع.',
 
     'cgu.section5.title': '5. الدفع والعمولة والمحفظة',
-    'cgu.section5.li1':
-      'تُدار عمليات الدفع عبر Stripe، وتخضع للوائح المالية المحلية.',
+    'cgu.section5.li1': 'يتم قبول الدفع إلكترونيًا فقط عبر مزوّد دفع معتمد.',
     'cgu.section5.li2':
       'تُحمّل نسبة 5.25% + 0.25£ من كل عملية كراء على المستأجر عند الدفع، وهي تغطي مصاريف الدفع الإلكتروني عبر Stripe إضافة إلى جزء من تكاليف تطوير وتشغيل المنصة (صيانة، استضافة، تحسينات تقنية).',
     'cgu.section5.li3': 'تُقتطع عمولة بنسبة 15% من كل عملية كراء ناجحة.',
     'cgu.section5.li4':
-      'تُودع أرباح المؤجر في محفظة رقمية داخلية ويمكن سحبها عبر Wise.',
+      ' لا يمكن للمؤجّر طلب مستحقاته إلا إذا بلغ الحد الأدنى للسحب والبالغ 50 جنيهًا إسترلينيًا، ويهدف هذا الإجراء إلى تقليل عدد عمليات السحب و التكاليف المرتبطة بالتحويلات.',
     'cgu.section5.li5':
-      'لا يمكن للمؤجر سحب الرصيد المتوفر في محفظته إلا إذا بلغ الحد الأدنى وهو 50 جنيهًا إسترلينيًا. هذا الإجراء يهدف إلى تقليص عدد عمليات السحب الصغيرة، وتفادي التكاليف المرتفعة المرتبطة بالتحويلات، وضمان انسيابية العمليات داخل المنصة.',
+      ' لا تتحمل Bricola LTD مسؤولية التأخيرات الناتجة عن الأنظمة البنكية الخارجية.',
     'cgu.section5.li6':
-      'لا تتحمل بريكولا مسؤولية التأخيرات الناتجة عن الأنظمة البنكية الخارجية.',
+      'قد تكون عمليات التحويل الدولية المنفذة عبر شبكة SWIFT خاضعة لاقتطاعات أو رسوم استلام تفرضها البنوك الوسيطة أو البنوك المستلمة. يتحمل المؤجر كامل هذه الرسوم، ولا تتحمل Bricola LTD أي مسؤولية عن أي مبالغ تقتطع أثناء عملية التحويل.',
 
     'cgu.section6.title': '6. سياسة مبلغ الضمان',
-    'cgu.section6.li1': 'يتم حجز مبلغ ضمان لكل عملية كراء عبر Stripe.',
+    'cgu.section6.li1':
+      'يحق للمؤجّر طلب مبلغ ضمان  من المستأجر و يتم الاتفاق عليه مسبقًا قبل تسليم الأداة.',
     'cgu.section6.li2':
-      'يُفرج عن المبلغ بعد مرور 24 ساعة من الإرجاع والتحقق من الحالة.',
-    'cgu.section6.li3': 'في حال وجود ضرر، يتم إعلام المستخدم قبل خصم أي مبلغ.',
-    'cgu.section6.li4': 'يمكن إستخدام الضمان كليًا أو جزئيًا لتعويض المؤجر.',
+      ' في حال حدوث ضرر، يمكن للمؤجّر اقتطاع جزء أو كل مبلغ الضمان بعد الاتفاق مع المستأجر.',
+    'cgu.section6.li3':
+      'لا تتدخل Bricola LTD في تحصيل مبلغ الضمان أو في أي نزاعات متعلقة به.',
 
-    'cgu.section7.title': '7. معالجة النزاعات',
-    'cgu.section7.li1':
-      'يجب الإبلاغ عن أي نزاع خلال 24 ساعة من وقت الإرجاع المحدد.',
-    'cgu.section7.li2':
-      'يقوم فريق الدعم بالتحقيق خلال 72 ساعة ويصدر قرارًا نهائيًا.',
-    'cgu.section7.li3': 'تحتفظ بريكولا بحق اتخاذ قرار عادل بناءً على الأدلة.',
-    'cgu.section7.li4': 'القرار الصادر عن الفريق ملزم للطرفين.',
+    'cgu.section8.title': '7. الاستخدام العادل وسلامة المنصة',
+    'cgu.section8.desc': 'يُمنع:',
+    'cgu.section8.li1': 'عرض أدوات غير قانونية أو غير مملوكة.',
+    'cgu.section8.li2': 'الإعلانات المزيفة أو العشوائية.',
+    'cgu.section8.li3': 'تأجير أدوات خطرة أو محظورة قانونيًا.',
+    'cgu.section8.li4': 'التحايل والاحتيال على المستخدمين الآخرين.',
 
-    'cgu.section8.title': '8. الاستخدام العادل وسلامة المنصة',
-    'cgu.section8.li1': 'يُمنع عرض أدوات غير قانونية أو غير مملوكة.',
-    'cgu.section8.li2': 'تُحظر الإعلانات المزيفة أو العشوائية.',
-    'cgu.section8.li3': 'يُمنع تأجير أدوات خطرة أو محظورة قانونيًا.',
-    'cgu.section8.li4': 'يتعرض المستخدمون المخالفون لحظر دائم.',
-
-    'cgu.section9.title': '9. سياسة الإلغاء والاسترجاع',
+    'cgu.section9.title': '8. سياسة الإلغاء والاسترجاع',
     'cgu.section9.li1':
       'يحق للمستأجر إلغاء الحجز واسترجاع المبلغ كاملًا (100%) في حال تم الإلغاء قبل 24 ساعة على الأقل من موعد بداية الكراء.',
     'cgu.section9.li2':
       'إذا تم الإلغاء خلال 24 ساعة الأخيرة قبل الموعد، فلن يتم استرجاع أي مبلغ، ويُعتبر الحجز نهائي.',
     'cgu.section9.li3':
       'في حال قام المؤجّر بإلغاء الحجز في أي وقت، يتم إرجاع كامل المبلغ للمستأجر، ويمكن أن تتخذ إدارة المنصة إجراءات ضد المؤجّر في حال تكرار الإلغاء.',
-
-    'cgu.section10.title': '10. توافر الخدمة والتحديثات',
+    'cgu.section9.li4':
+      'Bricola peut agir contre les Propriétaires annulant à répétition.',
+    'cgu.section10.title': '9. توافر الخدمة والتحديثات',
     'cgu.section10.li1': 'قد يتم تعليق المنصة مؤقتًا لأسباب تقنية أو تحديثات.',
     'cgu.section10.li2':
       'تُرسل إشعارات للمستخدمين مسبقًا في حال التوقف المبرمج.',
     'cgu.section10.li3':
       'يمكن للمنصة تعديل أو إضافة ميزات دون إشعار مسبق لضمان تحسين الخدمة.',
 
-    'cgu.section11.title': '11. حماية البيانات والخصوصية',
+    'cgu.section11.title': '10. حماية البيانات والخصوصية',
     'cgu.section11.li1':
       'تلتزم بريكولا بتطبيق قوانين حماية البيانات البريطانية والأوروبية (GDPR).',
     'cgu.section11.li2': 'يتم حفظ البيانات بشكل آمن ومشفّر.',
     'cgu.section11.li3': 'يمكن للمستخدم طلب حذف أو تعديل بياناته في أي وقت.',
     'cgu.section11.li4': 'لا يتم بيع أو مشاركة البيانات مع طرف ثالث دون إذن.',
 
-    'cgu.section12.title': '12. القانون المعتمد والاختصاص القضائي',
+    'cgu.section12.title': '11. القانون المعتمد والاختصاص القضائي',
     'cgu.section12.li1': 'تخضع هذه الشروط للقانون البريطاني.',
     'cgu.section12.li2':
       'في حال عدم التوصل لحل داخلي، يتم عرض النزاع أمام محاكم لندن المختصة.',
     'cgu.section12.li3':
       'يُعتبر استمرار إستخدام المنصة موافقة تلقائية على الشروط الجديدة.',
 
-    'cgu.section13.title': '13. التأكيد التلقائي في حال عدم التفاعل',
+    'cgu.section13.title': '12. التأكيد التلقائي في حال عدم التفاعل',
     'cgu.section13.p':
       'في بعض الحالات التي لا يقوم فيها المستخدم (سواء المستأجر أو المالك) باتخاذ الإجراء اللازم أو الرد خلال فترة زمنية معقولة، تحتفظ Bricola LTD بحقها في تأكيد حالة العملية تلقائيًا (مثل تسليم الأداة أو إرجاعها). يهدف هذا الإجراء إلى ضمان استمرارية الخدمة ومصداقيتها. ننصح المستخدمين بمتابعة معاملاتهم والتفاعل في الوقت المناسب لتفادي التأكيد التلقائي.',
 
-    'cgu.section14.title': '14. تعديل الشروط والموافقة عليها',
+    'cgu.section14.title': '13. تعديل الشروط والموافقة عليها',
     'cgu.section14.p1':
       'قد يتم تحديث شروط الاستخدام من وقت لآخر لتعكس التغيرات التقنية أو القانونية أو التشغيلية.',
     'cgu.section14.p2': 'سيتم إعلام المستخدمين بالتحديثات الجوهرية عبر المنصة.',
     'cgu.section14.p3':
       'يُعتبر استمرار إستخدام الخدمة بعد هذه التعديلات موافقة ضمنية على الشروط الجديدة.',
 
-    'cgu.section15.title': '15. الإتصال والتواصل',
+    'cgu.section15.title': '14. الإتصال والتواصل',
     'cgu.section15.p1':
       'لأي استفسارات أو ملاحظات أو مراسلات قانونية بخصوص شروط الاستخدام، يمكن للمستخدمين التواصل مع Bricola LTD عبر البريد الإلكتروني: contact@bricolaltd.com.',
     'cgu.section15.p2':
@@ -7688,9 +7608,9 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
       const savedLanguage = localStorage.getItem('selectedLanguage') as Language
       return savedLanguage && ['fr', 'en', 'ar'].includes(savedLanguage)
         ? savedLanguage
-        : 'en'
+        : 'ar'
     } catch (error) {
-      return 'en'
+      return 'ar'
     }
   })
 

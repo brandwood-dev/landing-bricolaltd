@@ -1,6 +1,6 @@
 import React from 'react'
 import { useLanguage } from '@/contexts/LanguageContext'
-import { Smartphone } from 'lucide-react'
+import { Smartphone, Bell, Fingerprint, Globe } from 'lucide-react'
 
 const MobileAppSection = () => {
   const { t } = useLanguage()
@@ -20,6 +20,18 @@ const MobileAppSection = () => {
           <p className='text-xl text-gray-600 mb-10 max-w-2xl mx-auto'>
             {t('mobile_app.subtitle')}
           </p>
+
+          <div className='flex flex-wrap justify-center gap-8 mb-10'>
+            <div className='flex flex-col items-center gap-3'>
+              <Bell className='w-8 h-8 text-orange-500' />
+            </div>
+            <div className='flex flex-col items-center gap-3'>
+              <Fingerprint className='w-8 h-8 text-orange-500' />
+            </div>
+            <div className='flex flex-col items-center gap-3'>
+              <Globe className='w-8 h-8 text-orange-500' />
+            </div>
+          </div>
 
           <div className='flex flex-col sm:flex-row gap-6 justify-center items-center w-full max-w-2xl mx-auto'>
             <a

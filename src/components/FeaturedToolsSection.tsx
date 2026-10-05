@@ -113,7 +113,9 @@ const FeaturedToolsSection = () => {
           </div>
           <div className='flex justify-center items-center py-12'>
             <Loader2 className='h-8 w-8 animate-spin text-primary' />
-            <span className='ml-2 text-gray-600'>{t('chargemento.outils')}</span>
+            <span className='ml-2 text-gray-600'>
+              {t('chargemento.outils')}
+            </span>
           </div>
         </div>
       </section>
@@ -131,9 +133,7 @@ const FeaturedToolsSection = () => {
             <p className='text-lg text-gray-600'>{t('tools.description')}</p>
           </div>
           <div className='text-center py-12'>
-            <p className='text-gray-600'>
-              {t('featured_tools.load_error')}
-            </p>
+            <p className='text-gray-600'>{t('featured_tools.load_error')}</p>
             <Button
               onClick={() => window.location.reload()}
               className='mt-4'
@@ -227,12 +227,16 @@ const FeaturedToolsSection = () => {
 
                         <div className='flex items-center justify-between mb-4'>
                           <div className='text-lg font-bold text-primary'>
-                            <OptimizedPriceDisplay
-                              price={displayPrice}
-                              baseCurrency={tool.baseCurrencyCode || 'GBP'}
-                              size='md'
-                              cible='basePrice'
-                            />
+                            {displayPrice ? (
+                              <OptimizedPriceDisplay
+                                price={displayPrice}
+                                baseCurrency={tool.baseCurrencyCode || 'GBP'}
+                                size='md'
+                                cible='basePrice'
+                              />
+                            ) : (
+                              <Loader2 className='h-8 w-8 animate-spin text-primary' />
+                            )}
                           </div>
                           <div className='text-sm text-gray-500'>
                             {t('tools.by')} {tool.owner.firstName}{' '}

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test Notifications Utilisateur</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 20px; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+    input, button, select, textarea { padding: 8px 12px; font-size: 14px; }
+    button { cursor: pointer; }
+    .btn { background:#0d6efd; color:#fff; border: none; border-radius:6px; }
+    .btn.secondary { background:#198754; }
+    .btn.warn { background:#dc3545; }
+    .btn.gray { background:#6c757d; }
+    .card { border:1px solid #e2e8f0; border-radius:8px; padding:12px; margin-bottom:12px; }
+    .title { font-weight:600; margin-bottom:6px; }
+    pre { background:#f8fafc; padding:12px; border-radius:6px; max-height: 320px; overflow:auto; }
+    code { white-space: pre-wrap; word-break: break-word; }
+    label { font-size: 12px; color: #555; display:block; margin-bottom:4px; }
+  </style>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
+  <!-- Note: cette page est destinée aux tests manuels côté utilisateur -->
+  <!-- Pour que l'API réponde, assurez-vous d'être connecté sur le site et que localStorage contient 'authToken' -->
+</head>
+<body>
+  <h1>Test du système de notifications utilisateur</h1>
+
+  <div class="card">
+    <div class="title">1) Authentification</div>
+    <div class="row">
+      <div style="flex:1; min-width:260px;">
+        <label>Token JWT utilisateur (Bearer)</label>
+        <input id="token" type="text" placeholder="Collez votre token ou laissez vide pour localStorage" style="width:100%;" />
+      </div>
+      <button class="btn gray" id="loadLocal">Charger depuis localStorage</button>
+      <button class="btn gray" id="saveLocal">Sauvegarder dans localStorage</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title">2) WebSocket Utilisateur</div>
+    <div class="row">
+      <button class="btn" id="connect">Connexion WS</button>
+      <button class="btn warn" id="disconnect">Déconnexion WS</button>
+      <button class="btn secondary" id="getNotifs">Demander notifications (WS)</button>
+      <button class="btn gray" id="markAllRead">Tout marquer comme lu (WS)</button>
+    </div>
+    <pre id="wsLog"><code></code></pre>
+  </div>
+
+  <div class="card">
+    <div class="title">3) Endpoints utilisateur (REST)</div>
+    <div class="row">
+      <button class="btn" id="fetchMy">GET /notifications/my</button>
+      <button class="btn secondary" id="fetchUnreadCount">GET /notifications/my/unread-count</button>
+      <button class="btn gray" id="patchMarkAll">PATCH /notifications/my/mark-all-read</button>
+    </div>
+    <pre id="apiLog"><code></code></pre>
+  </div>
+
+  <div class="card">
+    <div class="title">4) Créer une notification système (REST)</div>
+    <div class="row">
+      <div style="flex:1; min-width:220px;">
+        <label>Type</label>
+        <select id="notifType" style="width:100%;">
+          <option value="SYSTEM">SYSTEM</option>
+          <option value="TOOL_REJECTED">TOOL_REJECTED</option>
+          <option value="BOOKING_CONFIRMED">BOOKING_CONFIRMED</option>
+          <option value="PAYMENT_RECEIVED">PAYMENT_RECEIVED</option>
+        </select>
+      </div>
+      <div style="flex:1; min-width:220px;">
+        <label>Titre</label>
+        <input id="notifTitle" type="text" placeholder="Titre de la notification" style="width:100%;" />
+      </div>
+    </div>
+    <div class="row">
+      <div style="flex:1; min-width:220px;">
+        <label>Message</label>
+        <textarea id="notifMessage" rows="3" placeholder="Contenu du message" style="width:100%;"></textarea>
+      </div>
+    </div>
+    <div class="row">
+      <div style="flex:1; min-width:220px;">
+        <label>Lien (optionnel)</label>
+        <input id="notifLink" type="text" placeholder="/tools/uuid" style="width:100%;" />
+      </div>
+      <div style="flex:1; min-width:220px;">
+        <label>relatedId (optionnel)</label>
+        <input id="notifRelatedId" type="text" placeholder="uuid lié" style="width:100%;" />
+      </div>
+      <div style="flex:1; min-width:220px;">
+        <label>relatedType (optionnel)</label>
+        <input id="notifRelatedType" type="text" placeholder="tool | booking ..." style="width:100%;" />
+      </div>
+    </div>
+    <div class="row">
+      <button class="btn" id="createSystemNotif">POST /notifications/system</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title">5) Test SendGrid (nécessite un token admin)</div>
+    <div class="row">
+      <div style="flex:1; min-width:260px;">
+        <label>Email de réception</label>
+        <input id="email" type="email" placeholder="user@exemple.com" style="width:100%;" />
+      </div>
+      <button class="btn" id="sendEmail">POST /emails/test-sendgrid</button>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:4000/api';
+    const WS_BASE = 'http://localhost:4000';
+    let socket = null;
+
+    const tokenInput = document.getElementById('token');
+    const wsLog = document.getElementById('wsLog').querySelector('code');
+    const apiLog = document.getElementById('apiLog').querySelector('code');
+
+    function logWS(msg, obj) {
+      const ts = new Date().toLocaleTimeString();
+      wsLog.textContent += `[${ts}] ${msg}` + (obj ? `: ${JSON.stringify(obj)}\n` : '\n');
+      wsLog.parentElement.scrollTop = wsLog.parentElement.scrollHeight;
+    }
+
+    function logAPI(msg, obj) {
+      const ts = new Date().toLocaleTimeString();
+      apiLog.textContent += `[${ts}] ${msg}` + (obj ? `: ${JSON.stringify(obj)}\n` : '\n');
+      apiLog.parentElement.scrollTop = apiLog.parentElement.scrollHeight;
+    }
+
+    document.getElementById('loadLocal').onclick = () => {
+      const t = localStorage.getItem('authToken');
+      if (t) tokenInput.value = t;
+    };
+    document.getElementById('saveLocal').onclick = () => {
+      if (tokenInput.value) localStorage.setItem('authToken_manual', tokenInput.value);
+    };
+
+    document.getElementById('connect').onclick = () => {
+      const token = tokenInput.value || localStorage.getItem('authToken') || localStorage.getItem('authToken_manual');
+      if (!token) return logWS('Token manquant');
+      if (!window.io) return logWS('window.io non disponible');
+      if (socket) return logWS('Déjà connecté');
+
+      socket = window.io(`${WS_BASE}/notifications`, {
+        transports: ['websocket'],
+        auth: { token },
+        withCredentials: true,
+      });
+
+      socket.on('connect', () => logWS('WS connecté', { id: socket.id }));
+      socket.on('disconnect', (reason) => logWS('WS déconnecté', { reason }));
+      socket.on('connect_error', (err) => logWS('Erreur connexion', { message: err.message }));
+      socket.on('unread_count', (payload) => logWS('unread_count', payload));
+      socket.on('new_notification', (notification) => logWS('new_notification', notification));
+      socket.on('notifications', (payload) => logWS('notifications', payload));
+    };
+
+    document.getElementById('disconnect').onclick = () => {
+      try { socket?.disconnect(); socket = null; logWS('WS fermé'); } catch (e) { logWS('Erreur fermeture', e); }
+    };
+
+    document.getElementById('getNotifs').onclick = () => {
+      if (!socket) return logWS('Socket non connecté');
+      socket.emit('get_notifications');
+      logWS('emit get_notifications');
+    };
+
+    document.getElementById('markAllRead').onclick = () => {
+      if (!socket) return logWS('Socket non connecté');
+      socket.emit('mark_all_as_read');
+      logWS('emit mark_all_as_read');
+    };
+
+    async function authed(method, path, body) {
+      const token = tokenInput.value || localStorage.getItem('authToken') || localStorage.getItem('authToken_manual');
+      const res = await fetch(`${API_BASE}${path}`, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : '',
+        },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      const json = await res.json().catch(() => ({}));
+      return { status: res.status, json };
+    }
+
+    document.getElementById('fetchMy').onclick = async () => {
+      try {
+        const { status, json } = await authed('GET', '/notifications/my');
+        logAPI(`GET /notifications/my status ${status}`, json);
+      } catch (e) { logAPI('Erreur GET my', { error: String(e) }); }
+    };
+
+    document.getElementById('fetchUnreadCount').onclick = async () => {
+      try {
+        const { status, json } = await authed('GET', '/notifications/my/unread-count');
+        logAPI(`GET /notifications/my/unread-count status ${status}`, json);
+      } catch (e) { logAPI('Erreur GET unread-count', { error: String(e) }); }
+    };
+
+    document.getElementById('patchMarkAll').onclick = async () => {
+      try {
+        const { status, json } = await authed('PATCH', '/notifications/my/mark-all-read');
+        logAPI(`PATCH /notifications/my/mark-all-read status ${status}`, json);
+      } catch (e) { logAPI('Erreur PATCH mark-all-read', { error: String(e) }); }
+    };
+
+    document.getElementById('createSystemNotif').onclick = async () => {
+      try {
+        const type = document.getElementById('notifType').value;
+        const title = document.getElementById('notifTitle').value || 'Notification de test';
+        const message = document.getElementById('notifMessage').value || 'Ceci est une notification de test.';
+        const link = document.getElementById('notifLink').value || '';
+        const relatedId = document.getElementById('notifRelatedId').value || '';
+        const relatedType = document.getElementById('notifRelatedType').value || '';
+
+        const payload = { type, title, message };
+        if (link) payload.link = link;
+        if (relatedId) payload.relatedId = relatedId;
+        if (relatedType) payload.relatedType = relatedType;
+
+        const { status, json } = await authed('POST', '/notifications/system', payload);
+        logAPI(`POST /notifications/system status ${status}`, json);
+      } catch (e) { logAPI('Erreur POST system', { error: String(e) }); }
+    };
+
+    async function authedPostAdmin(path, body) {
+      // Permet de tester SendGrid si vous fournissez un token admin
+      const token = tokenInput.value || localStorage.getItem('admin_token');
+      const res = await fetch(`${API_BASE}${path}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : '',
+        },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      const json = await res.json().catch(() => ({}));
+      return { status: res.status, json };
+    }
+
+    document.getElementById('sendEmail').onclick = async () => {
+      const email = document.getElementById('email').value;
+      if (!email) return logAPI('Email manquant');
+      try {
+        const { status, json } = await authedPostAdmin('/emails/test-sendgrid', { email });
+        logAPI(`POST /emails/test-sendgrid status ${status}`, json);
+      } catch (e) { logAPI('Erreur test sendgrid', { error: String(e) }); }
+    };
+  </script>
+</body>
+</html>

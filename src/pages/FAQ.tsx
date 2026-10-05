@@ -147,14 +147,7 @@ const FAQ = () => {
             </CardHeader>
             <CardContent>
               <Accordion type="single" collapsible className={`w-full ${direction === 'rtl' ? 'rtl-accordion' : ''}`}>
-                <AccordionItem value="payment-1">
-                  <AccordionTrigger className={`${language === 'ar' ? 'flex !flex-row' : ''}`}>{t('faq.payment.q1')}</AccordionTrigger>
-                  <AccordionContent>{t('faq.payment.a1')}</AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="payment-2">
-                  <AccordionTrigger className={`${language === 'ar' ? 'flex !flex-row' : ''}`}>{t('faq.payment.q2')}</AccordionTrigger>
-                  <AccordionContent>{t('faq.payment.a2')}</AccordionContent>
-                </AccordionItem>
+               
                 <AccordionItem value="payment-3">
                   <AccordionTrigger className={`${language === 'ar' ? 'flex !flex-row' : ''}`}>{t('faq.payment.q3')}</AccordionTrigger>
                   <AccordionContent>{t('faq.payment.a3')}</AccordionContent>
@@ -162,10 +155,6 @@ const FAQ = () => {
                 <AccordionItem value="payment-4">
                   <AccordionTrigger className={`${language === 'ar' ? 'flex !flex-row' : ''}`}>{t('faq.payment.q4')}</AccordionTrigger>
                   <AccordionContent>{t('faq.payment.a4')}</AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="payment-5">
-                  <AccordionTrigger className={`${language === 'ar' ? 'flex !flex-row' : ''}`}>{t('faq.payment.q5')}</AccordionTrigger>
-                  <AccordionContent>{t('faq.payment.a5')}</AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="payment-6">
                   <AccordionTrigger className={`${language === 'ar' ? 'flex !flex-row' : ''}`}>{t('faq.payment.q6')}</AccordionTrigger>

@@ -30,15 +30,15 @@ const Favorites = () => {
     try {
       await removeFromFavorites(toolId);
       toast({
-        title: "Retiré des favoris",
-        description: "L'outil a été retiré de vos favoris.",
-      });
+        title: t('featured_tools.favorite_removed_title'),
+        description: t('featured_tools.favorite_removed_desc'),
+      })
     } catch (error) {
       toast({
-        title: "Erreur",
-        description: "Une erreur s'est produite lors de la suppression.",
-        variant: "destructive",
-      });
+        title: "ERROR",
+        description: t('favorites_update_error'),
+        variant: 'destructive',
+      })
     }
   };
   
@@ -66,7 +66,7 @@ const Favorites = () => {
             </div>
             <div className="text-center py-16">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4 mx-auto"></div>
-              <p className="text-gray-600">Chargement de vos favoris...</p>
+              <p className="text-gray-600">{t('favorites.loading')}</p>
             </div>
           </div>
         </main>

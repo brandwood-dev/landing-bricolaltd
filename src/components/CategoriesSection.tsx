@@ -58,15 +58,15 @@ const CategoriesSection = () => {
   // Image mapping for categories
   const getCategoryImage = (categoryName: string) => {
     const imageMap: { [key: string]: string } = {
-      'jardinage': 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-      'gardening': 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-      'bricolage': 'https://images.unsplash.com/photo-1504148455328-c376907d081c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-      'diy': 'https://images.unsplash.com/photo-1504148455328-c376907d081c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-      'nettoyage': 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-      'cleaning': 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-      'evenements': 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-      'events': 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
-    };
+      jardinage: 'public/gar.jpeg',
+      gardening: 'public/gar.jpeg',
+      bricolage: 'public/dy.jpeg',
+      diy: 'public/dy.jpeg',
+      nettoyage: 'public/clean.jpeg',
+      cleaning: 'public/clean.jpeg',
+      evenements: 'public/eve.jpeg',
+      events: 'public/eve.jpeg',
+    }
     return imageMap[categoryName.toLowerCase()] || 'https://images.unsplash.com/photo-1504148455328-c376907d081c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80';
   };
 

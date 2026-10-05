@@ -81,11 +81,9 @@ const CGU = () => {
                 <ul className='list-disc list-inside space-y-2 text-gray-600'>
                   <li>{t('cgu.section4.li1')}</li>
                   <li>{t('cgu.section4.li2')}</li>
-                  <li>{t('cgu.section4.li3')}</li>
+
                   <li>{t('cgu.section4.li4')}</li>
                   <li>{t('cgu.section4.li5')}</li>
-                  <li>{t('cgu.section4.li6')}</li>
-                  <li>{t('cgu.section4.li7')}</li>
                 </ul>
               </CardContent>
             </Card>
@@ -121,24 +119,6 @@ const CGU = () => {
                   <li>{t('cgu.section6.li1')}</li>
                   <li>{t('cgu.section6.li2')}</li>
                   <li>{t('cgu.section6.li3')}</li>
-                  <li>{t('cgu.section6.li4')}</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* Section 7: Dispute Handling */}
-            <Card>
-              <CardHeader
-                className={`flex ${language === 'ar' ? 'justify-end' : 'justify-start'}`}
-              >
-                <CardTitle>{t('cgu.section7.title')}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className='list-disc list-inside space-y-2 text-gray-600'>
-                  <li>{t('cgu.section7.li1')}</li>
-                  <li>{t('cgu.section7.li2')}</li>
-                  <li>{t('cgu.section7.li3')}</li>
-                  <li>{t('cgu.section7.li4')}</li>
                 </ul>
               </CardContent>
             </Card>
@@ -151,6 +131,7 @@ const CGU = () => {
                 <CardTitle>{t('cgu.section8.title')}</CardTitle>
               </CardHeader>
               <CardContent>
+                <p className='text-gray-600 mb-4'>{t('cgu.section8.desc')}</p>
                 <ul className='list-disc list-inside space-y-2 text-gray-600'>
                   <li>{t('cgu.section8.li1')}</li>
                   <li>{t('cgu.section8.li2')}</li>
@@ -172,6 +153,7 @@ const CGU = () => {
                   <li>{t('cgu.section9.li1')}</li>
                   <li>{t('cgu.section9.li2')}</li>
                   <li>{t('cgu.section9.li3')}</li>
+                  <li>{t('cgu.section9.li4')}</li>
                 </ul>
               </CardContent>
             </Card>

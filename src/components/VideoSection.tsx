@@ -9,7 +9,7 @@ const VideoSection = () => {
 
   return (
     <section className='py-16 px-4 bg-gray-50 overflow-hidden'>
-      <div className='max-w-5xl mx-auto'>
+      <div className='max-w-xl mx-auto'>
         <div className='flex flex-col items-center justify-center gap-12'>
           {/* Video Container */}
           <div className='w-full relative flex justify-center aspect-video'>
