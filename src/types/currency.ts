@@ -34,7 +34,8 @@ export enum RateFetchTrigger {
   RENT_PAGE_ENTRY = 'rent_page_entry',
   PAYMENT_INITIATION = 'payment_initiation',
   APP_INITIALIZATION = 'app_initialization',
-  CACHE_EXPIRATION = 'cache_expiration'
+  CACHE_EXPIRATION = 'cache_expiration',
+  PRICE_DISPLAY_ERROR_RETRY = 'price_display_error_retry',
 }
 
 // Interface pour le cache global unifié
@@ -79,6 +80,10 @@ export const RATE_FETCH_CONFIG: Record<RateFetchTrigger, RateFetchConfig> = {
     cacheDuration: 30 * 60 * 1000
   },
   [RateFetchTrigger.CACHE_EXPIRATION]: {
+    immediate: true,
+    cacheDuration: 30 * 60 * 1000
+  },
+  [RateFetchTrigger.PRICE_DISPLAY_ERROR_RETRY]: {
     immediate: true,
     cacheDuration: 30 * 60 * 1000
   }

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useCurrency } from '../contexts/CurrencyContext'
 import { useLanguage } from '../contexts/LanguageContext'
-
+import { RateFetchTrigger } from '../types/currency'
 const DEBUG_SERVER_URL = 'http://127.0.0.1:7777/event'
 const DEBUG_SESSION_ID = 'currency-price-error'
 const DEBUG_RUN_ID = 'post-fix'
@@ -207,7 +207,7 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
 
     const backoff = Math.min(500 * Math.pow(2, retryCount), 5000)
     const timer = setTimeout(() => {
-      refreshRates('price-display-error-retry')
+      refreshRates(RateFetchTrigger.PRICE_DISPLAY_ERROR_RETRY)
       setRetryCount((c) => c + 1)
     }, backoff)
 
