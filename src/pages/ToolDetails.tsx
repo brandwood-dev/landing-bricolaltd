@@ -609,16 +609,6 @@ const ToolDetails = () => {
                     {t('tools.desc')}
                   </h2>
                   <p className='text-gray-700 mb-6'>{tool.description}</p>
-
-                  {/* <h3 className="text-lg font-semibold mb-3">Caractéristiques</h3>
-                  <ul className="grid grid-cols-2 gap-2">
-                    {tool.features.map((feature, index) => (
-                      <li key={index} className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-accent rounded-full"></div>
-                        <span className="text-sm">{feature}</span>
-                      </li>
-                    ))}
-                  </ul> */}
                 </CardContent>
               </Card>
 

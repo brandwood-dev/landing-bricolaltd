@@ -227,7 +227,7 @@ const FeaturedToolsSection = () => {
 
                         <div className='flex items-center justify-between mb-4'>
                           <div className='text-lg font-bold text-primary'>
-                            {displayPrice ? (
+                            {displayPrice !== 0 ? (
                               <OptimizedPriceDisplay
                                 price={displayPrice}
                                 baseCurrency={tool.baseCurrencyCode || 'GBP'}

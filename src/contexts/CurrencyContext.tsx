@@ -166,6 +166,9 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({
             setCurrency(suggestedCurrency)
             localStorage.setItem('selectedCurrency', suggestedCurrencyCode)
           } else if (!suggestedCurrency) {
+            // Fallback to GBP
+            setCurrency(currencies[0])
+            localStorage.setItem('selectedCurrency', currencies[0].code)
           }
         }
       } else if (savedCurrencyCode) {
@@ -204,8 +207,14 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({
         if (savedCurrency) {
           setCurrency(savedCurrency)
         } else {
+          // Fallback to GBP
+          setCurrency(currencies[0])
+          localStorage.setItem('selectedCurrency', currencies[0].code)
         }
       } else {
+        // Fallback to GBP
+        setCurrency(currencies[0])
+        localStorage.setItem('selectedCurrency', currencies[0].code)
       }
     }
   }, [isAuthenticated])

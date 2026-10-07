@@ -26,7 +26,7 @@ import {
 } from '@/components/ui/select'
 import phonePrefixes from '@/data/phonePrefixes'
 import AddressAutocomplete from '@/components/ui/AddressAutocomplete'
-
+import { api } from '@/services/api'
 const Register = () => {
   const { t, language } = useLanguage()
   const { register, isLoading } = useAuth()
@@ -137,8 +137,7 @@ const Register = () => {
 
     // Vérifier qu'une adresse suggérée a été sélectionnée
     if (!isAddressSelected || !formData.address.trim()) {
-      newErrors.address =
-        'Veuillez sélectionner une adresse depuis les suggestions'
+      newErrors.address = t('validation.address_required')
     }
 
     // Also check if there's an email error from the onBlur validation
@@ -172,28 +171,22 @@ const Register = () => {
     }
 
     try {
-      const emailCheckResponse = await fetch(
-        'http://localhost:4000/api/auth/check-email',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email: formData.email }),
-        },
+      const emailCheckResponse = await api.post (
+        '/auth/check-email',
+        { email: formData.email },
       )
 
-      if (!emailCheckResponse.ok) {
+      if (!emailCheckResponse.data) {
         setEmailError('') // Clear error on API failure
         return
       }
 
-      const emailCheckData = await emailCheckResponse.json()
+      const emailCheckData = emailCheckResponse.data
 
       // For testing: always show error for test@example.com
       if (formData.email === 'test@example.com') {
         setEmailError(
-          'This email is already registered. Please use a different email or try logging in.',
+          t('validation.email_already_registered'),
         )
         return
       }
@@ -203,9 +196,7 @@ const Register = () => {
         emailCheckData.data &&
         emailCheckData.data.exists
       ) {
-        setEmailError(
-          'This email is already registered. Please use a different email or try logging in.',
-        )
+        setEmailError(t('validation.email_already_registered'))
       } else {
         setEmailError('')
       }
@@ -252,13 +243,11 @@ const Register = () => {
     } catch (error: any) {
       // Handle specific error cases
       if (error.message && error.message.includes('Email already exists')) {
-        setEmailError(
-          'This email is already registered. Please use a different email or try logging in.',
-        )
+        setEmailError(t('validation.email_already_registered'))
         setApiError('')
       } else {
         // Handle any other errors
-        setApiError(error.message || 'Registration failed. Please try again.')
+        setApiError(error.message || t('validation.registration_failed'))
       }
     }
   }

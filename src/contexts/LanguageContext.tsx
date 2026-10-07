@@ -690,6 +690,12 @@ const translations = {
     'validation.character_counter':
       'Attention: {current}/{max} caractères utilisés.',
     'validation.char_count': '{current}/{max} caractères',
+    'validation.email_already_registered':
+      'Cette adresse email est déjà utilisée. Veuillez utiliser une autre adresse email ou essayer de vous connecter.',
+    'validation.registration_failed':
+      'L`enregistrement a échoué. Veuillez réessayer.',
+    'validation.address_required_suggestions':
+      'Veuillez sélectionner une adresse depuis les suggestions',
 
     // Currency names
     'currency.GBP': 'Livre Sterling Britannique',
@@ -777,10 +783,10 @@ const translations = {
     'verification.description':
       'Entrez le code de vérification envoyé à {email}',
     'verification.code_label': 'Code de vérification',
-    'verification.code_placeholder': 'Entrez le code à 6 chiffres',
     'verification.verifying': 'Vérification en cours...',
     'verification.verify_button': 'Vérifier le code',
     'verification.no_email': "Vous n'avez pas reçu l'email ?",
+    'verification.code_placeholder': 'Entrez le code de vérification',
     'verification.resending': 'Envoi en cours...',
     'verification.resend_countdown': 'Renvoyer dans {seconds}s',
     'verification.resend_button': 'Renvoyer le code',
@@ -1594,7 +1600,7 @@ const translations = {
     'wallet.withdraw_money': 'Demander un virement',
     'wallet.withdraw_pending': 'Retrait en cours de traitement...',
     'wallet.withdrawal_note':
-      'Vous pouvez demander le paiement dès que vos revenus cumulés atteignent 50 GBP.',
+      'Vous pouvez vérifier votre compte et demander le paiement dès que vos revenus cumulés atteignent 50 GBP.',
     'wallet.conversion_rate': '50 GBP = {minWithdrawalEUR}',
     'wallet.dynamic_conversion':
       "Le taux de conversion s'actualise dynamiquement en fonction de la devise choisie dans le compte.",
@@ -1784,7 +1790,7 @@ const translations = {
     'wallet.dialog.errors.invalid_amount': 'Veuillez saisir un montant valide',
     'wallet.dialog.errors.iban_required': 'IBAN requis',
     'wallet.verify_min_amount_required':
-      'Un solde de 50£ minimum est requis pour vérifier votre compte et retirer vos fonds',
+      'Un solde de 50£ minimum est requis pour vérifier votre compte.',
     'wallet.dialog.errors.bic_required': 'BIC requis',
     'wallet.dialog.errors.name_required': 'Nom du titulaire requis',
     'wallet.dialog.errors.paypal_required': 'Email PayPal requis',
@@ -2101,6 +2107,7 @@ const translations = {
     'register.terms': "J'accepte les conditions Générales d'utilisation",
     'register.sales_conditions': "J'accepte la Politique de confidentialité",
     'register.create_account': 'Créer mon compte',
+    'register.creating_account': 'Création du compte...',
     'register.have_account': 'Déjà un compte ? Se connecter',
     'register.select_country': 'Sélectionnez un pays',
 
@@ -3097,6 +3104,9 @@ const translations = {
       'Please enter the 6-digit verification code sent to your email address.',
     'verification.code_label': 'Verification Code',
     'verification.verify_button': 'Verify',
+    'verification.no_email': "Did not receive the email?",
+    'verification.code_placeholder': 'Enter verification code',
+    'verification.back_to_login': 'Back to login',
     'verification.resend_button': 'Resend Code',
     'verification.resent': 'Code Resent',
     'verification.resent_message':
@@ -3908,7 +3918,7 @@ const translations = {
     'wallet.withdraw_money': 'Request payout',
     'wallet.withdraw_pending': 'Withdrawal is being processed...',
     'wallet.withdrawal_note':
-      'You can request a payout once your total earnings reach 50 GBP.',
+      'You can verify your account and request a payout once your total earnings reach 50 GBP.',
     'wallet.conversion_rate': '50 GBP = {minWithdrawalEUR}',
     'wallet.dynamic_conversion':
       'The conversion rate updates dynamically based on the currency selected in the account.',
@@ -4056,7 +4066,7 @@ const translations = {
     'wallet.dialog.errors.invalid_amount': 'Please enter a valid amount',
     'wallet.dialog.errors.iban_required': 'IBAN is required',
     'wallet.verify_min_amount_required':
-      'A minimum balance of £50 is required to verify your account and withdraw funds',
+      'A minimum balance of £50 is required to verify your account.',
     'wallet.dialog.errors.bic_required': 'BIC required',
     'wallet.dialog.errors.name_required': 'Account holder name is required',
     'wallet.dialog.errors.paypal_required': 'PayPal email is required',
@@ -4279,6 +4289,11 @@ const translations = {
     'validation.deposit_max_amount': 'The maximum deposit is 500 GBP.',
     'validation.character_counter': 'Warning: {current}/{max} characters used.',
     'validation.char_count': '{current}/{max} characters',
+    'validation.email_already_registered':
+      'This email is already registered. Please use a different email or try logging in.',
+    'validation.registration_failed': 'Registration failed. Please try again.',
+    'validation.address_required_suggestions':
+      'Veuillez sélectionner une adresse depuis les suggestions.',
 
     // Currency names
     'currency.GBP': 'British Pound Sterling',
@@ -4478,6 +4493,7 @@ const translations = {
     'register.terms': 'I accept the General terms of use',
     'register.sales_conditions': 'I accept the Privacy Policy',
     'register.create_account': 'Create my account',
+    'register.creating_account': 'Creating account...',
     'register.have_account': 'Already have an account? Sign in',
     'register.select_country': 'Select a country',
 
@@ -5818,6 +5834,10 @@ const translations = {
       'يرجى إدخال رمز التحقق المكون من 6 أرقام المرسل إلى عنوان بريدك الإلكتروني.',
     'verification.code_label': 'رمز التحقق',
     'verification.verify_button': 'تحقق',
+    'verification.no_email': "لم تستلم البريد الإلكتروني؟",
+
+    'verification.code_placeholder': 'أدخل رمز التحقق',
+    'verification.back_to_login': 'العودة إلى تسجيل الدخول',
     'verification.resend_button': 'إعادة إرسال الرمز',
     'verification.resent': 'تم إعادة إرسال الرمز',
     'verification.resent_message':
@@ -6563,7 +6583,7 @@ const translations = {
     'wallet.withdraw_money': 'طلب تحويل المستحقّات',
     'wallet.withdraw_pending': 'جارٍ معالجة طلب التحويل...',
     'wallet.withdrawal_note':
-      'يمكنك طلب تحويل مستحقّاتك عندما يبلغ الإجمالي 50 جنيهًا إسترلينيًا',
+      'يمكنك توثيق الحساب ثم طلب تحويل بنكي عندما يبلغ الإجمالي 50 جنيهًا إسترلينيًا',
     'wallet.conversion_rate': '50£ = {minWithdrawalEUR}',
     'wallet.dynamic_conversion':
       'يتم تحديث سعر الصرف تلقائيًا حسب العملة المختارة في الحساب.',
@@ -6705,7 +6725,7 @@ const translations = {
     'wallet.dialog.errors.invalid_amount': 'الرجاء إدخال مبلغ صحيح',
     'wallet.dialog.errors.iban_required': 'رقم IBAN مطلوب',
     'wallet.verify_min_amount_required':
-      'يلزم وجود رصيد بحد أدنى 50 جنيهًا إسترلينيًا لتوثيق حسابك وسحب مستحقاتك',
+      'يلزم وجود رصيد بحد أدنى 50 جنيهًا إسترلينيًا لتوثيق حسابك.',
     'wallet.dialog.errors.bic_required': 'رمز BIC مطلوب',
     'wallet.dialog.errors.name_required': 'اسم صاحب الحساب مطلوب',
     'wallet.dialog.errors.paypal_required': 'البريد الإلكتروني لـ PayPal مطلوب',
@@ -7074,6 +7094,7 @@ const translations = {
     'register.terms': 'أوافق على شروط الاستخدام',
     'register.sales_conditions': 'أوافق على سياسة الخصوصية',
     'register.create_account': 'إنشاء حسابي',
+    'register.creating_account': 'جاري إنشاء الحساب...',
     'register.have_account': 'لديك حساب بالفعل؟ تسجيل الدخول',
     'register.select_country': 'اختر بلداً',
 
@@ -7303,11 +7324,10 @@ const translations = {
       'Bricola LTD هي منصة رقمية تربط بين الأفراد لتبادل كراء الأدوات المتعلقة بالبستنة، التنظيف، الأشغال اليدوية، وتنظيم المناسبات.',
     'cgu.section1.p2':
       'تعمل المنصة كوسيط رقمي موثوق ولا تتحمل مسؤولية الأدوات فعليًا أو عمليات التوصيل.',
-  
+
     'cgu.section1.p3':
       'تقوم علاقة الإيجار مباشرة بين المؤجر والمستأجر. يعمل المؤجر كمقدم خدمة مستقل ولا يتم إنشاء أي علاقة وكالة، شراكة، أو تمثيل مع شركة Bricola.',
-    'cgu.section1.p4':
-      'إن استخدام المنصة يُشكل قبولاً تاماً بهذه الشروط.',
+    'cgu.section1.p4': 'إن استخدام المنصة يُشكل قبولاً تاماً بهذه الشروط.',
     'cgu.section1.p5': 'تسري شروط الاستخدام هذه ابتداءً من 1 سبتمبر 2025.',
     'cgu.section2.title': '2. الوصول إلى المنصة',
     'cgu.section2.p1':
@@ -7520,6 +7540,11 @@ const translations = {
     'validation.password_required': 'كلمة المرور مطلوبة',
     'validation.terms_required': 'يجب الموافقة على الشروط والأحكام',
     'validation.privacy_required': 'يجب الموافقة على سياسة الخصوصية',
+    'validation.email_already_registered':
+      'هذا البريد الإلكتروني مُستخدم بالفعل. يرجى استخدام بريد إلكتروني آخر أو تسجيل الدخول.',
+    'validation.registration_failed': 'التسجيل فشل. يرجى المحاولة مرة أخرى.',
+    'validation.address_required_suggestions':
+      'العنوان مطلوب. يرجى اختيار عنوان من قائمة المُقدمة.',
 
     // Contact form validation
     'contact.validation.firstName_required': 'الاسم الأول مطلوب.',

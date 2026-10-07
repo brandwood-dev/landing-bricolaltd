@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useCurrency } from '../contexts/CurrencyContext'
 import { useLanguage } from '../contexts/LanguageContext'
 
@@ -38,7 +38,13 @@ interface OptimizedPriceDisplayProps {
   className?: string
   showOriginal?: boolean
   size?: 'sm' | 'md' | 'lg'
-  cible?: 'basePrice' | 'fees' | 'feesInc' | 'deposit' | 'totalPrice' | 'minPrice'
+  cible?:
+    | 'basePrice'
+    | 'fees'
+    | 'feesInc'
+    | 'deposit'
+    | 'totalPrice'
+    | 'minPrice'
   useCache?: boolean // true par défaut, false pour paiements critiques
 }
 
@@ -55,14 +61,11 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
   cible = 'totalPrice',
   useCache = true,
 }) => {
-  const {
-    currency,
-    currencies,
-    getInstantRate,
-    isLoading,
-  } = useCurrency()
+  const { currency, currencies, getInstantRate, isLoading, refreshRates } =
+    useCurrency()
   const { t, language } = useLanguage()
   const normalizedBaseCurrency = baseCurrency.toUpperCase()
+  const [retryCount, setRetryCount] = useState(0)
 
   // #region debug-point B:price-display-input
   reportDisplayEvent({
@@ -133,7 +136,10 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
 
       // Utiliser le calcul optimisé instantané si le cache est activé
       if (useCache) {
-        const instantRate = getInstantRate(normalizedBaseCurrency, currency.code)
+        const instantRate = getInstantRate(
+          normalizedBaseCurrency,
+          currency.code,
+        )
         const targetSymbol = getCurrencySymbol(currency.code)
 
         // #region debug-point B:price-display-rate
@@ -174,7 +180,6 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
         }
       }
     } catch (err) {
-
       // Fallback en cas d'erreur
       return {
         convertedPrice: '',
@@ -192,7 +197,22 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
     getInstantRate,
     useCache,
     language,
+    retryCount,
   ])
+
+  useEffect(() => {
+    if (!error || convertedPrice) {
+      return
+    }
+
+    const backoff = Math.min(500 * Math.pow(2, retryCount), 5000)
+    const timer = setTimeout(() => {
+      refreshRates('price-display-error-retry')
+      setRetryCount((c) => c + 1)
+    }, backoff)
+
+    return () => clearTimeout(timer)
+  }, [error, convertedPrice, retryCount, refreshRates])
 
   const getSizeClasses = () => {
     switch (size) {
@@ -216,10 +236,10 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
       case 'fees':
         return `${t('tools.fees_and_taxes')} : ${formattedPrice}`
       case 'feesInc':
-        return `6% ${t('tools.of')} ${formattedPrice} ${t('tools.charged')}`
+        return `5.25% + 0.25£ ${t('tools.of')} ${formattedPrice} ${t('tools.charged')}`
       case 'deposit':
         return `${t('tools.deposit')} : ${formattedPrice} ${t(
-          'tools.refunded'
+          'tools.refunded',
         )}`
       case 'totalPrice':
         return formattedPrice
@@ -239,7 +259,7 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
     )
   }
 
-  // Affichage d'erreur
+  // Affichage d'erreur avec rechargement automatique du prix
   if (error && !convertedPrice) {
     // #region debug-point D:price-display-error-state
     reportDisplayEvent({
@@ -253,12 +273,37 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
         targetCurrency: currency.code,
         useCache,
         isLoading,
+        retryCount,
       },
     })
     // #endregion
     return (
-      <div className={`${getSizeClasses()} ${className} text-red-500`}>
-        {t('pricing.load_error')}
+      <div
+        className={`${getSizeClasses()} ${className} inline-flex items-center gap-2`}
+        aria-live='polite'
+        aria-busy='true'
+      >
+        <div className='animate-pulse bg-gray-200 h-4 w-16 rounded'></div>
+        <svg
+          className='w-3 h-3 text-gray-400 animate-spin flex-shrink-0'
+          xmlns='http://www.w3.org/2000/svg'
+          fill='none'
+          viewBox='0 0 24 24'
+        >
+          <circle
+            className='opacity-25'
+            cx='12'
+            cy='12'
+            r='10'
+            stroke='currentColor'
+            strokeWidth='4'
+          ></circle>
+          <path
+            className='opacity-75'
+            fill='currentColor'
+            d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+          ></path>
+        </svg>
       </div>
     )
   }
@@ -274,6 +319,8 @@ export const OptimizedPriceDisplay: React.FC<OptimizedPriceDisplayProps> = ({
 }
 
 // Composant de compatibilité qui utilise l'ancien PriceDisplay pour les cas critiques
-export const CriticalPriceDisplay: React.FC<OptimizedPriceDisplayProps> = (props) => {
+export const CriticalPriceDisplay: React.FC<OptimizedPriceDisplayProps> = (
+  props,
+) => {
   return <OptimizedPriceDisplay {...props} useCache={false} />
 }

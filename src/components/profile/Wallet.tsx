@@ -389,9 +389,27 @@ const Wallet = () => {
                     {t('profile.verify_account')}
                   </Button>
                   {!canWithdraw && (
-                    <p className='text-sm text-amber-600'>
-                      {t('wallet.verify_min_amount_required')}
-                    </p>
+                    <>
+                      <div className='bg-amber-50 border border-amber-200 rounded-lg p-4'>
+                        <div className='flex items-start gap-3'>
+                          <Info className='h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0' />
+                          <div className='space-y-2'>
+                            <p className='text-sm text-amber-800 font-medium'>
+                              <OptimizedPriceDisplay
+                                price={price || 0}
+                                baseCurrency='GBP'
+                                size='lg'
+                                cible='minPrice'
+                              />
+                            </p>
+
+                            <p className='text-xs text-amber-600'>
+                              {t('wallet.dynamic_conversion')}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </>
                   )}
                 </div>
               ) : (
@@ -429,25 +447,6 @@ const Wallet = () => {
             />
 
             {/* Information Note */}
-            <div className='bg-amber-50 border border-amber-200 rounded-lg p-4'>
-              <div className='flex items-start gap-3'>
-                <Info className='h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0' />
-                <div className='space-y-2'>
-                  <p className='text-sm text-amber-800 font-medium'>
-                    <OptimizedPriceDisplay
-                      price={price || 0}
-                      baseCurrency='GBP'
-                      size='lg'
-                      cible='minPrice'
-                    />
-                  </p>
-
-                  <p className='text-xs text-amber-600'>
-                    {t('wallet.dynamic_conversion')}
-                  </p>
-                </div>
-              </div>
-            </div>
           </CardContent>
         </Card>
 
